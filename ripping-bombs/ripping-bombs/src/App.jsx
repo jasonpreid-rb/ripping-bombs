@@ -66,25 +66,25 @@ const toB64    = f=>new Promise((res,rej)=>{ const r=new FileReader(); r.onload=
 
 // ─── DESIGN TOKENS  (Strava x RippingBombs) ──────────────────────────────────
 // Core palette: near-black backgrounds, Strava orange CTA, RB gold accents
-const BG   = "#111214";  // near black
-const BG2  = "#1a1c1f";  // card bg
-const BG3  = "#222428";  // elevated
-const ORG  = "#FC4C02";  // Strava orange — primary CTA
-const ORG2 = "#ff6b35";  // lighter orange hover
-const GOLD = "#f0b429";  // RB gold — achievements/records
-const GRN  = "#22c55e";  // success green
-const BDR  = "rgba(255,255,255,0.08)";
-const TXT  = "#f1f0ee";
-const MUT  = "#9ca3af";
-const DIM  = "#4b5563";
+const BG   = "#f4f5f7";  // light grey background
+const BG2  = "#ffffff";  // card bg — white
+const BG3  = "#eef0f3";  // elevated / inputs
+const ORG  = "#e10600";  // F1 red — primary CTA
+const ORG2 = "#c10500";  // darker red hover
+const GOLD = "#c9940a";  // gold — achievements/records
+const GRN  = "#15803d";  // success green
+const BDR  = "rgba(0,0,0,0.08)";
+const TXT  = "#0f1114";  // near black text
+const MUT  = "#52565e";  // muted text
+const DIM  = "#9ca3af";  // dimmed text
 const SANS = "'Inter','Helvetica Neue',sans-serif";
 const DISP = "'Bebas Neue','Arial Black',sans-serif";
 
 // ─── BADGE DEFINITIONS ───────────────────────────────────────────────────────
 const BADGES = {
-  platinum: { label:"Platinum Verified", icon:"💎", color:"#bfdbfe", bg:"rgba(147,197,253,0.1)",  border:"rgba(147,197,253,0.3)" },
-  tour:     { label:"Tour Verified",     icon:"🏆", color:GOLD,      bg:"rgba(240,180,41,0.1)",   border:"rgba(240,180,41,0.35)" },
-  amateur:  { label:"Amateur Verified",  icon:"✅", color:GRN,       bg:"rgba(34,197,94,0.1)",    border:"rgba(34,197,94,0.3)"  },
+  platinum: { label:"Platinum Verified", icon:"💎", color:"#1d4ed8", bg:"rgba(29,78,216,0.08)",  border:"rgba(29,78,216,0.2)" },
+  tour:     { label:"Tour Verified",     icon:"🏆", color:GOLD,      bg:"rgba(201,148,10,0.08)",   border:"rgba(201,148,10,0.25)" },
+  amateur:  { label:"Amateur Verified",  icon:"✅", color:GRN,       bg:"rgba(21,128,61,0.08)",    border:"rgba(21,128,61,0.2)"  },
 };
 
 // ─── SEED DATA ────────────────────────────────────────────────────────────────
@@ -185,7 +185,7 @@ function Toast({msg,onDone}){
 function Btn({children,onClick,variant="orange",small=false,full=false,style:sx={}}){
   const v={
     orange:  {background:`linear-gradient(135deg,${ORG},${ORG2})`,color:"#fff",   border:"none"},
-    ghost:   {background:"transparent",                            color:ORG,     border:`1px solid rgba(252,76,2,0.4)`},
+    ghost:   {background:"transparent",                            color:ORG,     border:`1px solid rgba(225,6,0,0.35)`},
     subtle:  {background:"rgba(255,255,255,0.05)",                 color:MUT,     border:`1px solid ${BDR}`},
     danger:  {background:"rgba(220,60,60,0.08)",                   color:"#f87171",border:"1px solid rgba(220,60,60,0.25)"},
     approve: {background:"rgba(34,197,94,0.1)",                    color:GRN,     border:"1px solid rgba(34,197,94,0.3)"},
@@ -213,7 +213,7 @@ function PhotoField({label,value,onChange,required}){
     <label style={{display:"block",fontFamily:SANS,fontSize:11,fontWeight:600,color:MUT,marginBottom:5,textTransform:"uppercase",letterSpacing:.8}}>
       {label}{required&&<span style={{color:ORG,marginLeft:2}}>*</span>}
     </label>
-    <div style={{border:`1px dashed rgba(252,76,2,0.3)`,borderRadius:10,padding:16,background:"rgba(252,76,2,0.03)",textAlign:"center"}}>
+    <div style={{border:`1px dashed rgba(252,76,2,0.3)`,borderRadius:10,padding:16,background:"rgba(225,6,0,0.02)",textAlign:"center"}}>
       {value?<><img src={value} alt="" style={{maxHeight:100,maxWidth:"100%",borderRadius:8,marginBottom:6,objectFit:"cover"}}/><div style={{fontFamily:SANS,fontSize:11,color:GRN}}>✓ Photo uploaded</div></>:<div style={{color:DIM,fontFamily:SANS,fontSize:12}}>📸 No photo selected</div>}
       <input type="file" accept="image/*" onChange={onChange} style={{display:"block",margin:"8px auto 0",fontFamily:SANS,fontSize:11,color:MUT}}/>
     </div>
@@ -238,7 +238,7 @@ function BadgePill({badge,small}){
 
 function Overlay({children,onClose}){
   return <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",zIndex:700,display:"flex",alignItems:"center",justifyContent:"center",padding:20,backdropFilter:"blur(4px)"}}>
-    <div onClick={e=>e.stopPropagation()} style={{background:BG2,border:`1px solid rgba(255,255,255,0.1)`,borderRadius:18,width:"100%",maxWidth:520,padding:30,position:"relative",boxShadow:"0 32px 100px rgba(0,0,0,0.7)",maxHeight:"92vh",overflowY:"auto"}}>
+    <div onClick={e=>e.stopPropagation()} style={{background:BG2,border:`1px solid ${BDR}`,borderRadius:18,width:"100%",maxWidth:520,padding:30,position:"relative",boxShadow:"0 32px 100px rgba(0,0,0,0.15)",maxHeight:"92vh",overflowY:"auto"}}>
       <button onClick={onClose} style={{position:"absolute",top:14,right:16,background:"none",border:"none",color:MUT,fontSize:20,cursor:"pointer",lineHeight:1}}>✕</button>
       {children}
     </div>
@@ -254,8 +254,8 @@ function LeaderTable({rows,orgFor,onView}){
   const bg=(ri,ci)=>{
     const rh=hr===ri, ch=hc===ci;
     if(rh&&ch) return ORG;
-    if(rh) return "rgba(252,76,2,0.1)";
-    if(ch) return "rgba(252,76,2,0.05)";
+    if(rh) return "rgba(225,6,0,0.08)";
+    if(ch) return "rgba(225,6,0,0.04)";
     return "transparent";
   };
   const fg=(ri,ci)=>{
@@ -271,7 +271,7 @@ function LeaderTable({rows,orgFor,onView}){
       <thead>
         <tr>
           {COLS.map((col,ci)=><th key={col} onMouseEnter={()=>setHc(ci)} onMouseLeave={()=>setHc(null)}
-            style={{padding:"11px 14px",fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:1.2,color:hc===ci?ORG:DIM,textTransform:"uppercase",textAlign:"left",background:hc===ci?"rgba(252,76,2,0.05)":"transparent",borderBottom:`2px solid ${BDR}`,transition:"all .12s",userSelect:"none"}}>{col}</th>)}
+            style={{padding:"11px 14px",fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:1.2,color:hc===ci?ORG:DIM,textTransform:"uppercase",textAlign:"left",background:hc===ci?"rgba(225,6,0,0.04)":"transparent",borderBottom:`2px solid ${BDR}`,transition:"all .12s",userSelect:"none"}}>{col}</th>)}
         </tr>
       </thead>
       <tbody>
@@ -289,7 +289,7 @@ function LeaderTable({rows,orgFor,onView}){
             <div><span style={{fontSize:12}}>{org?.courseName||"—"}</span>{org?.badge&&<span style={{marginLeft:6}}><BadgePill badge={org.badge} small/></span>}</div>,
             <span style={{fontSize:11,color:DIM}}>{fmtDate(e.date)}</span>,
             <span style={{fontFamily:SANS,fontSize:10,fontWeight:600,color:hr===ri&&hc===8?"#fff":tierClr(e.dist)}}>{tier(e.dist)}</span>,
-            <button onClick={ev=>{ev.stopPropagation();shareEntry(e,org);}} style={{background:"rgba(252,76,2,0.1)",border:"1px solid rgba(252,76,2,0.25)",color:ORG,borderRadius:6,padding:"4px 10px",cursor:"pointer",fontSize:11,fontFamily:SANS,fontWeight:600}}>↗ Share</button>,
+            <button onClick={ev=>{ev.stopPropagation();shareEntry(e,org);}} style={{background:"rgba(225,6,0,0.08)",border:"1px solid rgba(225,6,0,0.2)",color:ORG,borderRadius:6,padding:"4px 10px",cursor:"pointer",fontSize:11,fontFamily:SANS,fontWeight:600}}>↗ Share</button>,
           ];
           return <tr key={e.id} onMouseEnter={()=>setHr(ri)} onMouseLeave={()=>setHr(null)} onClick={()=>onView(e)}>
             {cells.map((cell,ci)=><td key={ci} onMouseEnter={()=>setHc(ci)} onMouseLeave={()=>setHc(null)} style={cellS(ri,ci)}>{cell}</td>)}
@@ -307,7 +307,7 @@ function EntryModal({entry,org,onClose}){
     <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:ORG,marginBottom:8,textTransform:"uppercase"}}>Drive Record</div>
     <div style={{fontFamily:DISP,fontSize:32,color:TXT,marginBottom:2,letterSpacing:1}}>{entry.player}</div>
     <div style={{fontFamily:SANS,fontSize:12,color:MUT,marginBottom:22}}>{org?.courseName} · {fmtDate(entry.date)}</div>
-    <div style={{textAlign:"center",padding:"20px 0",borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,marginBottom:20,background:"rgba(252,76,2,0.04)",borderRadius:10,margin:"0 -8px 20px"}}>
+    <div style={{textAlign:"center",padding:"20px 0",borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,marginBottom:20,background:"rgba(225,6,0,0.03)",borderRadius:10,margin:"0 -8px 20px"}}>
       <span style={{fontFamily:DISP,fontSize:64,color:tierClr(entry.dist),letterSpacing:1,textShadow:`0 0 40px ${tierClr(entry.dist)}55`}}>{entry.dist}</span>
       <span style={{fontFamily:SANS,fontSize:16,color:MUT,marginLeft:6}}>yards</span>
       <div style={{fontFamily:SANS,fontSize:12,fontWeight:600,color:tierClr(entry.dist),marginTop:6}}>{tier(entry.dist)}</div>
@@ -371,7 +371,7 @@ function AdminPanel({orgs,entries,setOrgs,setEntries,toast,onClose}){
     </div>
   );
   const Tab=({id,label,badge})=>(
-    <button onClick={()=>setSub(id)} style={{display:"flex",alignItems:"center",gap:6,background:sub===id?"rgba(252,76,2,0.12)":"transparent",border:`1px solid ${sub===id?ORG:BDR}`,color:sub===id?ORG:MUT,fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 16px",cursor:"pointer",borderRadius:8,transition:"all .15s"}}>
+    <button onClick={()=>setSub(id)} style={{display:"flex",alignItems:"center",gap:6,background:sub===id?"rgba(225,6,0,0.08)":"transparent",border:`1px solid ${sub===id?ORG:BDR}`,color:sub===id?ORG:MUT,fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 16px",cursor:"pointer",borderRadius:8,transition:"all .15s"}}>
       {label}{badge>0&&<span style={{background:ORG,color:"#fff",borderRadius:10,padding:"1px 7px",fontSize:10,fontWeight:700}}>{badge}</span>}
     </button>
   );
@@ -414,7 +414,7 @@ function AdminPanel({orgs,entries,setOrgs,setEntries,toast,onClose}){
         <div style={{fontFamily:SANS,fontWeight:700,fontSize:16,color:TXT,marginBottom:12}}>Recent Drives</div>
         {[...entries].sort((a,b)=>b.id.localeCompare(a.id)).slice(0,8).map(e=>(
           <div key={e.id} onClick={()=>setSelEnt(e)} style={{display:"grid",gridTemplateColumns:"1fr auto auto auto",alignItems:"center",gap:12,padding:"12px 16px",borderRadius:10,marginBottom:6,cursor:"pointer",background:BG3,border:`1px solid ${BDR}`,transition:"background .15s"}}
-            onMouseEnter={el=>el.currentTarget.style.background="rgba(252,76,2,0.06)"}
+            onMouseEnter={el=>el.currentTarget.style.background="rgba(225,6,0,0.05)"}
             onMouseLeave={el=>el.currentTarget.style.background=BG3}>
             <div><span style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>{e.player}</span><span style={{fontFamily:SANS,fontSize:11,color:MUT,marginLeft:10}}>{orgFor(e.orgId)?.courseName} · {fmtDate(e.date)}</span></div>
             <span style={{fontFamily:DISP,fontSize:20,color:tierClr(e.dist)}}>{e.dist} yds</span>
@@ -450,7 +450,7 @@ function AdminPanel({orgs,entries,setOrgs,setEntries,toast,onClose}){
         <div style={{fontFamily:DISP,fontSize:22,color:TXT,letterSpacing:1,marginBottom:18}}>All Courses ({orgs.length})</div>
         {orgs.map(org=><div key={org.id} onClick={()=>setSelOrg(org)}
           style={{display:"grid",gridTemplateColumns:"1fr auto",alignItems:"center",gap:12,padding:"13px 18px",borderRadius:10,marginBottom:8,cursor:"pointer",background:BG3,border:`1px solid ${BDR}`,transition:"background .15s"}}
-          onMouseEnter={el=>el.currentTarget.style.background="rgba(252,76,2,0.06)"}
+          onMouseEnter={el=>el.currentTarget.style.background="rgba(225,6,0,0.05)"}
           onMouseLeave={el=>el.currentTarget.style.background=BG3}>
           <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
             <span style={{fontFamily:SANS,fontWeight:700,fontSize:15,color:TXT}}>{org.courseName}</span>
@@ -475,7 +475,7 @@ function AdminPanel({orgs,entries,setOrgs,setEntries,toast,onClose}){
             <thead><tr>{["#","Player","Dist","Club","HCP","Age","Course","Date",""].map(h=><th key={h} style={{padding:"9px 13px",fontFamily:SANS,fontSize:9,fontWeight:700,letterSpacing:1.2,color:DIM,textTransform:"uppercase",textAlign:"left",borderBottom:`2px solid ${BDR}`}}>{h}</th>)}</tr></thead>
             <tbody>{[...entries].sort((a,b)=>b.dist-a.dist).map((e,i)=>(
               <tr key={e.id} onClick={()=>setSelEnt(e)} style={{cursor:"pointer",transition:"background .15s"}}
-                onMouseEnter={el=>el.currentTarget.style.background="rgba(252,76,2,0.06)"}
+                onMouseEnter={el=>el.currentTarget.style.background="rgba(225,6,0,0.05)"}
                 onMouseLeave={el=>el.currentTarget.style.background="transparent"}>
                 <td style={{padding:"9px 13px",fontFamily:SANS,fontSize:11,color:DIM,borderBottom:`1px solid rgba(255,255,255,0.04)`}}>#{i+1}</td>
                 <td style={{padding:"9px 13px",fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT,borderBottom:`1px solid rgba(255,255,255,0.04)`}}>{e.player}</td>
@@ -571,7 +571,7 @@ function DemoSubmit({onClose,entries,setEntries,orgs,toast}){
       <div style={{fontSize:48,marginBottom:10}}>⛳</div>
       <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:1,marginBottom:6}}>Looking Good!</div>
       <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginBottom:24}}>Here's a preview of how your drive would appear on the global leaderboard.</div>
-      <div style={{background:"rgba(252,76,2,0.06)",border:"1px solid rgba(252,76,2,0.2)",borderRadius:12,padding:"20px 24px",textAlign:"left",marginBottom:20}}>
+      <div style={{background:"rgba(225,6,0,0.05)",border:"1px solid rgba(225,6,0,0.18)",borderRadius:12,padding:"20px 24px",textAlign:"left",marginBottom:20}}>
         <div style={{fontFamily:DISP,fontSize:22,color:TXT,letterSpacing:.5}}>{submitted.entry.player}</div>
         <div style={{fontFamily:SANS,fontSize:11,color:MUT,marginBottom:12}}>{submitted.org.courseName} · {fmtDate(submitted.entry.date)}</div>
         <div style={{display:"flex",alignItems:"baseline",gap:8,marginBottom:8}}>
@@ -600,7 +600,7 @@ function DemoSubmit({onClose,entries,setEntries,orgs,toast}){
       <Field label="Handicap" type="number" value={form.hcp} onChange={e=>setForm({...form,hcp:e.target.value})} placeholder="5" min="-10" max="54" required/>
       <Field label="Age" type="number" value={form.age} onChange={e=>setForm({...form,age:e.target.value})} placeholder="34" min="10" max="100" required/>
     </div>
-    {form.dist&&Number(form.dist)>0&&<div style={{background:"rgba(252,76,2,0.07)",border:"1px solid rgba(252,76,2,0.2)",borderRadius:8,padding:"9px 14px",marginBottom:14,fontFamily:SANS,fontSize:12,fontWeight:600,color:ORG}}>{tier(Number(form.dist))} — {Number(form.dist)>=350?"Extraordinary! That\'s world-class.":Number(form.dist)>=300?"Impressive distance!":Number(form.dist)>=250?"Solid drive.":"Good effort!"}</div>}
+    {form.dist&&Number(form.dist)>0&&<div style={{background:"rgba(225,6,0,0.06)",border:"1px solid rgba(225,6,0,0.18)",borderRadius:8,padding:"9px 14px",marginBottom:14,fontFamily:SANS,fontSize:12,fontWeight:600,color:ORG}}>{tier(Number(form.dist))} — {Number(form.dist)>=350?"Extraordinary! That\'s world-class.":Number(form.dist)>=300?"Impressive distance!":Number(form.dist)>=250?"Solid drive.":"Good effort!"}</div>}
     <PhotoField label="Photo of Drive Marker (optional)" value={form.photo} onChange={async e=>{ if(e.target.files[0]) setForm({...form,photo:await toB64(e.target.files[0])}); }}/>
     <Btn full onClick={doDemo}>Preview My Drive →</Btn>
   </Overlay>;
@@ -720,14 +720,14 @@ export default function App(){
     `}</style>
 
     {/* ── HEADER ── */}
-    <div style={{borderBottom:`1px solid ${BDR}`,padding:"12px 22px",display:"flex",justifyContent:"space-between",alignItems:"center",background:"rgba(17,18,20,0.92)",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(16px)"}}>
+    <div style={{borderBottom:`1px solid ${BDR}`,padding:"12px 22px",display:"flex",justifyContent:"space-between",alignItems:"center",background:"rgba(244,245,247,0.95)",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(16px)"}}>
       <div style={{display:"flex",alignItems:"center",gap:14,cursor:"pointer"}} onClick={()=>setTab("leaderboard")}>
         <img src={RB_LOGO} alt="Ripping Bombs" style={{height:40,width:"auto"}}/>
       </div>
       <div style={{display:"flex",gap:7,alignItems:"center",flexWrap:"wrap"}}>
         <NavBtn id="leaderboard" label="Leaderboard"/>
         {/* Demo CTA */}
-        <button onClick={()=>setShowDemo(true)} style={{background:"rgba(240,180,41,0.1)",border:`1px solid rgba(240,180,41,0.3)`,color:GOLD,fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 14px",borderRadius:8,cursor:"pointer",letterSpacing:.3}}>⛳ Try Demo</button>
+        <button onClick={()=>setShowDemo(true)} style={{background:"rgba(240,180,41,0.1)",border:`1px solid rgba(240,180,41,0.3)`,color:GOLD,fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 14px",borderRadius:8,cursor:"pointer",letterSpacing:.3}}>Try Demo</button>
         {loggedOrg
           ?<><NavBtn id="submit" label="Submit Drive"/>
             <button onClick={()=>{setLoggedOrg(null);setTab("leaderboard");}} style={{background:"none",border:"1px solid rgba(220,80,80,0.3)",borderRadius:8,color:"#f87171",fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 14px",cursor:"pointer"}}>Log Out</button></>
@@ -747,7 +747,7 @@ export default function App(){
       {tab==="leaderboard"&&<div>
 
         {/* World record hero */}
-        {allTimeBest[0]&&<div style={{background:`linear-gradient(135deg,rgba(252,76,2,0.12),rgba(252,76,2,0.04))`,border:"1px solid rgba(252,76,2,0.25)",borderRadius:16,padding:"24px 28px",marginBottom:28,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:18}}>
+        {allTimeBest[0]&&<div style={{background:`linear-gradient(135deg,rgba(225,6,0,0.08),rgba(225,6,0,0.03))`,border:"1px solid rgba(225,6,0,0.2)",borderRadius:16,padding:"24px 28px",marginBottom:28,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:18}}>
           <div>
             <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:ORG,marginBottom:8,textTransform:"uppercase"}}>🏆 All-Time World Record</div>
             <div style={{fontFamily:DISP,fontSize:34,color:TXT,letterSpacing:.5}}>{allTimeBest[0].player}</div>
@@ -827,7 +827,7 @@ export default function App(){
           <Field label="Email" type="email"    value={reg.email} onChange={e=>setReg({...reg,email:e.target.value})} placeholder="you@course.com" required/>
           <Field label="Password" type="password" value={reg.pw} onChange={e=>setReg({...reg,pw:e.target.value})} placeholder="••••••••" required/>
           <PhotoField label="Course Logo (optional)" value={reg.logo} onChange={async e=>{ if(e.target.files[0]) setReg({...reg,logo:await toB64(e.target.files[0])}); }}/>
-          <div style={{background:"rgba(252,76,2,0.07)",border:"1px solid rgba(252,76,2,0.2)",borderRadius:8,padding:"10px 14px",marginBottom:16,fontFamily:SANS,fontSize:12,color:MUT,lineHeight:1.6}}>
+          <div style={{background:"rgba(225,6,0,0.06)",border:"1px solid rgba(225,6,0,0.18)",borderRadius:8,padding:"10px 14px",marginBottom:16,fontFamily:SANS,fontSize:12,color:MUT,lineHeight:1.6}}>
             ℹ Your registration will be reviewed by the admin team. You'll receive an email once approved.
           </div>
           <Btn onClick={doRegister} full>Submit Registration →</Btn>
@@ -858,7 +858,7 @@ export default function App(){
         <Card>
           <Field label="Player Name" value={form.player} onChange={e=>setForm({...form,player:e.target.value})} placeholder="Tiger Woods" required/>
           <Field label="Distance (yards)" type="number" value={form.dist} onChange={e=>setForm({...form,dist:e.target.value})} placeholder="e.g. 312" min="50" max="600" required/>
-          {form.dist&&Number(form.dist)>0&&<div style={{background:"rgba(252,76,2,0.07)",border:"1px solid rgba(252,76,2,0.2)",borderRadius:8,padding:"8px 14px",marginBottom:14,fontFamily:SANS,fontSize:12,fontWeight:600,color:ORG}}>{tier(Number(form.dist))} — {Number(form.dist)>=350?"World-class distance!":Number(form.dist)>=300?"Impressive!":Number(form.dist)>=250?"Solid drive.":"Good effort!"}</div>}
+          {form.dist&&Number(form.dist)>0&&<div style={{background:"rgba(225,6,0,0.06)",border:"1px solid rgba(225,6,0,0.18)",borderRadius:8,padding:"8px 14px",marginBottom:14,fontFamily:SANS,fontSize:12,fontWeight:600,color:ORG}}>{tier(Number(form.dist))} — {Number(form.dist)>=350?"World-class distance!":Number(form.dist)>=300?"Impressive!":Number(form.dist)>=250?"Solid drive.":"Good effort!"}</div>}
           <Field label="Club Brand & Model" value={form.club} onChange={e=>setForm({...form,club:e.target.value})} placeholder="TaylorMade Stealth 2" required/>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
             <Field label="Handicap" type="number" value={form.hcp} onChange={e=>setForm({...form,hcp:e.target.value})} placeholder="5" min="-10" max="54" required/>
@@ -881,7 +881,6 @@ export default function App(){
       <div style={{fontFamily:SANS,fontSize:12,color:MUT,marginBottom:20}}>Enter the admin password to continue</div>
       <Field label="Password" type="password" value={adminPw.val} onChange={e=>setAdminPw({...adminPw,val:e.target.value})} placeholder="••••••••"/>
       <Btn full onClick={()=>{ if(adminPw.val===ADMIN_PW){setShowAdmin(true);setAdminPw({show:false,val:""});}else toast("Incorrect password"); }}>Enter Dashboard →</Btn>
-      <div style={{fontFamily:SANS,fontSize:11,color:DIM,marginTop:12,textAlign:"center"}}>Password: LongShot2026</div>
     </Overlay>}
   </div>;
 }
