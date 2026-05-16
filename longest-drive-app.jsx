@@ -618,8 +618,8 @@ function HomePage({ onNav, entries, orgs }) {
   return (
     <div style={{ animation: "fi .4s ease" }}>
       {/* ── HERO ── */}
-      <div style={{ position: "relative", overflow: "hidden", borderRadius: 20, marginBottom: 0 }}>
-        <img src="https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=1400&q=80&fit=crop" alt="Golf drive" style={{ width: "100%", height: "clamp(420px,60vw,620px)", objectFit: "cover", display: "block", filter: "brightness(0.45)" }}/>
+      <div style={{ position: "relative", overflow: "hidden", margin: "0 -18px", marginBottom: 0 }}>
+        <img src="https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1400&q=80&fit=crop" alt="Golf drive" style={{ width: "100%", height: "clamp(420px,60vw,620px)", objectFit: "cover", display: "block", filter: "brightness(0.45)" }}/>
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 20px", textAlign: "center" }}>
           <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: 4, color: "#FC4C02", textTransform: "uppercase", marginBottom: 16, background: "rgba(252,76,2,0.15)", border: "1px solid rgba(252,76,2,0.4)", borderRadius: 20, padding: "5px 16px", display: "inline-block" }}>
@@ -655,9 +655,9 @@ function HomePage({ onNav, entries, orgs }) {
       {/* ── FEATURE CARDS ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, marginBottom: 60 }}>
         {[
-          { img: "https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=600&q=80&fit=crop", title: "Global Long Drive Standings", body: "Compare verified competition-winning drives with golfers from clubs and tournaments around the world." },
-          { img: "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=600&q=80&fit=crop", title: "Free Club & Tournament Registration", body: "Clubs, coaches, driving ranges, and event organisers can submit longest drive winners at no cost during launch." },
-          { img: "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=600&q=80&fit=crop", title: "Recognition for Big Hitters", body: "Give golfers a place to showcase huge drives, earn rankings, and represent their club on a global platform." },
+          { img: "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=600&q=80&fit=crop", title: "Global Long Drive Standings", body: "Compare verified competition-winning drives with golfers from clubs and tournaments around the world." },
+          { img: "https://images.unsplash.com/photo-1592919505780-303950717480?w=600&q=80&fit=crop", title: "Free Club & Tournament Registration", body: "Clubs, coaches, driving ranges, and event organisers can submit longest drive winners at no cost during launch." },
+          { img: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=600&q=80&fit=crop", title: "Recognition for Big Hitters", body: "Give golfers a place to showcase huge drives, earn rankings, and represent their club on a global platform." },
         ].map(({ img, title, body }) => (
           <div key={title} style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 16, overflow: "hidden" }}>
             <div style={{ position: "relative", height: 160, overflow: "hidden" }}>
@@ -686,9 +686,9 @@ function HomePage({ onNav, entries, orgs }) {
       {/* ── ACTION SHOTS ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, marginBottom: 60 }}>
         {[
-          "https://images.unsplash.com/photo-1551524559-8af4e6624178?w=500&q=80&fit=crop",
-          "https://images.unsplash.com/photo-1619407070792-82a3f2b95ac5?w=500&q=80&fit=crop",
-          "https://images.unsplash.com/photo-1543037901-08e723e6ba66?w=500&q=80&fit=crop",
+          "https://images.unsplash.com/photo-1510674842998-a1a4d3d3e4e4?w=500&q=80&fit=crop",
+          "https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=500&q=80&fit=crop",
+          "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=500&q=80&fit=crop",
         ].map((src, i) => (
           <div key={i} style={{ borderRadius: 12, overflow: "hidden", aspectRatio: "1/1" }}>
             <img src={src} alt="Golf action" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform .4s ease" }}
