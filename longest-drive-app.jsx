@@ -618,27 +618,27 @@ function HomePage({ onNav, entries, orgs }) {
   return (
     <div style={{ animation: "fi .4s ease" }}>
       {/* ── HERO ── */}
-      <div style={{ textAlign: "center", padding: "64px 20px 52px", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 600, height: 300, background: "radial-gradient(ellipse, rgba(252,76,2,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
-        <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: 4, color: ORG, textTransform: "uppercase", marginBottom: 20 }}>
-          The Global Home of Competition Longest Drives
-        </div>
-        <h1 style={{ fontFamily: DISP, fontSize: "clamp(42px, 8vw, 80px)", color: TXT, lineHeight: 1.0, letterSpacing: 2, marginBottom: 24 }}>
-          RIPPING<br />BOMBS
-        </h1>
-        <p style={{ fontFamily: SANS, fontSize: 15, color: MUT, maxWidth: 540, margin: "0 auto 14px", lineHeight: 1.7 }}>
-          A free platform where golfers, clubs, coaches, driving ranges, and tournament organisers can register verified longest drives and compare them on global standings.
-        </p>
-        <p style={{ fontFamily: SANS, fontSize: 14, color: MUT, maxWidth: 480, margin: "0 auto 36px", lineHeight: 1.7 }}>
-          From local club competitions to major events, every winning bomb has a place on the leaderboard.
-        </p>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <button onClick={() => onNav("register")} style={{ background: ORG, border: "none", color: "#fff", fontFamily: SANS, fontWeight: 700, fontSize: 14, padding: "14px 32px", borderRadius: 10, cursor: "pointer", letterSpacing: 0.5, boxShadow: "0 4px 24px rgba(252,76,2,0.35)" }}>
-            REGISTER NOW FREE →
-          </button>
-          <button onClick={() => onNav("leaderboard")} style={{ background: "transparent", border: `1px solid ${BDR}`, color: TXT, fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: "14px 28px", borderRadius: 10, cursor: "pointer", letterSpacing: 0.5 }}>
-            View Leaderboard
-          </button>
+      <div style={{ position: "relative", overflow: "hidden", borderRadius: 20, marginBottom: 0 }}>
+        <img src="https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=1400&q=80&fit=crop" alt="Golf drive" style={{ width: "100%", height: "clamp(420px,60vw,620px)", objectFit: "cover", display: "block", filter: "brightness(0.45)" }}/>
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 20px", textAlign: "center" }}>
+          <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: 4, color: "#FC4C02", textTransform: "uppercase", marginBottom: 16, background: "rgba(252,76,2,0.15)", border: "1px solid rgba(252,76,2,0.4)", borderRadius: 20, padding: "5px 16px", display: "inline-block" }}>
+            The Global Home of Competition Longest Drives
+          </div>
+          <h1 style={{ fontFamily: DISP, fontSize: "clamp(56px, 10vw, 110px)", color: "#ffffff", lineHeight: 0.95, letterSpacing: 3, marginBottom: 20, textShadow: "0 4px 32px rgba(0,0,0,0.5)" }}>
+            RIPPING<br/>BOMBS
+          </h1>
+          <p style={{ fontFamily: SANS, fontSize: 16, color: "rgba(255,255,255,0.85)", maxWidth: 520, margin: "0 auto 32px", lineHeight: 1.7 }}>
+            A free platform where golfers, clubs, coaches, driving ranges, and tournament organisers can register verified longest drives and compare them on global standings.
+          </p>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            <button onClick={() => onNav("register")} style={{ background: ORG, border: "none", color: "#fff", fontFamily: SANS, fontWeight: 700, fontSize: 14, padding: "14px 32px", borderRadius: 10, cursor: "pointer", letterSpacing: 0.5, boxShadow: "0 4px 24px rgba(252,76,2,0.5)" }}>
+              REGISTER NOW FREE →
+            </button>
+            <button onClick={() => onNav("leaderboard")} style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: "14px 28px", borderRadius: 10, cursor: "pointer", letterSpacing: 0.5, backdropFilter: "blur(8px)" }}>
+              View Leaderboard
+            </button>
+          </div>
         </div>
       </div>
 
@@ -655,13 +655,21 @@ function HomePage({ onNav, entries, orgs }) {
       {/* ── FEATURE CARDS ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, marginBottom: 60 }}>
         {[
-          { title: "Global Long Drive Standings", body: "Compare verified competition-winning drives with golfers from clubs and tournaments around the world." },
-          { title: "Free Club & Tournament Registration", body: "Clubs, coaches, driving ranges, and event organisers can submit longest drive winners at no cost during launch." },
-          { title: "Recognition for Big Hitters", body: "Give golfers a place to showcase huge drives, earn rankings, and represent their club on a global platform." },
-        ].map(({ title, body }) => (
-          <div key={title} style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 14, padding: "28px 24px" }}>
-            <div style={{ fontFamily: DISP, fontSize: 20, color: TXT, letterSpacing: 0.5, marginBottom: 10 }}>{title}</div>
-            <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, lineHeight: 1.7 }}>{body}</div>
+          { img: "https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=600&q=80&fit=crop", title: "Global Long Drive Standings", body: "Compare verified competition-winning drives with golfers from clubs and tournaments around the world." },
+          { img: "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=600&q=80&fit=crop", title: "Free Club & Tournament Registration", body: "Clubs, coaches, driving ranges, and event organisers can submit longest drive winners at no cost during launch." },
+          { img: "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=600&q=80&fit=crop", title: "Recognition for Big Hitters", body: "Give golfers a place to showcase huge drives, earn rankings, and represent their club on a global platform." },
+        ].map(({ img, title, body }) => (
+          <div key={title} style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 16, overflow: "hidden" }}>
+            <div style={{ position: "relative", height: 160, overflow: "hidden" }}>
+              <img src={img} alt={title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform .4s ease" }}
+                onMouseEnter={e=>e.target.style.transform="scale(1.05)"}
+                onMouseLeave={e=>e.target.style.transform="scale(1)"}/>
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.35) 100%)" }}/>
+            </div>
+            <div style={{ padding: "20px 22px 24px" }}>
+              <div style={{ fontFamily: DISP, fontSize: 21, color: TXT, letterSpacing: 0.5, marginBottom: 8 }}>{title}</div>
+              <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, lineHeight: 1.7 }}>{body}</div>
+            </div>
           </div>
         ))}
       </div>
@@ -673,6 +681,21 @@ function HomePage({ onNav, entries, orgs }) {
         <button onClick={() => onNav("register")} style={{ background: ORG, border: "none", color: "#fff", fontFamily: SANS, fontWeight: 700, fontSize: 14, padding: "14px 36px", borderRadius: 10, cursor: "pointer", boxShadow: "0 4px 24px rgba(252,76,2,0.35)" }}>
           REGISTER NOW FREE →
         </button>
+      </div>
+
+      {/* ── ACTION SHOTS ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, marginBottom: 60 }}>
+        {[
+          "https://images.unsplash.com/photo-1551524559-8af4e6624178?w=500&q=80&fit=crop",
+          "https://images.unsplash.com/photo-1619407070792-82a3f2b95ac5?w=500&q=80&fit=crop",
+          "https://images.unsplash.com/photo-1543037901-08e723e6ba66?w=500&q=80&fit=crop",
+        ].map((src, i) => (
+          <div key={i} style={{ borderRadius: 12, overflow: "hidden", aspectRatio: "1/1" }}>
+            <img src={src} alt="Golf action" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform .4s ease" }}
+              onMouseEnter={e=>e.target.style.transform="scale(1.06)"}
+              onMouseLeave={e=>e.target.style.transform="scale(1)"}/>
+          </div>
+        ))}
       </div>
 
       {/* ── FAQ ── */}
@@ -723,6 +746,7 @@ export default function App(){
   const [adminPw,   setAdminPw]   = useState({show:false,val:""});
   const [loggedOrg, setLoggedOrg] = useState(null);
   const [showDemo,  setShowDemo]  = useState(false);
+  const [menuOpen,  setMenuOpen]  = useState(false);
 
   // week + filters
   const [week,      setWeek]      = useState(nowWeek());
@@ -828,6 +852,10 @@ export default function App(){
       ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:${BG}}::-webkit-scrollbar-thumb{background:${BG3};border-radius:3px}
       @keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
       @keyframes fi{from{opacity:0}to{opacity:1}}
+      @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+      .desktop-nav{display:flex}
+      .burger-btn{display:none}
+      @media(max-width:680px){.desktop-nav{display:none}.burger-btn{display:flex}}
     `}</style>
 
     {/* ── HEADER ── */}
@@ -835,9 +863,9 @@ export default function App(){
       <div style={{display:"flex",alignItems:"center",gap:14,cursor:"pointer"}} onClick={()=>setTab("home")}>
         <RB_LOGO_SVG/>
       </div>
-      <div style={{display:"flex",gap:7,alignItems:"center",flexWrap:"wrap"}}>
+      {/* Desktop nav */}
+      <div className="desktop-nav" style={{gap:7,alignItems:"center"}}>
         <NavBtn id="leaderboard" label="Leaderboard"/>
-        {/* Demo CTA */}
         <button onClick={()=>setShowDemo(true)} style={{background:"rgba(240,180,41,0.1)",border:`1px solid rgba(240,180,41,0.3)`,color:GOLD,fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 14px",borderRadius:8,cursor:"pointer",letterSpacing:.3}}>Try Demo</button>
         {loggedOrg
           ?<><NavBtn id="submit" label="Submit Drive"/>
@@ -845,12 +873,30 @@ export default function App(){
           :<><NavBtn id="login" label="Organiser Login"/>
             <button onClick={()=>setTab("register")} style={{background:ORG,border:"none",color:"#fff",fontFamily:SANS,fontWeight:700,fontSize:12,padding:"7px 16px",borderRadius:8,cursor:"pointer"}}>Register Course</button></>
         }
-        {/* Admin gear */}
         <button onClick={()=>setAdminPw({show:true,val:""})} title="Admin" style={{position:"relative",background:"none",border:`1px solid ${BDR}`,borderRadius:8,color:DIM,fontSize:14,padding:"6px 10px",cursor:"pointer"}}>
           ⚙{pendingCount>0&&<span style={{position:"absolute",top:-4,right:-4,width:9,height:9,background:ORG,borderRadius:"50%",display:"block"}}/>}
         </button>
       </div>
+      {/* Burger button — mobile only */}
+      <button className="burger-btn" onClick={()=>setMenuOpen(m=>!m)} style={{background:"none",border:`1px solid ${BDR}`,borderRadius:8,padding:"6px 10px",cursor:"pointer",flexDirection:"column",gap:4,alignItems:"center",justifyContent:"center"}}>
+        <span style={{display:"block",width:18,height:2,background:TXT,borderRadius:2,transition:"all .2s",transform:menuOpen?"rotate(45deg) translate(4px,4px)":"none"}}/>
+        <span style={{display:"block",width:18,height:2,background:TXT,borderRadius:2,transition:"all .2s",opacity:menuOpen?0:1}}/>
+        <span style={{display:"block",width:18,height:2,background:TXT,borderRadius:2,transition:"all .2s",transform:menuOpen?"rotate(-45deg) translate(4px,-4px)":"none"}}/>
+      </button>
     </div>
+    {/* Mobile menu dropdown */}
+    {menuOpen&&<div style={{position:"fixed",top:62,left:0,right:0,background:"rgba(245,245,240,0.98)",backdropFilter:"blur(16px)",borderBottom:`1px solid ${BDR}`,zIndex:99,padding:"16px 22px 20px",display:"flex",flexDirection:"column",gap:10,animation:"slideDown .2s ease"}}>
+      {[["leaderboard","Leaderboard"],["login","Organiser Login"],["register","Register Course"]].map(([id,label])=>(
+        <button key={id} onClick={()=>{setTab(id);setMenuOpen(false);}} style={{background:tab===id?ORG:"transparent",border:tab===id?"none":`1px solid ${BDR}`,color:tab===id?"#fff":TXT,fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",borderRadius:10,cursor:"pointer",textAlign:"left"}}>
+          {label}
+        </button>
+      ))}
+      <button onClick={()=>{setShowDemo(true);setMenuOpen(false);}} style={{background:"rgba(240,180,41,0.1)",border:`1px solid rgba(240,180,41,0.3)`,color:GOLD,fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",borderRadius:10,cursor:"pointer",textAlign:"left"}}>Try Demo</button>
+      {loggedOrg&&<>
+        <button onClick={()=>{setTab("submit");setMenuOpen(false);}} style={{background:"transparent",border:`1px solid ${BDR}`,color:TXT,fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",borderRadius:10,cursor:"pointer",textAlign:"left"}}>Submit Drive</button>
+        <button onClick={()=>{setLoggedOrg(null);setTab("home");setMenuOpen(false);}} style={{background:"none",border:"1px solid rgba(220,80,80,0.3)",borderRadius:10,color:"#f87171",fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",cursor:"pointer",textAlign:"left"}}>Log Out</button>
+      </>}
+    </div>}
 
     <div style={{maxWidth:1000,margin:"0 auto",padding:"28px 18px 80px",animation:"fi .35s ease"}}>
 
