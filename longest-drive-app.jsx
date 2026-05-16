@@ -618,8 +618,8 @@ function HomePage({ onNav, entries, orgs }) {
   return (
     <div style={{ animation: "fi .4s ease" }}>
       {/* ── HERO ── */}
-      <div style={{ position: "relative", overflow: "hidden", margin: "0 -18px", marginBottom: 0 }}>
-        <img src="https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1400&q=80&fit=crop" alt="Golf drive" style={{ width: "100%", height: "clamp(420px,60vw,620px)", objectFit: "cover", display: "block", filter: "brightness(0.45)" }}/>
+      <div style={{ position: "relative", overflow: "hidden", margin: "0 calc(-50vw + 50%)", marginBottom: 0 }}>
+        <img src="https://images.pexels.com/photos/1325681/pexels-photo-1325681.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Golf drive" style={{ width: "100%", height: "clamp(420px,60vw,620px)", objectFit: "cover", display: "block", filter: "brightness(0.45)" }}/>
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 20px", textAlign: "center" }}>
           <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: 4, color: "#FC4C02", textTransform: "uppercase", marginBottom: 16, background: "rgba(252,76,2,0.15)", border: "1px solid rgba(252,76,2,0.4)", borderRadius: 20, padding: "5px 16px", display: "inline-block" }}>
@@ -655,9 +655,9 @@ function HomePage({ onNav, entries, orgs }) {
       {/* ── FEATURE CARDS ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, marginBottom: 60 }}>
         {[
-          { img: "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=600&q=80&fit=crop", title: "Global Long Drive Standings", body: "Compare verified competition-winning drives with golfers from clubs and tournaments around the world." },
-          { img: "https://images.unsplash.com/photo-1627513849960-5f30e9eed159?w=600&q=80&fit=crop", title: "Free Club & Tournament Registration", body: "Clubs, coaches, driving ranges, and event organisers can submit longest drive winners at no cost during launch." },
-          { img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&fit=crop", title: "Recognition for Big Hitters", body: "Give golfers a place to showcase huge drives, earn rankings, and represent their club on a global platform." },
+          { img: "https://images.pexels.com/photos/1325681/pexels-photo-1325681.jpeg?auto=compress&cs=tinysrgb&w=600", title: "Global Long Drive Standings", body: "Compare verified competition-winning drives with golfers from clubs and tournaments around the world." },
+          { img: "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=600", title: "Free Club & Tournament Registration", body: "Clubs, coaches, driving ranges, and event organisers can submit longest drive winners at no cost during launch." },
+          { img: "https://images.pexels.com/photos/4498362/pexels-photo-4498362.jpeg?auto=compress&cs=tinysrgb&w=600", title: "Recognition for Big Hitters", body: "Give golfers a place to showcase huge drives, earn rankings, and represent their club on a global platform." },
         ].map(({ img, title, body }) => (
           <div key={title} style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 16, overflow: "hidden" }}>
             <div style={{ position: "relative", height: 160, overflow: "hidden" }}>
