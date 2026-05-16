@@ -655,9 +655,9 @@ function HomePage({ onNav, entries, orgs }) {
       {/* ── FEATURE CARDS ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, marginBottom: 60 }}>
         {[
-          { img: "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=600&q=80&fit=crop", title: "Global Long Drive Standings", body: "Compare verified competition-winning drives with golfers from clubs and tournaments around the world." },
-          { img: "https://images.unsplash.com/photo-1592919505780-303950717480?w=600&q=80&fit=crop", title: "Free Club & Tournament Registration", body: "Clubs, coaches, driving ranges, and event organisers can submit longest drive winners at no cost during launch." },
-          { img: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=600&q=80&fit=crop", title: "Recognition for Big Hitters", body: "Give golfers a place to showcase huge drives, earn rankings, and represent their club on a global platform." },
+          { img: "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=600&q=80&fit=crop", title: "Global Long Drive Standings", body: "Compare verified competition-winning drives with golfers from clubs and tournaments around the world." },
+          { img: "https://images.unsplash.com/photo-1627513849960-5f30e9eed159?w=600&q=80&fit=crop", title: "Free Club & Tournament Registration", body: "Clubs, coaches, driving ranges, and event organisers can submit longest drive winners at no cost during launch." },
+          { img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&fit=crop", title: "Recognition for Big Hitters", body: "Give golfers a place to showcase huge drives, earn rankings, and represent their club on a global platform." },
         ].map(({ img, title, body }) => (
           <div key={title} style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 16, overflow: "hidden" }}>
             <div style={{ position: "relative", height: 160, overflow: "hidden" }}>
@@ -681,21 +681,6 @@ function HomePage({ onNav, entries, orgs }) {
         <button onClick={() => onNav("register")} style={{ background: ORG, border: "none", color: "#fff", fontFamily: SANS, fontWeight: 700, fontSize: 14, padding: "14px 36px", borderRadius: 10, cursor: "pointer", boxShadow: "0 4px 24px rgba(252,76,2,0.35)" }}>
           REGISTER NOW FREE →
         </button>
-      </div>
-
-      {/* ── ACTION SHOTS ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, marginBottom: 60 }}>
-        {[
-          "https://images.unsplash.com/photo-1510674842998-a1a4d3d3e4e4?w=500&q=80&fit=crop",
-          "https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=500&q=80&fit=crop",
-          "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=500&q=80&fit=crop",
-        ].map((src, i) => (
-          <div key={i} style={{ borderRadius: 12, overflow: "hidden", aspectRatio: "1/1" }}>
-            <img src={src} alt="Golf action" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform .4s ease" }}
-              onMouseEnter={e=>e.target.style.transform="scale(1.06)"}
-              onMouseLeave={e=>e.target.style.transform="scale(1)"}/>
-          </div>
-        ))}
       </div>
 
       {/* ── FAQ ── */}
@@ -832,7 +817,7 @@ export default function App(){
 
   useEffect(()=>{
     const link=document.querySelector("link[rel~='icon']")||document.createElement('link');
-    link.rel='icon'; link.type='image/svg+xml'; link.href='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20841.89%20595.28%22%3E%3Cpolygon%20fill%3D%22%23C8102E%22%20points%3D%22146.662%2C300.557%2022.035%2C521.864%20155.217%2C521.864%20279.933%2C300.406%20216.568%2C188.458%20369.538%2C188.458%20421.032%2C72.414%2017.521%2C72.414%22%2F%3E%3Cpolygon%20fill%3D%22%23C8102E%22%20points%3D%22695.492%2C293.872%20824.537%2C72.414%20820.016%2C72.414%20820.029%2C72.414%20686.834%2C72.414%20686.834%2C72.414%20421.032%2C72.414%20472.527%2C188.458%20621.49%2C188.458%20562.133%2C293.872%20623.367%2C405.807%20472.527%2C405.807%20421.032%2C521.864%20686.834%2C521.851%20686.834%2C521.864%20820.029%2C521.864%20820.016%2C521.851%20824.537%2C521.851%22%2F%3E%3C%2Fsvg%3E';
+    link.rel='icon'; link.type='image/svg+xml'; link.href='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20841.89%20595.28%22%3E%3Cpolygon%20fill%3D%22%23111111%22%20points%3D%22146.662%2C300.557%2022.035%2C521.864%20155.217%2C521.864%20279.933%2C300.406%20216.568%2C188.458%20369.538%2C188.458%20421.032%2C72.414%2017.521%2C72.414%22%2F%3E%3Cpolygon%20fill%3D%22%23111111%22%20points%3D%22695.492%2C293.872%20824.537%2C72.414%20820.016%2C72.414%20820.029%2C72.414%20686.834%2C72.414%20686.834%2C72.414%20421.032%2C72.414%20472.527%2C188.458%20621.49%2C188.458%20562.133%2C293.872%20623.367%2C405.807%20472.527%2C405.807%20421.032%2C521.864%20686.834%2C521.851%20686.834%2C521.864%20820.029%2C521.864%20820.016%2C521.851%20824.537%2C521.851%22%2F%3E%3C%2Fsvg%3E';
     document.head.appendChild(link);
   },[]);
 
