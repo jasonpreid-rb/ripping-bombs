@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 // ─── LOGO ─────────────────────────────────────────────────────────────────────
 const RB_LOGO_SVG = () => (
@@ -1032,5 +1033,6 @@ export default function App(){
       <Btn full onClick={()=>{ if(adminPw.val===ADMIN_PW){setShowAdmin(true);setAdminPw({show:false,val:""});}else toast("Incorrect password"); }}>Enter Dashboard →</Btn>
       <div style={{fontFamily:SANS,fontSize:11,color:DIM,marginTop:12,textAlign:"center"}}>Password: LongShot2026</div>
     </Overlay>}
+    <Analytics />
   </div>;
 }
