@@ -82,16 +82,16 @@ const BADGES = {
 function daysAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); }
 
 const SEED_ORGS = [
-  {id:"o1",name:"James Hargreaves",courseName:"Royal Birkdale Golf Club", location:"Southport, England",    email:"james@royalbirkdale.com", pw:"demo",logo:"",status:"approved",badge:"platinum"},
-  {id:"o2",name:"Caitlin O'Brien", courseName:"Lahinch Golf Club",         location:"Lahinch, Ireland",      email:"caitlin@lahinch.ie",      pw:"demo",logo:"",status:"approved",badge:"tour"},
-  {id:"o3",name:"Magnus Lindqvist",courseName:"Barsebäck G&CC",            location:"Malmö, Sweden",         email:"magnus@barseback.se",     pw:"demo",logo:"",status:"approved",badge:"platinum"},
-  {id:"o4",name:"Hiroshi Tanaka",  courseName:"Hirono Golf Club",           location:"Kobe, Japan",           email:"hiroshi@hirono.jp",       pw:"demo",logo:"",status:"approved",badge:"tour"},
-  {id:"o5",name:"Priya Nair",      courseName:"Royal Calcutta Golf Club",   location:"Kolkata, India",        email:"priya@rcgc.in",           pw:"demo",logo:"",status:"approved",badge:"amateur"},
-  {id:"o6",name:"Dylan Schwartz",  courseName:"Bethpage Black",             location:"New York, USA",         email:"dylan@bethpage.com",      pw:"demo",logo:"",status:"approved",badge:"platinum"},
-  {id:"o7",name:"Amara Diallo",    courseName:"Leopard Creek CC",           location:"Malelane, South Africa",email:"amara@leopardcreek.co.za",pw:"demo",logo:"",status:"approved",badge:"tour"},
-  {id:"o8",name:"Sofia Reyes",     courseName:"Club de Golf Chapultepec",   location:"Mexico City, Mexico",   email:"sofia@chapultepec.mx",    pw:"demo",logo:"",status:"approved",badge:"amateur"},
-  {id:"o9",name:"Lena Fischer",    courseName:"Golf Club Bad Griesbach",    location:"Bavaria, Germany",      email:"lena@gcbg.de",            pw:"demo",logo:"",status:"pending", badge:null},
-  {id:"o10",name:"Will Cartwright",courseName:"Carnoustie Golf Links",      location:"Carnoustie, Scotland",  email:"will@carnoustie.co.uk",   pw:"demo",logo:"",status:"pending", badge:null},
+  {id:"o1", fullName:"James Hargreaves", position:"Club Secretary",       courseName:"Royal Birkdale Golf Club", location:"Southport, England",    email:"james@royalbirkdale.com", pw:"demo",logo:"",status:"approved",badge:"platinum"},
+  {id:"o2", fullName:"Caitlin O'Brien",  position:"Tournament Director",  courseName:"Lahinch Golf Club",         location:"Lahinch, Ireland",      email:"caitlin@lahinch.ie",      pw:"demo",logo:"",status:"approved",badge:"tour"},
+  {id:"o3", fullName:"Magnus Lindqvist", position:"Head Professional",    courseName:"Barsebäck G&CC",            location:"Malmö, Sweden",         email:"magnus@barseback.se",     pw:"demo",logo:"",status:"approved",badge:"platinum"},
+  {id:"o4", fullName:"Hiroshi Tanaka",   position:"General Manager",      courseName:"Hirono Golf Club",          location:"Kobe, Japan",           email:"hiroshi@hirono.jp",       pw:"demo",logo:"",status:"approved",badge:"tour"},
+  {id:"o5", fullName:"Priya Nair",       position:"Events Coordinator",   courseName:"Royal Calcutta Golf Club",  location:"Kolkata, India",        email:"priya@rcgc.in",           pw:"demo",logo:"",status:"approved",badge:"amateur"},
+  {id:"o6", fullName:"Dylan Schwartz",   position:"Club Manager",         courseName:"Bethpage Black",            location:"New York, USA",         email:"dylan@bethpage.com",      pw:"demo",logo:"",status:"approved",badge:"platinum"},
+  {id:"o7", fullName:"Amara Diallo",     position:"Tournament Organiser", courseName:"Leopard Creek CC",          location:"Malelane, South Africa",email:"amara@leopardcreek.co.za",pw:"demo",logo:"",status:"approved",badge:"tour"},
+  {id:"o8", fullName:"Sofia Reyes",      position:"Head Pro",             courseName:"Club de Golf Chapultepec",  location:"Mexico City, Mexico",   email:"sofia@chapultepec.mx",    pw:"demo",logo:"",status:"approved",badge:"amateur"},
+  {id:"o9", fullName:"Lena Fischer",     position:"Club Secretary",       courseName:"Golf Club Bad Griesbach",   location:"Bavaria, Germany",      email:"lena@gcbg.de",            pw:"demo",logo:"",status:"pending", badge:null},
+  {id:"o10",fullName:"Will Cartwright",  position:"General Manager",      courseName:"Carnoustie Golf Links",     location:"Carnoustie, Scotland",  email:"will@carnoustie.co.uk",   pw:"demo",logo:"",status:"pending", badge:null},
 ];
 
 const SEED_ENTRIES = [
@@ -139,7 +139,7 @@ function sendRegistrationNotification(org) {
   const subject = encodeURIComponent(`New Course Registration: ${org.courseName}`);
   const body = encodeURIComponent(
     `New registration request received on Ripping Bombs:\n\n` +
-    `Course: ${org.courseName}\nOrganiser: ${org.name}\nLocation: ${org.location}\nEmail: ${org.email}\n\n` +
+    `Course: ${org.courseName}\nFull Name: ${org.fullName||org.name||"—"}\nPosition: ${org.position||"—"}\nLocation: ${org.location}\nEmail: ${org.email}\n\n` +
     `Login to the admin dashboard to approve or reject this registration.\n\nhttps://www.rippingbombs.com`
   );
   window.open(`mailto:rippingbombs@outlook.com?subject=${subject}&body=${body}`, "_blank");
@@ -449,7 +449,7 @@ function AdminPanel({orgs,entries,setOrgs,setEntries,toast,onClose,cvt,unitLbl})
               <div style={{fontFamily:DISP,fontSize:22,color:TXT,letterSpacing:.5,marginBottom:3}}>{org.courseName}</div>
               <div style={{fontFamily:SANS,fontSize:12,color:MUT,marginBottom:10}}>{org.location}</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-                {[["Organiser",org.name],["Email",org.email]].map(([k,v])=><div key={k}><div style={{fontFamily:SANS,fontSize:9,fontWeight:700,color:DIM,letterSpacing:1,textTransform:"uppercase"}}>{k}</div><div style={{fontFamily:SANS,fontSize:12,color:TXT}}>{v}</div></div>)}
+                {[["Organiser",org.fullName||org.name||"—"],["Position",org.position||"—"],["Email",org.email]].map(([k,v])=><div key={k}><div style={{fontFamily:SANS,fontSize:9,fontWeight:700,color:DIM,letterSpacing:1,textTransform:"uppercase"}}>{k}</div><div style={{fontFamily:SANS,fontSize:12,color:TXT}}>{v}</div></div>)}
               </div>
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:8,alignItems:"flex-end"}}>
@@ -534,7 +534,7 @@ function AdminPanel({orgs,entries,setOrgs,setEntries,toast,onClose,cvt,unitLbl})
       <div style={{fontFamily:SANS,fontSize:12,color:MUT,marginBottom:10}}>{selOrg.location}</div>
       <div style={{display:"flex",gap:8,marginBottom:18,flexWrap:"wrap"}}><Pill label={selOrg.status} color={selOrg.status}/>{selOrg.badge&&<BadgePill badge={selOrg.badge}/>}</div>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:18}}>
-        {[["Organiser",selOrg.name],["Email",selOrg.email],["Drives",entries.filter(e=>e.orgId===selOrg.id).length],["Avg Dist",entries.filter(e=>e.orgId===selOrg.id).length?cvt(Math.round(entries.filter(e=>e.orgId===selOrg.id).reduce((s,e)=>s+e.dist,0)/entries.filter(e=>e.orgId===selOrg.id).length))+unitLbl:"—"]].map(([k,v])=>(
+        {[["Full Name",selOrg.fullName||selOrg.name||"—"],["Position",selOrg.position||"—"],["Email",selOrg.email],["Drives",entries.filter(e=>e.orgId===selOrg.id).length],["Avg Dist",entries.filter(e=>e.orgId===selOrg.id).length?cvt(Math.round(entries.filter(e=>e.orgId===selOrg.id).reduce((s,e)=>s+e.dist,0)/entries.filter(e=>e.orgId===selOrg.id).length))+unitLbl:"—"]].map(([k,v])=>(
           <div key={k} style={{background:BG3,borderRadius:10,padding:"10px 14px",border:`1px solid ${BDR}`}}>
             <div style={{fontFamily:SANS,fontSize:9,fontWeight:700,color:DIM,letterSpacing:1,textTransform:"uppercase",marginBottom:3}}>{k}</div>
             <div style={{fontFamily:SANS,fontSize:13,fontWeight:600,color:TXT}}>{String(v)}</div>
@@ -613,6 +613,159 @@ function DemoSubmit({onClose,entries,setEntries,orgs,toast,cvt,unitLbl}){
     <PhotoField label="Photo of Drive Marker (optional)" value={form.photo} onChange={async e=>{ if(e.target.files[0]) setForm({...form,photo:await toB64(e.target.files[0])}); }}/>
     <Btn full onClick={doDemo}>Preview My Drive →</Btn>
   </Overlay>;
+}
+
+// ─── CLUBS DIRECTORY PAGE ────────────────────────────────────────────────────
+
+function ClubsDirectory({ orgs, entries, onSelectClub }) {
+  const [search, setSearch] = useState("");
+  const approved = orgs
+    .filter(o => o.status === "approved")
+    .filter(o => !search || o.courseName.toLowerCase().includes(search.toLowerCase()) || (o.location||"").toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => a.courseName.localeCompare(b.courseName));
+
+  const grouped = approved.reduce((acc, org) => {
+    const letter = org.courseName[0].toUpperCase();
+    if (!acc[letter]) acc[letter] = [];
+    acc[letter].push(org);
+    return acc;
+  }, {});
+
+  const letters = Object.keys(grouped).sort();
+
+  return (
+    <div>
+      <div style={{fontFamily:DISP,fontSize:36,color:TXT,letterSpacing:1,marginBottom:6}}>Clubs &amp; Events</div>
+      <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginBottom:24}}>All registered venues on the Ripping Bombs global database.</div>
+
+      <input
+        value={search}
+        onChange={e=>setSearch(e.target.value)}
+        placeholder="Search clubs or locations..."
+        style={{width:"100%",background:BG2,border:`1px solid ${BDR}`,borderRadius:10,padding:"11px 16px",fontFamily:SANS,fontSize:14,color:TXT,outline:"none",marginBottom:28,boxSizing:"border-box"}}
+      />
+
+      {letters.map(letter => (
+        <div key={letter} style={{marginBottom:28}}>
+          <div style={{fontFamily:DISP,fontSize:22,color:ORG,letterSpacing:1,marginBottom:10,borderBottom:`2px solid rgba(252,76,2,0.15)`,paddingBottom:6}}>{letter}</div>
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            {grouped[letter].map(org => {
+              const clubEntries = entries.filter(e=>e.orgId===org.id);
+              const best = clubEntries.length ? Math.max(...clubEntries.map(e=>e.dist)) : null;
+              return (
+                <div key={org.id} onClick={()=>onSelectClub(org.id)}
+                  style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 18px",background:BG2,border:`1px solid ${BDR}`,borderRadius:10,cursor:"pointer",transition:"all .15s",gap:12,flexWrap:"wrap"}}
+                  onMouseEnter={e=>e.currentTarget.style.borderColor=ORG}
+                  onMouseLeave={e=>e.currentTarget.style.borderColor=BDR}>
+                  <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+                    <span style={{fontFamily:SANS,fontWeight:700,fontSize:15,color:TXT}}>{org.courseName}</span>
+                    <span style={{fontFamily:SANS,fontSize:12,color:MUT}}>{org.location}</span>
+                    {org.badge&&<BadgePill badge={org.badge} small/>}
+                  </div>
+                  <div style={{display:"flex",alignItems:"center",gap:16}}>
+                    {best&&<span style={{fontFamily:DISP,fontSize:18,color:tierClr(best)}}>{best} <span style={{fontFamily:SANS,fontSize:11,color:DIM}}>yds best</span></span>}
+                    <span style={{fontFamily:SANS,fontSize:11,color:MUT}}>{clubEntries.length} drive{clubEntries.length!==1?"s":""}</span>
+                    <span style={{color:ORG,fontSize:14}}>›</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+      {approved.length===0&&<div style={{textAlign:"center",padding:"48px 0",fontFamily:SANS,fontSize:14,color:DIM}}>No clubs found</div>}
+    </div>
+  );
+}
+
+// ─── CLUB PAGE ────────────────────────────────────────────────────────────────
+
+function ClubPage({ org, entries, onBack, cvt, unitLbl }) {
+  const clubEntries = entries.filter(e=>e.orgId===org.id).sort((a,b)=>b.dist-a.dist);
+  const best = clubEntries[0];
+  const [week, setWeek] = useState(nowWeek());
+  const [allTime, setAllTime] = useState(false);
+  const weekEntries = allTime ? clubEntries : clubEntries.filter(e=>sameWeek(e.date,week));
+
+  // SEO meta update
+  useEffect(()=>{
+    document.title = `${org.courseName} | Ripping Bombs`;
+    const desc = document.querySelector('meta[name="description"]');
+    if(desc) desc.setAttribute("content", `Longest drive leaderboard for ${org.courseName}, ${org.location}. View all competition results on Ripping Bombs.`);
+  },[org]);
+
+  return (
+    <div>
+      <button onClick={onBack} style={{background:"none",border:"none",color:ORG,fontFamily:SANS,fontWeight:600,fontSize:13,cursor:"pointer",padding:"0 0 18px",display:"flex",alignItems:"center",gap:6}}>
+        ← Back to Clubs
+      </button>
+
+      {/* Header */}
+      <div style={{marginBottom:28}}>
+        <div style={{display:"flex",alignItems:"flex-start",gap:12,flexWrap:"wrap",marginBottom:8}}>
+          <div>
+            <div style={{fontFamily:DISP,fontSize:36,color:TXT,letterSpacing:1,lineHeight:1.1}}>{org.courseName}</div>
+            <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginTop:6}}>{org.location}</div>
+          </div>
+        </div>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:10}}>
+          {org.badge&&<BadgePill badge={org.badge}/>}
+          <span style={{fontFamily:SANS,fontSize:11,color:MUT,background:BG3,border:`1px solid ${BDR}`,borderRadius:4,padding:"2px 9px"}}>{clubEntries.length} drives recorded</span>
+        </div>
+      </div>
+
+      {/* Club record hero */}
+      {best&&<div style={{background:`linear-gradient(135deg,rgba(252,76,2,0.1),rgba(252,76,2,0.03))`,border:"1px solid rgba(252,76,2,0.22)",borderRadius:14,padding:"20px 24px",marginBottom:24,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
+        <div>
+          <div style={{fontFamily:SANS,fontSize:9,fontWeight:700,letterSpacing:2,color:ORG,marginBottom:6,textTransform:"uppercase"}}>🏆 Club Record</div>
+          <div style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>{best.player}</div>
+          <div style={{fontFamily:SANS,fontSize:11,color:MUT,marginTop:3}}>{best.club} · HCP {best.hcp} · {fmtDate(best.date)}</div>
+        </div>
+        <div style={{textAlign:"right"}}>
+          <div style={{fontFamily:DISP,fontSize:48,color:tierClr(best.dist),letterSpacing:1,lineHeight:1}}>{cvt(best.dist)}</div>
+          <div style={{fontFamily:SANS,fontSize:13,color:MUT}}>{unitLbl}</div>
+        </div>
+      </div>}
+
+      {/* Week nav */}
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:18,flexWrap:"wrap"}}>
+        <button onClick={()=>setAllTime(v=>!v)} style={{background:allTime?ORG:"transparent",border:`1px solid ${allTime?ORG:BDR}`,color:allTime?"#fff":MUT,fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 14px",borderRadius:8,cursor:"pointer"}}>
+          {allTime?"All Time ✓":"All Time"}
+        </button>
+        {!allTime&&<>
+          <button onClick={()=>setWeek(prevWeek(week))} style={{background:"transparent",border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontSize:13,padding:"7px 12px",borderRadius:8,cursor:"pointer"}}>‹</button>
+          <span style={{fontFamily:SANS,fontSize:13,color:TXT,fontWeight:600}}>{weekLabel(week)}</span>
+          <button onClick={()=>setWeek(nextWeek(week))} style={{background:"transparent",border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontSize:13,padding:"7px 12px",borderRadius:8,cursor:"pointer"}}>›</button>
+        </>}
+      </div>
+
+      {/* Leaderboard */}
+      <div style={{overflowX:"auto",borderRadius:14,border:`1px solid ${BDR}`,background:BG2}}>
+        <table style={{width:"100%",borderCollapse:"collapse",minWidth:520}}>
+          <thead>
+            <tr>{["Rank","Player","Distance","Club","HCP","Age","Date","Tier"].map(h=>(
+              <th key={h} style={{padding:"10px 14px",fontFamily:SANS,fontSize:9,fontWeight:700,letterSpacing:1.2,color:DIM,textTransform:"uppercase",textAlign:"left",borderBottom:`2px solid ${BDR}`}}>{h}</th>
+            ))}</tr>
+          </thead>
+          <tbody>
+            {weekEntries.map((e,i)=>(
+              <tr key={e.id} style={{borderBottom:`1px solid rgba(0,0,0,0.04)`}}>
+                <td style={{padding:"11px 14px",fontFamily:SANS,fontSize:12,color:DIM}}>{i===0?"🥇":i===1?"🥈":i===2?"🥉":`#${i+1}`}</td>
+                <td style={{padding:"11px 14px",fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>{e.player}</td>
+                <td style={{padding:"11px 14px",fontFamily:DISP,fontSize:20,color:tierClr(e.dist)}}>{cvt(e.dist)} <span style={{fontFamily:SANS,fontSize:10,color:DIM}}>{unitLbl}</span></td>
+                <td style={{padding:"11px 14px",fontFamily:SANS,fontSize:12,color:MUT}}>{e.club}</td>
+                <td style={{padding:"11px 14px",fontFamily:SANS,fontSize:12,color:MUT}}>{e.hcp}</td>
+                <td style={{padding:"11px 14px",fontFamily:SANS,fontSize:12,color:MUT}}>{e.age}</td>
+                <td style={{padding:"11px 14px",fontFamily:SANS,fontSize:11,color:DIM}}>{fmtDate(e.date)}</td>
+                <td style={{padding:"11px 14px",fontFamily:SANS,fontSize:10,fontWeight:600,color:tierClr(e.dist)}}>{tier(e.dist)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {weekEntries.length===0&&<div style={{padding:"48px 0",textAlign:"center",color:DIM,fontFamily:SANS,fontSize:13}}>No drives for this period</div>}
+      </div>
+    </div>
+  );
 }
 
 // ─── HOME PAGE ────────────────────────────────────────────────────────────────
@@ -726,7 +879,10 @@ function HomePage({ onNav, entries, orgs }) {
 
       {/* FOOTER */}
       <div style={{ borderTop: `1px solid ${BDR}`, paddingTop: 28, paddingBottom: 20, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
-        <div style={{ fontFamily: SANS, fontSize: 12, color: DIM }}>Copyright © 2026 rippingbombs.com · Powered by the HRH Collective LTD</div>
+        <div style={{display:"flex",flexDirection:"column",gap:6}}>
+          <div style={{ fontFamily: SANS, fontSize: 12, color: DIM }}>Copyright © 2026 rippingbombs.com · Powered by the HRH Collective LTD</div>
+          <span onClick={()=>onNav("clubs")} style={{fontFamily:SANS,fontSize:12,color:MUT,cursor:"pointer",textDecoration:"underline",width:"fit-content"}}>Clubs &amp; Events Directory</span>
+        </div>
         <a href="https://www.instagram.com/rippingbombs/" target="_blank" rel="noreferrer" style={{ fontFamily: SANS, fontSize: 12, color: MUT, textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
@@ -765,10 +921,12 @@ export default function App(){
   const [fHcp,    setFHcp]    = useState("");
   const [fAge,    setFAge]    = useState("");
   const [fClub,   setFClub]   = useState("");
+  const [fPlayer, setFPlayer] = useState("");
   const [sortBy,  setSortBy]  = useState("dist");
+  const [selectedClubId, setSelectedClubId] = useState(null);
 
   // forms
-  const [reg,  setReg]  = useState({name:"",courseName:"",location:"",email:"",pw:"",logo:""});
+  const [reg,  setReg]  = useState({fullName:"",position:"",courseName:"",location:"",email:"",pw:"",logo:""});
   const [lgn,  setLgn]  = useState({email:"",pw:""});
   const [form, setForm] = useState({player:"",dist:"",club:"",hcp:"",age:"",photo:"",date:todayStr()});
 
@@ -805,6 +963,7 @@ export default function App(){
     .filter(e=>approvedOrgs.find(o=>o.id===e.orgId))
     .filter(e=>allTime||sameWeek(e.date,week))
     .filter(e=>!fCountry||(orgFor(e.orgId)?.location||"").toLowerCase().includes(fCountry.toLowerCase()))
+    .filter(e=>!fPlayer||e.player.toLowerCase().includes(fPlayer.toLowerCase()))
     .filter(e=>hcpIn(e.hcp,fHcp))
     .filter(e=>ageIn(e.age,fAge))
     .filter(e=>!fClub||e.club.toLowerCase().includes(fClub.toLowerCase()))
@@ -819,11 +978,11 @@ export default function App(){
   const allTimeBest = [...entries].filter(e=>approvedOrgs.find(o=>o.id===e.orgId)).sort((a,b)=>b.dist-a.dist);
 
   async function doRegister(){
-    if(!reg.name||!reg.courseName||!reg.location||!reg.email||!reg.pw){ toast("Fill all required fields"); return; }
+    if(!reg.fullName||!reg.position||!reg.courseName||!reg.location||!reg.email||!reg.pw){ toast("Fill all required fields"); return; }
     if(orgs.find(o=>o.email===reg.email)){ toast("Email already registered"); return; }
-    const newOrg={id:Date.now().toString(),name:reg.name,courseName:reg.courseName,location:reg.location,email:reg.email,pw:reg.pw,logo:reg.logo,status:"pending",badge:null};
+    const newOrg={id:Date.now().toString(),fullName:reg.fullName,position:reg.position,courseName:reg.courseName,location:reg.location,email:reg.email,pw:reg.pw,logo:reg.logo,status:"pending",badge:null};
     const up=[...orgs,newOrg]; setOrgs(up); await db.set(ORGS_KEY,up);
-    setReg({name:"",courseName:"",location:"",email:"",pw:"",logo:""});
+    setReg({fullName:"",position:"",courseName:"",location:"",email:"",pw:"",logo:""});
     toast("Registration submitted — awaiting admin approval"); setTab("leaderboard");
   }
 
@@ -924,6 +1083,12 @@ export default function App(){
       {/* ── HOME ── */}
       {tab==="home"&&<HomePage onNav={setTab} entries={entries} orgs={orgs}/>}
 
+      {/* ── CLUBS DIRECTORY ── */}
+      {tab==="clubs"&&!selectedClubId&&<ClubsDirectory orgs={orgs} entries={entries} onSelectClub={id=>{setSelectedClubId(id);}}/>}
+
+      {/* ── CLUB PAGE ── */}
+      {tab==="clubs"&&selectedClubId&&<ClubPage org={orgFor(selectedClubId)} entries={entries} onBack={()=>setSelectedClubId(null)} cvt={cvt} unitLbl={unitLbl}/>}
+
       {/* ── LEADERBOARD ── */}
       {tab==="leaderboard"&&<div>
         <div style={{background:"rgba(200,16,46,0.07)",border:"1px solid rgba(200,16,46,0.22)",borderRadius:10,padding:"10px 18px",marginBottom:20,display:"flex",alignItems:"center",gap:10}}>
@@ -961,6 +1126,7 @@ export default function App(){
         {/* Filters */}
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:8,marginBottom:20}}>
           {[
+            {label:"Search Player",val:fPlayer,set:setFPlayer,ph:"Player name"},
             {label:"Country/Region",val:fCountry,set:setFCountry,ph:"Filter by location"},
             {label:"Handicap",val:fHcp,set:setFHcp,ph:"All",opts:[["","All"],["scratch","Scratch (0 & under)"],["low","Low (1–5)"],["mid","Mid (6–14)"],["high","High (15–28)"],["beginner","Beginner (28+)"]]},
             {label:"Age Group",val:fAge,set:setFAge,ph:"All",opts:[["","All"],["u25","Under 25"],["25-40","25–40"],["40-55","40–55"],["55+","55+"]]},
@@ -987,7 +1153,10 @@ export default function App(){
         <div style={{fontFamily:DISP,fontSize:30,color:TXT,letterSpacing:1,marginBottom:6}}>Register Your Course</div>
         <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginBottom:28}}>Free to join. Once approved, you can submit your longest drive competition winners to the global leaderboard.</div>
         <Card>
-          <Field label="Organiser Name" value={reg.name} onChange={e=>setReg({...reg,name:e.target.value})} placeholder="Your full name" required/>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+            <div style={{gridColumn:"1/-1"}}><Field label="Your Full Name" value={reg.fullName} onChange={e=>setReg({...reg,fullName:e.target.value})} placeholder="e.g. James Hargreaves" required/></div>
+            <div style={{gridColumn:"1/-1"}}><Field label="Your Role / Position" value={reg.position} onChange={e=>setReg({...reg,position:e.target.value})} placeholder="e.g. Club Secretary, Tournament Director, Head Pro" required/></div>
+          </div>
           <Field label="Course / Club / Event Name" value={reg.courseName} onChange={e=>setReg({...reg,courseName:e.target.value})} placeholder="Augusta National Golf Club" required/>
           <Field label="Location" value={reg.location} onChange={e=>setReg({...reg,location:e.target.value})} placeholder="Augusta, Georgia, USA" required/>
           <Field label="Email Address" type="email" value={reg.email} onChange={e=>setReg({...reg,email:e.target.value})} placeholder="you@example.com" required/>
