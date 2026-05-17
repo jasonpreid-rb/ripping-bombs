@@ -9,6 +9,13 @@ const RB_LOGO_SVG = () => (
   </svg>
 );
 
+const RB_LOGO_SVG_WHITE = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 841.89 595.28" style={{height:36,width:"auto",display:"block"}} aria-label="Ripping Bombs">
+    <polygon fill="#ffffff" points="146.662,300.557 22.035,521.864 155.217,521.864 279.933,300.406 216.568,188.458 369.538,188.458 421.032,72.414 17.521,72.414"/>
+    <polygon fill="#ffffff" points="695.492,293.872 824.537,72.414 820.016,72.414 820.029,72.414 686.834,72.414 686.834,72.414 421.032,72.414 472.527,188.458 621.49,188.458 562.133,293.872 623.367,405.807 472.527,405.807 421.032,521.864 686.834,521.851 686.834,521.864 820.029,521.864 820.016,521.851 824.537,521.851"/>
+  </svg>
+);
+
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 
 const ADMIN_PW = "LongShot2026";
@@ -876,21 +883,120 @@ function HomePage({ onNav, entries, orgs }) {
           ))}
         </div>
       </div>
-
-      {/* FOOTER */}
-      <div style={{ borderTop: `1px solid ${BDR}`, paddingTop: 28, paddingBottom: 20, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
-        <div style={{display:"flex",flexDirection:"column",gap:6}}>
-          <div style={{ fontFamily: SANS, fontSize: 12, color: DIM }}>Copyright © 2026 rippingbombs.com · Powered by the HRH Collective LTD</div>
-          <span onClick={()=>onNav("clubs")} style={{fontFamily:SANS,fontSize:12,color:MUT,cursor:"pointer",textDecoration:"underline",width:"fit-content"}}>Clubs &amp; Events Directory</span>
-        </div>
-        <a href="https://www.instagram.com/rippingbombs/" target="_blank" rel="noreferrer" style={{ fontFamily: SANS, fontSize: 12, color: MUT, textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-          </svg>
-          Follow us on Instagram
-        </a>
-      </div>
     </div>
+  );
+}
+
+// ─── SITE FOOTER ─────────────────────────────────────────────────────────────
+
+function SiteFooter({ onNav }) {
+  const [enquiry, setEnquiry] = useState({ name: "", email: "", message: "" });
+  const [sent, setSent] = useState(false);
+
+  function sendEnquiry() {
+    if (!enquiry.name || !enquiry.email || !enquiry.message) return;
+    const subject = encodeURIComponent(`Ripping Bombs Enquiry from ${enquiry.name}`);
+    const body = encodeURIComponent(
+      `Name: ${enquiry.name}\nEmail: ${enquiry.email}\n\nMessage:\n${enquiry.message}`
+    );
+    window.open(`mailto:rippingbombs@outlook.com?subject=${subject}&body=${body}`, "_blank");
+    setSent(true);
+    setEnquiry({ name: "", email: "", message: "" });
+    setTimeout(() => setSent(false), 4000);
+  }
+
+  const inp = (val, onChange, placeholder, type="text", multiline=false) => {
+    const base = {
+      width:"100%", background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.12)",
+      borderRadius:8, padding:"9px 12px", color:"#fff", fontFamily:SANS, fontSize:13,
+      outline:"none", boxSizing:"border-box", resize:"none",
+      transition:"border-color .2s"
+    };
+    return multiline
+      ? <textarea value={val} onChange={onChange} placeholder={placeholder} rows={3}
+          style={base}
+          onFocus={e=>e.target.style.borderColor=ORG} onBlur={e=>e.target.style.borderColor="rgba(255,255,255,0.12)"}/>
+      : <input type={type} value={val} onChange={onChange} placeholder={placeholder}
+          style={base}
+          onFocus={e=>e.target.style.borderColor=ORG} onBlur={e=>e.target.style.borderColor="rgba(255,255,255,0.12)"}/>;
+  };
+
+  return (
+    <footer style={{ background: "#0e0e0e", borderTop: "1px solid rgba(255,255,255,0.07)", marginTop: 60 }}>
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "52px 18px 32px" }}>
+
+        {/* 3-column grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 40, marginBottom: 40 }}>
+
+          {/* Col 1 — Brand + links */}
+          <div>
+            <RB_LOGO_SVG_WHITE />
+            <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 14, marginBottom: 20, lineHeight: 1.7 }}>
+              The global home of competition longest drives. Free to join, free to submit.
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {[
+                ["Leaderboard", "leaderboard"],
+                ["Clubs & Events Directory", "clubs"],
+                ["Register Your Course", "register"],
+                ["Organiser Login", "login"],
+              ].map(([label, id]) => (
+                <span key={id} onClick={() => onNav(id)} style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.55)", cursor: "pointer", transition: "color .15s" }}
+                  onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color="rgba(255,255,255,0.55)"}>
+                  {label}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Col 2 — Instagram */}
+          <div>
+            <div style={{ fontFamily: DISP, fontSize: 18, color: "#fff", letterSpacing: 1, marginBottom: 14 }}>FOLLOW US</div>
+            <a href="https://www.instagram.com/rippingbombs/" target="_blank" rel="noreferrer"
+              style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)", borderRadius: 10, padding: "12px 18px", textDecoration: "none", marginBottom: 16 }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+              </svg>
+              <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 13, color: "#fff" }}>@rippingbombs</span>
+            </a>
+            <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.4)", lineHeight: 1.7 }}>
+              Follow us on Instagram for the latest longest drives, big hitter highlights, and updates from courses around the world.
+            </div>
+          </div>
+
+          {/* Col 3 — Enquiry form */}
+          <div>
+            <div style={{ fontFamily: DISP, fontSize: 18, color: "#fff", letterSpacing: 1, marginBottom: 14 }}>GET IN TOUCH</div>
+            {sent
+              ? <div style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 10, padding: "16px", fontFamily: SANS, fontSize: 13, color: GRN }}>
+                  ✓ Your message is ready to send — check your email app!
+                </div>
+              : <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {inp(enquiry.name, e=>setEnquiry({...enquiry,name:e.target.value}), "Your name")}
+                  {inp(enquiry.email, e=>setEnquiry({...enquiry,email:e.target.value}), "Your email", "email")}
+                  {inp(enquiry.message, e=>setEnquiry({...enquiry,message:e.target.value}), "Your message...", "text", true)}
+                  <button onClick={sendEnquiry}
+                    style={{ background: ORG, border: "none", color: "#fff", fontFamily: SANS, fontWeight: 700, fontSize: 12, padding: "10px 20px", borderRadius: 8, cursor: "pointer", letterSpacing: .5, marginTop: 2 }}>
+                    Send Enquiry →
+                  </button>
+                </div>
+            }
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 20, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+          <div style={{ fontFamily: SANS, fontSize: 11, color: "rgba(255,255,255,0.3)" }}>
+            Copyright © 2026 rippingbombs.com · Powered by the HRH Collective LTD
+          </div>
+          <div style={{ fontFamily: SANS, fontSize: 11, color: "rgba(255,255,255,0.3)" }}>
+            The global home of competition longest drives
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }
 
@@ -1009,7 +1115,7 @@ export default function App(){
   if(showAdmin) return <AdminPanel orgs={orgs} entries={entries} setOrgs={setOrgs} setEntries={setEntries} toast={toast} onClose={()=>setShowAdmin(false)} cvt={cvt} unitLbl={unitLbl}/>;
 
   const NavBtn=({id,label})=>(
-    <button onClick={()=>setTab(id)} style={{background:tab===id?ORG:"transparent",border:tab===id?"none":`1px solid ${BDR}`,color:tab===id?"#fff":MUT,fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 16px",borderRadius:8,cursor:"pointer",transition:"all .15s",letterSpacing:.3}}>{label}</button>
+    <button onClick={()=>setTab(id)} style={{background:tab===id?ORG:"transparent",border:tab===id?"none":"1px solid rgba(255,255,255,0.15)",color:tab===id?"#fff":"rgba(255,255,255,0.7)",fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 16px",borderRadius:8,cursor:"pointer",transition:"all .15s",letterSpacing:.3}}>{label}</button>
   );
 
   return <div style={{minHeight:"100vh",background:BG,color:TXT,fontFamily:SANS}}>
@@ -1028,9 +1134,9 @@ export default function App(){
     `}</style>
 
     {/* ── HEADER ── */}
-    <div style={{borderBottom:`1px solid ${BDR}`,padding:"12px 22px",display:"flex",justifyContent:"space-between",alignItems:"center",background:"rgba(245,245,240,0.95)",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(16px)"}}>
+    <div style={{borderBottom:"1px solid rgba(255,255,255,0.08)",padding:"12px 22px",display:"flex",justifyContent:"space-between",alignItems:"center",background:"rgba(14,14,14,0.97)",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(16px)"}}>
       <div style={{display:"flex",alignItems:"center",gap:14,cursor:"pointer"}} onClick={()=>setTab("home")}>
-        <RB_LOGO_SVG/>
+        <RB_LOGO_SVG_WHITE/>
       </div>
 
       {/* Desktop nav */}
@@ -1039,41 +1145,41 @@ export default function App(){
         <UnitToggle unit={unit} setUnit={setUnit}/>
 
         <NavBtn id="leaderboard" label="Leaderboard"/>
-        <button onClick={()=>setShowDemo(true)} style={{background:"rgba(240,180,41,0.1)",border:`1px solid rgba(240,180,41,0.3)`,color:GOLD,fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 14px",borderRadius:8,cursor:"pointer",letterSpacing:.3}}>Try Demo</button>
+        <button onClick={()=>setShowDemo(true)} style={{background:"rgba(240,180,41,0.12)",border:"1px solid rgba(240,180,41,0.3)",color:GOLD,fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 14px",borderRadius:8,cursor:"pointer",letterSpacing:.3}}>Try Demo</button>
         {loggedOrg
           ?<><NavBtn id="submit" label="Submit Drive"/>
             <button onClick={()=>{setLoggedOrg(null);setTab("home");}} style={{background:"none",border:"1px solid rgba(220,80,80,0.3)",borderRadius:8,color:"#f87171",fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 14px",cursor:"pointer"}}>Log Out</button></>
           :<><NavBtn id="login" label="Organiser Login"/>
             <button onClick={()=>setTab("register")} style={{background:ORG,border:"none",color:"#fff",fontFamily:SANS,fontWeight:700,fontSize:12,padding:"7px 16px",borderRadius:8,cursor:"pointer"}}>Register Course</button></>
         }
-        <button onClick={()=>setAdminPw({show:true,val:""})} title="Admin" style={{position:"relative",background:"none",border:`1px solid ${BDR}`,borderRadius:8,color:DIM,fontSize:14,padding:"6px 10px",cursor:"pointer"}}>
+        <button onClick={()=>setAdminPw({show:true,val:""})} title="Admin" style={{position:"relative",background:"none",border:"1px solid rgba(255,255,255,0.15)",borderRadius:8,color:"rgba(255,255,255,0.5)",fontSize:14,padding:"6px 10px",cursor:"pointer"}}>
           ⚙{pendingCount>0&&<span style={{position:"absolute",top:-4,right:-4,width:9,height:9,background:ORG,borderRadius:"50%",display:"block"}}/>}
         </button>
       </div>
 
       {/* Burger button */}
-      <button className="burger-btn" onClick={()=>setMenuOpen(m=>!m)} style={{background:"none",border:`1px solid ${BDR}`,borderRadius:8,padding:"6px 10px",cursor:"pointer",flexDirection:"column",gap:4,alignItems:"center",justifyContent:"center"}}>
-        <span style={{display:"block",width:18,height:2,background:TXT,borderRadius:2,transition:"all .2s",transform:menuOpen?"rotate(45deg) translate(4px,4px)":"none"}}/>
-        <span style={{display:"block",width:18,height:2,background:TXT,borderRadius:2,transition:"all .2s",opacity:menuOpen?0:1}}/>
-        <span style={{display:"block",width:18,height:2,background:TXT,borderRadius:2,transition:"all .2s",transform:menuOpen?"rotate(-45deg) translate(4px,-4px)":"none"}}/>
+      <button className="burger-btn" onClick={()=>setMenuOpen(m=>!m)} style={{background:"none",border:"1px solid rgba(255,255,255,0.15)",borderRadius:8,padding:"6px 10px",cursor:"pointer",flexDirection:"column",gap:4,alignItems:"center",justifyContent:"center"}}>
+        <span style={{display:"block",width:18,height:2,background:"#fff",borderRadius:2,transition:"all .2s",transform:menuOpen?"rotate(45deg) translate(4px,4px)":"none"}}/>
+        <span style={{display:"block",width:18,height:2,background:"#fff",borderRadius:2,transition:"all .2s",opacity:menuOpen?0:1}}/>
+        <span style={{display:"block",width:18,height:2,background:"#fff",borderRadius:2,transition:"all .2s",transform:menuOpen?"rotate(-45deg) translate(4px,-4px)":"none"}}/>
       </button>
     </div>
 
     {/* Mobile menu dropdown */}
-    {menuOpen&&<div style={{position:"fixed",top:62,left:0,right:0,background:"rgba(245,245,240,0.98)",backdropFilter:"blur(16px)",borderBottom:`1px solid ${BDR}`,zIndex:99,padding:"16px 22px 20px",display:"flex",flexDirection:"column",gap:10,animation:"slideDown .2s ease"}}>
+    {menuOpen&&<div style={{position:"fixed",top:62,left:0,right:0,background:"rgba(14,14,14,0.98)",backdropFilter:"blur(16px)",borderBottom:"1px solid rgba(255,255,255,0.08)",zIndex:99,padding:"16px 22px 20px",display:"flex",flexDirection:"column",gap:10,animation:"slideDown .2s ease"}}>
       {/* Unit toggle in mobile menu */}
       <div style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0"}}>
-        <span style={{fontFamily:SANS,fontSize:13,color:MUT}}>Distance unit:</span>
+        <span style={{fontFamily:SANS,fontSize:13,color:"rgba(255,255,255,0.5)"}}>Distance unit:</span>
         <UnitToggle unit={unit} setUnit={setUnit}/>
       </div>
       {[["leaderboard","Leaderboard"],["login","Organiser Login"],["register","Register Course"]].map(([id,label])=>(
-        <button key={id} onClick={()=>{setTab(id);setMenuOpen(false);}} style={{background:tab===id?ORG:"transparent",border:tab===id?"none":`1px solid ${BDR}`,color:tab===id?"#fff":TXT,fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",borderRadius:10,cursor:"pointer",textAlign:"left"}}>
+        <button key={id} onClick={()=>{setTab(id);setMenuOpen(false);}} style={{background:tab===id?ORG:"transparent",border:tab===id?"none":"1px solid rgba(255,255,255,0.12)",color:tab===id?"#fff":"rgba(255,255,255,0.8)",fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",borderRadius:10,cursor:"pointer",textAlign:"left"}}>
           {label}
         </button>
       ))}
-      <button onClick={()=>{setShowDemo(true);setMenuOpen(false);}} style={{background:"rgba(240,180,41,0.1)",border:`1px solid rgba(240,180,41,0.3)`,color:GOLD,fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",borderRadius:10,cursor:"pointer",textAlign:"left"}}>Try Demo</button>
+      <button onClick={()=>{setShowDemo(true);setMenuOpen(false);}} style={{background:"rgba(240,180,41,0.1)",border:"1px solid rgba(240,180,41,0.3)",color:GOLD,fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",borderRadius:10,cursor:"pointer",textAlign:"left"}}>Try Demo</button>
       {loggedOrg&&<>
-        <button onClick={()=>{setTab("submit");setMenuOpen(false);}} style={{background:"transparent",border:`1px solid ${BDR}`,color:TXT,fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",borderRadius:10,cursor:"pointer",textAlign:"left"}}>Submit Drive</button>
+        <button onClick={()=>{setTab("submit");setMenuOpen(false);}} style={{background:"transparent",border:"1px solid rgba(255,255,255,0.12)",color:"rgba(255,255,255,0.8)",fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",borderRadius:10,cursor:"pointer",textAlign:"left"}}>Submit Drive</button>
         <button onClick={()=>{setLoggedOrg(null);setTab("home");setMenuOpen(false);}} style={{background:"none",border:"1px solid rgba(220,80,80,0.3)",borderRadius:10,color:"#f87171",fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",cursor:"pointer",textAlign:"left"}}>Log Out</button>
       </>}
     </div>}
@@ -1218,5 +1324,7 @@ export default function App(){
     </Overlay>}
 
     {toastMsg&&<Toast msg={toastMsg} onDone={()=>setToastMsg(null)}/>}
+
+    <SiteFooter onNav={id=>{setTab(id);setMenuOpen(false);window.scrollTo(0,0);}}/>
   </div>;
 }
