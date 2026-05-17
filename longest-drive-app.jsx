@@ -1,4 +1,9 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate, useParams, Routes, Route } from "react-router-dom";
+
+// ─── SLUG UTIL ────────────────────────────────────────────────────────────────
+
+const toSlug = str => str.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 
 // ─── LOGO ─────────────────────────────────────────────────────────────────────
 
@@ -19,7 +24,7 @@ const RB_LOGO_SVG_WHITE = () => (
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 
 const ADMIN_PW = "LongShot2026";
-const SEED_KEY = "rb_seed_v8";
+const SEED_KEY = "rb_seed_v9";
 const ORGS_KEY = "rb_orgs";
 const ENT_KEY  = "rb_entries";
 const NOTIF_KEY = "rb_notifications";
@@ -89,44 +94,77 @@ const BADGES = {
 function daysAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); }
 
 const SEED_ORGS = [
-  {id:"o1", fullName:"James Hargreaves", position:"Club Secretary",       courseName:"Royal Birkdale Golf Club", location:"Southport, England",    email:"james@royalbirkdale.com", pw:"demo",logo:"",status:"approved",badge:"platinum"},
-  {id:"o2", fullName:"Caitlin O'Brien",  position:"Tournament Director",  courseName:"Lahinch Golf Club",         location:"Lahinch, Ireland",      email:"caitlin@lahinch.ie",      pw:"demo",logo:"",status:"approved",badge:"tour"},
-  {id:"o3", fullName:"Magnus Lindqvist", position:"Head Professional",    courseName:"Barsebäck G&CC",            location:"Malmö, Sweden",         email:"magnus@barseback.se",     pw:"demo",logo:"",status:"approved",badge:"platinum"},
-  {id:"o4", fullName:"Hiroshi Tanaka",   position:"General Manager",      courseName:"Hirono Golf Club",          location:"Kobe, Japan",           email:"hiroshi@hirono.jp",       pw:"demo",logo:"",status:"approved",badge:"tour"},
-  {id:"o5", fullName:"Priya Nair",       position:"Events Coordinator",   courseName:"Royal Calcutta Golf Club",  location:"Kolkata, India",        email:"priya@rcgc.in",           pw:"demo",logo:"",status:"approved",badge:"amateur"},
-  {id:"o6", fullName:"Dylan Schwartz",   position:"Club Manager",         courseName:"Bethpage Black",            location:"New York, USA",         email:"dylan@bethpage.com",      pw:"demo",logo:"",status:"approved",badge:"platinum"},
-  {id:"o7", fullName:"Amara Diallo",     position:"Tournament Organiser", courseName:"Leopard Creek CC",          location:"Malelane, South Africa",email:"amara@leopardcreek.co.za",pw:"demo",logo:"",status:"approved",badge:"tour"},
-  {id:"o8", fullName:"Sofia Reyes",      position:"Head Pro",             courseName:"Club de Golf Chapultepec",  location:"Mexico City, Mexico",   email:"sofia@chapultepec.mx",    pw:"demo",logo:"",status:"approved",badge:"amateur"},
-  {id:"o9", fullName:"Lena Fischer",     position:"Club Secretary",       courseName:"Golf Club Bad Griesbach",   location:"Bavaria, Germany",      email:"lena@gcbg.de",            pw:"demo",logo:"",status:"pending", badge:null},
-  {id:"o10",fullName:"Will Cartwright",  position:"General Manager",      courseName:"Carnoustie Golf Links",     location:"Carnoustie, Scotland",  email:"will@carnoustie.co.uk",   pw:"demo",logo:"",status:"pending", badge:null},
+  {id:"o1", fullName:"James Hargreaves", position:"Club Secretary",       courseName:"Royal Birkdale Golf Club",  location:"Southport, England",     email:"james@royalbirkdale.com",  pw:"demo",logo:"",status:"approved",badge:"platinum"},
+  {id:"o2", fullName:"Caitlin O'Brien",  position:"Tournament Director",  courseName:"Lahinch Golf Club",          location:"Lahinch, Ireland",       email:"caitlin@lahinch.ie",       pw:"demo",logo:"",status:"approved",badge:"tour"},
+  {id:"o3", fullName:"Magnus Lindqvist", position:"Head Professional",    courseName:"Barsebäck G&CC",             location:"Malmö, Sweden",          email:"magnus@barseback.se",      pw:"demo",logo:"",status:"approved",badge:"platinum"},
+  {id:"o4", fullName:"Hiroshi Tanaka",   position:"General Manager",      courseName:"Hirono Golf Club",           location:"Kobe, Japan",            email:"hiroshi@hirono.jp",        pw:"demo",logo:"",status:"approved",badge:"tour"},
+  {id:"o5", fullName:"Priya Nair",       position:"Events Coordinator",   courseName:"Royal Calcutta Golf Club",   location:"Kolkata, India",         email:"priya@rcgc.in",            pw:"demo",logo:"",status:"approved",badge:"amateur"},
+  {id:"o6", fullName:"Dylan Schwartz",   position:"Club Manager",         courseName:"Bethpage Black",             location:"New York, USA",          email:"dylan@bethpage.com",       pw:"demo",logo:"",status:"approved",badge:"platinum"},
+  {id:"o7", fullName:"Amara Diallo",     position:"Tournament Organiser", courseName:"Leopard Creek CC",           location:"Malelane, South Africa", email:"amara@leopardcreek.co.za", pw:"demo",logo:"",status:"approved",badge:"tour"},
+  {id:"o8", fullName:"Sofia Reyes",      position:"Head Pro",             courseName:"Club de Golf Chapultepec",   location:"Mexico City, Mexico",    email:"sofia@chapultepec.mx",     pw:"demo",logo:"",status:"approved",badge:"amateur"},
+  {id:"o9", fullName:"Hans Brauer",      position:"Head Professional",    courseName:"Golf Club Bad Griesbach",    location:"Bavaria, Germany",       email:"hans@gcbg.de",             pw:"demo",logo:"",status:"approved",badge:"tour"},
+  {id:"o10",fullName:"Will Cartwright",  position:"General Manager",      courseName:"Carnoustie Golf Links",      location:"Carnoustie, Scotland",   email:"will@carnoustie.co.uk",    pw:"demo",logo:"",status:"approved",badge:"platinum"},
+  {id:"o11",fullName:"Nadia Okonkwo",    position:"Club Director",        courseName:"Ikoyi Golf Club",            location:"Lagos, Nigeria",         email:"nadia@ikoyi.ng",           pw:"demo",logo:"",status:"approved",badge:"amateur"},
+  {id:"o12",fullName:"Pedro Almeida",    position:"Tournament Director",  courseName:"Quinta do Lago Golf",        location:"Algarve, Portugal",      email:"pedro@qdl.pt",             pw:"demo",logo:"",status:"approved",badge:"tour"},
+  {id:"o13",fullName:"Chen Wei",         position:"Head Professional",    courseName:"Mission Hills Golf Club",    location:"Shenzhen, China",        email:"chen@missionhills.cn",     pw:"demo",logo:"",status:"approved",badge:"platinum"},
+  {id:"o14",fullName:"Aiden Murphy",     position:"Events Manager",       courseName:"K Club Golf Resort",         location:"Straffan, Ireland",      email:"aiden@kclub.ie",           pw:"demo",logo:"",status:"approved",badge:"tour"},
+  {id:"o15",fullName:"Fatima Al-Rashid", position:"Club Secretary",       courseName:"Abu Dhabi Golf Club",        location:"Abu Dhabi, UAE",         email:"fatima@adgc.ae",           pw:"demo",logo:"",status:"pending", badge:null},
+  {id:"o16",fullName:"Marco Rossi",      position:"General Manager",      courseName:"Golf Club Milano",           location:"Milan, Italy",           email:"marco@gcmilano.it",        pw:"demo",logo:"",status:"pending", badge:null},
 ];
 
 const SEED_ENTRIES = [
-  {id:"e01",orgId:"o6",player:"Marcus Webb",      dist:368,club:"TaylorMade Stealth 2",              hcp:2, age:34,date:daysAgo(0),photo:""},
-  {id:"e02",orgId:"o1",player:"Tom Ashworth",      dist:334,club:"Callaway Paradym",                  hcp:7, age:28,date:daysAgo(0),photo:""},
-  {id:"e03",orgId:"o4",player:"Kenji Mori",         dist:321,club:"Ping G430 LST",                     hcp:0, age:41,date:daysAgo(0),photo:""},
-  {id:"e04",orgId:"o7",player:"Sipho Dlamini",      dist:298,club:"Cobra Aerojet LS",                  hcp:14,age:22,date:daysAgo(0),photo:""},
-  {id:"e05",orgId:"o2",player:"Finn O'Sullivan",    dist:317,club:"Titleist TSR3",                     hcp:5, age:37,date:daysAgo(0),photo:""},
-  {id:"e06",orgId:"o3",player:"Erik Johansson",     dist:352,club:"TaylorMade Qi10 LS",               hcp:1, age:29,date:daysAgo(1),photo:""},
-  {id:"e07",orgId:"o8",player:"Carlos Mendoza",     dist:309,club:"Callaway Paradym Ai Smoke",         hcp:9, age:45,date:daysAgo(1),photo:""},
-  {id:"e08",orgId:"o5",player:"Arjun Sharma",       dist:288,club:"Srixon ZX5 Mk II",                 hcp:3, age:31,date:daysAgo(1),photo:""},
-  {id:"e09",orgId:"o6",player:"Tyler Briggs",       dist:271,club:"Cleveland Launcher XL2",            hcp:18,age:55,date:daysAgo(1),photo:""},
-  {id:"e10",orgId:"o1",player:"Oliver Crane",       dist:343,club:"Titleist TSi3",                     hcp:4, age:26,date:daysAgo(1),photo:""},
-  {id:"e11",orgId:"o4",player:"Ryo Fujiwara",       dist:374,club:"Ping G430 Max 10K",                hcp:0, age:24,date:daysAgo(2),photo:""},
-  {id:"e12",orgId:"o2",player:"Declan Murphy",      dist:295,club:"TaylorMade Stealth HD",             hcp:11,age:48,date:daysAgo(2),photo:""},
-  {id:"e13",orgId:"o7",player:"Thandeka Nkosi",     dist:326,club:"Cobra Darkspeed X",                hcp:6, age:33,date:daysAgo(2),photo:""},
-  {id:"e14",orgId:"o8",player:"Valentina Cruz",     dist:263,club:"Mizuno ST-X 230",                  hcp:16,age:62,date:daysAgo(2),photo:""},
-  {id:"e15",orgId:"o3",player:"Lars Eklund",        dist:348,club:"Callaway Paradym Triple Diamond",   hcp:2, age:38,date:daysAgo(2),photo:""},
-  {id:"e16",orgId:"o5",player:"Rohit Menon",        dist:302,club:"Wilson Dynapower",                  hcp:8, age:44,date:daysAgo(3),photo:""},
-  {id:"e17",orgId:"o1",player:"James Whitfield",    dist:361,club:"TaylorMade Qi10",                  hcp:0, age:27,date:daysAgo(3),photo:""},
-  {id:"e18",orgId:"o6",player:"DeShawn Porter",     dist:344,club:"Ping G430 Max",                    hcp:5, age:19,date:daysAgo(3),photo:""},
-  {id:"e19",orgId:"o2",player:"Cormac Byrne",       dist:248,club:"Titleist TSR2",                    hcp:20,age:67,date:daysAgo(3),photo:""},
-  {id:"e20",orgId:"o4",player:"Takeshi Ono",        dist:337,club:"Srixon ZX7 Mk II",                 hcp:3, age:35,date:daysAgo(3),photo:""},
-  {id:"e21",orgId:"o7",player:"Bongani Zulu",       dist:318,club:"Cobra Aerojet Max",                hcp:12,age:40,date:daysAgo(4),photo:""},
-  {id:"e22",orgId:"o3",player:"Björn Magnusson",    dist:357,club:"TaylorMade Stealth 2+",            hcp:1, age:30,date:daysAgo(4),photo:""},
-  {id:"e23",orgId:"o8",player:"Diego Fuentes",      dist:294,club:"Callaway Rogue ST LS",             hcp:7, age:52,date:daysAgo(4),photo:""},
-  {id:"e24",orgId:"o5",player:"Vikram Pillai",      dist:277,club:"Titleist TSR1",                    hcp:10,age:58,date:daysAgo(4),photo:""},
-  {id:"e25",orgId:"o6",player:"Ryan Kowalski",      dist:339,club:"Mizuno ST-Z 230",                  hcp:4, age:23,date:daysAgo(4),photo:""},
+  // ── Week 1 (this week) ────────────────────────────────────────────────────
+  {id:"e01",orgId:"o6", player:"Marcus Webb",       dist:368,club:"TaylorMade Stealth 2",             hcp:2, age:34,date:daysAgo(0), photo:""},
+  {id:"e02",orgId:"o1", player:"Tom Ashworth",       dist:334,club:"Callaway Paradym",                 hcp:7, age:28,date:daysAgo(0), photo:""},
+  {id:"e03",orgId:"o4", player:"Kenji Mori",          dist:321,club:"Ping G430 LST",                    hcp:0, age:41,date:daysAgo(0), photo:""},
+  {id:"e04",orgId:"o7", player:"Sipho Dlamini",       dist:298,club:"Cobra Aerojet LS",                 hcp:14,age:22,date:daysAgo(0), photo:""},
+  {id:"e05",orgId:"o2", player:"Finn O'Sullivan",     dist:317,club:"Titleist TSR3",                    hcp:5, age:37,date:daysAgo(0), photo:""},
+  {id:"e06",orgId:"o3", player:"Erik Johansson",      dist:352,club:"TaylorMade Qi10 LS",              hcp:1, age:29,date:daysAgo(1), photo:""},
+  {id:"e07",orgId:"o8", player:"Carlos Mendoza",      dist:309,club:"Callaway Paradym Ai Smoke",        hcp:9, age:45,date:daysAgo(1), photo:""},
+  {id:"e08",orgId:"o5", player:"Arjun Sharma",        dist:288,club:"Srixon ZX5 Mk II",                hcp:3, age:31,date:daysAgo(1), photo:""},
+  {id:"e09",orgId:"o6", player:"Tyler Briggs",        dist:271,club:"Cleveland Launcher XL2",           hcp:18,age:55,date:daysAgo(1), photo:""},
+  {id:"e10",orgId:"o1", player:"Oliver Crane",        dist:343,club:"Titleist TSi3",                    hcp:4, age:26,date:daysAgo(1), photo:""},
+  {id:"e11",orgId:"o4", player:"Ryo Fujiwara",        dist:374,club:"Ping G430 Max 10K",               hcp:0, age:24,date:daysAgo(2), photo:""},
+  {id:"e12",orgId:"o2", player:"Declan Murphy",       dist:295,club:"TaylorMade Stealth HD",            hcp:11,age:48,date:daysAgo(2), photo:""},
+  {id:"e13",orgId:"o7", player:"Thandeka Nkosi",      dist:326,club:"Cobra Darkspeed X",               hcp:6, age:33,date:daysAgo(2), photo:""},
+  {id:"e14",orgId:"o8", player:"Valentina Cruz",      dist:263,club:"Mizuno ST-X 230",                 hcp:16,age:62,date:daysAgo(2), photo:""},
+  {id:"e15",orgId:"o3", player:"Lars Eklund",         dist:348,club:"Callaway Paradym Triple Diamond",  hcp:2, age:38,date:daysAgo(2), photo:""},
+  {id:"e16",orgId:"o5", player:"Rohit Menon",         dist:302,club:"Wilson Dynapower",                 hcp:8, age:44,date:daysAgo(3), photo:""},
+  {id:"e17",orgId:"o1", player:"James Whitfield",     dist:361,club:"TaylorMade Qi10",                 hcp:0, age:27,date:daysAgo(3), photo:""},
+  {id:"e18",orgId:"o6", player:"DeShawn Porter",      dist:344,club:"Ping G430 Max",                   hcp:5, age:19,date:daysAgo(3), photo:""},
+  {id:"e19",orgId:"o2", player:"Cormac Byrne",        dist:248,club:"Titleist TSR2",                   hcp:20,age:67,date:daysAgo(3), photo:""},
+  {id:"e20",orgId:"o4", player:"Takeshi Ono",         dist:337,club:"Srixon ZX7 Mk II",                hcp:3, age:35,date:daysAgo(3), photo:""},
+  {id:"e21",orgId:"o7", player:"Bongani Zulu",        dist:318,club:"Cobra Aerojet Max",               hcp:12,age:40,date:daysAgo(4), photo:""},
+  {id:"e22",orgId:"o3", player:"Björn Magnusson",     dist:357,club:"TaylorMade Stealth 2+",           hcp:1, age:30,date:daysAgo(4), photo:""},
+  {id:"e23",orgId:"o8", player:"Diego Fuentes",       dist:294,club:"Callaway Rogue ST LS",            hcp:7, age:52,date:daysAgo(4), photo:""},
+  {id:"e24",orgId:"o5", player:"Vikram Pillai",       dist:277,club:"Titleist TSR1",                   hcp:10,age:58,date:daysAgo(4), photo:""},
+  {id:"e25",orgId:"o6", player:"Ryan Kowalski",       dist:339,club:"Mizuno ST-Z 230",                 hcp:4, age:23,date:daysAgo(4), photo:""},
+  {id:"e26",orgId:"o9", player:"Hans Brauer",         dist:343,club:"TaylorMade Stealth 2+",            hcp:2, age:44,date:daysAgo(2), photo:""},
+  {id:"e27",orgId:"o10",player:"Alistair MacLeod",    dist:361,club:"Cobra Darkspeed LS",               hcp:0, age:38,date:daysAgo(1), photo:""},
+  {id:"e28",orgId:"o11",player:"Emeka Osei",          dist:312,club:"TaylorMade Qi10 Max",             hcp:8, age:29,date:daysAgo(1), photo:""},
+  {id:"e29",orgId:"o12",player:"João Silva",           dist:341,club:"Callaway Paradym Ai Smoke",       hcp:3, age:33,date:daysAgo(2), photo:""},
+  {id:"e30",orgId:"o13",player:"Zhang Wei",            dist:358,club:"Ping G430 LST",                   hcp:1, age:26,date:daysAgo(0), photo:""},
+  {id:"e31",orgId:"o14",player:"Conor Gallagher",     dist:329,club:"Titleist TSR3",                    hcp:6, age:31,date:daysAgo(3), photo:""},
+  // ── Week 2 (last week, days 7–13) ────────────────────────────────────────
+  {id:"e32",orgId:"o6", player:"Marcus Webb",         dist:371,club:"TaylorMade Stealth 2",             hcp:2, age:34,date:daysAgo(7), photo:""},
+  {id:"e33",orgId:"o1", player:"Sam Fletcher",        dist:319,club:"Callaway Paradym",                 hcp:9, age:22,date:daysAgo(7), photo:""},
+  {id:"e34",orgId:"o4", player:"Ryo Fujiwara",        dist:382,club:"Ping G430 Max 10K",               hcp:0, age:24,date:daysAgo(7), photo:""},
+  {id:"e35",orgId:"o3", player:"Erik Johansson",      dist:346,club:"TaylorMade Qi10 LS",              hcp:1, age:29,date:daysAgo(8), photo:""},
+  {id:"e36",orgId:"o7", player:"Thandeka Nkosi",      dist:331,club:"Cobra Darkspeed X",               hcp:6, age:33,date:daysAgo(8), photo:""},
+  {id:"e37",orgId:"o2", player:"Finn O'Sullivan",     dist:308,club:"Titleist TSR3",                    hcp:5, age:37,date:daysAgo(8), photo:""},
+  {id:"e38",orgId:"o5", player:"Arjun Sharma",        dist:293,club:"Srixon ZX5 Mk II",                hcp:3, age:31,date:daysAgo(9), photo:""},
+  {id:"e39",orgId:"o8", player:"Sofia Vargas",        dist:267,club:"Mizuno ST-Z 230",                 hcp:15,age:41,date:daysAgo(9), photo:""},
+  {id:"e40",orgId:"o6", player:"DeShawn Porter",      dist:349,club:"Ping G430 Max",                   hcp:5, age:19,date:daysAgo(9), photo:""},
+  {id:"e41",orgId:"o1", player:"Oliver Crane",        dist:338,club:"Titleist TSi3",                    hcp:4, age:26,date:daysAgo(10),photo:""},
+  {id:"e42",orgId:"o13",player:"Zhang Wei",            dist:364,club:"Ping G430 LST",                   hcp:1, age:26,date:daysAgo(8), photo:""},
+  {id:"e43",orgId:"o12",player:"João Silva",           dist:335,club:"Callaway Paradym",                hcp:3, age:33,date:daysAgo(9), photo:""},
+  {id:"e44",orgId:"o11",player:"Emeka Osei",          dist:307,club:"TaylorMade Qi10 Max",             hcp:8, age:29,date:daysAgo(10),photo:""},
+  {id:"e45",orgId:"o14",player:"Conor Gallagher",     dist:322,club:"Titleist TSR3",                    hcp:6, age:31,date:daysAgo(11),photo:""},
+  {id:"e46",orgId:"o9", player:"Hans Brauer",         dist:337,club:"TaylorMade Stealth 2+",            hcp:2, age:44,date:daysAgo(10),photo:""},
+  {id:"e47",orgId:"o10",player:"Alistair MacLeod",    dist:355,club:"Cobra Darkspeed LS",               hcp:0, age:38,date:daysAgo(9), photo:""},
+  {id:"e48",orgId:"o4", player:"Kenji Mori",          dist:318,club:"Ping G430 LST",                    hcp:0, age:41,date:daysAgo(11),photo:""},
+  {id:"e49",orgId:"o2", player:"Declan Murphy",       dist:289,club:"TaylorMade Stealth HD",            hcp:11,age:48,date:daysAgo(12),photo:""},
+  {id:"e50",orgId:"o3", player:"Lars Eklund",         dist:353,club:"Callaway Paradym Triple Diamond",  hcp:2, age:38,date:daysAgo(13),photo:""},
 ];
 
 async function initData(){
@@ -180,7 +218,7 @@ function Btn({children,onClick,variant="orange",small=false,full=false,style:sx=
     approve: {background:"rgba(34,197,94,0.1)", color:GRN, border:"1px solid rgba(34,197,94,0.3)"},
     gold:    {background:`linear-gradient(135deg,#c9a84c,${GOLD})`,color:BG, border:"none"},
   }[variant]||{};
-  return <button onClick={onClick} style={{...v,fontFamily:SANS,fontWeight:700,fontSize:small?10:12,letterSpacing:.5,cursor:"pointer",borderRadius:8,padding:small?"5px 12px":"10px 22px",width:full?"100%":"auto",transition:"opacity .15s,transform .1s",...sx}}
+  return <button onClick={onClick} style={{...v,fontFamily:SANS,fontWeight:700,fontSize:small?10:12,letterSpacing:.5,cursor:"pointer",borderRadius:0,padding:small?"5px 12px":"10px 22px",width:full?"100%":"auto",transition:"opacity .15s,transform .1s",...sx}}
     onMouseEnter={e=>{e.currentTarget.style.opacity=".85";e.currentTarget.style.transform="translateY(-1px)";}}
     onMouseLeave={e=>{e.currentTarget.style.opacity="1";e.currentTarget.style.transform="translateY(0)";}}>{children}</button>;
 }
@@ -210,19 +248,19 @@ function PhotoField({label,value,onChange,required}){
 }
 
 function Card({children,style:sx={}}){
-  return <div style={{background:BG2,border:`1px solid ${BDR}`,borderRadius:14,padding:24,...sx}}>{children}</div>;
+  return <div style={{background:BG2,border:`1px solid ${BDR}`,borderRadius:0,padding:24,...sx}}>{children}</div>;
 }
 
 function Pill({label,color}){
   const map={approved:GRN,pending:GOLD,rejected:"#f87171",disabled:"#6b7280"};
   const c=map[color]||MUT;
-  return <span style={{fontFamily:SANS,fontSize:10,fontWeight:600,letterSpacing:.8,color:c,background:`${c}18`,border:`1px solid ${c}44`,borderRadius:4,padding:"2px 8px",textTransform:"uppercase"}}>{label}</span>;
+  return <span style={{fontFamily:SANS,fontSize:10,fontWeight:600,letterSpacing:.8,color:c,background:`${c}18`,border:`1px solid ${c}44`,borderRadius:0,padding:"2px 8px",textTransform:"uppercase"}}>{label}</span>;
 }
 
 function BadgePill({badge,small}){
   if(!badge||!BADGES[badge]) return null;
   const b=BADGES[badge];
-  return <span style={{fontFamily:SANS,fontSize:small?9:10,fontWeight:600,color:b.color,background:b.bg,border:`1px solid ${b.border}`,borderRadius:4,padding:small?"1px 6px":"2px 9px",whiteSpace:"nowrap",letterSpacing:.5}}>{b.icon} {b.label}</span>;
+  return <span style={{fontFamily:SANS,fontSize:small?9:10,fontWeight:600,color:b.color,background:b.bg,border:`1px solid ${b.border}`,borderRadius:0,padding:small?"1px 6px":"2px 9px",whiteSpace:"nowrap",letterSpacing:.5}}>{b.icon} {b.label}</span>;
 }
 
 function Overlay({children,onClose}){
@@ -242,7 +280,7 @@ function UnitToggle({ unit, setUnit }) {
     <div style={{display:"flex",alignItems:"center",gap:7}}>
       <span
         onClick={()=>setUnit("yds")}
-        style={{fontFamily:SANS,fontSize:12,fontWeight:600,cursor:"pointer",color:isM?DIM:TXT,transition:"color .2s",userSelect:"none"}}
+        style={{fontFamily:SANS,fontSize:12,fontWeight:700,cursor:"pointer",color:isM?"rgba(255,255,255,0.4)":"#fff",transition:"color .2s",userSelect:"none",letterSpacing:.5}}
       >yds</span>
       <div
         onClick={()=>setUnit(isM?"yds":"m")}
@@ -250,21 +288,21 @@ function UnitToggle({ unit, setUnit }) {
         aria-checked={isM}
         tabIndex={0}
         onKeyDown={e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();setUnit(isM?"yds":"m");}}}
-        style={{width:42,height:24,borderRadius:12,background:isM?ORG:"rgba(0,0,0,0.15)",cursor:"pointer",position:"relative",transition:"background .22s",border:"none",flexShrink:0}}
+        style={{width:42,height:24,borderRadius:12,background:isM?ORG:"rgba(255,255,255,0.2)",cursor:"pointer",position:"relative",transition:"background .22s",border:"1px solid rgba(255,255,255,0.25)",flexShrink:0}}
       >
         <div style={{
-          position:"absolute",top:3,
-          left:isM?19:3,
+          position:"absolute",top:2,
+          left:isM?18:2,
           width:18,height:18,
           borderRadius:"50%",
           background:"#fff",
           transition:"left .22s cubic-bezier(.4,0,.2,1)",
-          boxShadow:"0 1px 4px rgba(0,0,0,0.25)"
+          boxShadow:"0 1px 4px rgba(0,0,0,0.4)"
         }}/>
       </div>
       <span
         onClick={()=>setUnit("m")}
-        style={{fontFamily:SANS,fontSize:12,fontWeight:600,cursor:"pointer",color:isM?TXT:DIM,transition:"color .2s",userSelect:"none"}}
+        style={{fontFamily:SANS,fontSize:12,fontWeight:700,cursor:"pointer",color:isM?"#fff":"rgba(255,255,255,0.4)",transition:"color .2s",userSelect:"none",letterSpacing:.5}}
       >m</span>
     </div>
   );
@@ -624,7 +662,8 @@ function DemoSubmit({onClose,entries,setEntries,orgs,toast,cvt,unitLbl}){
 
 // ─── CLUBS DIRECTORY PAGE ────────────────────────────────────────────────────
 
-function ClubsDirectory({ orgs, entries, onSelectClub }) {
+function ClubsDirectory({ orgs, entries }) {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const approved = orgs
     .filter(o => o.status === "approved")
@@ -649,7 +688,7 @@ function ClubsDirectory({ orgs, entries, onSelectClub }) {
         value={search}
         onChange={e=>setSearch(e.target.value)}
         placeholder="Search clubs or locations..."
-        style={{width:"100%",background:BG2,border:`1px solid ${BDR}`,borderRadius:10,padding:"11px 16px",fontFamily:SANS,fontSize:14,color:TXT,outline:"none",marginBottom:28,boxSizing:"border-box"}}
+        style={{width:"100%",background:BG2,border:`1px solid ${BDR}`,borderRadius:0,padding:"11px 16px",fontFamily:SANS,fontSize:14,color:TXT,outline:"none",marginBottom:28,boxSizing:"border-box"}}
       />
 
       {letters.map(letter => (
@@ -660,8 +699,8 @@ function ClubsDirectory({ orgs, entries, onSelectClub }) {
               const clubEntries = entries.filter(e=>e.orgId===org.id);
               const best = clubEntries.length ? Math.max(...clubEntries.map(e=>e.dist)) : null;
               return (
-                <div key={org.id} onClick={()=>onSelectClub(org.id)}
-                  style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 18px",background:BG2,border:`1px solid ${BDR}`,borderRadius:10,cursor:"pointer",transition:"all .15s",gap:12,flexWrap:"wrap"}}
+                <div key={org.id} onClick={()=>navigate(`/clubs/${toSlug(org.courseName)}`)}
+                  style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 18px",background:BG2,border:`1px solid ${BDR}`,borderRadius:0,cursor:"pointer",transition:"all .15s",gap:12,flexWrap:"wrap"}}
                   onMouseEnter={e=>e.currentTarget.style.borderColor=ORG}
                   onMouseLeave={e=>e.currentTarget.style.borderColor=BDR}>
                   <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
@@ -687,14 +726,27 @@ function ClubsDirectory({ orgs, entries, onSelectClub }) {
 
 // ─── CLUB PAGE ────────────────────────────────────────────────────────────────
 
-function ClubPage({ org, entries, onBack, cvt, unitLbl }) {
+function ClubPage({ orgs, entries, cvt, unitLbl }) {
+  const { slug } = useParams();
+  const navigate = useNavigate();
+  const org = orgs.find(o => toSlug(o.courseName) === slug);
+
+  useEffect(()=>{ window.scrollTo(0,0); },[slug]);
+
+  if (!org) return (
+    <div style={{padding:"80px 0",textAlign:"center"}}>
+      <div style={{fontFamily:DISP,fontSize:28,color:TXT,marginBottom:12}}>Club Not Found</div>
+      <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginBottom:24}}>This club may not be registered or the URL may be incorrect.</div>
+      <Btn onClick={()=>navigate("/clubs")}>← Back to Clubs</Btn>
+    </div>
+  );
+
   const clubEntries = entries.filter(e=>e.orgId===org.id).sort((a,b)=>b.dist-a.dist);
   const best = clubEntries[0];
   const [week, setWeek] = useState(nowWeek());
   const [allTime, setAllTime] = useState(false);
   const weekEntries = allTime ? clubEntries : clubEntries.filter(e=>sameWeek(e.date,week));
 
-  // SEO meta update
   useEffect(()=>{
     document.title = `${org.courseName} | Ripping Bombs`;
     const desc = document.querySelector('meta[name="description"]');
@@ -703,7 +755,7 @@ function ClubPage({ org, entries, onBack, cvt, unitLbl }) {
 
   return (
     <div>
-      <button onClick={onBack} style={{background:"none",border:"none",color:ORG,fontFamily:SANS,fontWeight:600,fontSize:13,cursor:"pointer",padding:"0 0 18px",display:"flex",alignItems:"center",gap:6}}>
+      <button onClick={()=>navigate("/clubs")} style={{background:"none",border:"none",color:ORG,fontFamily:SANS,fontWeight:600,fontSize:13,cursor:"pointer",padding:"0 0 18px",display:"flex",alignItems:"center",gap:6}}>
         ← Back to Clubs
       </button>
 
@@ -800,12 +852,18 @@ function HomePage({ onNav, entries, orgs }) {
 
   return (
     <div style={{ animation: "fi .4s ease" }}>
-      {/* HERO */}
+      {/* HERO VIDEO — flush against dark header, no gap */}
       <div style={{ position: "relative", overflow: "hidden", margin: "0 calc(-50vw + 50%)", marginBottom: 0 }}>
-        <img src="https://images.pexels.com/photos/6542438/pexels-photo-6542438.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Golf drive" style={{ width: "100%", height: "clamp(420px,60vw,620px)", objectFit: "cover", display: "block", filter: "brightness(0.45)" }}/>
+        <video
+          autoPlay muted loop playsInline
+          poster="https://images.pexels.com/videos/33511561/tee-shot-33511561.jpeg?auto=compress&cs=tinysrgb&h=627&fit=crop&w=1200"
+          style={{ width: "100%", height: "clamp(420px,60vw,620px)", objectFit: "cover", display: "block", filter: "brightness(0.45)" }}
+        >
+          <source src="https://videos.pexels.com/video-files/33511561/14252773_2560_1440_60fps.mp4" type="video/mp4"/>
+        </video>
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 20px", textAlign: "center" }}>
-          <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: 4, color: "#FC4C02", textTransform: "uppercase", marginBottom: 16, background: "rgba(252,76,2,0.15)", border: "1px solid rgba(252,76,2,0.4)", borderRadius: 20, padding: "5px 16px", display: "inline-block" }}>
+          <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: 4, color: "#FC4C02", textTransform: "uppercase", marginBottom: 16, background: "rgba(252,76,2,0.15)", border: "1px solid rgba(252,76,2,0.4)", padding: "5px 16px", display: "inline-block" }}>
             The Global Home of Competition Longest Drives
           </div>
           <h1 style={{ fontFamily: DISP, fontSize: "clamp(56px, 10vw, 110px)", color: "#ffffff", lineHeight: 0.95, letterSpacing: 3, marginBottom: 20, textShadow: "0 4px 32px rgba(0,0,0,0.5)" }}>
@@ -815,10 +873,10 @@ function HomePage({ onNav, entries, orgs }) {
             A free platform where golfers, clubs, coaches, driving ranges, and tournament organisers can register verified longest drives and compare them on global standings.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <button onClick={() => onNav("register")} style={{ background: ORG, border: "none", color: "#fff", fontFamily: SANS, fontWeight: 700, fontSize: 14, padding: "14px 32px", borderRadius: 10, cursor: "pointer", letterSpacing: 0.5, boxShadow: "0 4px 24px rgba(252,76,2,0.5)" }}>
+            <button onClick={() => onNav("register")} style={{ background: ORG, border: "none", color: "#fff", fontFamily: SANS, fontWeight: 700, fontSize: 14, padding: "14px 32px", borderRadius: 0, cursor: "pointer", letterSpacing: 0.5, boxShadow: "0 4px 24px rgba(252,76,2,0.5)" }}>
               REGISTER NOW FREE →
             </button>
-            <button onClick={() => onNav("leaderboard")} style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: "14px 28px", borderRadius: 10, cursor: "pointer", letterSpacing: 0.5, backdropFilter: "blur(8px)" }}>
+            <button onClick={() => onNav("leaderboard")} style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: "14px 28px", borderRadius: 0, cursor: "pointer", letterSpacing: 0.5, backdropFilter: "blur(8px)" }}>
               View Leaderboard
             </button>
           </div>
@@ -826,7 +884,7 @@ function HomePage({ onNav, entries, orgs }) {
       </div>
 
       {/* STATS BAR */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 1, background: BDR, borderTop: `1px solid ${BDR}`, borderBottom: `1px solid ${BDR}`, margin: "0 0 60px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 1, background: BDR, borderTop: `1px solid ${BDR}`, borderBottom: `1px solid ${BDR}`, margin: "0 0 0" }}>
         {stats.map(({ val, label }) => (
           <div key={label} style={{ background: BG2, padding: "28px 20px", textAlign: "center" }}>
             <div style={{ fontFamily: DISP, fontSize: 38, color: ORG, letterSpacing: 1, lineHeight: 1 }}>{val}</div>
@@ -835,14 +893,16 @@ function HomePage({ onNav, entries, orgs }) {
         ))}
       </div>
 
+      <div style={{padding:"0 18px"}}>
+
       {/* FEATURE CARDS */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, marginBottom: 60 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, marginBottom: 60, marginTop: 60 }}>
         {[
           { img: "https://images.pexels.com/photos/10463463/pexels-photo-10463463.jpeg?auto=compress&cs=tinysrgb&w=600", title: "Global Long Drive Standings", body: "Compare verified competition-winning drives with golfers from clubs and tournaments around the world." },
           { img: "https://images.pexels.com/photos/12642295/pexels-photo-12642295.jpeg?auto=compress&cs=tinysrgb&w=600", title: "Free Club & Tournament Registration", body: "Clubs, coaches, driving ranges, and event organisers can submit longest drive winners at no cost during launch." },
           { img: "https://images.pexels.com/photos/6572962/pexels-photo-6572962.jpeg?auto=compress&cs=tinysrgb&w=600", title: "Recognition for Big Hitters", body: "Give golfers a place to showcase huge drives, earn rankings, and represent their club on a global platform." },
         ].map(({ img, title, body }) => (
-          <div key={title} style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 16, overflow: "hidden" }}>
+          <div key={title} style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 0, overflow: "hidden" }}>
             <div style={{ position: "relative", height: 160, overflow: "hidden" }}>
               <img src={img} alt={title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform .4s ease" }}
                 onMouseEnter={e=>e.target.style.transform="scale(1.05)"}
@@ -871,7 +931,7 @@ function HomePage({ onNav, entries, orgs }) {
         <div style={{ fontFamily: DISP, fontSize: 28, color: TXT, letterSpacing: 0.5, marginBottom: 20 }}>FAQ</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {faqs.map(({ q, a }, i) => (
-            <div key={i} style={{ background: BG2, border: `1px solid ${openFaq === i ? "rgba(200,16,46,0.25)" : BDR}`, borderRadius: 10, overflow: "hidden" }}>
+            <div key={i} style={{ background: BG2, border: `1px solid ${openFaq === i ? "rgba(200,16,46,0.25)" : BDR}`, borderRadius: 0, overflow: "hidden" }}>
               <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width: "100%", background: "none", border: "none", padding: "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", gap: 16 }}>
                 <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 600, color: TXT, textAlign: "left" }}>{q}</span>
                 <span style={{ fontFamily: SANS, fontSize: 18, color: ORG, flexShrink: 0, display: "block", transform: openFaq === i ? "rotate(45deg)" : "none", transition: "transform .2s" }}>+</span>
@@ -883,6 +943,8 @@ function HomePage({ onNav, entries, orgs }) {
           ))}
         </div>
       </div>
+
+      </div>{/* end padding wrapper */}
     </div>
   );
 }
@@ -1130,11 +1192,13 @@ export default function App(){
       @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
       .desktop-nav{display:flex}
       .burger-btn{display:none}
-      @media(max-width:680px){.desktop-nav{display:none}.burger-btn{display:flex}}
+      @media(max-width:680px){.desktop-nav{display:none}.burger-btn{display:flex;align-items:center;justify-content:center}}
+      .site-header{padding:16px 22px!important;min-height:64px}
+      @media(max-width:680px){.site-header{padding:18px 16px!important;min-height:72px}}
     `}</style>
 
     {/* ── HEADER ── */}
-    <div style={{borderBottom:"1px solid rgba(255,255,255,0.08)",padding:"12px 22px",display:"flex",justifyContent:"space-between",alignItems:"center",background:"rgba(14,14,14,0.97)",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(16px)"}}>
+    <div className="site-header" style={{borderBottom:"1px solid rgba(255,255,255,0.08)",padding:"12px 22px",display:"flex",justifyContent:"space-between",alignItems:"center",background:"rgba(14,14,14,0.97)",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(16px)"}}>
       <div style={{display:"flex",alignItems:"center",gap:14,cursor:"pointer"}} onClick={()=>setTab("home")}>
         <RB_LOGO_SVG_WHITE/>
       </div>
@@ -1184,10 +1248,10 @@ export default function App(){
       </>}
     </div>}
 
-    <div style={{maxWidth:1000,margin:"0 auto",padding:"28px 18px 80px",animation:"fi .35s ease"}}>
+    <div style={{maxWidth:1000,margin:"0 auto",padding:tab==="home"?"0 0 80px":"28px 18px 80px",animation:"fi .35s ease"}}>
 
       {/* ── HOME ── */}
-      {tab==="home"&&<HomePage onNav={setTab} entries={entries} orgs={orgs}/>}
+      {tab==="home"&&<HomePage onNav={id=>{setTab(id);window.scrollTo(0,0);}} entries={entries} orgs={orgs}/>}
 
       {/* ── CLUBS DIRECTORY ── */}
       {tab==="clubs"&&!selectedClubId&&<ClubsDirectory orgs={orgs} entries={entries} onSelectClub={id=>{setSelectedClubId(id);}}/>}
