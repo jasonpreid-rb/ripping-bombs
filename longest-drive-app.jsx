@@ -1065,6 +1065,7 @@ function SiteFooter({ onNav }) {
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 
 export default function App(){
+  const navigate = useNavigate();
   const [orgs,    setOrgs]    = useState([]);
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1175,8 +1176,6 @@ export default function App(){
   if(loading) return <div style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{fontFamily:SANS,color:MUT,fontSize:13,letterSpacing:2}}>LOADING…</div></div>;
 
   if(showAdmin) return <AdminPanel orgs={orgs} entries={entries} setOrgs={setOrgs} setEntries={setEntries} toast={toast} onClose={()=>setShowAdmin(false)} cvt={cvt} unitLbl={unitLbl}/>;
-
-  const navigate = useNavigate();
 
   function navTo(id) {
     if(id==="clubs"){ navigate("/clubs"); }
