@@ -1277,7 +1277,7 @@ export default function App(){
       .burger-btn{display:none}
       @media(max-width:680px){.desktop-nav{display:none}.burger-btn{display:flex;align-items:center;justify-content:center}}
       .site-header{padding:16px 22px!important;min-height:64px}
-      @media(max-width:680px){.site-header{padding:18px 16px!important;min-height:72px}}
+      @media(max-width:680px){.site-header{padding:20px 16px!important;min-height:80px;box-sizing:border-box}}
     `}</style>
 
     {/* ── HEADER ── */}
@@ -1292,7 +1292,7 @@ export default function App(){
         <UnitToggle unit={unit} setUnit={setUnit}/>
 
         <NavBtn id="leaderboard" label="Leaderboard"/>
-        <button onClick={()=>setShowDemo(true)} style={{background:"rgba(240,180,41,0.12)",border:"1px solid rgba(240,180,41,0.3)",color:GOLD,fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 14px",borderRadius:0,cursor:"pointer",letterSpacing:.3}}>Try Demo</button>
+        <button onClick={()=>setShowDemo(true)} style={{background:"transparent",border:`1px solid rgba(163,230,53,0.4)`,color:ORG,fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 14px",borderRadius:0,cursor:"pointer",letterSpacing:.3}}>Try Demo</button>
         {loggedOrg
           ?<><NavBtn id="submit" label="Submit Drive"/>
             <button onClick={()=>{setLoggedOrg(null);navTo("home");}} style={{background:"none",border:"1px solid rgba(220,80,80,0.3)",borderRadius:0,color:"#f87171",fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 14px",cursor:"pointer"}}>Log Out</button></>
@@ -1325,7 +1325,7 @@ export default function App(){
         </button>
       ))}
       <button onClick={()=>navTo("clubs")} style={{background:"transparent",border:"1px solid rgba(255,255,255,0.12)",color:"rgba(255,255,255,0.8)",fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",borderRadius:0,cursor:"pointer",textAlign:"left"}}>Clubs &amp; Events</button>
-      <button onClick={()=>{setShowDemo(true);setMenuOpen(false);}} style={{background:"rgba(240,180,41,0.1)",border:"1px solid rgba(240,180,41,0.3)",color:GOLD,fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",borderRadius:0,cursor:"pointer",textAlign:"left"}}>Try Demo</button>
+      <button onClick={()=>{setShowDemo(true);setMenuOpen(false);}} style={{background:"transparent",border:`1px solid rgba(163,230,53,0.4)`,color:ORG,fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",borderRadius:0,cursor:"pointer",textAlign:"left"}}>Try Demo</button>
       {loggedOrg&&<>
         <button onClick={()=>navTo("submit")} style={{background:"transparent",border:"1px solid rgba(255,255,255,0.12)",color:"rgba(255,255,255,0.8)",fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",borderRadius:0,cursor:"pointer",textAlign:"left"}}>Submit Drive</button>
         <button onClick={()=>{setLoggedOrg(null);navTo("home");}} style={{background:"none",border:"1px solid rgba(220,80,80,0.3)",borderRadius:0,color:"#f87171",fontFamily:SANS,fontWeight:600,fontSize:14,padding:"12px 16px",cursor:"pointer",textAlign:"left"}}>Log Out</button>
