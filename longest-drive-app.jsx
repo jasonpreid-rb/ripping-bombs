@@ -9,8 +9,8 @@ const toSlug = str => str.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-
 
 const RB_LOGO_SVG = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 841.89 595.28" style={{height:40,width:"auto",display:"block"}} aria-label="Ripping Bombs">
-    <polygon fill="#111111" points="146.662,300.557 22.035,521.864 155.217,521.864 279.933,300.406 216.568,188.458 369.538,188.458 421.032,72.414 17.521,72.414"/>
-    <polygon fill="#111111" points="695.492,293.872 824.537,72.414 820.016,72.414 820.029,72.414 686.834,72.414 686.834,72.414 421.032,72.414 472.527,188.458 621.49,188.458 562.133,293.872 623.367,405.807 472.527,405.807 421.032,521.864 686.834,521.851 686.834,521.864 820.029,521.864 820.016,521.851 824.537,521.851"/>
+    <polygon fill="#a3e635" points="146.662,300.557 22.035,521.864 155.217,521.864 279.933,300.406 216.568,188.458 369.538,188.458 421.032,72.414 17.521,72.414"/>
+    <polygon fill="#a3e635" points="695.492,293.872 824.537,72.414 820.016,72.414 820.029,72.414 686.834,72.414 686.834,72.414 421.032,72.414 472.527,188.458 621.49,188.458 562.133,293.872 623.367,405.807 472.527,405.807 421.032,521.864 686.834,521.851 686.834,521.864 820.029,521.864 820.016,521.851 824.537,521.851"/>
   </svg>
 );
 
@@ -62,22 +62,22 @@ function nextWeek({y,w}) { const nw=nowWeek(); if(y>nw.y||(y===nw.y&&w>=nw.w)) r
 const todayStr = ()=>new Date().toISOString().slice(0,10);
 const fmtDate = d=>{ try{ return new Date(d+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}); }catch{return d;} };
 const tier = d=>d>=350?"🟡 Elite":d>=300?"🟢 Pro":d>=250?"🔵 Strong":"⚪ Amateur";
-const tierClr = d=>"#C8102E";
+const tierClr = d=>"#a3e635";
 const toB64 = f=>new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
 
 // ─── DESIGN TOKENS ──────────────────────────────────────────────────────────
 
-const BG   = "#f5f5f0";
-const BG2  = "#ffffff";
-const BG3  = "#e8e8e2";
-const ORG  = "#FC4C02";
-const ORG2 = "#ff6b35";
-const GOLD = "#f0b429";
-const GRN  = "#22c55e";
-const BDR  = "rgba(0,0,0,0.10)";
-const TXT  = "#111111";
-const MUT  = "#555555";
-const DIM  = "#999999";
+const BG   = "#1a1a1a";
+const BG2  = "#242424";
+const BG3  = "#2e2e2e";
+const ORG  = "#a3e635";
+const ORG2 = "#bef264";
+const GOLD = "#a3e635";
+const GRN  = "#a3e635";
+const BDR  = "rgba(255,255,255,0.08)";
+const TXT  = "#f0f0f0";
+const MUT  = "#a0a0a0";
+const DIM  = "#666666";
 const SANS = "'Inter','Helvetica Neue',sans-serif";
 const DISP = "'Bebas Neue','Arial Black',sans-serif";
 
@@ -211,12 +211,12 @@ function Toast({msg,onDone}){
 
 function Btn({children,onClick,variant="orange",small=false,full=false,style:sx={}}){
   const v={
-    orange:  {background:`linear-gradient(135deg,${ORG},${ORG2})`,color:"#fff", border:"none"},
-    ghost:   {background:"transparent", color:ORG, border:`1px solid rgba(252,76,2,0.4)`},
-    subtle:  {background:"rgba(255,255,255,0.05)", color:MUT, border:`1px solid ${BDR}`},
-    danger:  {background:"rgba(220,60,60,0.08)", color:"#f87171",border:"1px solid rgba(220,60,60,0.25)"},
-    approve: {background:"rgba(34,197,94,0.1)", color:GRN, border:"1px solid rgba(34,197,94,0.3)"},
-    gold:    {background:`linear-gradient(135deg,#c9a84c,${GOLD})`,color:BG, border:"none"},
+    orange:  {background:"transparent", color:ORG, border:`1px solid ${ORG}`},
+    ghost:   {background:"transparent", color:ORG, border:`1px solid rgba(163,230,53,0.4)`},
+    subtle:  {background:"transparent", color:MUT,  border:`1px solid ${BDR}`},
+    danger:  {background:"transparent", color:"#f87171", border:"1px solid rgba(220,60,60,0.5)"},
+    approve: {background:"transparent", color:GRN,  border:`1px solid rgba(163,230,53,0.5)`},
+    gold:    {background:"transparent", color:ORG,  border:`1px solid ${ORG}`},
   }[variant]||{};
   return <button onClick={onClick} style={{...v,fontFamily:SANS,fontWeight:700,fontSize:small?10:12,letterSpacing:.5,cursor:"pointer",borderRadius:0,padding:small?"5px 12px":"10px 22px",width:full?"100%":"auto",transition:"opacity .15s,transform .1s",...sx}}
     onMouseEnter={e=>{e.currentTarget.style.opacity=".85";e.currentTarget.style.transform="translateY(-1px)";}}
@@ -873,10 +873,10 @@ function HomePage({ onNav, entries, orgs }) {
             A free platform where golfers, clubs, coaches, driving ranges, and tournament organisers can register verified longest drives and compare them on global standings.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <button onClick={() => onNav("register")} style={{ background: ORG, border: "none", color: "#fff", fontFamily: SANS, fontWeight: 700, fontSize: 14, padding: "14px 32px", borderRadius: 0, cursor: "pointer", letterSpacing: 0.5, boxShadow: "0 4px 24px rgba(252,76,2,0.5)" }}>
+            <button onClick={() => onNav("register")} style={{ background: "transparent", border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 14, padding: "14px 32px", borderRadius: 0, cursor: "pointer", letterSpacing: 0.5 }}>
               REGISTER NOW FREE →
             </button>
-            <button onClick={() => onNav("leaderboard")} style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: "14px 28px", borderRadius: 0, cursor: "pointer", letterSpacing: 0.5, backdropFilter: "blur(8px)" }}>
+            <button onClick={() => onNav("leaderboard")} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: "14px 28px", borderRadius: 0, cursor: "pointer", letterSpacing: 0.5, backdropFilter: "blur(8px)" }}>
               View Leaderboard
             </button>
           </div>
@@ -918,10 +918,10 @@ function HomePage({ onNav, entries, orgs }) {
       </div>
 
       {/* CTA STRIP */}
-      <div style={{ background: "linear-gradient(135deg, rgba(252,76,2,0.08), rgba(200,16,46,0.05))", border: "1px solid rgba(252,76,2,0.2)", borderRadius: 16, padding: "40px 32px", textAlign: "center", marginBottom: 60 }}>
+      <div style={{ background: `rgba(163,230,53,0.05)`, border: `1px solid rgba(163,230,53,0.2)`, borderRadius: 0, padding: "40px 32px", textAlign: "center", marginBottom: 60 }}>
         <div style={{ fontFamily: DISP, fontSize: "clamp(24px,5vw,40px)", color: TXT, letterSpacing: 1, marginBottom: 10 }}>FREE TO JOIN. FREE TO SUBMIT.</div>
         <div style={{ fontFamily: SANS, fontSize: 14, color: MUT, marginBottom: 28 }}>Built for golfers who love sending it.</div>
-        <button onClick={() => onNav("register")} style={{ background: ORG, border: "none", color: "#fff", fontFamily: SANS, fontWeight: 700, fontSize: 14, padding: "14px 36px", borderRadius: 10, cursor: "pointer", boxShadow: "0 4px 24px rgba(252,76,2,0.35)" }}>
+        <button onClick={() => onNav("register")} style={{ background: "transparent", border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 14, padding: "14px 36px", borderRadius: 0, cursor: "pointer" }}>
           REGISTER NOW FREE →
         </button>
       </div>
@@ -1040,7 +1040,7 @@ function SiteFooter({ onNav }) {
                   {inp(enquiry.email, e=>setEnquiry({...enquiry,email:e.target.value}), "Your email", "email")}
                   {inp(enquiry.message, e=>setEnquiry({...enquiry,message:e.target.value}), "Your message...", "text", true)}
                   <button onClick={sendEnquiry}
-                    style={{ background: ORG, border: "none", color: "#fff", fontFamily: SANS, fontWeight: 700, fontSize: 12, padding: "10px 20px", borderRadius: 8, cursor: "pointer", letterSpacing: .5, marginTop: 2 }}>
+                    style={{ background: "transparent", border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 12, padding: "10px 20px", borderRadius: 0, cursor: "pointer", letterSpacing: .5, marginTop: 2 }}>
                     Send Enquiry →
                   </button>
                 </div>
@@ -1192,9 +1192,9 @@ export default function App(){
     <style>{`
       @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
       *{box-sizing:border-box;margin:0;padding:0}
-      input::placeholder,select option{color:${DIM}!important}
+      input::placeholder,select option{color:#666666!important}
       select{appearance:none}
-      ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:${BG}}::-webkit-scrollbar-thumb{background:${BG3};border-radius:3px}
+      ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#1a1a1a}::-webkit-scrollbar-thumb{background:#2e2e2e;border-radius:3px}
       @keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
       @keyframes fi{from{opacity:0}to{opacity:1}}
       @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
@@ -1222,7 +1222,7 @@ export default function App(){
           ?<><NavBtn id="submit" label="Submit Drive"/>
             <button onClick={()=>{setLoggedOrg(null);navTo("home");}} style={{background:"none",border:"1px solid rgba(220,80,80,0.3)",borderRadius:0,color:"#f87171",fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 14px",cursor:"pointer"}}>Log Out</button></>
           :<><NavBtn id="login" label="Organiser Login"/>
-            <button onClick={()=>navTo("register")} style={{background:ORG,border:"none",color:"#fff",fontFamily:SANS,fontWeight:700,fontSize:12,padding:"7px 16px",borderRadius:0,cursor:"pointer"}}>Register Course</button></>
+            <button onClick={()=>navTo("register")} style={{background:"transparent",border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:12,padding:"7px 16px",borderRadius:0,cursor:"pointer"}}>Register Course</button></>
         }
         <button onClick={()=>setAdminPw({show:true,val:""})} title="Admin" style={{position:"relative",background:"none",border:"1px solid rgba(255,255,255,0.15)",borderRadius:0,color:"rgba(255,255,255,0.5)",fontSize:14,padding:"6px 10px",cursor:"pointer"}}>
           ⚙{pendingCount>0&&<span style={{position:"absolute",top:-4,right:-4,width:9,height:9,background:ORG,borderRadius:"50%",display:"block"}}/>}
