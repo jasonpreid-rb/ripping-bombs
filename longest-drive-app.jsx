@@ -240,7 +240,7 @@ function PhotoField({label,value,onChange,required}){
     <label style={{display:"block",fontFamily:SANS,fontSize:11,fontWeight:600,color:MUT,marginBottom:5,textTransform:"uppercase",letterSpacing:.8}}>
       {label}{required&&<span style={{color:ORG,marginLeft:2}}>*</span>}
     </label>
-    <div style={{border:`1px dashed rgba(252,76,2,0.3)`,borderRadius:10,padding:16,background:"rgba(252,76,2,0.03)",textAlign:"center"}}>
+    <div style={{border:`1px dashed rgba(163,230,53,0.3)`,borderRadius:10,padding:16,background:"rgba(163,230,53,0.03)",textAlign:"center"}}>
       {value?<><img src={value} alt="" style={{maxHeight:100,maxWidth:"100%",borderRadius:8,marginBottom:6,objectFit:"cover"}}/><div style={{fontFamily:SANS,fontSize:11,color:GRN}}>Photo uploaded</div></>:<div style={{color:DIM,fontFamily:SANS,fontSize:12}}>No photo selected</div>}
       <input type="file" accept="image/*" onChange={onChange} style={{display:"block",margin:"8px auto 0",fontFamily:SANS,fontSize:11,color:MUT}}/>
     </div>
@@ -317,8 +317,8 @@ function LeaderTable({rows,orgFor,onView,cvt,unitLbl}){
   const bg=(ri,ci)=>{
     const rh=hr===ri, ch=hc===ci;
     if(rh&&ch) return ORG;
-    if(rh) return "rgba(252,76,2,0.1)";
-    if(ch) return "rgba(252,76,2,0.05)";
+    if(rh) return "rgba(163,230,53,0.1)";
+    if(ch) return "rgba(163,230,53,0.05)";
     return "transparent";
   };
   const fg=(ri,ci)=>{
@@ -332,7 +332,7 @@ function LeaderTable({rows,orgFor,onView,cvt,unitLbl}){
       <thead>
         <tr>
           {COLS.map((col,ci)=><th key={col} onMouseEnter={()=>setHc(ci)} onMouseLeave={()=>setHc(null)}
-            style={{padding:"11px 14px",fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:1.2,color:hc===ci?ORG:DIM,textTransform:"uppercase",textAlign:"left",background:hc===ci?"rgba(252,76,2,0.05)":"transparent",borderBottom:`2px solid ${BDR}`,transition:"all .12s",userSelect:"none"}}>{col}</th>)}
+            style={{padding:"11px 14px",fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:1.2,color:hc===ci?ORG:DIM,textTransform:"uppercase",textAlign:"left",background:hc===ci?"rgba(163,230,53,0.05)":"transparent",borderBottom:`2px solid ${BDR}`,transition:"all .12s",userSelect:"none"}}>{col}</th>)}
         </tr>
       </thead>
       <tbody>
@@ -350,7 +350,7 @@ function LeaderTable({rows,orgFor,onView,cvt,unitLbl}){
             <div><span style={{fontSize:12}}>{org?.courseName||"—"}</span>{org?.badge&&<span style={{marginLeft:6}}><BadgePill badge={org.badge} small/></span>}</div>,
             <span style={{fontSize:11,color:DIM}}>{fmtDate(e.date)}</span>,
             <span style={{fontFamily:SANS,fontSize:10,fontWeight:600,color:hr===ri&&hc===8?"#fff":tierClr(e.dist)}}>{tier(e.dist)}</span>,
-            <button onClick={ev=>{ev.stopPropagation();shareEntry(e,org,cvt,unitLbl);}} style={{background:"rgba(252,76,2,0.1)",border:"1px solid rgba(252,76,2,0.25)",color:ORG,borderRadius:6,padding:"4px 10px",cursor:"pointer",fontSize:11,fontFamily:SANS,fontWeight:600}}>↗ Share</button>,
+            <button onClick={ev=>{ev.stopPropagation();shareEntry(e,org,cvt,unitLbl);}} style={{background:"rgba(163,230,53,0.1)",border:"1px solid rgba(163,230,53,0.25)",color:ORG,borderRadius:6,padding:"4px 10px",cursor:"pointer",fontSize:11,fontFamily:SANS,fontWeight:600}}>↗ Share</button>,
           ];
           return <tr key={e.id} onMouseEnter={()=>setHr(ri)} onMouseLeave={()=>setHr(null)} onClick={()=>onView(e)}>
             {cells.map((cell,ci)=><td key={ci} onMouseEnter={()=>setHc(ci)} onMouseLeave={()=>setHc(null)} style={cellS(ri,ci)}>{cell}</td>)}
@@ -369,7 +369,7 @@ function EntryModal({entry,org,onClose,cvt,unitLbl}){
     <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:ORG,marginBottom:8,textTransform:"uppercase"}}>Drive Record</div>
     <div style={{fontFamily:DISP,fontSize:32,color:TXT,marginBottom:2,letterSpacing:1}}>{entry.player}</div>
     <div style={{fontFamily:SANS,fontSize:12,color:MUT,marginBottom:22}}>{org?.courseName} · {fmtDate(entry.date)}</div>
-    <div style={{textAlign:"center",padding:"20px 0",borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,marginBottom:20,background:"rgba(252,76,2,0.04)",borderRadius:10,margin:"0 -8px 20px"}}>
+    <div style={{textAlign:"center",padding:"20px 0",borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,marginBottom:20,background:"rgba(163,230,53,0.04)",borderRadius:10,margin:"0 -8px 20px"}}>
       <span style={{fontFamily:DISP,fontSize:64,color:tierClr(entry.dist),letterSpacing:1,textShadow:`0 0 40px ${tierClr(entry.dist)}55`}}>{cvt(entry.dist)}</span>
       <span style={{fontFamily:SANS,fontSize:16,color:MUT,marginLeft:6}}>{unitLbl}</span>
       <div style={{fontFamily:SANS,fontSize:12,fontWeight:600,color:tierClr(entry.dist),marginTop:6}}>{tier(entry.dist)}</div>
@@ -433,7 +433,7 @@ function AdminPanel({orgs,entries,setOrgs,setEntries,toast,onClose,cvt,unitLbl})
     </div>
   );
   const Tab=({id,label,badge})=>(
-    <button onClick={()=>setSub(id)} style={{display:"flex",alignItems:"center",gap:6,background:sub===id?"rgba(252,76,2,0.12)":"transparent",border:`1px solid ${sub===id?ORG:BDR}`,color:sub===id?ORG:MUT,fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 16px",cursor:"pointer",borderRadius:8,transition:"all .15s"}}>
+    <button onClick={()=>setSub(id)} style={{display:"flex",alignItems:"center",gap:6,background:sub===id?"rgba(163,230,53,0.12)":"transparent",border:`1px solid ${sub===id?ORG:BDR}`,color:sub===id?ORG:MUT,fontFamily:SANS,fontWeight:600,fontSize:12,padding:"7px 16px",cursor:"pointer",borderRadius:8,transition:"all .15s"}}>
       {label}{badge>0&&<span style={{background:ORG,color:"#fff",borderRadius:10,padding:"1px 7px",fontSize:10,fontWeight:700}}>{badge}</span>}
     </button>
   );
@@ -475,7 +475,7 @@ function AdminPanel({orgs,entries,setOrgs,setEntries,toast,onClose,cvt,unitLbl})
         <div style={{fontFamily:SANS,fontWeight:700,fontSize:16,color:TXT,marginBottom:12}}>Recent Drives</div>
         {[...entries].sort((a,b)=>b.id.localeCompare(a.id)).slice(0,8).map(e=>(
           <div key={e.id} onClick={()=>setSelEnt(e)} style={{display:"grid",gridTemplateColumns:"1fr auto auto auto",alignItems:"center",gap:12,padding:"12px 16px",borderRadius:10,marginBottom:6,cursor:"pointer",background:BG3,border:`1px solid ${BDR}`,transition:"background .15s"}}
-            onMouseEnter={el=>el.currentTarget.style.background="rgba(252,76,2,0.06)"}
+            onMouseEnter={el=>el.currentTarget.style.background="rgba(163,230,53,0.06)"}
             onMouseLeave={el=>el.currentTarget.style.background=BG3}>
             <div><span style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>{e.player}</span><span style={{fontFamily:SANS,fontSize:11,color:MUT,marginLeft:10}}>{orgFor(e.orgId)?.courseName} · {fmtDate(e.date)}</span></div>
             <span style={{fontFamily:DISP,fontSize:20,color:tierClr(e.dist)}}>{cvt(e.dist)} {unitLbl}</span>
@@ -509,7 +509,7 @@ function AdminPanel({orgs,entries,setOrgs,setEntries,toast,onClose,cvt,unitLbl})
         <div style={{fontFamily:DISP,fontSize:22,color:TXT,letterSpacing:1,marginBottom:18}}>All Courses ({orgs.length})</div>
         {orgs.map(org=><div key={org.id} onClick={()=>setSelOrg(org)}
           style={{display:"grid",gridTemplateColumns:"1fr auto",alignItems:"center",gap:12,padding:"13px 18px",borderRadius:10,marginBottom:8,cursor:"pointer",background:BG3,border:`1px solid ${BDR}`,transition:"background .15s"}}
-          onMouseEnter={el=>el.currentTarget.style.background="rgba(252,76,2,0.06)"}
+          onMouseEnter={el=>el.currentTarget.style.background="rgba(163,230,53,0.06)"}
           onMouseLeave={el=>el.currentTarget.style.background=BG3}>
           <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
             <span style={{fontFamily:SANS,fontWeight:700,fontSize:15,color:TXT}}>{org.courseName}</span>
@@ -533,7 +533,7 @@ function AdminPanel({orgs,entries,setOrgs,setEntries,toast,onClose,cvt,unitLbl})
             <thead><tr>{["#","Player","Dist","Club","HCP","Age","Course","Date",""].map(h=><th key={h} style={{padding:"9px 13px",fontFamily:SANS,fontSize:9,fontWeight:700,letterSpacing:1.2,color:DIM,textTransform:"uppercase",textAlign:"left",borderBottom:`2px solid ${BDR}`}}>{h}</th>)}</tr></thead>
             <tbody>{[...entries].sort((a,b)=>b.dist-a.dist).map((e,i)=>(
               <tr key={e.id} onClick={()=>setSelEnt(e)} style={{cursor:"pointer",transition:"background .15s"}}
-                onMouseEnter={el=>el.currentTarget.style.background="rgba(252,76,2,0.06)"}
+                onMouseEnter={el=>el.currentTarget.style.background="rgba(163,230,53,0.06)"}
                 onMouseLeave={el=>el.currentTarget.style.background="transparent"}>
                 <td style={{padding:"9px 13px",fontFamily:SANS,fontSize:11,color:DIM,borderBottom:`1px solid rgba(255,255,255,0.04)`}}>#{i+1}</td>
                 <td style={{padding:"9px 13px",fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT,borderBottom:`1px solid rgba(255,255,255,0.04)`}}>{e.player}</td>
@@ -625,7 +625,7 @@ function DemoSubmit({onClose,entries,setEntries,orgs,toast,cvt,unitLbl}){
     <div style={{textAlign:"center",padding:"10px 0 20px"}}>
       <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:1,marginBottom:6}}>Looking Good!</div>
       <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginBottom:24}}>Here's a preview of how your drive would appear on the global leaderboard.</div>
-      <div style={{background:"rgba(252,76,2,0.06)",border:"1px solid rgba(252,76,2,0.2)",borderRadius:12,padding:"20px 24px",textAlign:"left",marginBottom:20}}>
+      <div style={{background:"rgba(163,230,53,0.06)",border:"1px solid rgba(163,230,53,0.2)",borderRadius:12,padding:"20px 24px",textAlign:"left",marginBottom:20}}>
         <div style={{fontFamily:DISP,fontSize:22,color:TXT,letterSpacing:.5}}>{submitted.entry.player}</div>
         <div style={{fontFamily:SANS,fontSize:11,color:MUT,marginBottom:12}}>{submitted.org.courseName} · {fmtDate(submitted.entry.date)}</div>
         <div style={{display:"flex",alignItems:"baseline",gap:8,marginBottom:8}}>
@@ -654,7 +654,7 @@ function DemoSubmit({onClose,entries,setEntries,orgs,toast,cvt,unitLbl}){
       <Field label="Handicap" type="number" value={form.hcp} onChange={e=>setForm({...form,hcp:e.target.value})} placeholder="5" min="-10" max="54" required/>
       <Field label="Age" type="number" value={form.age} onChange={e=>setForm({...form,age:e.target.value})} placeholder="34" min="10" max="100" required/>
     </div>
-    {form.dist&&Number(form.dist)>0&&<div style={{background:"rgba(252,76,2,0.07)",border:"1px solid rgba(252,76,2,0.2)",borderRadius:8,padding:"9px 14px",marginBottom:14,fontFamily:SANS,fontSize:12,fontWeight:600,color:ORG}}>{tier(Number(form.dist))} — {Number(form.dist)>=350?"Extraordinary! That's world-class.":Number(form.dist)>=300?"Impressive distance!":Number(form.dist)>=250?"Solid drive.":"Good effort!"}</div>}
+    {form.dist&&Number(form.dist)>0&&<div style={{background:"rgba(163,230,53,0.07)",border:"1px solid rgba(163,230,53,0.2)",borderRadius:8,padding:"9px 14px",marginBottom:14,fontFamily:SANS,fontSize:12,fontWeight:600,color:ORG}}>{tier(Number(form.dist))} — {Number(form.dist)>=350?"Extraordinary! That's world-class.":Number(form.dist)>=300?"Impressive distance!":Number(form.dist)>=250?"Solid drive.":"Good effort!"}</div>}
     <PhotoField label="Photo of Drive Marker (optional)" value={form.photo} onChange={async e=>{ if(e.target.files[0]) setForm({...form,photo:await toB64(e.target.files[0])}); }}/>
     <Btn full onClick={doDemo}>Preview My Drive →</Btn>
   </Overlay>;
@@ -693,7 +693,7 @@ function ClubsDirectory({ orgs, entries }) {
 
       {letters.map(letter => (
         <div key={letter} style={{marginBottom:28}}>
-          <div style={{fontFamily:DISP,fontSize:22,color:ORG,letterSpacing:1,marginBottom:10,borderBottom:`2px solid rgba(252,76,2,0.15)`,paddingBottom:6}}>{letter}</div>
+          <div style={{fontFamily:DISP,fontSize:22,color:ORG,letterSpacing:1,marginBottom:10,borderBottom:`2px solid rgba(163,230,53,0.15)`,paddingBottom:6}}>{letter}</div>
           <div style={{display:"flex",flexDirection:"column",gap:6}}>
             {grouped[letter].map(org => {
               const clubEntries = entries.filter(e=>e.orgId===org.id);
@@ -774,7 +774,7 @@ function ClubPage({ orgs, entries, cvt, unitLbl }) {
       </div>
 
       {/* Club record hero */}
-      {best&&<div style={{background:`linear-gradient(135deg,rgba(252,76,2,0.1),rgba(252,76,2,0.03))`,border:"1px solid rgba(252,76,2,0.22)",borderRadius:14,padding:"20px 24px",marginBottom:24,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
+      {best&&<div style={{background:`linear-gradient(135deg,rgba(163,230,53,0.1),rgba(163,230,53,0.03))`,border:"1px solid rgba(163,230,53,0.22)",borderRadius:14,padding:"20px 24px",marginBottom:24,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
         <div>
           <div style={{fontFamily:SANS,fontSize:9,fontWeight:700,letterSpacing:2,color:ORG,marginBottom:6,textTransform:"uppercase"}}>🏆 Club Record</div>
           <div style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>{best.player}</div>
@@ -863,7 +863,7 @@ function HomePage({ onNav, entries, orgs }) {
         </video>
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 20px", textAlign: "center" }}>
-          <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: 4, color: "#FC4C02", textTransform: "uppercase", marginBottom: 16, background: "rgba(252,76,2,0.15)", border: "1px solid rgba(252,76,2,0.4)", padding: "5px 16px", display: "inline-block" }}>
+          <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: 4, color: "#a3e635", textTransform: "uppercase", marginBottom: 16, background: "rgba(163,230,53,0.15)", border: "1px solid rgba(163,230,53,0.4)", padding: "5px 16px", display: "inline-block" }}>
             The Global Home of Competition Longest Drives
           </div>
           <h1 style={{ fontFamily: DISP, fontSize: "clamp(56px, 10vw, 110px)", color: "#ffffff", lineHeight: 0.95, letterSpacing: 3, marginBottom: 20, textShadow: "0 4px 32px rgba(0,0,0,0.5)" }}>
@@ -931,7 +931,7 @@ function HomePage({ onNav, entries, orgs }) {
         <div style={{ fontFamily: DISP, fontSize: 28, color: TXT, letterSpacing: 0.5, marginBottom: 20 }}>FAQ</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {faqs.map(({ q, a }, i) => (
-            <div key={i} style={{ background: BG2, border: `1px solid ${openFaq === i ? "rgba(200,16,46,0.25)" : BDR}`, borderRadius: 0, overflow: "hidden" }}>
+            <div key={i} style={{ background: BG2, border: `1px solid ${openFaq === i ? "rgba(163,230,53,0.25)" : BDR}`, borderRadius: 0, overflow: "hidden" }}>
               <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width: "100%", background: "none", border: "none", padding: "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", gap: 16 }}>
                 <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 600, color: TXT, textAlign: "left" }}>{q}</span>
                 <span style={{ fontFamily: SANS, fontSize: 18, color: ORG, flexShrink: 0, display: "block", transform: openFaq === i ? "rotate(45deg)" : "none", transition: "transform .2s" }}>+</span>
@@ -949,7 +949,81 @@ function HomePage({ onNav, entries, orgs }) {
   );
 }
 
-// ─── SITE FOOTER ─────────────────────────────────────────────────────────────
+// ─── LAUNCH MODAL ─────────────────────────────────────────────────────────────
+
+function LaunchModal({ onClose, onNav }) {
+  const LAUNCH = new Date("2026-09-01T00:00:00");
+  const [timeLeft, setTimeLeft] = useState({});
+
+  useEffect(() => {
+    function calc() {
+      const diff = LAUNCH - new Date();
+      if (diff <= 0) { setTimeLeft({ d:0,h:0,m:0,s:0 }); return; }
+      setTimeLeft({
+        d: Math.floor(diff / 864e5),
+        h: Math.floor((diff % 864e5) / 36e5),
+        m: Math.floor((diff % 36e5) / 6e4),
+        s: Math.floor((diff % 6e4) / 1e3),
+      });
+    }
+    calc();
+    const t = setInterval(calc, 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const pad = n => String(n).padStart(2,"0");
+
+  return (
+    <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:900,display:"flex",alignItems:"center",justifyContent:"center",padding:20,backdropFilter:"blur(6px)"}}>
+      <div onClick={e=>e.stopPropagation()} style={{background:"#1a1a1a",border:`1px solid rgba(163,230,53,0.25)`,width:"100%",maxWidth:560,padding:"40px 36px",position:"relative",boxShadow:"0 0 80px rgba(163,230,53,0.08)"}}>
+        
+        {/* Close */}
+        <button onClick={onClose} style={{position:"absolute",top:14,right:16,background:"none",border:"none",color:MUT,fontSize:20,cursor:"pointer",lineHeight:1}}>✕</button>
+
+        {/* Launching label */}
+        <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:"uppercase",marginBottom:16}}>
+          Official Platform Launch
+        </div>
+
+        {/* Headline */}
+        <div style={{fontFamily:"'Bebas Neue','Arial Black',sans-serif",fontSize:"clamp(32px,7vw,52px)",color:"#fff",letterSpacing:2,lineHeight:1,marginBottom:28}}>
+          LAUNCHING<br/>SEPTEMBER 2026
+        </div>
+
+        {/* Countdown */}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginBottom:28}}>
+          {[["DAYS",timeLeft.d],["HRS",timeLeft.h],["MIN",timeLeft.m],["SEC",timeLeft.s]].map(([label,val])=>(
+            <div key={label} style={{background:"#242424",border:`1px solid rgba(163,230,53,0.15)`,padding:"16px 8px",textAlign:"center"}}>
+              <div style={{fontFamily:"'Bebas Neue','Arial Black',sans-serif",fontSize:36,color:ORG,letterSpacing:2,lineHeight:1}}>{pad(val??0)}</div>
+              <div style={{fontFamily:"'Inter',sans-serif",fontSize:9,fontWeight:700,letterSpacing:2,color:MUT,marginTop:5,textTransform:"uppercase"}}>{label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Body text */}
+        <p style={{fontFamily:"'Inter',sans-serif",fontSize:13,color:"rgba(255,255,255,0.6)",lineHeight:1.8,marginBottom:24}}>
+          Ripping Bombs is currently onboarding participating courses, clubs and launch events worldwide ahead of the official platform launch. Global rankings will be built through verified real-world competition results once events begin going live.
+        </p>
+
+        {/* Buttons */}
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          <button onClick={()=>{onClose();onNav("register");}} style={{background:"transparent",border:`1px solid ${ORG}`,color:ORG,fontFamily:"'Inter',sans-serif",fontWeight:700,fontSize:13,padding:"13px 24px",cursor:"pointer",letterSpacing:.5,transition:"opacity .15s"}}
+            onMouseEnter={e=>e.currentTarget.style.opacity=".75"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+            REGISTER YOUR CLUB →
+          </button>
+          <button onClick={()=>{onClose();document.querySelector("footer")?.scrollIntoView({behavior:"smooth"});}} style={{background:"transparent",border:"1px solid rgba(255,255,255,0.15)",color:"rgba(255,255,255,0.6)",fontFamily:"'Inter',sans-serif",fontWeight:600,fontSize:13,padding:"13px 24px",cursor:"pointer",letterSpacing:.5,transition:"opacity .15s"}}
+            onMouseEnter={e=>e.currentTarget.style.opacity=".75"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+            CONTACT / PARTNERSHIPS →
+          </button>
+        </div>
+
+        <div style={{fontFamily:"'Inter',sans-serif",fontSize:11,color:DIM,marginTop:16,textAlign:"center"}}>
+          Commercial partnerships, launch sponsorships and prize collaboration opportunities are now open.
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function SiteFooter({ onNav }) {
   const [enquiry, setEnquiry] = useState({ name: "", email: "", message: "" });
@@ -1077,6 +1151,7 @@ export default function App(){
   const [loggedOrg,setLoggedOrg]=useState(null);
   const [showDemo,setShowDemo]= useState(false);
   const [menuOpen,setMenuOpen]= useState(false);
+  const [showLaunch,setShowLaunch] = useState(()=>!sessionStorage.getItem("rb_launch_seen"));
 
   // ── UNIT STATE ──────────────────────────────────────────────────────────────
   const [unit, setUnit] = useState("yds"); // "yds" | "m"
@@ -1270,13 +1345,13 @@ export default function App(){
 
       {/* ── LEADERBOARD ── */}
       {tab==="leaderboard"&&<div>
-        <div style={{background:"rgba(200,16,46,0.07)",border:"1px solid rgba(200,16,46,0.22)",borderRadius:10,padding:"10px 18px",marginBottom:20,display:"flex",alignItems:"center",gap:10}}>
-          <span style={{fontFamily:SANS,fontSize:13,fontWeight:700,color:"#C8102E"}}>Sample data only</span>
+        <div style={{background:"rgba(163,230,53,0.07)",border:"1px solid rgba(163,230,53,0.22)",borderRadius:10,padding:"10px 18px",marginBottom:20,display:"flex",alignItems:"center",gap:10}}>
+          <span style={{fontFamily:SANS,fontSize:13,fontWeight:700,color:"#a3e635"}}>Sample data only</span>
           <span style={{fontFamily:SANS,fontSize:13,color:MUT}}>— site going live September</span>
         </div>
 
         {/* World record hero */}
-        {allTimeBest[0]&&<div style={{background:`linear-gradient(135deg,rgba(252,76,2,0.12),rgba(252,76,2,0.04))`,border:"1px solid rgba(252,76,2,0.25)",borderRadius:16,padding:"24px 28px",marginBottom:28,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:18}}>
+        {allTimeBest[0]&&<div style={{background:`linear-gradient(135deg,rgba(163,230,53,0.12),rgba(163,230,53,0.04))`,border:"1px solid rgba(163,230,53,0.25)",borderRadius:16,padding:"24px 28px",marginBottom:28,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:18}}>
           <div>
             <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:ORG,marginBottom:8,textTransform:"uppercase"}}>🏆 All-Time World Record</div>
             <div style={{fontFamily:DISP,fontSize:34,color:TXT,letterSpacing:.5}}>{allTimeBest[0].player}</div>
@@ -1377,7 +1452,7 @@ export default function App(){
             <Field label="Handicap" type="number" value={form.hcp} onChange={e=>setForm({...form,hcp:e.target.value})} placeholder="5" min="-10" max="54" required/>
             <Field label="Age" type="number" value={form.age} onChange={e=>setForm({...form,age:e.target.value})} placeholder="34" min="10" max="100" required/>
           </div>
-          {form.dist&&Number(form.dist)>0&&<div style={{background:"rgba(252,76,2,0.07)",border:"1px solid rgba(252,76,2,0.2)",borderRadius:8,padding:"9px 14px",marginBottom:14,fontFamily:SANS,fontSize:12,fontWeight:600,color:ORG}}>{tier(Number(form.dist))} — {cvt(Number(form.dist))} {unitLbl}</div>}
+          {form.dist&&Number(form.dist)>0&&<div style={{background:"rgba(163,230,53,0.07)",border:"1px solid rgba(163,230,53,0.2)",borderRadius:8,padding:"9px 14px",marginBottom:14,fontFamily:SANS,fontSize:12,fontWeight:600,color:ORG}}>{tier(Number(form.dist))} — {cvt(Number(form.dist))} {unitLbl}</div>}
           <PhotoField label="Photo Evidence (required)" value={form.photo} onChange={async e=>{ if(e.target.files[0]) setForm({...form,photo:await toB64(e.target.files[0])}); }} required/>
           <Btn full onClick={doSubmit}>Submit to World Registry →</Btn>
         </Card>
@@ -1397,6 +1472,8 @@ export default function App(){
     </Overlay>}
 
     {toastMsg&&<Toast msg={toastMsg} onDone={()=>setToastMsg(null)}/>}
+
+    {showLaunch&&<LaunchModal onClose={()=>{setShowLaunch(false);sessionStorage.setItem("rb_launch_seen","1");}} onNav={navTo}/>}
 
     <SiteFooter onNav={id=>navTo(id)}/>
   </div>;
