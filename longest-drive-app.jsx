@@ -1,6 +1,29 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams, Routes, Route } from "react-router-dom";
 
+// ─── EMAILJS CONFIG ───────────────────────────────────────────────────────────
+
+const EJS_SERVICE       = "service_ijz7h1p";
+const EJS_TEMPLATE_NOTIF = "template_9w26xwm";  // registration notifications
+const EJS_TEMPLATE_CONTACT = "template_21fdarp"; // contact/enquiry form
+const EJS_KEY           = "jQT8w9IWlDWFVXTri";
+
+async function sendEmail(subject, message, templateId = EJS_TEMPLATE_NOTIF) {
+  try {
+    const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        service_id:  EJS_SERVICE,
+        template_id: templateId,
+        user_id:     EJS_KEY,
+        template_params: { subject, message },
+      }),
+    });
+    return res.status === 200;
+  } catch { return false; }
+}
+
 // ─── SLUG UTIL ────────────────────────────────────────────────────────────────
 
 const toSlug = str => str.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
@@ -180,14 +203,18 @@ async function initData(){
 
 // ─── EMAIL NOTIFICATION ────────────────────────────────────────────────────────
 
-function sendRegistrationNotification(org) {
-  const subject = encodeURIComponent(`New Course Registration: ${org.courseName}`);
-  const body = encodeURIComponent(
+async function sendRegistrationNotification(org) {
+  const subject = `New Course Registration: ${org.courseName}`;
+  const message = 
     `New registration request received on Ripping Bombs:\n\n` +
-    `Course: ${org.courseName}\nFull Name: ${org.fullName||org.name||"—"}\nPosition: ${org.position||"—"}\nLocation: ${org.location}\nEmail: ${org.email}\n\n` +
-    `Login to the admin dashboard to approve or reject this registration.\n\nhttps://www.rippingbombs.com`
-  );
-  window.open(`mailto:rippingbombs@outlook.com?subject=${subject}&body=${body}`, "_blank");
+    `Course: ${org.courseName}\n` +
+    `Full Name: ${org.fullName||"—"}\n` +
+    `Position: ${org.position||"—"}\n` +
+    `Location: ${org.location}\n` +
+    `Email: ${org.email}\n\n` +
+    `Login to the admin dashboard to approve or reject this registration.\n\n` +
+    `https://www.rippingbombs.com`;
+  return sendEmail(subject, message);
 }
 
 // ─── SHARE UTILS ─────────────────────────────────────────────────────────────
@@ -498,7 +525,7 @@ function AdminPanel({orgs,entries,setOrgs,setEntries,toast,onClose,cvt,unitLbl})
               </div>
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:8,alignItems:"flex-end"}}>
-              <Btn onClick={()=>{setStatus(org.id,"approved");sendRegistrationNotification(org);}} variant="approve">Approve &amp; Notify</Btn>
+              <Btn onClick={async()=>{setStatus(org.id,"approved");const ok=await sendRegistrationNotification(org);toast(ok?"Course approved — notification sent":"Course approved (email failed — check EmailJS)");}} variant="approve">Approve &amp; Notify</Btn>
               <Btn onClick={()=>setStatus(org.id,"rejected")} variant="danger" small>✕ Reject</Btn>
             </div>
           </div>
@@ -596,7 +623,7 @@ function AdminPanel({orgs,entries,setOrgs,setEntries,toast,onClose,cvt,unitLbl})
         </div>
       </div>
       <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        {selOrg.status==="pending"  &&<Btn onClick={()=>{setStatus(selOrg.id,"approved");sendRegistrationNotification(selOrg);}} variant="approve">Approve &amp; Notify</Btn>}
+        {selOrg.status==="pending"  &&<Btn onClick={async()=>{setStatus(selOrg.id,"approved");const ok=await sendRegistrationNotification(selOrg);toast(ok?"Course approved — notification sent":"Course approved (email failed — check EmailJS)");}} variant="approve">Approve &amp; Notify</Btn>}
         {selOrg.status==="approved" &&<Btn onClick={()=>setStatus(selOrg.id,"disabled")} variant="danger">Disable Account</Btn>}
         {(selOrg.status==="rejected"||selOrg.status==="disabled")&&<Btn onClick={()=>setStatus(selOrg.id,"approved")} variant="approve">Reinstate</Btn>}
         <Btn onClick={()=>removeOrg(selOrg.id)} variant="danger">Delete</Btn>
@@ -1029,16 +1056,14 @@ function SiteFooter({ onNav }) {
   const [enquiry, setEnquiry] = useState({ name: "", email: "", message: "" });
   const [sent, setSent] = useState(false);
 
-  function sendEnquiry() {
+  async function sendEnquiry() {
     if (!enquiry.name || !enquiry.email || !enquiry.message) return;
-    const subject = encodeURIComponent(`Ripping Bombs Enquiry from ${enquiry.name}`);
-    const body = encodeURIComponent(
-      `Name: ${enquiry.name}\nEmail: ${enquiry.email}\n\nMessage:\n${enquiry.message}`
-    );
-    window.open(`mailto:rippingbombs@outlook.com?subject=${subject}&body=${body}`, "_blank");
-    setSent(true);
-    setEnquiry({ name: "", email: "", message: "" });
-    setTimeout(() => setSent(false), 4000);
+    const subject = `Ripping Bombs Enquiry from ${enquiry.name}`;
+    const message = `Name: ${enquiry.name}\nEmail: ${enquiry.email}\n\nMessage:\n${enquiry.message}`;
+    const ok = await sendEmail(subject, message, EJS_TEMPLATE_CONTACT);
+    setSent(ok ? "success" : "error");
+    if (ok) setEnquiry({ name: "", email: "", message: "" });
+    setTimeout(() => setSent(false), 5000);
   }
 
   const inp = (val, onChange, placeholder, type="text", multiline=false) => {
@@ -1105,9 +1130,13 @@ function SiteFooter({ onNav }) {
           {/* Col 3 — Enquiry form */}
           <div>
             <div style={{ fontFamily: DISP, fontSize: 18, color: "#fff", letterSpacing: 1, marginBottom: 14 }}>GET IN TOUCH</div>
-            {sent
-              ? <div style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 10, padding: "16px", fontFamily: SANS, fontSize: 13, color: GRN }}>
-                  ✓ Your message is ready to send — check your email app!
+            {sent==="success"
+              ? <div style={{ background: "rgba(163,230,53,0.1)", border: "1px solid rgba(163,230,53,0.3)", padding: "16px", fontFamily: SANS, fontSize: 13, color: GRN }}>
+                  ✓ Message sent successfully!
+                </div>
+              : sent==="error"
+              ? <div style={{ background: "rgba(220,60,60,0.1)", border: "1px solid rgba(220,60,60,0.3)", padding: "16px", fontFamily: SANS, fontSize: 13, color: "#f87171" }}>
+                  ✕ Failed to send — please try again or email rippingbombs@outlook.com
                 </div>
               : <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {inp(enquiry.name, e=>setEnquiry({...enquiry,name:e.target.value}), "Your name")}
@@ -1172,7 +1201,7 @@ export default function App(){
   // forms
   const [reg,  setReg]  = useState({fullName:"",position:"",courseName:"",location:"",email:"",pw:"",logo:""});
   const [lgn,  setLgn]  = useState({email:"",pw:""});
-  const [form, setForm] = useState({player:"",dist:"",club:"",hcp:"",age:"",photo:"",date:todayStr()});
+  const [form, setForm] = useState({player:"",dist:"",club:"",hcp:"",age:"",photo:"",date:todayStr(),tournament:""});
 
   useEffect(()=>{
     initData().then(({orgs,entries})=>{ setOrgs(orgs); setEntries(entries); setLoading(false); });
@@ -1242,9 +1271,9 @@ export default function App(){
     if(!loggedOrg){ toast("Not logged in"); return; }
     if(!form.player||!form.dist||!form.club||!form.hcp||!form.age){ toast("Fill all required fields"); return; }
     if(!form.photo){ toast("Photo evidence required"); return; }
-    const e={id:Date.now().toString(),orgId:loggedOrg.id,player:form.player,dist:Number(form.dist),club:form.club,hcp:Number(form.hcp),age:Number(form.age),photo:form.photo,date:form.date};
+    const e={id:Date.now().toString(),orgId:loggedOrg.id,player:form.player,dist:Number(form.dist),club:form.club,hcp:Number(form.hcp),age:Number(form.age),photo:form.photo,date:form.date,tournament:form.tournament};
     const up=[...entries,e]; setEntries(up); await db.set(ENT_KEY,up);
-    setForm({player:"",dist:"",club:"",hcp:"",age:"",photo:"",date:todayStr()});
+    setForm({player:"",dist:"",club:"",hcp:"",age:"",photo:"",date:todayStr(),tournament:""});
     toast("Drive submitted to the World Registry!"); setTab("leaderboard");
   }
 
@@ -1277,7 +1306,8 @@ export default function App(){
       .burger-btn{display:none}
       @media(max-width:680px){.desktop-nav{display:none}.burger-btn{display:flex;align-items:center;justify-content:center}}
       .site-header{padding:16px 22px!important;min-height:64px}
-      @media(max-width:680px){.site-header{padding:20px 16px!important;min-height:80px;box-sizing:border-box}}
+      @media(max-width:680px){.site-header{padding:12px 16px!important;min-height:60px;box-sizing:border-box}}
+      @media(max-width:680px){.site-header svg{height:28px!important}}
     `}</style>
 
     {/* ── HEADER ── */}
@@ -1445,6 +1475,7 @@ export default function App(){
         </div>
         <Card>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+            <div style={{gridColumn:"1/-1"}}><Field label="Tournament / Event Name" value={form.tournament} onChange={e=>setForm({...form,tournament:e.target.value})} placeholder="e.g. Club Championship 2026, Monthly Medal"/></div>
             <div style={{gridColumn:"1/-1"}}><Field label="Player Name" value={form.player} onChange={e=>setForm({...form,player:e.target.value})} placeholder="Full name" required/></div>
             <Field label="Distance (yards)" type="number" value={form.dist} onChange={e=>setForm({...form,dist:e.target.value})} placeholder="312" min="50" max="600" required/>
             <Field label="Date of Drive" type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})} required/>
