@@ -8,7 +8,7 @@ const EJS_TEMPLATE_NOTIF = "template_9w26xwm";  // registration notifications
 const EJS_TEMPLATE_CONTACT = "template_21fdarp"; // contact/enquiry form
 const EJS_KEY           = "jQT8w9IWlDWFVXTri";
 
-async function sendEmail(subject, message, templateId = EJS_TEMPLATE_NOTIF) {
+async function sendEmail(subject, message, templateId = EJS_TEMPLATE_NOTIF, toEmail = "rippingbombs@outlook.com") {
   try {
     const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
       method: "POST",
@@ -17,11 +17,39 @@ async function sendEmail(subject, message, templateId = EJS_TEMPLATE_NOTIF) {
         service_id:  EJS_SERVICE,
         template_id: templateId,
         user_id:     EJS_KEY,
-        template_params: { subject, message },
+        template_params: { subject, message, to_email: toEmail },
       }),
     });
     return res.status === 200;
   } catch { return false; }
+}
+
+async function sendRegistrationNotification(org) {
+  const subject = `New Course Registration: ${org.courseName}`;
+  const message =
+    `New registration request received on Ripping Bombs:\n\n` +
+    `Course: ${org.courseName}\n` +
+    `Full Name: ${org.fullName||"—"}\n` +
+    `Position: ${org.position||"—"}\n` +
+    `Location: ${org.location}\n` +
+    `Email: ${org.email}\n\n` +
+    `Login to the admin dashboard to approve or reject this registration.\n\n` +
+    `https://www.rippingbombs.com`;
+  return sendEmail(subject, message, EJS_TEMPLATE_NOTIF, "rippingbombs@outlook.com");
+}
+
+async function sendApprovalEmail(org) {
+  const subject = `You're approved on Ripping Bombs!`;
+  const message =
+    `Hi ${org.fullName},\n\n` +
+    `Great news — ${org.courseName} has been approved on Ripping Bombs!\n\n` +
+    `You can now log in and start submitting your longest drive competition results to the global leaderboard.\n\n` +
+    `Login at: https://www.rippingbombs.com\n` +
+    `Email: ${org.email}\n\n` +
+    `If you have any questions, use the contact form on the site.\n\n` +
+    `Welcome to Ripping Bombs!\n` +
+    `The Ripping Bombs Team`;
+  return sendEmail(subject, message, EJS_TEMPLATE_NOTIF, org.email);
 }
 
 // ─── SLUG UTIL ────────────────────────────────────────────────────────────────
@@ -525,7 +553,7 @@ function AdminPanel({orgs,entries,setOrgs,setEntries,toast,onClose,cvt,unitLbl})
               </div>
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:8,alignItems:"flex-end"}}>
-              <Btn onClick={async()=>{setStatus(org.id,"approved");const ok=await sendRegistrationNotification(org);toast(ok?"Course approved — notification sent":"Course approved (email failed — check EmailJS)");}} variant="approve">Approve &amp; Notify</Btn>
+              <Btn onClick={async()=>{setStatus(org.id,"approved");await sendRegistrationNotification(org);const ok=await sendApprovalEmail(org);toast(ok?"Course approved — club notified":"Course approved (approval email failed)");}} variant="approve">Approve &amp; Notify</Btn>
               <Btn onClick={()=>setStatus(org.id,"rejected")} variant="danger" small>✕ Reject</Btn>
             </div>
           </div>
@@ -623,7 +651,7 @@ function AdminPanel({orgs,entries,setOrgs,setEntries,toast,onClose,cvt,unitLbl})
         </div>
       </div>
       <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        {selOrg.status==="pending"  &&<Btn onClick={async()=>{setStatus(selOrg.id,"approved");const ok=await sendRegistrationNotification(selOrg);toast(ok?"Course approved — notification sent":"Course approved (email failed — check EmailJS)");}} variant="approve">Approve &amp; Notify</Btn>}
+        {selOrg.status==="pending"&&<Btn onClick={async()=>{setStatus(selOrg.id,"approved");await sendRegistrationNotification(selOrg);const ok=await sendApprovalEmail(selOrg);toast(ok?"Course approved — club notified":"Course approved (approval email failed)");}} variant="approve">Approve &amp; Notify</Btn>}
         {selOrg.status==="approved" &&<Btn onClick={()=>setStatus(selOrg.id,"disabled")} variant="danger">Disable Account</Btn>}
         {(selOrg.status==="rejected"||selOrg.status==="disabled")&&<Btn onClick={()=>setStatus(selOrg.id,"approved")} variant="approve">Reinstate</Btn>}
         <Btn onClick={()=>removeOrg(selOrg.id)} variant="danger">Delete</Btn>
