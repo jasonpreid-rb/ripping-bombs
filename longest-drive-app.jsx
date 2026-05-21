@@ -1191,7 +1191,7 @@ export default function App(){
   const [tab,     setTab]     = useState("home");
   const [toastMsg,setToastMsg]= useState(null);
   const [detEnt,  setDetEnt]  = useState(null);
-  const [showAdmin,setShowAdmin]=useState(false);
+  const [showAdmin,setShowAdmin]=useState(()=>localStorage.getItem("rb_admin_auth")==="1");
   const [adminPw, setAdminPw] = useState({show:false,val:""});
   const [loggedOrg,setLoggedOrg]=useState(null);
   const [showDemo,setShowDemo]= useState(false);
@@ -1295,7 +1295,7 @@ export default function App(){
 
   if(loading) return <div style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{fontFamily:SANS,color:MUT,fontSize:13,letterSpacing:2}}>LOADING…</div></div>;
 
-  if(showAdmin) return <AdminPanel orgs={orgs} entries={entries} setOrgs={setOrgs} setEntries={setEntries} toast={toast} onClose={()=>setShowAdmin(false)} cvt={cvt} unitLbl={unitLbl}/>;
+  if(showAdmin) return <AdminPanel orgs={orgs} entries={entries} setOrgs={setOrgs} setEntries={setEntries} toast={toast} onClose={()=>{setShowAdmin(false);localStorage.removeItem("rb_admin_auth");}} cvt={cvt} unitLbl={unitLbl}/>;
 
   function navTo(id) {
     if(id==="clubs"){ navigate("/clubs"); }
@@ -1515,7 +1515,7 @@ export default function App(){
     {adminPw.show&&<Overlay onClose={()=>setAdminPw({show:false,val:""})}>
       <div style={{fontFamily:DISP,fontSize:24,color:TXT,letterSpacing:1,marginBottom:20}}>Admin Access</div>
       <Field label="Password" type="password" value={adminPw.val} onChange={e=>setAdminPw({...adminPw,val:e.target.value})} placeholder="Enter admin password"/>
-      <Btn full onClick={()=>{ if(adminPw.val===ADMIN_PW){setShowAdmin(true);setAdminPw({show:false,val:""});}else{toast("Incorrect password");} }}>Enter Dashboard →</Btn>
+      <Btn full onClick={()=>{ if(adminPw.val===ADMIN_PW){setShowAdmin(true);localStorage.setItem("rb_admin_auth","1");setAdminPw({show:false,val:""});}else{toast("Incorrect password");} }}>Enter Dashboard →</Btn>
     </Overlay>}
 
     {toastMsg&&<Toast msg={toastMsg} onDone={()=>setToastMsg(null)}/>}
