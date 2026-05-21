@@ -8,8 +8,10 @@ const EJS_TEMPLATE_NOTIF = "template_9w26xwm";  // registration notifications
 const EJS_TEMPLATE_CONTACT = "template_21fdarp"; // contact/enquiry form
 const EJS_KEY           = "jQT8w9IWlDWFVXTri";
 
-async function sendEmail(subject, message, templateId = EJS_TEMPLATE_NOTIF, toEmail = "rippingbombs@outlook.com") {
+async function sendEmail(subject, message, templateId = EJS_TEMPLATE_NOTIF, toEmail = null) {
   try {
+    const params = { subject, message };
+    if (toEmail) params.to_email = toEmail;
     const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -17,7 +19,7 @@ async function sendEmail(subject, message, templateId = EJS_TEMPLATE_NOTIF, toEm
         service_id:  EJS_SERVICE,
         template_id: templateId,
         user_id:     EJS_KEY,
-        template_params: { subject, message, to_email: toEmail },
+        template_params: params,
       }),
     });
     return res.status === 200;
@@ -25,6 +27,7 @@ async function sendEmail(subject, message, templateId = EJS_TEMPLATE_NOTIF, toEm
 }
 
 async function sendRegistrationNotification(org) {
+  // Sends to your hardcoded email in the EmailJS template
   const subject = `New Course Registration: ${org.courseName}`;
   const message =
     `New registration request received on Ripping Bombs:\n\n` +
@@ -35,10 +38,11 @@ async function sendRegistrationNotification(org) {
     `Email: ${org.email}\n\n` +
     `Login to the admin dashboard to approve or reject this registration.\n\n` +
     `https://www.rippingbombs.com`;
-  return sendEmail(subject, message, EJS_TEMPLATE_NOTIF, "rippingbombs@outlook.com");
+  return sendEmail(subject, message, EJS_TEMPLATE_NOTIF);
 }
 
 async function sendApprovalEmail(org) {
+  // Uses contact template which should have {{to_email}} or club's address
   const subject = `You're approved on Ripping Bombs!`;
   const message =
     `Hi ${org.fullName},\n\n` +
@@ -49,7 +53,7 @@ async function sendApprovalEmail(org) {
     `If you have any questions, use the contact form on the site.\n\n` +
     `Welcome to Ripping Bombs!\n` +
     `The Ripping Bombs Team`;
-  return sendEmail(subject, message, EJS_TEMPLATE_NOTIF, org.email);
+  return sendEmail(subject, message, EJS_TEMPLATE_CONTACT, org.email);
 }
 
 // ─── SLUG UTIL ────────────────────────────────────────────────────────────────
