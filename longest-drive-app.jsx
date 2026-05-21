@@ -229,22 +229,6 @@ async function initData(){
   return { orgs: _m[ORGS_KEY]||SEED_ORGS, entries: _m[ENT_KEY]||SEED_ENTRIES };
 }
 
-// ─── EMAIL NOTIFICATION ────────────────────────────────────────────────────────
-
-async function sendRegistrationNotification(org) {
-  const subject = `New Course Registration: ${org.courseName}`;
-  const message = 
-    `New registration request received on Ripping Bombs:\n\n` +
-    `Course: ${org.courseName}\n` +
-    `Full Name: ${org.fullName||"—"}\n` +
-    `Position: ${org.position||"—"}\n` +
-    `Location: ${org.location}\n` +
-    `Email: ${org.email}\n\n` +
-    `Login to the admin dashboard to approve or reject this registration.\n\n` +
-    `https://www.rippingbombs.com`;
-  return sendEmail(subject, message);
-}
-
 // ─── SHARE UTILS ─────────────────────────────────────────────────────────────
 
 function shareEntry(entry, org, cvt, unitLbl) {
