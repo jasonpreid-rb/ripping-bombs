@@ -124,61 +124,9 @@ const NOTIF_KEY = "rb_notifications";
 // ─── STORAGE ─────────────────────────────────────────────────────────────────
 
 const db = {
-  async get(k) {
-    try {
-      const v = localStorage.getItem(k);
-      return v ? JSON.parse(v) : null;
-    } catch {
-      return null;
-    }
-  },
-
-  async set(k, v) {
-    try {
-      // always save locally first
-      localStorage.setItem(k, JSON.stringify(v));
-
-      // only sync clubs
-      if (k === "clubs") {
-        const { supabase } = await import("../lib/supabaseClient");
-
-        console.log("RAW VALUE:", v);
-
-        const payload = Array.isArray(v) ? v : [v];
-
-        const clean = payload.map(c => ({
-          full_name: c.fullName || null,
-          position: c.position || null,
-          course_name: c.courseName || null,
-          location: c.location || null,
-          country: c.country || null,
-          email: c.email || null,
-          password: c.password || null,
-          logo_url: c.logo || null,
-        }));
-
-        console.log("FINAL PAYLOAD:", clean);
-
-        const { data, error } = await supabase
-          .from("clubs")
-          .insert(clean);
-
-        console.log("SUPABASE DATA:", data);
-        console.log("SUPABASE ERROR:", error);
-
-        alert(error ? error.message : "Inserted OK");
-      }
-
-    } catch (e) {
-      console.log("DB set error:", e);
-    }
-  },
-
-  async del(k) {
-    try {
-      localStorage.removeItem(k);
-    } catch {}
-  },
+  async get(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } },
+  async set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  async del(k) { try { localStorage.removeItem(k); } catch {} },
 };
 
 // ─── WEEK UTILS ───────────────────────────────────────────────────────────────
@@ -227,7 +175,11 @@ const DISP = "'Bebas Neue','Arial Black',sans-serif";
 // ─── BADGE DEFINITIONS ───────────────────────────────────────────────────────
 
 const BADGES = {
-  platinum: { label:"Platinum Verified", icon:"💎", color:"#bfdbfe", bg:"rgba(147,197,253,0.1)", border:"rgba(147,197,253,0.3)" },
+  platinum:  { label:"Platinum Verified",  icon:"💎", color:"#bfdbfe", bg:"rgba(147,197,253,0.1)", border:"rgba(147,197,253,0.3)" },
+  tour:      { label:"Tour Verified",      icon:"★",  color:GOLD,      bg:"rgba(240,180,41,0.1)",  border:"rgba(240,180,41,0.35)" },
+  amateur:   { label:"Amateur Verified",   icon:"✅", color:GRN,       bg:"rgba(34,197,94,0.1)",   border:"rgba(34,197,94,0.3)" },
+  simulator: { label:"Simulator Drive",    icon:"🖥️", color:"#c4b5fd", bg:"rgba(196,181,253,0.1)", border:"rgba(196,181,253,0.3)" },
+};
   tour:     { label:"Tour Verified",     icon:"★",  color:GOLD,       bg:"rgba(240,180,41,0.1)",  border:"rgba(240,180,41,0.35)" },
   amateur:  { label:"Amateur Verified",  icon:"✅", color:GRN,        bg:"rgba(34,197,94,0.1)",   border:"rgba(34,197,94,0.3)" },
 };
@@ -1414,33 +1366,81 @@ function EmailSignup() {
 
 // ─── REGISTER PAGE ───────────────────────────────────────────────────────────
 
+const SIMULATORS = ["Trackman","Flightscope","GCQuad","Full Swing","Foresight Sports","SkyTrak","Uneekor","Bushnell Launch Pro","Garmin Approach","Other"];
+
 function RegisterPage({ reg, setReg, doRegister }) {
+  const isSimulator = reg.type === "simulator";
+  const CountrySelect = () => (
+    <div style={{marginBottom:14}}>
+      <label style={{display:"block",fontFamily:SANS,fontSize:11,fontWeight:600,color:MUT,marginBottom:5,textTransform:"uppercase",letterSpacing:.8}}>Country <span style={{color:ORG}}>*</span></label>
+      <div style={{position:"relative"}}>
+        <select value={reg.country} onChange={e=>setReg({...reg,country:e.target.value})}
+          style={{width:"100%",background:BG3,border:`1px solid ${BDR}`,padding:"10px 36px 10px 14px",color:reg.country?TXT:DIM,fontFamily:SANS,fontSize:14,outline:"none",appearance:"none",boxSizing:"border-box"}}>
+          <option value="">Select country...</option>
+          {COUNTRIES.map(c=><option key={c.code} value={c.code}>{c.name}</option>)}
+        </select>
+        <span style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",pointerEvents:"none",color:DIM,fontSize:10}}>▾</span>
+      </div>
+    </div>
+  );
+
   return (
     <div style={{maxWidth:540,margin:"0 auto",padding:"28px 18px 80px"}}>
-      <div style={{fontFamily:DISP,fontSize:30,color:TXT,letterSpacing:1,marginBottom:6}}>Register Your Course</div>
-      <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginBottom:28}}>Free to join. Once approved, you can submit your longest drive competition winners to the global leaderboard.</div>
+      <div style={{fontFamily:DISP,fontSize:30,color:TXT,letterSpacing:1,marginBottom:6}}>Register</div>
+      <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginBottom:28}}>Free to join. Select your account type below.</div>
       <Card>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-          <div style={{gridColumn:"1/-1"}}><Field label="Your Full Name" value={reg.fullName} onChange={e=>setReg({...reg,fullName:e.target.value})} placeholder="e.g. James Hargreaves" required/></div>
-          <div style={{gridColumn:"1/-1"}}><Field label="Your Role / Position" value={reg.position} onChange={e=>setReg({...reg,position:e.target.value})} placeholder="e.g. Club Secretary, Tournament Director, Head Pro" required/></div>
-        </div>
-        <Field label="Course / Club / Event Name" value={reg.courseName} onChange={e=>setReg({...reg,courseName:e.target.value})} placeholder="Augusta National Golf Club" required/>
-        <Field label="Location / City" value={reg.location} onChange={e=>setReg({...reg,location:e.target.value})} placeholder="Augusta, Georgia" required/>
-        <div style={{marginBottom:14}}>
-          <label style={{display:"block",fontFamily:SANS,fontSize:11,fontWeight:600,color:MUT,marginBottom:5,textTransform:"uppercase",letterSpacing:.8}}>Country <span style={{color:ORG}}>*</span></label>
-          <div style={{position:"relative"}}>
-            <select value={reg.country} onChange={e=>setReg({...reg,country:e.target.value})}
-              style={{width:"100%",background:BG3,border:`1px solid ${BDR}`,padding:"10px 36px 10px 14px",color:reg.country?TXT:DIM,fontFamily:SANS,fontSize:14,outline:"none",appearance:"none",boxSizing:"border-box"}}>
-              <option value="">Select country...</option>
-              {COUNTRIES.map(c=><option key={c.code} value={c.code}>{c.name}</option>)}
-            </select>
-            <span style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",pointerEvents:"none",color:DIM,fontSize:10}}>▾</span>
+        {/* Account type toggle */}
+        <div style={{marginBottom:22}}>
+          <label style={{display:"block",fontFamily:SANS,fontSize:11,fontWeight:600,color:MUT,marginBottom:8,textTransform:"uppercase",letterSpacing:.8}}>Account Type</label>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            {[["club","🏌️ Golf Club / Event"],["simulator","🖥️ Individual / Simulator"]].map(([val,label])=>(
+              <button key={val} type="button" onClick={()=>setReg({...reg,type:val})}
+                style={{padding:"12px 8px",background:reg.type===val?"transparent":BG3,border:`1px solid ${reg.type===val?ORG:BDR}`,color:reg.type===val?ORG:MUT,fontFamily:SANS,fontWeight:600,fontSize:12,cursor:"pointer",letterSpacing:.3,textAlign:"center"}}>
+                {label}
+              </button>
+            ))}
+          </div>
+          <div style={{fontFamily:SANS,fontSize:11,color:DIM,marginTop:8}}>
+            {isSimulator
+              ? "🖥️ Submit your simulator longest drives. Account approved instantly — no waiting required."
+              : "🏌️ Register a club, course or event. Submit verified competition longest drives to the global leaderboard."}
           </div>
         </div>
+
+        <Field label="Your Full Name" value={reg.fullName} onChange={e=>setReg({...reg,fullName:e.target.value})} placeholder="e.g. James Hargreaves" required/>
+
+        {isSimulator ? (
+          <>
+            {/* Simulator brand */}
+            <div style={{marginBottom:14}}>
+              <label style={{display:"block",fontFamily:SANS,fontSize:11,fontWeight:600,color:MUT,marginBottom:5,textTransform:"uppercase",letterSpacing:.8}}>Simulator Brand <span style={{color:ORG}}>*</span></label>
+              <div style={{position:"relative"}}>
+                <select value={reg.simulator} onChange={e=>setReg({...reg,simulator:e.target.value})}
+                  style={{width:"100%",background:BG3,border:`1px solid ${BDR}`,padding:"10px 36px 10px 14px",color:reg.simulator?TXT:DIM,fontFamily:SANS,fontSize:14,outline:"none",appearance:"none",boxSizing:"border-box"}}>
+                  <option value="">Select simulator...</option>
+                  {SIMULATORS.map(s=><option key={s} value={s}>{s}</option>)}
+                </select>
+                <span style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",pointerEvents:"none",color:DIM,fontSize:10}}>▾</span>
+              </div>
+            </div>
+            <Field label="Location / City" value={reg.location} onChange={e=>setReg({...reg,location:e.target.value})} placeholder="e.g. London, UK"/>
+            <CountrySelect/>
+          </>
+        ) : (
+          <>
+            <Field label="Your Role / Position" value={reg.position} onChange={e=>setReg({...reg,position:e.target.value})} placeholder="e.g. Club Secretary, Tournament Director, Head Pro" required/>
+            <Field label="Course / Club / Event Name" value={reg.courseName} onChange={e=>setReg({...reg,courseName:e.target.value})} placeholder="Augusta National Golf Club" required/>
+            <Field label="Location / City" value={reg.location} onChange={e=>setReg({...reg,location:e.target.value})} placeholder="Augusta, Georgia" required/>
+            <CountrySelect/>
+          </>
+        )}
+
         <Field label="Email Address" type="email" value={reg.email} onChange={e=>setReg({...reg,email:e.target.value})} placeholder="you@example.com" required/>
         <Field label="Password" type="password" value={reg.pw} onChange={e=>setReg({...reg,pw:e.target.value})} placeholder="Choose a password" required/>
-        <Btn full onClick={doRegister}>Submit Registration →</Btn>
-        <div style={{fontFamily:SANS,fontSize:11,color:DIM,marginTop:12,textAlign:"center"}}>Registrations are reviewed within 24 hours</div>
+        <Btn full onClick={doRegister}>{isSimulator?"Create Account →":"Submit Registration →"}</Btn>
+        <div style={{fontFamily:SANS,fontSize:11,color:DIM,marginTop:12,textAlign:"center"}}>
+          {isSimulator?"Simulator accounts are approved instantly.":"Club registrations are reviewed within 24 hours."}
+        </div>
       </Card>
     </div>
   );
@@ -1469,18 +1469,31 @@ function LoginPage({ lgn, setLgn, doLogin, onNav }) {
 
 function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, unitLbl }) {
   const [consent, setConsent] = useState(false);
-  if (!loggedOrg) return null;
+  const navigate = useNavigate();
+  const isSimulator = loggedOrg?.accountType === "simulator";
+
+  if (!loggedOrg) return (
+    <div style={{padding:"80px 18px",textAlign:"center"}}>
+      <div style={{fontFamily:DISP,fontSize:28,color:TXT,marginBottom:12}}>Not Logged In</div>
+      <div style={{fontFamily:SANS,fontSize:14,color:MUT,marginBottom:24}}>Please log in to submit a drive.</div>
+      <Btn onClick={()=>navigate("/login")}>Log In →</Btn>
+    </div>
+  );
+
   return (
     <div style={{maxWidth:560,margin:"0 auto",padding:"28px 18px 80px"}}>
-      <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:22}}>
-        <div>
-          <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:1}}>Submit a Drive</div>
-          <div style={{fontFamily:SANS,fontSize:12,color:MUT}}>{loggedOrg.courseName} · {loggedOrg.location}</div>
-        </div>
+      <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:1,marginBottom:4}}>Submit a Drive</div>
+      <div style={{fontFamily:SANS,fontSize:12,color:MUT,marginBottom:16}}>
+        {isSimulator?`🖥️ ${loggedOrg.simulator||"Simulator"} · ${loggedOrg.fullName}`:`${loggedOrg.courseName} · ${loggedOrg.location}`}
       </div>
+      {isSimulator&&(
+        <div style={{background:"rgba(196,181,253,0.08)",border:"1px solid rgba(196,181,253,0.25)",padding:"12px 16px",marginBottom:20,fontFamily:SANS,fontSize:12,color:"#c4b5fd",lineHeight:1.6}}>
+          🖥️ <strong>Simulator Drive</strong> — A screenshot of your simulator readout is required as evidence. Simulator drives appear on the global leaderboard with the simulator badge.
+        </div>
+      )}
       <Card>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-          <div style={{gridColumn:"1/-1"}}><Field label="Tournament / Event Name" value={form.tournament} onChange={e=>setForm({...form,tournament:e.target.value})} placeholder="e.g. Club Championship 2026, Monthly Medal"/></div>
+          {!isSimulator&&<div style={{gridColumn:"1/-1"}}><Field label="Tournament / Event Name" value={form.tournament} onChange={e=>setForm({...form,tournament:e.target.value})} placeholder="e.g. Club Championship 2026"/></div>}
           <div style={{gridColumn:"1/-1"}}><Field label="Player Name" value={form.player} onChange={e=>setForm({...form,player:e.target.value})} placeholder="Full name" required/></div>
           <div>
             <label style={{display:"block",fontFamily:SANS,fontSize:11,fontWeight:600,color:MUT,marginBottom:5,textTransform:"uppercase",letterSpacing:.8}}>Gender <span style={{color:ORG}}>*</span></label>
@@ -1493,30 +1506,26 @@ function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, unitLbl }) {
               ))}
             </div>
           </div>
-          <Field label="Distance (yards)" type="number" value={form.dist} onChange={e=>setForm({...form,dist:e.target.value})} placeholder="245" min="50" max="400" required/>
+          <Field label="Distance (yards)" type="number" value={form.dist} onChange={e=>setForm({...form,dist:e.target.value})} placeholder="245" min="50" max="600" required/>
           <Field label="Date of Drive" type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})} required/>
           <div style={{gridColumn:"1/-1"}}><Field label="Club Brand & Model" value={form.club} onChange={e=>setForm({...form,club:e.target.value})} placeholder="TaylorMade Qi10 LS" required/></div>
           <Field label="Handicap" type="number" value={form.hcp} onChange={e=>setForm({...form,hcp:e.target.value})} placeholder="5" min="-10" max="54" required/>
           <Field label="Age" type="number" value={form.age} onChange={e=>setForm({...form,age:e.target.value})} placeholder="34" min="10" max="100" required/>
         </div>
         {form.dist&&Number(form.dist)>0&&<div style={{background:"rgba(163,230,53,0.07)",border:"1px solid rgba(163,230,53,0.2)",padding:"9px 14px",marginBottom:14,fontFamily:SANS,fontSize:12,fontWeight:600,color:ORG}}>{tier(Number(form.dist))} — {cvt(Number(form.dist))} {unitLbl}</div>}
-        <PhotoField label="Photo Evidence (required)" value={form.photo} onChange={async e=>{ if(e.target.files[0]) setForm({...form,photo:await toB64(e.target.files[0])}); }} required/>
-
-        {/* Consent checkbox */}
+        <PhotoField label={isSimulator?"Simulator Screenshot (required)":"Photo Evidence (required)"} value={form.photo} onChange={async e=>{ if(e.target.files[0]) setForm({...form,photo:await toB64(e.target.files[0])}); }} required/>
         <div style={{background:"rgba(163,230,53,0.04)",border:"1px solid rgba(163,230,53,0.2)",padding:"16px",marginBottom:16}}>
           <label style={{display:"flex",alignItems:"flex-start",gap:12,cursor:"pointer"}}>
-            <div style={{position:"relative",flexShrink:0,marginTop:2}}>
-              <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}
-                style={{width:18,height:18,accentColor:"#a3e635",cursor:"pointer"}}/>
-            </div>
+            <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} style={{width:18,height:18,accentColor:"#a3e635",cursor:"pointer",flexShrink:0,marginTop:2}}/>
             <div style={{fontFamily:SANS,fontSize:12,color:MUT,lineHeight:1.6}}>
-              <span style={{fontWeight:700,color:TXT}}>Player Consent Confirmed</span><br/>
-              I confirm that I have notified the player named above and have their approval to submit their personal details (name, distance, handicap, age and gender) to the Ripping Bombs global leaderboard. This submission is made in accordance with the player's consent and the Ripping Bombs terms of use.
+              <span style={{fontWeight:700,color:TXT}}>{isSimulator?"Accuracy Confirmed":"Player Consent Confirmed"}</span><br/>
+              {isSimulator
+                ?"I confirm the distance shown is accurate and the screenshot is genuine and unedited."
+                :"I confirm that I have notified the player named above and have their approval to submit their personal details to the Ripping Bombs global leaderboard."}
             </div>
           </label>
         </div>
-
-        <Btn full onClick={()=>{ if(!consent){ alert("Please confirm player consent before submitting."); return; } doSubmit(); }} style={{opacity:consent?1:0.5}}>Submit to World Registry →</Btn>
+        <Btn full onClick={()=>{ if(!consent){ alert(isSimulator?"Please confirm accuracy before submitting.":"Please confirm player consent before submitting."); return; } doSubmit(); }} style={{opacity:consent?1:0.5}}>Submit to World Registry →</Btn>
       </Card>
     </div>
   );
@@ -2711,11 +2720,12 @@ export default function App(){
   const [fClub,   setFClub]   = useState("");
   const [fPlayer, setFPlayer] = useState("");
   const [fGender, setFGender] = useState("");
+  const [fSimulator, setFSimulator] = useState("all"); // "all" | "competition" | "simulator"
   const [sortBy,  setSortBy]  = useState("dist");
   const [selectedClubId, setSelectedClubId] = useState(null);
 
   // forms
-  const [reg,  setReg]  = useState({fullName:"",position:"",courseName:"",location:"",country:"",email:"",pw:"",logo:""});
+  const [reg,  setReg]  = useState({type:"club",fullName:"",position:"",courseName:"",location:"",country:"",email:"",pw:"",logo:"",simulator:""});
   const [lgn,  setLgn]  = useState({email:"",pw:""});
   const [form, setForm] = useState({player:"",dist:"",club:"",hcp:"",age:"",photo:"",date:todayStr(),tournament:"",gender:"male"});
 
@@ -2757,6 +2767,7 @@ export default function App(){
     .filter(e=>hcpIn(e.hcp,fHcp))
     .filter(e=>ageIn(e.age,fAge))
     .filter(e=>!fClub||e.club.toLowerCase().includes(fClub.toLowerCase()))
+    .filter(e=>{ const org=orgFor(e.orgId); if(fSimulator==="competition") return org?.accountType!=="simulator"; if(fSimulator==="simulator") return org?.accountType==="simulator"; return true; })
     .sort((a,b)=>{
       if(sortBy==="hcp")  return a.hcp-b.hcp;
       if(sortBy==="age")  return a.age-b.age;
@@ -2768,13 +2779,39 @@ export default function App(){
   const allTimeBest = [...entries].filter(e=>approvedOrgs.find(o=>o.id===e.orgId)).sort((a,b)=>b.dist-a.dist);
 
   async function doRegister(){
-    if(!reg.fullName||!reg.position||!reg.courseName||!reg.location||!reg.country||!reg.email||!reg.pw){ toast("Fill all required fields"); return; }
+    if(reg.type==="club"){
+      if(!reg.fullName||!reg.position||!reg.courseName||!reg.location||!reg.country||!reg.email||!reg.pw){ toast("Fill all required fields"); return; }
+    } else {
+      if(!reg.fullName||!reg.country||!reg.email||!reg.pw){ toast("Fill all required fields"); return; }
+    }
     if(orgs.find(o=>o.email===reg.email)){ toast("Email already registered"); return; }
-    const newOrg={id:Date.now().toString(),fullName:reg.fullName,position:reg.position,courseName:reg.courseName,location:reg.location,country:reg.country,email:reg.email,pw:reg.pw,logo:reg.logo,status:"pending",badge:null};
+    const isSimulator = reg.type==="simulator";
+    const newOrg={
+      id:Date.now().toString(),
+      fullName:reg.fullName,
+      position:isSimulator?"Individual / Simulator":reg.position,
+      courseName:isSimulator?`${reg.simulator||"Simulator"} — ${reg.fullName}`:reg.courseName,
+      location:reg.location||"",
+      country:reg.country,
+      email:reg.email,
+      pw:reg.pw,
+      logo:reg.logo||"",
+      status:isSimulator?"approved":"pending",
+      badge:isSimulator?"simulator":null,
+      accountType:reg.type,
+      simulator:reg.simulator||"",
+    };
     const up=[...orgs,newOrg]; setOrgs(up); await db.set(ORGS_KEY,up);
     await sendRegistrationNotification(newOrg);
-    setReg({fullName:"",position:"",courseName:"",location:"",country:"",email:"",pw:"",logo:""});
-    toast("Registration submitted — awaiting admin approval"); navTo("leaderboard");
+    setReg({type:"club",fullName:"",position:"",courseName:"",location:"",country:"",email:"",pw:"",logo:"",simulator:""});
+    if(isSimulator){
+      setLoggedOrg(newOrg);
+      toast("Account created! Submit your first simulator drive.");
+      navTo("submit");
+    } else {
+      toast("Registration submitted — awaiting admin approval");
+      navTo("leaderboard");
+    }
   }
 
   async function doLogin(){
@@ -2782,7 +2819,7 @@ export default function App(){
     if(!org){ toast("Invalid credentials"); return; }
     if(org.status==="pending"){ toast("Awaiting admin approval"); return; }
     if(org.status==="rejected"||org.status==="disabled"){ toast("Account not active — contact admin"); return; }
-    setLoggedOrg(org); setLgn({email:"",pw:""}); toast(`Welcome, ${org.name}!`); setTab("submit");
+    setLoggedOrg(org); setLgn({email:"",pw:""}); toast(`Welcome, ${org.fullName||org.name}!`); navTo("submit");
   }
 
   async function doSubmit(){
@@ -2957,6 +2994,7 @@ export default function App(){
             {[
               {label:"Search Player",val:fPlayer,set:setFPlayer,ph:"Player name"},
               {label:"Gender",val:fGender,set:setFGender,ph:"All",opts:[["","All"],["male","♂ Male"],["female","♀ Female"]]},
+            {label:"Drive Type",val:fSimulator,set:setFSimulator,ph:"All",opts:[["all","All Drives"],["competition","Competition Only"],["simulator","Simulator Only"]]},
               {label:"Country/Region",val:fCountry,set:setFCountry,ph:"Filter by location"},
               {label:"Handicap",val:fHcp,set:setFHcp,ph:"All",opts:[["","All"],["scratch","Scratch (0 & under)"],["low","Low (1–5)"],["mid","Mid (6–14)"],["high","High (15–28)"],["beginner","Beginner (28+)"]]},
               {label:"Age Group",val:fAge,set:setFAge,ph:"All",opts:[["","All"],["u25","Under 25"],["25-40","25–40"],["40-55","40–55"],["55+","55+"]]},
