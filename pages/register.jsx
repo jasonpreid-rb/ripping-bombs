@@ -68,7 +68,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
             </div>
           </div>
 
-          {/* Shared fields */}
+          {/* Shared name field */}
           <Field
             label="Your Full Name"
             value={reg.fullName}
@@ -80,9 +80,25 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
           {/* Simulator fields */}
           {isSimulator ? (
             <>
+              {/* Gender — captured once at registration */}
               <div style={{ marginBottom: 14 }}>
                 <label style={{ display: 'block', fontFamily: SANS, fontSize: 11, fontWeight: 600, color: MUT, marginBottom: 5, textTransform: 'uppercase', letterSpacing: .8 }}>
-                  Simulator Brand <span style={{ color: ORG }}>*</span>
+                  Gender <span style={{ color: ORG }}>*</span>
+                </label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {['male', 'female'].map(g => (
+                    <button key={g} type="button" onClick={() => setReg({ ...reg, gender: g })}
+                      style={{ flex: 1, padding: '10px', background: reg.gender === g ? 'transparent' : BG3, border: `1px solid ${reg.gender === g ? ORG : BDR}`, color: reg.gender === g ? ORG : MUT, fontFamily: SANS, fontWeight: 600, fontSize: 12, cursor: 'pointer', textTransform: 'capitalize', letterSpacing: .5 }}>
+                      {g === 'male' ? '♂ Male' : '♀ Female'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Simulator brand — optional */}
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: 'block', fontFamily: SANS, fontSize: 11, fontWeight: 600, color: MUT, marginBottom: 5, textTransform: 'uppercase', letterSpacing: .8 }}>
+                  Simulator Brand <span style={{ color: DIM, fontWeight: 400 }}>(optional)</span>
                 </label>
                 <div style={{ position: 'relative' }}>
                   <select
@@ -96,6 +112,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
                   <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: DIM, fontSize: 10 }}>▾</span>
                 </div>
               </div>
+
               <Field
                 label="Location / City (optional)"
                 value={reg.location}

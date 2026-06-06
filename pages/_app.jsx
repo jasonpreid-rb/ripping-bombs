@@ -26,9 +26,31 @@ export default function App({ Component, pageProps }) {
   const [detEnt, setDetEnt] = useState(null);
 
   // Form state
-  const [reg, setReg] = useState({ type:'club', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
+  const [reg, setReg] = useState({
+    type: 'club',
+    fullName: '',
+    position: '',
+    courseName: '',
+    location: '',
+    country: '',
+    email: '',
+    pw: '',
+    logo: '',
+    simulator: '',
+    gender: 'male',
+  });
   const [lgn, setLgn] = useState({ email:'', pw:'' });
-  const [form, setForm] = useState({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male' });
+  const [form, setForm] = useState({
+    player: '',
+    dist: '',
+    club: '',
+    hcp: '',
+    age: '',
+    photo: '',
+    date: todayStr(),
+    tournament: '',
+    gender: 'male',
+  });
 
   // Leaderboard filter state
   const [week, setWeek] = useState(null);
@@ -67,7 +89,6 @@ export default function App({ Component, pageProps }) {
 
     // Validation
     if (!reg.fullName || !reg.email || !reg.pw) { toast('Fill all required fields'); return; }
-    if (isSimulator && !reg.simulator) { toast('Please select your simulator brand'); return; }
     if (!isSimulator && (!reg.position || !reg.courseName || !reg.location || !reg.country)) { toast('Fill all required fields'); return; }
     if (orgs.find(o => o.email === reg.email)) { toast('Email already registered'); return; }
 
@@ -75,7 +96,7 @@ export default function App({ Component, pageProps }) {
       id: Date.now().toString(),
       fullName: reg.fullName,
       position: isSimulator ? 'Individual / Simulator' : reg.position,
-      courseName: isSimulator ? `${reg.simulator} — ${reg.fullName}` : reg.courseName,
+      courseName: isSimulator ? `${reg.simulator ? reg.simulator + ' — ' : ''}${reg.fullName}` : reg.courseName,
       location: reg.location || '',
       country: reg.country || '',
       email: reg.email,
@@ -85,6 +106,7 @@ export default function App({ Component, pageProps }) {
       badge: isSimulator ? 'simulator' : null,
       accountType: reg.type,
       simulator: reg.simulator || '',
+      gender: reg.gender || 'male',
     };
 
     const ok = await db.insertOrg(newOrg);
@@ -92,7 +114,7 @@ export default function App({ Component, pageProps }) {
 
     setOrgs(prev => [...prev, newOrg]);
     await sendRegistrationNotification(newOrg);
-    setReg({ type:'club', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
+    setReg({ type:'club', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'', gender:'male' });
 
     if (isSimulator) {
       setLoggedOrg(newOrg);
@@ -105,10 +127,10 @@ export default function App({ Component, pageProps }) {
   }
 
   async function doLogin() {
-    // Search loaded orgs state first (already fetched from Supabase)
+    // Search loaded orgs state first
     let org = orgs.find(o => o.email === lgn.email && o.pw === lgn.pw);
 
-    // If not found in state, query Supabase directly (handles edge case of stale state)
+    // If not found in state, query Supabase directly
     if (!org) {
       try {
         const { supabase } = await import('../lib/supabaseClient');
@@ -134,21 +156,26 @@ export default function App({ Component, pageProps }) {
 
   async function doSubmit() {
     if (!loggedOrg) { toast('Not logged in'); return; }
-    if (!form.player || !form.dist || !form.club || !form.hcp || !form.age) { toast('Fill all required fields'); return; }
+    if (!form.dist || !form.club || !form.hcp || !form.age) { toast('Fill all required fields'); return; }
     if (!form.photo) { toast('Photo evidence required'); return; }
+
+    const isSimulator = loggedOrg.accountType === 'simulator';
+
+    // For club accounts, player name is required
+    if (!isSimulator && !form.player) { toast('Fill all required fields'); return; }
 
     const e = {
       id: Date.now().toString(),
       orgId: loggedOrg.id,
-      player: form.player,
+      player: isSimulator ? loggedOrg.fullName : form.player,
       dist: Number(form.dist),
       club: form.club,
       hcp: Number(form.hcp),
       age: Number(form.age),
       photo: form.photo,
       date: form.date,
-      tournament: form.tournament,
-      gender: form.gender,
+      tournament: isSimulator ? 'Simulator' : form.tournament,
+      gender: isSimulator ? (loggedOrg.gender || 'male') : form.gender,
     };
 
     const ok = await db.insertEntry(e);
