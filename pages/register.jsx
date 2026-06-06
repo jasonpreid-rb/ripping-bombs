@@ -1,118 +1,15 @@
-import { useState } from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { COUNTRIES, ORG, MUT, TXT, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { Card, Field, Btn } from '../components/UI';
 import { toB64 } from '../lib/constants';
-
-const EJS_SERVICE  = "service_ijz7h1p";
-const EJS_TEMPLATE = "template_9w26xwm";
-const EJS_KEY      = "jQT8w9IWlDWFVXTri";
 
 const SIMULATORS = [
   "Trackman","Flightscope","GCQuad","Full Swing","Foresight Sports",
   "SkyTrak","Uneekor","Bushnell Launch Pro","Garmin Approach","Other"
 ];
 
-async function sendRegistrationNotification(org) {
-  try {
-    const subject = org.accountType === 'simulator'
-      ? `New Simulator Registration: ${org.fullName}`
-      : `New Course Registration: ${org.courseName}`;
-    const message = org.accountType === 'simulator'
-      ? `New simulator registration on Ripping Bombs:\n\nName: ${org.fullName}\nSimulator: ${org.simulator||'—'}\nLocation: ${org.location||'—'}\nCountry: ${org.country||'—'}\nEmail: ${org.email}\nPassword: ${org.pw}\n\nSimulator accounts are auto-approved.`
-      : `New registration request received on Ripping Bombs:\n\nCourse: ${org.courseName}\nFull Name: ${org.fullName||'—'}\nPosition: ${org.position||'—'}\nLocation: ${org.location}\nCountry: ${org.country||'—'}\nEmail: ${org.email}\nPassword: ${org.pw}\n\nLogin to the admin dashboard to approve or reject.\n\nhttps://www.rippingbombs.com`;
-    await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        service_id: EJS_SERVICE,
-        template_id: EJS_TEMPLATE,
-        user_id: EJS_KEY,
-        template_params: { subject, message },
-      }),
-    });
-  } catch {}
-}
-
-const EMPTY_REG = {
-  type: 'club',
-  fullName: '',
-  position: '',
-  courseName: '',
-  location: '',
-  country: '',
-  email: '',
-  pw: '',
-  logo: '',
-  simulator: '',
-};
-
-export default function RegisterPage() {
-  const router = useRouter();
-  const [reg, setReg] = useState(EMPTY_REG);
-  const [status, setStatus] = useState(null); // null | 'submitting' | 'success' | 'error'
-  const [toast, setToast] = useState(null);
-
+export default function RegisterPage({ reg, setReg, doRegister }) {
   const isSimulator = reg.type === 'simulator';
-
-  function showToast(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3500);
-  }
-
-  async function doRegister() {
-    // Validation
-    if (!reg.fullName || !reg.email || !reg.pw) {
-      showToast('Please fill all required fields'); return;
-    }
-    if (isSimulator && !reg.simulator) {
-      showToast('Please select your simulator brand'); return;
-    }
-    if (!isSimulator && (!reg.position || !reg.courseName || !reg.location || !reg.country)) {
-      showToast('Please fill all required fields'); return;
-    }
-
-    setStatus('submitting');
-
-    const newOrg = {
-      id: Date.now().toString(),
-      fullName: reg.fullName,
-      position: isSimulator ? 'Individual / Simulator' : reg.position,
-      courseName: isSimulator ? `${reg.simulator} — ${reg.fullName}` : reg.courseName,
-      location: reg.location || '',
-      country: reg.country,
-      email: reg.email,
-      pw: reg.pw,
-      logo: reg.logo || '',
-      status: isSimulator ? 'approved' : 'pending',
-      badge: isSimulator ? 'simulator' : null,
-      accountType: reg.type,
-      simulator: reg.simulator || '',
-    };
-
-    // Save to localStorage (to be replaced with Supabase)
-    try {
-      const existing = JSON.parse(localStorage.getItem('rb_orgs') || '[]');
-      if (existing.find(o => o.email === reg.email)) {
-        showToast('Email already registered'); setStatus(null); return;
-      }
-      localStorage.setItem('rb_orgs', JSON.stringify([...existing, newOrg]));
-    } catch {}
-
-    await sendRegistrationNotification(newOrg);
-
-    setStatus('success');
-    setReg(EMPTY_REG);
-
-    if (isSimulator) {
-      showToast('Account created! You can now submit simulator drives.');
-      setTimeout(() => router.push('/'), 2000);
-    } else {
-      showToast('Registration submitted — awaiting admin approval.');
-      setTimeout(() => router.push('/'), 2000);
-    }
-  }
 
   const CountrySelect = () => (
     <div style={{ marginBottom: 14 }}>
@@ -147,7 +44,7 @@ export default function RegisterPage() {
         </div>
 
         <Card>
-          {/* ── Account type toggle ── */}
+          {/* Account type toggle */}
           <div style={{ marginBottom: 22 }}>
             <label style={{ display: 'block', fontFamily: SANS, fontSize: 11, fontWeight: 600, color: MUT, marginBottom: 8, textTransform: 'uppercase', letterSpacing: .8 }}>
               Account Type
@@ -171,7 +68,7 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* ── Shared fields ── */}
+          {/* Shared fields */}
           <Field
             label="Your Full Name"
             value={reg.fullName}
@@ -180,7 +77,7 @@ export default function RegisterPage() {
             required
           />
 
-          {/* ── Simulator fields ── */}
+          {/* Simulator fields */}
           {isSimulator ? (
             <>
               <div style={{ marginBottom: 14 }}>
@@ -209,7 +106,7 @@ export default function RegisterPage() {
             </>
           ) : (
             <>
-              {/* ── Club fields ── */}
+              {/* Club fields */}
               <Field
                 label="Your Role / Position"
                 value={reg.position}
@@ -252,7 +149,7 @@ export default function RegisterPage() {
             </>
           )}
 
-          {/* ── Shared auth fields ── */}
+          {/* Shared auth fields */}
           <Field
             label="Email Address"
             type="email"
@@ -270,13 +167,8 @@ export default function RegisterPage() {
             required
           />
 
-          {/* ── Submit ── */}
-          <Btn full onClick={doRegister} style={{ opacity: status === 'submitting' ? 0.6 : 1 }}>
-            {status === 'submitting'
-              ? 'Submitting...'
-              : isSimulator
-                ? 'Create Account →'
-                : 'Submit Registration →'}
+          <Btn full onClick={doRegister}>
+            {isSimulator ? 'Create Account →' : 'Submit Registration →'}
           </Btn>
 
           <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 12, textAlign: 'center' }}>
@@ -285,13 +177,6 @@ export default function RegisterPage() {
               : 'Club registrations are reviewed within 24 hours.'}
           </div>
         </Card>
-
-        {/* ── Toast ── */}
-        {toast && (
-          <div style={{ position: 'fixed', bottom: 22, right: 22, zIndex: 9999, background: '#2e2e2e', border: `1px solid ${ORG}`, padding: '12px 20px', fontFamily: SANS, fontSize: 12, color: ORG, boxShadow: '0 8px 30px rgba(0,0,0,0.12)', letterSpacing: .5 }}>
-            {toast}
-          </div>
-        )}
       </div>
     </>
   );
