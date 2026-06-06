@@ -45,7 +45,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           <button onClick={onShowDemo} style={{ background: 'transparent', border: '1px solid rgba(163,230,53,0.4)', color: ORG, fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', borderRadius: 0, cursor: 'pointer' }}>Try Demo</button>
           {loggedOrg
             ? <><NavBtn href="/submit" label="Submit Drive"/><button onClick={onLogout} style={{ background: 'none', border: '1px solid rgba(220,80,80,0.3)', color: '#f87171', fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', cursor: 'pointer', borderRadius: 0 }}>Log Out</button></>
-            : <><NavBtn href="/login" label="Organiser Login"/><button onClick={() => navTo('/register')} style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 12, padding: '7px 16px', borderRadius: 0, cursor: 'pointer' }}>Register Course</button></>
+            : <><NavBtn href="/login" label="Login"/><button onClick={() => navTo('/register')} style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 12, padding: '7px 16px', borderRadius: 0, cursor: 'pointer' }}>Register</button></>
           }
           <button onClick={onAdminClick} style={{ position: 'relative', background: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 0, color: 'rgba(255,255,255,0.5)', fontSize: 14, padding: '6px 10px', cursor: 'pointer' }}>
             ⚙{pendingCount > 0 && <span style={{ position: 'absolute', top: -4, right: -4, width: 9, height: 9, background: ORG, borderRadius: '50%', display: 'block' }}/>}
@@ -58,7 +58,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
 
       {menuOpen && (
         <div style={{ position: 'fixed', top: 58, left: 0, right: 0, background: 'rgba(14,14,14,0.98)', borderBottom: '1px solid rgba(255,255,255,0.08)', zIndex: 99, padding: '16px 22px 20px', display: 'flex', flexDirection: 'column', gap: 10, animation: 'slideDown .2s ease' }}>
-          {[['Leaderboard','/leaderboard'],['Contact','/contact'],['Organiser Login','/login'],['Register Course','/register']].map(([label,href]) => (
+          {[['Leaderboard','/leaderboard'],['Contact','/contact'],['Login','/login'],['Register','/register']].map(([label,href]) => (
             <button key={href} onClick={() => navTo(href)} style={{ background: isActive(href) ? ORG : 'transparent', border: isActive(href) ? 'none' : '1px solid rgba(255,255,255,0.12)', color: isActive(href) ? '#111' : 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>{label}</button>
           ))}
           <button onClick={() => { onShowDemo(); setMenuOpen(false); }} style={{ background: 'transparent', border: '1px solid rgba(163,230,53,0.4)', color: ORG, fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Try Demo</button>
@@ -101,7 +101,7 @@ function SiteFooter() {
             <RBLogoWhite height={32}/>
             <div style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 14, marginBottom: 20, lineHeight: 1.7 }}>The global home of competition longest drives. Free to join, free to submit.</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {[['Leaderboard','/leaderboard'],['Clubs & Events','/clubs'],['Register Your Course','/register'],['Organiser Login','/login'],['Contact Us','/contact']].map(([l,h]) => (
+              {[['Leaderboard','/leaderboard'],['Clubs & Events','/clubs'],['Register','/register'],['Login','/login'],['Contact Us','/contact']].map(([l,h]) => (
                 <span key={h} onClick={() => router.push(h)} style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(255,255,255,0.55)', cursor: 'pointer' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.55)'}>{l}</span>
               ))}
             </div>
@@ -109,7 +109,7 @@ function SiteFooter() {
           <div>
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 1.5, color: DIM, marginBottom: 12, textTransform: 'uppercase' }}>Leaderboards</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              {[[`Global Leaderboard`,'/leaderboard'],["Longest Men's Drives",'/longest-mens-drive'],["Longest Women's Drives",'/longest-womens-drive'],['Low Handicap','/longest-drive-low-handicap'],['Mid Handicap','/longest-drive-mid-handicap'],['High Handicap','/longest-drive-high-handicap'],['Seniors (55+)','/longest-drive-seniors'],['Juniors (U12)','/longest-drive-juniors-u12'],['Youth (13–16)','/longest-drive-juniors-13-16'],['Cadets (17–18)','/longest-drive-juniors-17-18']].map(([l,h]) => (
+              {[['Global Leaderboard','/leaderboard'],["Longest Men's Drives",'/longest-mens-drive'],["Longest Women's Drives",'/longest-womens-drive'],['Low Handicap','/longest-drive-low-handicap'],['Mid Handicap','/longest-drive-mid-handicap'],['High Handicap','/longest-drive-high-handicap'],['Seniors (55+)','/longest-drive-seniors'],['Juniors (U12)','/longest-drive-juniors-u12'],['Youth (13-16)','/longest-drive-juniors-13-16'],['Cadets (17-18)','/longest-drive-juniors-17-18']].map(([l,h]) => (
                 <a key={h} href={h} style={{ display: 'block', fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.4)'}>{l}</a>
               ))}
             </div>
