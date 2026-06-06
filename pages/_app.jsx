@@ -26,9 +26,9 @@ export default function App({ Component, pageProps }) {
   const [detEnt, setDetEnt] = useState(null);
 
   // Form state
-  const [reg, setReg] = useState({ fullName:'',position:'',courseName:'',location:'',country:'',email:'',pw:'',logo:'' });
-  const [lgn, setLgn] = useState({ email:'',pw:'' });
-  const [form, setForm] = useState({ player:'',dist:'',club:'',hcp:'',age:'',photo:'',date:todayStr(),tournament:'',gender:'male' });
+  const [reg, setReg] = useState({ type:'club', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
+  const [lgn, setLgn] = useState({ email:'', pw:'' });
+  const [form, setForm] = useState({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male' });
 
   // Leaderboard filter state
   const [week, setWeek] = useState(null);
@@ -63,22 +63,69 @@ export default function App({ Component, pageProps }) {
   const pendingCount = orgs.filter(o => o.status === 'pending').length;
 
   async function doRegister() {
-    if (!reg.fullName||!reg.position||!reg.courseName||!reg.location||!reg.country||!reg.email||!reg.pw) { toast('Fill all required fields'); return; }
+    const isSimulator = reg.type === 'simulator';
+
+    // Validation
+    if (!reg.fullName || !reg.email || !reg.pw) { toast('Fill all required fields'); return; }
+    if (isSimulator && !reg.simulator) { toast('Please select your simulator brand'); return; }
+    if (!isSimulator && (!reg.position || !reg.courseName || !reg.location || !reg.country)) { toast('Fill all required fields'); return; }
     if (orgs.find(o => o.email === reg.email)) { toast('Email already registered'); return; }
-    const newOrg = { id:Date.now().toString(), ...reg, status:'pending', badge:null };
-    const up = [...orgs, newOrg];
-    setOrgs(up); await db.set("clubs", newOrg);
+
+    const newOrg = {
+      id: Date.now().toString(),
+      fullName: reg.fullName,
+      position: isSimulator ? 'Individual / Simulator' : reg.position,
+      courseName: isSimulator ? `${reg.simulator} — ${reg.fullName}` : reg.courseName,
+      location: reg.location || '',
+      country: reg.country || '',
+      email: reg.email,
+      pw: reg.pw,
+      logo: reg.logo || '',
+      status: isSimulator ? 'approved' : 'pending',
+      badge: isSimulator ? 'simulator' : null,
+      accountType: reg.type,
+      simulator: reg.simulator || '',
+    };
+
+    const ok = await db.insertOrg(newOrg);
+    if (!ok) { toast('Registration failed — please try again'); return; }
+
+    setOrgs(prev => [...prev, newOrg]);
     await sendRegistrationNotification(newOrg);
-    setReg({ fullName:'',position:'',courseName:'',location:'',country:'',email:'',pw:'',logo:'' });
-    toast('Registration submitted — awaiting admin approval');
-    router.push('/');
+    setReg({ type:'club', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
+
+    if (isSimulator) {
+      setLoggedOrg(newOrg);
+      toast('Account created! You can now submit simulator drives.');
+      router.push('/submit');
+    } else {
+      toast('Registration submitted — awaiting admin approval');
+      router.push('/');
+    }
   }
 
   async function doLogin() {
-    const org = orgs.find(o => o.email === lgn.email && o.pw === lgn.pw);
+    // Search loaded orgs state first (already fetched from Supabase)
+    let org = orgs.find(o => o.email === lgn.email && o.pw === lgn.pw);
+
+    // If not found in state, query Supabase directly (handles edge case of stale state)
+    if (!org) {
+      try {
+        const { supabase } = await import('../lib/supabaseClient');
+        const { data } = await supabase
+          .from('clubs')
+          .select('*')
+          .eq('email', lgn.email)
+          .eq('pw', lgn.pw)
+          .single();
+        org = data;
+      } catch {}
+    }
+
     if (!org) { toast('Invalid credentials'); return; }
     if (org.status === 'pending') { toast('Awaiting admin approval'); return; }
     if (org.status !== 'approved') { toast('Account not active'); return; }
+
     setLoggedOrg(org);
     setLgn({ email:'', pw:'' });
     toast(`Welcome, ${org.fullName}!`);
@@ -87,12 +134,28 @@ export default function App({ Component, pageProps }) {
 
   async function doSubmit() {
     if (!loggedOrg) { toast('Not logged in'); return; }
-    if (!form.player||!form.dist||!form.club||!form.hcp||!form.age) { toast('Fill all required fields'); return; }
+    if (!form.player || !form.dist || !form.club || !form.hcp || !form.age) { toast('Fill all required fields'); return; }
     if (!form.photo) { toast('Photo evidence required'); return; }
-    const e = { id:Date.now().toString(), orgId:loggedOrg.id, player:form.player, dist:Number(form.dist), club:form.club, hcp:Number(form.hcp), age:Number(form.age), photo:form.photo, date:form.date, tournament:form.tournament, gender:form.gender };
-    const up = [...entries, e];
-    setEntries(up); await db.set(ENT_KEY, up);
-    setForm({ player:'',dist:'',club:'',hcp:'',age:'',photo:'',date:todayStr(),tournament:'',gender:'male' });
+
+    const e = {
+      id: Date.now().toString(),
+      orgId: loggedOrg.id,
+      player: form.player,
+      dist: Number(form.dist),
+      club: form.club,
+      hcp: Number(form.hcp),
+      age: Number(form.age),
+      photo: form.photo,
+      date: form.date,
+      tournament: form.tournament,
+      gender: form.gender,
+    };
+
+    const ok = await db.insertEntry(e);
+    if (!ok) { toast('Submission failed — please try again'); return; }
+
+    setEntries(prev => [...prev, e]);
+    setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male' });
     toast('Drive submitted to the World Registry!');
   }
 
@@ -110,7 +173,7 @@ export default function App({ Component, pageProps }) {
 
   if (loading) return (
     <div style={{ minHeight:'100vh', background:'#1a1a1a', display:'flex', alignItems:'center', justifyContent:'center' }}>
-      <div style={{ fontFamily:SANS, color:MUT, fontSize:13, letterSpacing:2 }}>LOADING…</div>
+      <div style={{ fontFamily:SANS, color:MUT, fontSize:13, letterSpacing:2 }}>LOADING...</div>
     </div>
   );
 
@@ -128,7 +191,7 @@ export default function App({ Component, pageProps }) {
       </Layout>
 
       {/* Admin password modal */}
-      {adminPw.show&&(
+      {adminPw.show && (
         <div onClick={()=>setAdminPw({show:false,val:''})} style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.8)',zIndex:700,display:'flex',alignItems:'center',justifyContent:'center',padding:20,backdropFilter:'blur(4px)'}}>
           <div onClick={e=>e.stopPropagation()} style={{background:BG2,border:`1px solid rgba(255,255,255,0.1)`,width:'100%',maxWidth:400,padding:30,position:'relative'}}>
             <button onClick={()=>setAdminPw({show:false,val:''})} style={{position:'absolute',top:14,right:16,background:'none',border:'none',color:MUT,fontSize:20,cursor:'pointer'}}>✕</button>
@@ -145,13 +208,13 @@ export default function App({ Component, pageProps }) {
       )}
 
       {/* Demo */}
-      {showDemo&&<DemoSubmit onClose={()=>setShowDemo(false)} cvt={cvt} unitLbl={unitLbl} toast={toast}/>}
+      {showDemo && <DemoSubmit onClose={()=>setShowDemo(false)} cvt={cvt} unitLbl={unitLbl} toast={toast}/>}
 
       {/* Launch modal */}
-      {showLaunch&&<LaunchModal onClose={()=>{setShowLaunch(false);sessionStorage.setItem('rb_launch_seen','1');}}/>}
+      {showLaunch && <LaunchModal onClose={()=>{setShowLaunch(false);sessionStorage.setItem('rb_launch_seen','1');}}/>}
 
       {/* Toast */}
-      {toastMsg&&(
+      {toastMsg && (
         <div style={{position:'fixed',bottom:22,right:22,zIndex:9999,background:'#2e2e2e',border:`1px solid ${ORG}`,padding:'12px 20px',fontFamily:SANS,fontSize:12,color:ORG,boxShadow:'0 8px 30px rgba(0,0,0,0.12)'}}>
           ✓ {toastMsg}
           <span style={{marginLeft:12,cursor:'pointer',opacity:.6}} onClick={()=>setToastMsg(null)}>✕</span>
