@@ -61,6 +61,7 @@ export default function App({ Component, pageProps }) {
   const [fClub, setFClub] = useState('');
   const [fPlayer, setFPlayer] = useState('');
   const [fGender, setFGender] = useState('');
+  const [fSimulator, setFSimulator] = useState('');
   const [sortBy, setSortBy] = useState('dist');
 
   useEffect(() => {
@@ -176,6 +177,7 @@ export default function App({ Component, pageProps }) {
       date: form.date,
       tournament: isSimulator ? 'Simulator' : form.tournament,
       gender: isSimulator ? (loggedOrg.gender || 'male') : form.gender,
+      is_simulator: isSimulator,
     };
 
     const ok = await db.insertEntry(e);
@@ -195,6 +197,7 @@ export default function App({ Component, pageProps }) {
     week, setWeek, allTime, setAllTime,
     fCountry, setFCountry, fHcp, setFHcp, fAge, setFAge,
     fClub, setFClub, fPlayer, setFPlayer, fGender, setFGender,
+    fSimulator, setFSimulator,
     sortBy, setSortBy,
   };
 

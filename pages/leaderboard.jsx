@@ -52,6 +52,7 @@ export default function LeaderboardPage(props) {
     week, setWeek, allTime, setAllTime,
     fCountry, setFCountry, fHcp, setFHcp, fAge, setFAge,
     fClub, setFClub, fPlayer, setFPlayer, fGender, setFGender,
+    fSimulator, setFSimulator,
     sortBy, setSortBy } = props;
 
   const router = useRouter();
@@ -66,12 +67,13 @@ export default function LeaderboardPage(props) {
     .filter(e=>!fCountry||(orgFor(e.orgId)?.location||'').toLowerCase().includes(fCountry.toLowerCase()))
     .filter(e=>!fPlayer||e.player.toLowerCase().includes(fPlayer.toLowerCase()))
     .filter(e=>!fGender||e.gender===fGender)
+    .filter(e=>!fSimulator||(fSimulator==='simulator'?e.is_simulator===true:e.is_simulator!==true))
     .filter(e=>hcpIn(e.hcp,fHcp))
     .filter(e=>ageIn(e.age,fAge))
     .filter(e=>!fClub||e.club.toLowerCase().includes(fClub.toLowerCase()))
     .sort((a,b)=>{if(sortBy==='hcp')return a.hcp-b.hcp;if(sortBy==='age')return a.age-b.age;if(sortBy==='club')return a.club.localeCompare(b.club);if(sortBy==='date')return new Date(b.date)-new Date(a.date);return b.dist-a.dist;});
 
-  const allTimeBest=[...entries].filter(e=>approvedOrgs.find(o=>o.id===e.orgId)).sort((a,b)=>b.dist-a.dist);
+  const allTimeBest=[...entries].filter(e=>approvedOrgs.find(o=>o.id===e.orgId)&&e.is_simulator!==true).sort((a,b)=>b.dist-a.dist);
 
   return (
     <>
@@ -128,6 +130,7 @@ export default function LeaderboardPage(props) {
             {label:'Age Group',val:fAge,set:setFAge,ph:'All',opts:[['','All'],['u25','Under 25'],['25-40','25–40'],['40-55','40–55'],['55+','55+']]},
             {label:'Club Brand',val:fClub,set:setFClub,ph:'e.g. TaylorMade'},
             {label:'Sort By',val:sortBy,set:setSortBy,ph:'Distance',opts:[['dist','Distance'],['date','Date'],['hcp','Handicap'],['age','Age'],['club','Club']]},
+            {label:'Entry Type',val:fSimulator,set:setFSimulator,ph:'All',opts:[['','All'],['official','🏌️ Official Only'],['simulator','🖥️ Simulator Only']]},
           ].map(({label,val,set,ph,opts})=>(
             <div key={label}>
               <div style={{fontFamily:SANS,fontSize:9,fontWeight:700,color:DIM,letterSpacing:1.2,marginBottom:5,textTransform:'uppercase'}}>{label}</div>

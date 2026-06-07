@@ -16,12 +16,14 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
 
   async function setStatus(id, status) {
     const up = orgs.map(o=>o.id===id?{...o,status}:o);
-    setOrgs(up); await db.set(ORGS_KEY, up);
+    setOrgs(up);
+    await db.updateOrg(id, { status });
   }
 
   async function deleteEntry(id) {
     const up = entries.filter(e=>e.id!==id);
-    setEntries(up); await db.set(ENT_KEY, up);
+    setEntries(up);
+    await db.deleteEntry(id);
     toast('Drive deleted');
   }
 
@@ -132,7 +134,7 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
                       {org.status==='pending'&&<Btn variant="approve" small onClick={async()=>{ await setStatus(org.id,'approved'); const ok=await sendApprovalEmail(org); toast(ok?'Approved & notified':'Approved (email failed)'); }}>Approve & Notify</Btn>}
                       {org.status==='approved'&&<Btn variant="danger" small onClick={async()=>{ await setStatus(org.id,'disabled'); toast('Course disabled'); }}>Disable</Btn>}
                       {org.status==='disabled'&&<Btn variant="approve" small onClick={async()=>{ await setStatus(org.id,'approved'); toast('Course re-enabled'); }}>Re-enable</Btn>}
-                      <Btn variant="danger" small onClick={async()=>{ if(!confirm('Delete this course?')) return; const up=orgs.filter(o=>o.id!==org.id); setOrgs(up); await db.set(ORGS_KEY,up); setSelOrg(null); toast('Course deleted'); }}>Delete</Btn>
+                      <Btn variant="danger" small onClick={async()=>{ if(!confirm('Delete this course?')) return; const up=orgs.filter(o=>o.id!==org.id); setOrgs(up); await db.deleteOrg(org.id); setSelOrg(null); toast('Course deleted'); }}>Delete</Btn>
                     </div>
                   </div>
                 )}
