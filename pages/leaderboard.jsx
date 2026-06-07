@@ -6,24 +6,50 @@ import { countryFlag, BadgePill } from '../components/UI';
 import EntryModal from '../components/EntryModal';
 import ShareModal from '../components/ShareModal';
 
+const STICKY = { position:'sticky', zIndex:2 };
+const RANK_W = 52;
+const PLAYER_W = 180;
+
 function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
   const COLS = ['Rank','Player','Distance','Club','HCP','Age','Gender','Course','Event','Date','Tier','Share'];
   return (
     <div style={{overflowX:'auto',border:`1px solid ${BDR}`,background:BG2}}>
       <table style={{width:'100%',borderCollapse:'collapse',minWidth:750}}>
         <thead>
-          <tr>{COLS.map(col=><th key={col} style={{padding:'11px 14px',fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:1.2,color:DIM,textTransform:'uppercase',textAlign:'left',borderBottom:`2px solid ${BDR}`}}>{col}</th>)}</tr>
+          <tr>
+            {COLS.map((col,ci)=>{
+              const rankSticky  = ci===0 ? {...STICKY,left:0,         background:'#0e0e0e',borderRight:`1px solid ${BDR}`} : {};
+              const playerSticky= ci===1 ? {...STICKY,left:RANK_W,    background:'#0e0e0e',borderRight:`1px solid ${BDR}`} : {};
+              return (
+                <th key={col} style={{padding:'11px 14px',fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:1.2,color:DIM,textTransform:'uppercase',textAlign:'left',borderBottom:`2px solid ${BDR}`,...rankSticky,...playerSticky}}>
+                  {col}
+                </th>
+              );
+            })}
+          </tr>
         </thead>
         <tbody>
           {rows.map((e,ri)=>{
             const org=orgFor(e.orgId);
             const medal=ri===0?'🥇':ri===1?'🥈':ri===2?'🥉':null;
+            const tdSticky = (left) => ({...STICKY, left, background:BG2, borderRight:`1px solid ${BDR}`});
             return (
               <tr key={e.id} onClick={()=>onView(e)} style={{cursor:'pointer',borderBottom:`1px solid ${BDR}`}}
-                onMouseEnter={el=>el.currentTarget.style.background='rgba(163,230,53,0.04)'}
-                onMouseLeave={el=>el.currentTarget.style.background='transparent'}>
-                <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:12,color:DIM}}>{medal||`#${ri+1}`}</td>
-                <td style={{padding:'12px 14px'}}><span style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>{e.player}</span>{org?.country&&countryFlag(org.country)}</td>
+                onMouseEnter={el=>{
+                  el.currentTarget.style.background='rgba(163,230,53,0.04)';
+                  [...el.currentTarget.querySelectorAll('td[data-sticky]')].forEach(td=>td.style.background='#1c201a');
+                }}
+                onMouseLeave={el=>{
+                  el.currentTarget.style.background='transparent';
+                  [...el.currentTarget.querySelectorAll('td[data-sticky]')].forEach(td=>td.style.background=BG2);
+                }}>
+                <td data-sticky="1" style={{...tdSticky(0),padding:'12px 14px',fontFamily:SANS,fontSize:12,color:DIM,minWidth:RANK_W}}>
+                  {medal||`#${ri+1}`}
+                </td>
+                <td data-sticky="1" style={{...tdSticky(RANK_W),padding:'12px 14px',minWidth:PLAYER_W}}>
+                  <span style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>{e.player}</span>
+                  {org?.country&&countryFlag(org.country)}
+                </td>
                 <td style={{padding:'12px 14px'}}><span style={{fontFamily:DISP,fontSize:20,color:ORG}}>{cvt(e.dist)}</span><span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:3}}>{unitLbl}</span></td>
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:12,color:MUT}}>{e.club}</td>
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:12,color:MUT}}>{e.hcp}</td>
@@ -100,7 +126,7 @@ export default function LeaderboardPage(props) {
         {/* World record hero */}
         {allTimeBest[0]&&<div style={{background:'linear-gradient(135deg,rgba(163,230,53,0.12),rgba(163,230,53,0.04))',border:'1px solid rgba(163,230,53,0.25)',padding:'24px 28px',marginBottom:28,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:18}}>
           <div>
-            <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:ORG,marginBottom:8,textTransform:'uppercase'}}>🏆 All-Time Record</div>
+            <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:ORG,marginBottom:8,textTransform:'uppercase'}}>🏆 All-Time Record (Official)</div>
             <div style={{fontFamily:DISP,fontSize:34,color:TXT,letterSpacing:.5}}>{allTimeBest[0].player}</div>
             <div style={{fontFamily:SANS,fontSize:12,color:MUT,marginTop:4}}>{orgFor(allTimeBest[0].orgId)?.courseName} · {allTimeBest[0].club} · HCP {allTimeBest[0].hcp}</div>
           </div>
