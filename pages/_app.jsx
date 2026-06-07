@@ -210,7 +210,7 @@ export default function App({ Component, pageProps }) {
   if (showAdmin) return (
     <AdminPanel orgs={orgs} entries={entries} setOrgs={setOrgs} setEntries={setEntries}
       toast={toast} cvt={cvt} unitLbl={unitLbl}
-      onClose={() => { setShowAdmin(false); localStorage.removeItem('rb_admin_auth'); }}/>
+      onClose={() => setShowAdmin(false)}/>
   );
 
   return (
