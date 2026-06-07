@@ -2,7 +2,7 @@ import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants'
 import { fmtDate, tier } from '../lib/constants';
 import { Overlay, BadgePill, countryFlag } from './UI';
 
-export default function EntryModal({ entry, org, onClose, cvt, unitLbl }) {
+export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl }) {
   if (!entry) return null;
   return (
     <Overlay onClose={onClose}>
@@ -43,7 +43,13 @@ export default function EntryModal({ entry, org, onClose, cvt, unitLbl }) {
         <img src={entry.photo} alt="Drive evidence" style={{ width:'100%', maxHeight:180, objectFit:'cover', marginBottom:14 }}/>
       )}
 
-      <div style={{ marginTop:18 }}>
+      <div style={{ marginTop:18, display:'flex', flexDirection:'column', gap:8 }}>
+        {onShare && (
+          <button onClick={()=>{ onClose(); onShare(entry); }}
+            style={{ width:'100%', background:`linear-gradient(135deg,${ORG},#bef264)`, border:'none', color:'#111', fontFamily:SANS, fontWeight:700, fontSize:12, padding:'11px', cursor:'pointer', letterSpacing:.5 }}>
+            ↗ SHARE THIS DRIVE
+          </button>
+        )}
         <button onClick={onClose}
           style={{ width:'100%', background:'transparent', border:`1px solid rgba(255,255,255,0.15)`, color:MUT, fontFamily:SANS, fontWeight:600, fontSize:12, padding:'10px', cursor:'pointer' }}>
           Close
