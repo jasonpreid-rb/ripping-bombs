@@ -4,8 +4,9 @@ import { useRouter } from 'next/router';
 import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { fmtDate } from '../lib/constants';
 import EmailSignup from '../components/EmailSignup';
+import { countryFlag } from '../components/UI';
 
-const FLAG = cc => cc ? String.fromCodePoint(...[...cc.toUpperCase()].map(c=>0x1F1E6-65+c.charCodeAt(0))) : '';
+
 
 export default function HomePage({ entries=[], orgs=[] }) {
   const router = useRouter();
@@ -99,7 +100,7 @@ export default function HomePage({ entries=[], orgs=[] }) {
                       <div style={{flex:1,minWidth:140}}>
                         <div style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>
                           {e.player}
-                          {org?.country&&<span style={{marginLeft:6}}>{FLAG(org.country)}</span>}
+                          {org?.country&&countryFlag(org.country)}
                         </div>
                         <div style={{fontFamily:SANS,fontSize:11,color:DIM,marginTop:2}}>
                           {isSimulator
