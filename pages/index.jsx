@@ -1,46 +1,39 @@
 import Head from 'next/head';
 import { useState } from 'react';
-import { supabase } from "../lib/supabaseClient";
 import { useRouter } from 'next/router';
 import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP } from '../lib/constants';
+import { fmtDate } from '../lib/constants';
 import EmailSignup from '../components/EmailSignup';
 
-export default function HomePage({ entries=[], orgs=[] }) {
-  async function testSupabase() {
-  const { data, error } = await supabase
-    .from("clubs")
-    .select("*");
+const FLAG = cc => cc ? String.fromCodePoint(...[...cc.toUpperCase()].map(c=>0x1F1A5+c.charCodeAt(0))) : '';
 
-  console.log("DATA:", data);
-  console.log("ERROR:", error);
-}
+export default function HomePage({ entries=[], orgs=[] }) {
   const router = useRouter();
   const approvedOrgs = orgs.filter(o=>o.status==='approved');
-  const totalYards = entries.reduce((s,e)=>s+(e.dist||0),0);
-  const countries = new Set(approvedOrgs.map(o=>(o.country||''))).size;
   const [openFaq, setOpenFaq] = useState(null);
 
-  const stats = [
-    { val: approvedOrgs.length>0?approvedOrgs.length+'+':'14+', label:'Clubs' },
-    { val: totalYards>0?Math.round(totalYards/1000)+'K':'16K', label:'Yards Measured' },
-    { val: countries>0?countries+'+':'13+', label:'Countries' },
-    { val: entries.length>0?entries.length+'+':'50+', label:'Golfers' },
-  ];
+  const orgFor = id => orgs.find(o=>o.id===id);
+
+  const top5 = [...entries]
+    .filter(e=>approvedOrgs.find(o=>o.id===e.orgId))
+    .sort((a,b)=>b.dist-a.dist)
+    .slice(0,5);
+
+  const medals = ['🥇','🥈','🥉'];
 
   const faqs = [
-    {q:'What is Ripping Bombs?',a:"Ripping Bombs is a global registry of verified longest drives from golf tournaments and events around the world, creating a unified leaderboard of the game's biggest hitters."},
+    {q:'What is Ripping Bombs?',a:"Ripping Bombs is a global registry of longest drives from golf tournaments, events, and simulator sessions around the world — creating a unified leaderboard of the game's biggest hitters."},
+    {q:'Who can register and submit?',a:"Anyone. Golf clubs, tournament organisers, driving ranges, and individual golfers with simulator access can all register for free and submit their longest drives to the global leaderboard."},
     {q:'Why should golf courses get involved?',a:"Courses benefit by turning one of golf's most exciting moments — the longest drive — into an ongoing attraction. Run official 'Big Hitter' competitions, increase engagement, attract younger golfers, and be featured as an official Ripping Bombs location."},
     {q:'Why should tournament organisers participate?',a:'Event organisers get an always-on longest drive leaderboard, increased player engagement, shareable results for social media, additional sponsorship opportunities, and a digital footprint beyond the tournament weekend.'},
-    {q:'Why is only event-based submission allowed?',a:'To maintain accuracy and fairness, all entries must be the official longest drive winner of an event or designated hole, supported by photo or scorecard evidence, and submitted by the organiser.'},
-    {q:'How are drives verified?',a:'Verification may include course or event confirmation, launch monitor data, photo or scorecard evidence, and organiser validation for official events.'},
-    {q:"Is this just for professionals?",a:"No. Ripping Bombs is designed for everyone who plays golf — from casual players to long drive competitors. If you've ever said 'I absolutely smoked that one,' you belong on the leaderboard."},
+    {q:'Can I submit simulator drives?',a:'Yes. Individual golfers can register a simulator account and submit drives recorded on a launch monitor or simulator, with a screenshot as evidence. Simulator entries are clearly badged on the leaderboard.'},
+    {q:'How are drives verified?',a:'Verification depends on entry type. Club and event submissions require photo or scorecard evidence and are submitted by the organiser. Simulator submissions require a screenshot of the readout as evidence.'},
+    {q:"Is this just for professionals?",a:"Not at all. Ripping Bombs is for everyone who plays golf — from casual weekend players to long drive competitors. If you've ever said 'I absolutely smoked that one,' you belong on the leaderboard."},
     {q:"What's the goal of Ripping Bombs?",a:'To create the first global benchmark for driving distance in golf — a system where the best big hitters in the world can be recognised, ranked, and compared internationally.'},
   ];
 
-
   return (
-  <>
-    
+    <>
       <Head>
         <title>Ripping Bombs | Global Longest Golf Drive Database</title>
         <meta name="description" content="Track and compare the longest golf drives from tournaments worldwide. Ripping Bombs is the global leaderboard for longest drive competitions."/>
@@ -50,6 +43,7 @@ export default function HomePage({ entries=[], orgs=[] }) {
         <meta property="og:type" content="website"/>
       </Head>
       <div style={{animation:'fi .4s ease'}}>
+
         {/* HERO */}
         <div style={{position:'relative',overflow:'hidden'}}>
           <video autoPlay muted loop playsInline poster="https://images.pexels.com/videos/33511561/tee-shot-33511561.jpeg?auto=compress&cs=tinysrgb&h=627&fit=crop&w=1200"
@@ -62,11 +56,11 @@ export default function HomePage({ entries=[], orgs=[] }) {
               The Global Home of Competition Longest Drives
             </div>
             <h1 style={{fontFamily:DISP,fontSize:'clamp(56px,10vw,110px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:20,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
-  COMPETE LOCALLY.<br/>RANK GLOBALLY.
-</h1>
-<p style={{fontFamily:SANS,fontSize:16,color:'rgba(255,255,255,0.85)',maxWidth:520,margin:'0 auto 32px',lineHeight:1.7}}>
-  Submit your longest drives from simulators, events, or qualifying locations worldwide.
-</p>
+              COMPETE LOCALLY.<br/>RANK GLOBALLY.
+            </h1>
+            <p style={{fontFamily:SANS,fontSize:16,color:'rgba(255,255,255,0.85)',maxWidth:520,margin:'0 auto 32px',lineHeight:1.7}}>
+              Submit your longest drives from simulators, events, or qualifying locations worldwide.
+            </p>
             <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
               <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 32px',borderRadius:0,cursor:'pointer',letterSpacing:.5}}>REGISTER NOW FREE →</button>
               <button onClick={()=>router.push('/leaderboard')} style={{background:'rgba(255,255,255,0.12)',border:'1px solid rgba(255,255,255,0.3)',color:'#fff',fontFamily:SANS,fontWeight:600,fontSize:14,padding:'14px 28px',borderRadius:0,cursor:'pointer',letterSpacing:.5}}>View Leaderboard</button>
@@ -74,23 +68,67 @@ export default function HomePage({ entries=[], orgs=[] }) {
           </div>
         </div>
 
-        {/* STATS */}
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))',gap:1,background:BDR,borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`}}>
-          {stats.map(({val,label})=>(
-            <div key={label} style={{background:BG2,padding:'28px 20px',textAlign:'center'}}>
-              <div style={{fontFamily:DISP,fontSize:38,color:ORG,letterSpacing:1,lineHeight:1}}>{val}</div>
-              <div style={{fontFamily:SANS,fontSize:11,fontWeight:600,color:MUT,marginTop:6,letterSpacing:1,textTransform:'uppercase'}}>{label}</div>
+        {/* TOP 5 ALL-TIME */}
+        <div style={{background:'#0e0e0e',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'40px 18px'}}>
+          <div style={{maxWidth:1000,margin:'0 auto'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
+              <div>
+                <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:6}}>Live from the Registry</div>
+                <div style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>Top 5 Longest Drives All Time</div>
+              </div>
+              <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
             </div>
-          ))}
+
+            {top5.length === 0 ? (
+              <div style={{fontFamily:SANS,fontSize:13,color:DIM,textAlign:'center',padding:'32px 0'}}>No drives recorded yet — be the first.</div>
+            ) : (
+              <div style={{display:'flex',flexDirection:'column',gap:6}}>
+                {top5.map((e,i)=>{
+                  const org = orgFor(e.orgId);
+                  const isSimulator = e.is_simulator === true;
+                  return (
+                    <div key={e.id} onClick={()=>router.push('/leaderboard')}
+                      style={{background:i===0?'linear-gradient(135deg,rgba(163,230,53,0.1),rgba(163,230,53,0.03))':BG2,border:`1px solid ${i===0?'rgba(163,230,53,0.3)':BDR}`,padding:'16px 20px',display:'flex',alignItems:'center',gap:16,cursor:'pointer',flexWrap:'wrap'}}
+                      onMouseEnter={el=>el.currentTarget.style.borderColor='rgba(163,230,53,0.3)'}
+                      onMouseLeave={el=>el.currentTarget.style.borderColor=i===0?'rgba(163,230,53,0.3)':BDR}>
+                      {/* Rank */}
+                      <div style={{fontFamily:DISP,fontSize:22,width:36,flexShrink:0,textAlign:'center'}}>
+                        {medals[i]||<span style={{fontFamily:SANS,fontSize:13,color:DIM}}>#{i+1}</span>}
+                      </div>
+                      {/* Player + org */}
+                      <div style={{flex:1,minWidth:140}}>
+                        <div style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>
+                          {e.player}
+                          {org?.country&&<span style={{marginLeft:6}}>{FLAG(org.country)}</span>}
+                        </div>
+                        <div style={{fontFamily:SANS,fontSize:11,color:DIM,marginTop:2}}>
+                          {isSimulator
+                            ? <span style={{color:'rgba(163,230,53,0.6)'}}>🖥️ Simulator</span>
+                            : org?.courseName||'—'}
+                          {e.club&&<span style={{marginLeft:8,color:DIM}}>· {e.club}</span>}
+                        </div>
+                      </div>
+                      {/* Distance */}
+                      <div style={{textAlign:'right',flexShrink:0}}>
+                        <div style={{fontFamily:DISP,fontSize:32,color:ORG,letterSpacing:1,lineHeight:1}}>{e.dist}</div>
+                        <div style={{fontFamily:SANS,fontSize:10,color:DIM,marginTop:2}}>yards</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
         <div style={{padding:'0 18px'}}>
+
           {/* FEATURE CARDS */}
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',gap:16,marginBottom:60,marginTop:60}}>
             {[
-              {img:'https://images.pexels.com/photos/10463463/pexels-photo-10463463.jpeg?auto=compress&cs=tinysrgb&w=600',title:'Global Long Drive Standings',body:'Compare verified competition-winning drives with golfers from clubs and tournaments around the world.'},
-              {img:'https://images.pexels.com/photos/12642295/pexels-photo-12642295.jpeg?auto=compress&cs=tinysrgb&w=600',title:'Free Club & Tournament Registration',body:'Clubs, coaches, driving ranges, and event organisers can submit longest drive winners at no cost during launch.'},
-              {img:'https://images.pexels.com/photos/6572962/pexels-photo-6572962.jpeg?auto=compress&cs=tinysrgb&w=600',title:'Recognition for Big Hitters',body:"Give golfers a place to showcase huge drives, earn rankings, and represent their club on a global platform."},
+              {img:'https://images.pexels.com/photos/10463463/pexels-photo-10463463.jpeg?auto=compress&cs=tinysrgb&w=600',title:'Global Long Drive Standings',body:'Compare verified drives from clubs, tournaments, and simulator sessions worldwide on one unified leaderboard.'},
+              {img:'https://images.pexels.com/photos/12642295/pexels-photo-12642295.jpeg?auto=compress&cs=tinysrgb&w=600',title:'Free for Clubs, Events & Individuals',body:'Golf clubs, tournament organisers, driving ranges, and individual simulator golfers can all register and submit for free.'},
+              {img:'https://images.pexels.com/photos/6572962/pexels-photo-6572962.jpeg?auto=compress&cs=tinysrgb&w=600',title:'Recognition for Big Hitters',body:"Give golfers a place to showcase huge drives, earn rankings, and represent their club or themselves on a global platform."},
             ].map(({img,title,body})=>(
               <div key={title} style={{background:BG2,border:`1px solid ${BDR}`,overflow:'hidden'}}>
                 <div style={{height:160,overflow:'hidden'}}>
@@ -126,6 +164,7 @@ export default function HomePage({ entries=[], orgs=[] }) {
               ))}
             </div>
           </div>
+
         </div>
         <EmailSignup/>
       </div>
