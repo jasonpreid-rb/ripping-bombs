@@ -5,7 +5,7 @@ import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { fmtDate } from '../lib/constants';
 import EmailSignup from '../components/EmailSignup';
 
-const FLAG = cc => cc ? String.fromCodePoint(...[...cc.toUpperCase()].map(c=>0x1F1A5+c.charCodeAt(0))) : '';
+const FLAG = cc => cc ? String.fromCodePoint(...[...cc.toUpperCase()].map(c=>0x1F1E6-65+c.charCodeAt(0))) : '';
 
 export default function HomePage({ entries=[], orgs=[] }) {
   const router = useRouter();
