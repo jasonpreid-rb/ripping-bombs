@@ -99,7 +99,7 @@ export default function LeaderboardPage(props) {
     .filter(e=>!fClub||e.club.toLowerCase().includes(fClub.toLowerCase()))
     .sort((a,b)=>{if(sortBy==='hcp')return a.hcp-b.hcp;if(sortBy==='age')return a.age-b.age;if(sortBy==='club')return a.club.localeCompare(b.club);if(sortBy==='date')return new Date(b.date)-new Date(a.date);return b.dist-a.dist;});
 
-  const allTimeBest=[...entries].filter(e=>approvedOrgs.find(o=>o.id===e.orgId)&&e.is_simulator!==true).sort((a,b)=>Number(b.dist)-Number(a.dist));
+  const allTimeBest=[...entries].filter(e=>approvedOrgs.find(o=>o.id===e.orgId)).sort((a,b)=>Number(b.dist)-Number(a.dist));
 
   return (
     <>
@@ -124,17 +124,27 @@ export default function LeaderboardPage(props) {
         </div>
 
         {/* World record hero */}
-        {allTimeBest[0]&&<div style={{background:'linear-gradient(135deg,rgba(163,230,53,0.12),rgba(163,230,53,0.04))',border:'1px solid rgba(163,230,53,0.25)',padding:'24px 28px',marginBottom:28,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:18}}>
-          <div>
-            <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:ORG,marginBottom:8,textTransform:'uppercase'}}>🏆 All-Time Record (Official)</div>
-            <div style={{fontFamily:DISP,fontSize:34,color:TXT,letterSpacing:.5}}>{allTimeBest[0].player}</div>
-            <div style={{fontFamily:SANS,fontSize:12,color:MUT,marginTop:4}}>{orgFor(allTimeBest[0].orgId)?.courseName} · {allTimeBest[0].club} · HCP {allTimeBest[0].hcp}</div>
+        {allTimeBest[0]&&(()=>{ const best=allTimeBest[0]; const bestOrg=orgFor(best.orgId); return (
+          <div onClick={()=>setDetEnt&&setDetEnt(best)} style={{background:'linear-gradient(135deg,rgba(163,230,53,0.12),rgba(163,230,53,0.04))',border:'1px solid rgba(163,230,53,0.25)',padding:'24px 28px',marginBottom:28,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:18,cursor:'pointer'}}
+            onMouseEnter={e=>e.currentTarget.style.background='linear-gradient(135deg,rgba(163,230,53,0.18),rgba(163,230,53,0.08))'}
+            onMouseLeave={e=>e.currentTarget.style.background='linear-gradient(135deg,rgba(163,230,53,0.12),rgba(163,230,53,0.04))'}>
+            <div>
+              <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:ORG,marginBottom:8,textTransform:'uppercase'}}>🏆 All-Time Record</div>
+              <div style={{fontFamily:DISP,fontSize:34,color:TXT,letterSpacing:.5,display:'flex',alignItems:'center',gap:8}}>
+                {best.player}
+                {bestOrg?.country&&<span style={{fontSize:24}}>{countryFlag(bestOrg.country)}</span>}
+              </div>
+              <div style={{fontFamily:SANS,fontSize:12,color:MUT,marginTop:4}}>{bestOrg?.courseName} · {best.club} · HCP {best.hcp}</div>
+            </div>
+            <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:10}}>
+              <div style={{textAlign:'right'}}>
+                <div style={{fontFamily:DISP,fontSize:56,color:ORG,letterSpacing:1,lineHeight:1}}>{cvt(best.dist)}</div>
+                <div style={{fontFamily:SANS,fontSize:14,color:MUT,marginTop:2}}>{unitLbl}</div>
+              </div>
+              <button onClick={e=>{e.stopPropagation();setShareEnt&&setShareEnt(best);}} style={{background:`linear-gradient(135deg,${ORG},#bef264)`,border:'none',color:'#111',padding:'8px 16px',cursor:'pointer',fontSize:11,fontFamily:SANS,fontWeight:700,letterSpacing:.5}}>↗ SHARE</button>
+            </div>
           </div>
-          <div style={{textAlign:'right'}}>
-            <div style={{fontFamily:DISP,fontSize:56,color:ORG,letterSpacing:1,lineHeight:1}}>{cvt(allTimeBest[0].dist)}</div>
-            <div style={{fontFamily:SANS,fontSize:14,color:MUT,marginTop:2}}>{unitLbl}</div>
-          </div>
-        </div>}
+        );})()}
 
         {/* Week nav */}
         <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:20,flexWrap:'wrap'}}>
