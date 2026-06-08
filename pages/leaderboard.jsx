@@ -99,7 +99,7 @@ export default function LeaderboardPage(props) {
     .filter(e=>!fClub||e.club.toLowerCase().includes(fClub.toLowerCase()))
     .sort((a,b)=>{if(sortBy==='hcp')return a.hcp-b.hcp;if(sortBy==='age')return a.age-b.age;if(sortBy==='club')return a.club.localeCompare(b.club);if(sortBy==='date')return new Date(b.date)-new Date(a.date);return b.dist-a.dist;});
 
-  const allTimeBest=[...entries].filter(e=>approvedOrgs.find(o=>o.id===e.orgId)&&e.is_simulator!==true).sort((a,b)=>b.dist-a.dist);
+  const allTimeBest=[...entries].filter(e=>approvedOrgs.find(o=>o.id===e.orgId)&&e.is_simulator!==true).sort((a,b)=>Number(b.dist)-Number(a.dist));
 
   return (
     <>

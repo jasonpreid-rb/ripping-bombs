@@ -124,6 +124,7 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
         <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
           {TABS.map(t=><TabBtn key={t} id={t}/>)}
           <button onClick={onClose} style={{ background:'none', border:`1px solid rgba(220,60,60,0.3)`, color:'#f87171', fontFamily:SANS, fontWeight:600, fontSize:11, padding:'6px 14px', cursor:'pointer' }}>← Back to Site</button>
+          <button onClick={()=>{ localStorage.removeItem('rb_admin_auth'); localStorage.removeItem('rb_admin_expiry'); onClose(); }} style={{ background:'rgba(248,113,113,0.12)', border:`1px solid rgba(248,113,113,0.4)`, color:'#f87171', fontFamily:SANS, fontWeight:700, fontSize:11, padding:'6px 14px', cursor:'pointer', letterSpacing:.5 }}>⏻ Log Out</button>
         </div>
       </div>
 

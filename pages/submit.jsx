@@ -5,7 +5,7 @@ import { TXT, MUT, ORG, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { tier, todayStr, toB64 } from '../lib/constants';
 import { Card, Field, PhotoField, Btn } from '../components/UI';
 
-export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, unitLbl }) {
+export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, unitLbl, entries=[] }) {
   const [consent, setConsent] = useState(false);
   const router = useRouter();
 
@@ -18,6 +18,27 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, un
   );
 
   const isSimulator = loggedOrg.accountType === 'simulator';
+
+  // Once-per-week check for simulator accounts
+  const simulatorWeeklyBlock = (() => {
+    if (!isSimulator) return null;
+    const now = new Date();
+    // Get Monday of current week
+    const day = now.getDay();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+    monday.setHours(0,0,0,0);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23,59,59,999);
+    const existingThisWeek = entries.find(e =>
+      e.orgId === loggedOrg.id &&
+      e.is_simulator === true &&
+      new Date(e.date) >= monday &&
+      new Date(e.date) <= sunday
+    );
+    return existingThisWeek || null;
+  })();
 
   return (
     <>
@@ -37,6 +58,16 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, un
         {isSimulator && (
           <div style={{ background:'rgba(163,230,53,0.06)', border:'1px solid rgba(163,230,53,0.2)', padding:'12px 16px', marginBottom:20, fontFamily:SANS, fontSize:12, color:MUT, lineHeight:1.6 }}>
             🖥️ <span style={{ fontWeight:700, color:TXT }}>Simulator Drive</span> — A screenshot of your simulator readout is required as evidence. Your drive will appear on the global leaderboard with the simulator badge.
+          </div>
+        )}
+
+        {/* Weekly limit block for simulator accounts */}
+        {isSimulator && simulatorWeeklyBlock && (
+          <div style={{ background:'rgba(248,113,113,0.06)', border:'1px solid rgba(248,113,113,0.3)', padding:'20px 20px', marginBottom:20, fontFamily:SANS }}>
+            <div style={{ fontSize:14, fontWeight:700, color:'#f87171', marginBottom:6 }}>⏱ Weekly Submission Limit Reached</div>
+            <div style={{ fontSize:12, color:MUT, lineHeight:1.7 }}>
+              You've already submitted a drive this week (<span style={{ color:TXT, fontWeight:600 }}>{simulatorWeeklyBlock.dist} yds on {simulatorWeeklyBlock.date}</span>). Simulator accounts are limited to one submission per week. Come back next Monday!
+            </div>
           </div>
         )}
 
@@ -125,6 +156,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, un
           <Btn
             full
             onClick={() => {
+              if (isSimulator && simulatorWeeklyBlock) { alert('You have already submitted a drive this week. Simulator accounts are limited to one submission per week.'); return; }
               if (!consent) { alert(isSimulator ? 'Please confirm your consent before submitting.' : 'Please confirm player consent before submitting.'); return; }
               // For simulator accounts, pre-fill player name and tournament from account
               if (isSimulator) {
@@ -132,7 +164,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, un
               }
               doSubmit();
             }}
-            style={{ opacity:consent?1:0.5 }}
+            style={{ opacity:(consent && !(isSimulator && simulatorWeeklyBlock))?1:0.5 }}
           >
             Submit to World Registry →
           </Btn>
