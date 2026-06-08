@@ -1,6 +1,7 @@
 import '../styles/globals.css';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Script from 'next/script';
 import Layout from '../components/Layout';
 import AdminPanel from '../components/AdminPanel';
 import LaunchModal from '../components/LaunchModal';
@@ -215,6 +216,20 @@ export default function App({ Component, pageProps }) {
 
   return (
     <>
+      {/* Google Analytics */}
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-5RCJDKVBER"
+        strategy="afterInteractive"
+      />
+      <Script id="ga4-init" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-5RCJDKVBER');
+        `}
+      </Script>
+
       <Layout loggedOrg={loggedOrg} onLogout={()=>setLoggedOrg(null)} unit={unit} setUnit={setUnit}
         onAdminClick={()=>setAdminPw({show:true,val:''})} pendingCount={pendingCount} onShowDemo={()=>setShowDemo(true)}>
         <Component {...pageProps} {...sharedProps}/>
