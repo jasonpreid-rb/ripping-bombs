@@ -1,11 +1,13 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP, ORGS_KEY, ENT_KEY, SEED_KEY } from '../lib/constants';
 import { fmtDate, tier } from '../lib/constants';
 import { SEED_ORGS, SEED_ENTRIES, db } from '../lib/data';
 import { Btn, Pill, BadgePill, countryFlag } from './UI';
 import { sendApprovalEmail, sendRegistrationNotification } from '../lib/email';
+import supabase from '../lib/supabaseClient';
 
-const TABS = ['Overview', 'Approvals', 'Clubs', 'Drives', 'Danger'];
+const TABS = ['Overview', 'Approvals', 'Clubs', 'Drives', 'Founding', 'Danger'];
+const FOUNDING_LIMIT = 50;
 
 // ── small helpers ────────────────────────────────────────────────────────────
 const Stat = ({ val, label, accent }) => (
@@ -36,10 +38,188 @@ const EditField = ({ label, value, onChange }) => (
   </div>
 );
 
+// ── founding member badge ─────────────────────────────────────────────────────
+const FoundingBadge = () => (
+  <span style={{
+    display:'inline-flex', alignItems:'center', gap:3,
+    background:'linear-gradient(135deg,#78350f,#92400e)',
+    color:'#fbbf24', border:'1px solid #b45309',
+    borderRadius:20, padding:'1px 7px',
+    fontFamily:SANS, fontSize:'0.6rem', fontWeight:700,
+    letterSpacing:'0.06em', textTransform:'uppercase', whiteSpace:'nowrap',
+  }}>
+    ★ Founding
+  </span>
+);
+
+// ── founding tab ─────────────────────────────────────────────────────────────
+function FoundingTab({ toast }) {
+  const [clubs, setClubs]       = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [toggling, setToggling] = useState(null);
+  const [search, setSearch]     = useState('');
+  const [filter, setFilter]     = useState('all'); // 'all' | 'founding' | 'regular'
+
+  const foundingCount = clubs.filter(c => c.is_founding_member).length;
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('clubs')
+      .select('id, fullName, courseName, email, location, country, status, accountType, is_founding_member')
+      .order('id', { ascending: true });
+    if (!error) setClubs(data || []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const handleToggle = async (id, current) => {
+    if (!current && foundingCount >= FOUNDING_LIMIT) return;
+    setToggling(id);
+    const { error } = await supabase
+      .from('clubs')
+      .update({ is_founding_member: !current })
+      .eq('id', id);
+    if (!error) {
+      setClubs(prev => prev.map(c => c.id === id ? { ...c, is_founding_member: !current } : c));
+      toast(current ? 'Founding Member status removed' : '★ Founding Member granted!');
+    } else {
+      toast('Error updating — check console');
+      console.error(error);
+    }
+    setToggling(null);
+  };
+
+  const filtered = clubs.filter(c => {
+    const q = search.toLowerCase();
+    const matchSearch = !q ||
+      (c.fullName   || '').toLowerCase().includes(q) ||
+      (c.courseName || '').toLowerCase().includes(q) ||
+      (c.email      || '').toLowerCase().includes(q);
+    const matchFilter =
+      filter === 'all' ||
+      (filter === 'founding' && c.is_founding_member) ||
+      (filter === 'regular'  && !c.is_founding_member);
+    return matchSearch && matchFilter;
+  });
+
+  const filterBtn = (key, label) => (
+    <button key={key} onClick={() => setFilter(key)} style={{
+      background: filter === key ? 'rgba(163,230,53,0.08)' : 'transparent',
+      border: `1px solid ${filter === key ? ORG : BDR}`,
+      color: filter === key ? ORG : MUT,
+      fontFamily: SANS, fontSize: 11, padding: '5px 11px',
+      cursor: 'pointer', letterSpacing: .5,
+    }}>{label}</button>
+  );
+
+  return (
+    <div>
+      {/* Header + counter */}
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:12, marginBottom:16 }}>
+        <div>
+          <div style={{ fontFamily:DISP, fontSize:22, color:TXT, letterSpacing:1, marginBottom:4 }}>Founding Members</div>
+          <div style={{ fontFamily:SANS, fontSize:12, color:MUT }}>First {FOUNDING_LIMIT} registrants receive lifetime recognition. Toggle on/off per club.</div>
+        </div>
+        <div style={{ textAlign:'right' }}>
+          <div style={{ fontFamily:DISP, fontSize:36, letterSpacing:1, color: foundingCount >= FOUNDING_LIMIT ? '#f59e0b' : ORG, lineHeight:1 }}>
+            {foundingCount}<span style={{ fontFamily:SANS, fontSize:16, color:MUT, fontWeight:400 }}> / {FOUNDING_LIMIT}</span>
+          </div>
+          <div style={{ fontFamily:SANS, fontSize:9, color:MUT, textTransform:'uppercase', letterSpacing:.8, marginTop:2 }}>Founding Members</div>
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div style={{ height:3, background:BDR, borderRadius:99, marginBottom:16, overflow:'hidden' }}>
+        <div style={{
+          height:'100%', borderRadius:99,
+          background: foundingCount >= FOUNDING_LIMIT ? '#f59e0b' : ORG,
+          width: `${Math.min((foundingCount / FOUNDING_LIMIT) * 100, 100)}%`,
+          transition: 'width 0.4s ease',
+        }}/>
+      </div>
+
+      {/* Controls */}
+      <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:14, alignItems:'center' }}>
+        <div style={{ flex:1, minWidth:200 }}>
+          <SearchBox value={search} onChange={setSearch} placeholder="Search name, club, or email…" />
+        </div>
+        <div style={{ display:'flex', gap:4 }}>
+          {filterBtn('all',      `All (${clubs.length})`)}
+          {filterBtn('founding', `★ Founding (${foundingCount})`)}
+          {filterBtn('regular',  `Regular (${clubs.length - foundingCount})`)}
+        </div>
+      </div>
+
+      {/* List */}
+      <div style={{ border:`1px solid ${BDR}`, background:BG2 }}>
+        {loading ? (
+          <div style={{ padding:'40px', textAlign:'center', fontFamily:SANS, fontSize:13, color:DIM }}>Loading clubs…</div>
+        ) : filtered.length === 0 ? (
+          <div style={{ padding:'40px', textAlign:'center', fontFamily:SANS, fontSize:13, color:DIM }}>No clubs match your search.</div>
+        ) : filtered.map((c, i) => {
+          const atCap   = !c.is_founding_member && foundingCount >= FOUNDING_LIMIT;
+          const spinning = toggling === c.id;
+          return (
+            <div key={c.id} style={{
+              display:'flex', alignItems:'center', justifyContent:'space-between',
+              padding:'12px 16px', gap:12,
+              borderBottom: i < filtered.length - 1 ? `1px solid ${BDR}` : 'none',
+              background: c.is_founding_member ? 'rgba(163,230,53,0.025)' : 'transparent',
+            }}>
+              {/* Info */}
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap', marginBottom:2 }}>
+                  <span style={{ fontFamily:SANS, fontWeight:700, fontSize:13, color:TXT }}>
+                    {c.courseName || c.fullName || c.id}
+                  </span>
+                  {c.country && countryFlag(c.country)}
+                  {c.is_founding_member && <FoundingBadge />}
+                  <span style={{ fontFamily:SANS, fontSize:10, color:DIM, border:`1px solid ${BDR}`, padding:'1px 5px' }}>
+                    {c.accountType === 'simulator' ? '🖥️ Sim' : '🏌️ Club'}
+                  </span>
+                </div>
+                <div style={{ fontFamily:SANS, fontSize:11, color:MUT, display:'flex', gap:6, flexWrap:'wrap' }}>
+                  {c.fullName && <span>{c.fullName}</span>}
+                  {c.email    && <span>· {c.email}</span>}
+                  {c.location && <span>· {c.location}</span>}
+                  <span style={{ color:DIM }}>· {c.id}</span>
+                </div>
+              </div>
+
+              {/* Toggle */}
+              <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+                {atCap && <span style={{ fontFamily:SANS, fontSize:10, color:'#f59e0b' }}>Limit reached</span>}
+                <button
+                  onClick={() => handleToggle(c.id, c.is_founding_member)}
+                  disabled={spinning || atCap}
+                  style={{
+                    fontFamily:SANS, fontSize:11, fontWeight:700,
+                    padding:'5px 12px', cursor: spinning || atCap ? 'not-allowed' : 'pointer',
+                    opacity: spinning || atCap ? 0.45 : 1,
+                    border: `1px solid ${c.is_founding_member ? 'rgba(248,113,113,0.4)' : atCap ? BDR : 'rgba(163,230,53,0.4)'}`,
+                    background: c.is_founding_member ? 'rgba(248,113,113,0.08)' : atCap ? 'transparent' : 'rgba(163,230,53,0.08)',
+                    color: c.is_founding_member ? '#f87171' : atCap ? DIM : ORG,
+                    minWidth:58, textAlign:'center',
+                  }}
+                >
+                  {spinning ? '…' : c.is_founding_member ? 'Revoke' : 'Grant'}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── main component ───────────────────────────────────────────────────────────
 export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, onClose, cvt, unitLbl }) {
   const [tab, setTab]       = useState('Overview');
   const [selOrg, setSelOrg] = useState(null);
-  const [editing, setEditing] = useState(null);   // holds edited fields while open
+  const [editing, setEditing] = useState(null);
   const [clubSearch, setClubSearch]   = useState('');
   const [driveSearch, setDriveSearch] = useState('');
 
@@ -47,14 +227,12 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
   const approved = orgs.filter(o => o.status === 'approved');
   const disabled = orgs.filter(o => o.status === 'disabled');
 
-  // drives per org
   const driveCount = useMemo(() => {
     const m = {};
     entries.forEach(e => { m[e.orgId] = (m[e.orgId]||0) + 1; });
     return m;
   }, [entries]);
 
-  // clubs with zero submissions
   const noSubmissions = approved.filter(o => !driveCount[o.id]);
 
   async function setStatus(id, status) {
@@ -92,16 +270,15 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
     toast('All data cleared');
   }
 
-  // filtered lists
   const filteredOrgs = orgs.filter(o => {
     const q = clubSearch.toLowerCase();
     return !q || o.courseName?.toLowerCase().includes(q) || o.fullName?.toLowerCase().includes(q) || o.location?.toLowerCase().includes(q) || o.email?.toLowerCase().includes(q);
   });
 
-  const filteredEntries = [...entries].sort((a,b)=>b.dist-a.dist).filter(e => {
+  const filteredEntries = [...entries].sort((a,b) => Number(b.dist) - Number(a.dist)).filter(e => {
     const q = driveSearch.toLowerCase();
     if (!q) return true;
-    const org = orgs.find(o=>o.id===e.orgId);
+    const org = orgs.find(o => o.id===e.orgId);
     return e.player?.toLowerCase().includes(q) || e.club?.toLowerCase().includes(q) || org?.courseName?.toLowerCase().includes(q);
   });
 
@@ -133,7 +310,6 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
         {/* ── OVERVIEW ── */}
         {tab==='Overview'&&(
           <div>
-            {/* Stats row */}
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', gap:12, marginBottom:24 }}>
               <Stat val={orgs.length} label="Registered"/>
               <Stat val={approved.length} label="Approved"/>
@@ -143,7 +319,6 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
               <Stat val={noSubmissions.length} label="No Submissions Yet" accent={noSubmissions.length>0?'#fb923c':ORG}/>
             </div>
 
-            {/* Pending approvals – inline action */}
             {pending.length>0&&(
               <div style={{ marginBottom:24 }}>
                 <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:2, color:'#f87171', textTransform:'uppercase', marginBottom:10 }}>⚠ Awaiting Approval</div>
@@ -162,7 +337,6 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
               </div>
             )}
 
-            {/* Approved clubs with no submissions */}
             {noSubmissions.length>0&&(
               <div>
                 <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:2, color:'#fb923c', textTransform:'uppercase', marginBottom:10 }}>📭 Approved — No Drives Submitted Yet</div>
@@ -223,12 +397,14 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
               const drives = driveCount[org.id]||0;
               return (
                 <div key={org.id} style={{ background:BG2, border:`1px solid ${isOpen?ORG:BDR}`, marginBottom:6, overflow:'hidden' }}>
+
                   {/* Row */}
                   <div onClick={()=>{ setSelOrg(isOpen?null:org); setEditing(null); }} style={{ padding:'13px 18px', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:8, cursor:'pointer' }}>
                     <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
                       <span style={{ fontFamily:SANS, fontWeight:700, fontSize:14, color:TXT }}>{org.courseName}</span>
                       {org.country&&countryFlag(org.country)}
                       <span style={{ fontFamily:SANS, fontSize:12, color:MUT }}>{org.location}</span>
+                      {org.is_founding_member&&<FoundingBadge/>}
                     </div>
                     <div style={{ display:'flex', gap:8, alignItems:'center', flexShrink:0 }}>
                       <span style={{ fontFamily:SANS, fontSize:11, color:drives>0?ORG:DIM, fontWeight:600 }}>{drives} drive{drives!==1?'s':''}</span>
@@ -318,6 +494,11 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
               </table>
             </div>
           </div>
+        )}
+
+        {/* ── FOUNDING ── */}
+        {tab==='Founding'&&(
+          <FoundingTab toast={toast} />
         )}
 
         {/* ── DANGER ── */}
