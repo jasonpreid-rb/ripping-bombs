@@ -6,8 +6,6 @@ import { fmtDate } from '../lib/constants';
 import EmailSignup from '../components/EmailSignup';
 import { countryFlag } from '../components/UI';
 
-
-
 export default function HomePage({ entries=[], orgs=[] }) {
   const router = useRouter();
   const approvedOrgs = orgs.filter(o=>o.status==='approved');
@@ -15,12 +13,39 @@ export default function HomePage({ entries=[], orgs=[] }) {
 
   const orgFor = id => orgs.find(o=>o.id===id);
 
-  const top5 = [...entries]
-    .filter(e=>approvedOrgs.find(o=>o.id===e.orgId))
-    .sort((a,b)=>b.dist-a.dist)
-    .slice(0,5);
+  // Week number helper
+  const getWeekNumber = (dateStr) => {
+    const d = new Date(dateStr);
+    const jan1 = new Date(d.getFullYear(), 0, 1);
+    return Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+  };
 
-  const medals = ['🥇','🥈','🥉'];
+  const now = new Date();
+  const currentWeek = getWeekNumber(now.toISOString().slice(0,10));
+  const currentYear = now.getFullYear();
+  const approved = entries.filter(e => approvedOrgs.find(o => o.id === e.orgId));
+
+  const CATEGORIES = [
+    { key:'mens',       label:'Men',                  icon:'♂',  filter: e => e.gender==='male'   && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)<20  },
+    { key:'mens_hcp',   label:'Men High Handicap',    icon:'♂',  filter: e => e.gender==='male'   && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)>=20 },
+    { key:'womens',     label:'Women',                icon:'♀',  filter: e => e.gender==='female' && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)<20  },
+    { key:'womens_hcp', label:'Women High Handicap',  icon:'♀',  filter: e => e.gender==='female' && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)>=20 },
+    { key:'youth',      label:'Youth (Under 16)',     icon:'🌱', filter: e => Number(e.age) < 16 },
+    { key:'senior',     label:'Senior (55+)',         icon:'⭐', filter: e => Number(e.age) >= 55 },
+  ];
+
+  const weeklyLeaders = CATEGORIES.map(cat => {
+    const best = approved
+      .filter(e => getWeekNumber(e.date) === currentWeek && new Date(e.date).getFullYear() === currentYear)
+      .filter(cat.filter)
+      .sort((a,b) => Number(b.dist) - Number(a.dist))[0] || null;
+    return { ...cat, entry: best };
+  });
+
+  const allTimeLeaders = CATEGORIES.map(cat => {
+    const best = approved.filter(cat.filter).sort((a,b) => Number(b.dist) - Number(a.dist))[0] || null;
+    return { ...cat, entry: best };
+  });
 
   const faqs = [
     {q:'What is Ripping Bombs?',a:"Ripping Bombs is a global registry of longest drives from golf tournaments, events, and simulator sessions around the world — creating a unified leaderboard of the game's biggest hitters."},
@@ -32,6 +57,38 @@ export default function HomePage({ entries=[], orgs=[] }) {
     {q:"Is this just for professionals?",a:"Not at all. Ripping Bombs is for everyone who plays golf — from casual weekend players to long drive competitors. If you've ever said 'I absolutely smoked that one,' you belong on the leaderboard."},
     {q:"What's the goal of Ripping Bombs?",a:'To create the first global benchmark for driving distance in golf — a system where the best big hitters in the world can be recognised, ranked, and compared internationally.'},
   ];
+
+  // Reusable category card
+  const CategoryCard = ({ cat, isWeekly }) => {
+    const e = cat.entry;
+    const org = e ? orgFor(e.orgId) : null;
+    return (
+      <div style={{background:BG2,border:`1px solid ${e?'rgba(163,230,53,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:6,minWidth:0}}>
+        <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:2}}>
+          <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase'}}>{cat.icon} {cat.label}</span>
+        </div>
+        {e ? (
+          <>
+            <div style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT,display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
+              {e.player}
+              {org?.country && countryFlag(org.country)}
+            </div>
+            <div style={{fontFamily:SANS,fontSize:11,color:DIM}}>
+              {e.is_simulator ? <span style={{color:'rgba(163,230,53,0.6)'}}>🖥️ Simulator</span> : org?.courseName||'—'}
+              {e.club && <span style={{marginLeft:6}}>· {e.club}</span>}
+            </div>
+            <div style={{display:'flex',alignItems:'baseline',gap:4,marginTop:4}}>
+              <span style={{fontFamily:DISP,fontSize:36,color:ORG,letterSpacing:1,lineHeight:1}}>{Number(e.dist)}</span>
+              <span style={{fontFamily:SANS,fontSize:11,color:DIM}}>yds</span>
+            </div>
+            <div style={{fontFamily:SANS,fontSize:10,color:DIM,marginTop:2}}>{fmtDate(e.date)}</div>
+          </>
+        ) : (
+          <div style={{fontFamily:SANS,fontSize:12,color:DIM,marginTop:4,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -69,56 +126,35 @@ export default function HomePage({ entries=[], orgs=[] }) {
           </div>
         </div>
 
-        {/* TOP 5 ALL-TIME */}
+        {/* WEEKLY LEADERS */}
         <div style={{background:'#0e0e0e',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'40px 18px'}}>
           <div style={{maxWidth:1000,margin:'0 auto'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
               <div>
                 <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:6}}>Live from the Registry</div>
-                <div style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>Top 5 Longest Drives All Time</div>
+                <div style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>Week {currentWeek}, {currentYear} — Category Leaders</div>
               </div>
               <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
             </div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10}}>
+              {weeklyLeaders.map(cat => <CategoryCard key={cat.key} cat={cat} isWeekly={true}/>)}
+            </div>
+          </div>
+        </div>
 
-            {top5.length === 0 ? (
-              <div style={{fontFamily:SANS,fontSize:13,color:DIM,textAlign:'center',padding:'32px 0'}}>No drives recorded yet — be the first.</div>
-            ) : (
-              <div style={{display:'flex',flexDirection:'column',gap:6}}>
-                {top5.map((e,i)=>{
-                  const org = orgFor(e.orgId);
-                  const isSimulator = e.is_simulator === true;
-                  return (
-                    <div key={e.id} onClick={()=>router.push('/leaderboard')}
-                      style={{background:i===0?'linear-gradient(135deg,rgba(163,230,53,0.1),rgba(163,230,53,0.03))':BG2,border:`1px solid ${i===0?'rgba(163,230,53,0.3)':BDR}`,padding:'16px 20px',display:'flex',alignItems:'center',gap:16,cursor:'pointer',flexWrap:'wrap'}}
-                      onMouseEnter={el=>el.currentTarget.style.borderColor='rgba(163,230,53,0.3)'}
-                      onMouseLeave={el=>el.currentTarget.style.borderColor=i===0?'rgba(163,230,53,0.3)':BDR}>
-                      {/* Rank */}
-                      <div style={{fontFamily:DISP,fontSize:22,width:36,flexShrink:0,textAlign:'center'}}>
-                        {medals[i]||<span style={{fontFamily:SANS,fontSize:13,color:DIM}}>#{i+1}</span>}
-                      </div>
-                      {/* Player + org */}
-                      <div style={{flex:1,minWidth:140}}>
-                        <div style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>
-                          {e.player}
-                          {org?.country&&countryFlag(org.country)}
-                        </div>
-                        <div style={{fontFamily:SANS,fontSize:11,color:DIM,marginTop:2}}>
-                          {isSimulator
-                            ? <span style={{color:'rgba(163,230,53,0.6)'}}>🖥️ Simulator</span>
-                            : org?.courseName||'—'}
-                          {e.club&&<span style={{marginLeft:8,color:DIM}}>· {e.club}</span>}
-                        </div>
-                      </div>
-                      {/* Distance */}
-                      <div style={{textAlign:'right',flexShrink:0}}>
-                        <div style={{fontFamily:DISP,fontSize:32,color:ORG,letterSpacing:1,lineHeight:1}}>{e.dist}</div>
-                        <div style={{fontFamily:SANS,fontSize:10,color:DIM,marginTop:2}}>yards</div>
-                      </div>
-                    </div>
-                  );
-                })}
+        {/* ALL-TIME LEADERS */}
+        <div style={{background:'#111',borderBottom:`1px solid ${BDR}`,padding:'40px 18px'}}>
+          <div style={{maxWidth:1000,margin:'0 auto'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
+              <div>
+                <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:MUT,textTransform:'uppercase',marginBottom:6}}>Hall of Records</div>
+                <div style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>All-Time Category Leaders</div>
               </div>
-            )}
+              <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10}}>
+              {allTimeLeaders.map(cat => <CategoryCard key={cat.key} cat={cat} isWeekly={false}/>)}
+            </div>
           </div>
         </div>
 
