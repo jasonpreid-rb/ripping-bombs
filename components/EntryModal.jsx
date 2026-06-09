@@ -17,7 +17,7 @@ export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl 
         {org?.country && countryFlag(org.country)}
       </div>
       <div style={{ fontFamily:SANS, fontSize:12, color:MUT, marginBottom:18 }}>
-        {org?.courseName}{entry.tournament ? ` · ${entry.tournament}` : ''} · {fmtDate(entry.date)}
+        {org?.courseName}{org?.is_founding_member&&<span title="Founding Member" style={{marginLeft:6,color:ORG,fontSize:13,cursor:'default'}}>✦</span>}{entry.tournament ? ` · ${entry.tournament}` : ''} · {fmtDate(entry.date)}
       </div>
       {org?.badge && <div style={{ marginBottom:14 }}><BadgePill badge={org.badge}/></div>}
 

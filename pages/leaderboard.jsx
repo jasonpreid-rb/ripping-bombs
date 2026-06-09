@@ -55,7 +55,7 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:12,color:MUT}}>{e.hcp}</td>
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:12,color:MUT}}>{e.age}</td>
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:12,color:MUT}}>{e.gender==='female'?'♀ Female':e.gender==='male'?'♂ Male':'—'}</td>
-                <td style={{padding:'12px 14px'}}><span style={{fontFamily:SANS,fontSize:12,color:MUT}}>{org?.courseName||'—'}</span>{org?.badge&&<span style={{marginLeft:6}}><BadgePill badge={org.badge} small/></span>}</td>
+                <td style={{padding:'12px 14px'}}><span style={{fontFamily:SANS,fontSize:12,color:MUT}}>{org?.courseName||'—'}</span>{org?.is_founding_member&&<span title="Founding Member" style={{marginLeft:6,color:ORG,fontSize:13,cursor:'default'}}>✦</span>}{org?.badge&&<span style={{marginLeft:6}}><BadgePill badge={org.badge} small/></span>}</td>
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:12,color:DIM}}>{e.tournament||'—'}</td>
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:11,color:DIM}}>{fmtDate(e.date)}</td>
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:10,fontWeight:600,color:ORG}}>{tier(e.dist)}</td>
