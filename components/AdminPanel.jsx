@@ -4,7 +4,7 @@ import { fmtDate, tier } from '../lib/constants';
 import { SEED_ORGS, SEED_ENTRIES, db } from '../lib/data';
 import { Btn, Pill, BadgePill, countryFlag } from './UI';
 import { sendApprovalEmail, sendRegistrationNotification } from '../lib/email';
-import supabase from '../lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 
 const TABS = ['Overview', 'Approvals', 'Clubs', 'Drives', 'Founding', 'Danger'];
 const FOUNDING_LIMIT = 50;

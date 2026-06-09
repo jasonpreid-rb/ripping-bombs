@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import supabase from '../lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 import Layout from '../components/Layout';
 
 // ─── Design tokens (matching constants.js) ───────────────────────────────────
