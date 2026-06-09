@@ -43,8 +43,8 @@ export default function HomePage({ entries=[], orgs=[] }) {
   });
 
   const allTimeLeaders = CATEGORIES.map(cat => {
-    const best = approved.filter(cat.filter).sort((a,b) => Number(b.dist) - Number(a.dist))[0] || null;
-    return { ...cat, entry: best };
+    const top3 = approved.filter(cat.filter).sort((a,b) => Number(b.dist) - Number(a.dist)).slice(0,3);
+    return { ...cat, top3 };
   });
 
   const faqs = [
@@ -58,20 +58,19 @@ export default function HomePage({ entries=[], orgs=[] }) {
     {q:"What's the goal of Ripping Bombs?",a:'To create the first global benchmark for driving distance in golf — a system where the best big hitters in the world can be recognised, ranked, and compared internationally.'},
   ];
 
-  // Reusable category card
-  const CategoryCard = ({ cat, isWeekly }) => {
+  const MEDALS = ['🥇','🥈','🥉'];
+
+  // Weekly card — single best entry
+  const WeeklyCard = ({ cat }) => {
     const e = cat.entry;
     const org = e ? orgFor(e.orgId) : null;
     return (
       <div style={{background:BG2,border:`1px solid ${e?'rgba(163,230,53,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:6,minWidth:0}}>
-        <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:2}}>
-          <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase'}}>{cat.icon} {cat.label}</span>
-        </div>
+        <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase'}}>{cat.icon} {cat.label}</span>
         {e ? (
           <>
             <div style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT,display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
-              {e.player}
-              {org?.country && countryFlag(org.country)}
+              {e.player}{org?.country && countryFlag(org.country)}
             </div>
             <div style={{fontFamily:SANS,fontSize:11,color:DIM}}>
               {e.is_simulator ? <span style={{color:'rgba(163,230,53,0.6)'}}>🖥️ Simulator</span> : org?.courseName||'—'}
@@ -85,6 +84,40 @@ export default function HomePage({ entries=[], orgs=[] }) {
           </>
         ) : (
           <div style={{fontFamily:SANS,fontSize:12,color:DIM,marginTop:4,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
+        )}
+      </div>
+    );
+  };
+
+  // All-time card — top 3 entries
+  const AllTimeCard = ({ cat }) => {
+    const { top3 } = cat;
+    return (
+      <div style={{background:BG2,border:`1px solid ${top3.length?'rgba(163,230,53,0.15)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0}}>
+        <span style={{fontFamily:SANS,fontSize:10,color:MUT,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.icon} {cat.label}</span>
+        {top3.length === 0 ? (
+          <div style={{fontFamily:SANS,fontSize:12,color:DIM,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
+        ) : (
+          top3.map((e, i) => {
+            const org = orgFor(e.orgId);
+            return (
+              <div key={e.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none'}}>
+                <span style={{fontSize:16,width:22,flexShrink:0,textAlign:'center'}}>{MEDALS[i]}</span>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,display:'flex',alignItems:'center',gap:4,flexWrap:'wrap'}}>
+                    {e.player}{org?.country && countryFlag(org.country)}
+                  </div>
+                  <div style={{fontFamily:SANS,fontSize:10,color:DIM,marginTop:1}}>
+                    {e.is_simulator ? <span style={{color:'rgba(163,230,53,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
+                  </div>
+                </div>
+                <div style={{textAlign:'right',flexShrink:0}}>
+                  <span style={{fontFamily:DISP,fontSize:22,color:i===0?ORG:MUT,letterSpacing:.5}}>{Number(e.dist)}</span>
+                  <span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:3}}>yds</span>
+                </div>
+              </div>
+            );
+          })
         )}
       </div>
     );
@@ -137,7 +170,7 @@ export default function HomePage({ entries=[], orgs=[] }) {
               <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
             </div>
             <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10}}>
-              {weeklyLeaders.map(cat => <CategoryCard key={cat.key} cat={cat} isWeekly={true}/>)}
+              {weeklyLeaders.map(cat => <WeeklyCard key={cat.key} cat={cat}/>)}
             </div>
           </div>
         </div>
@@ -153,7 +186,7 @@ export default function HomePage({ entries=[], orgs=[] }) {
               <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
             </div>
             <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10}}>
-              {allTimeLeaders.map(cat => <CategoryCard key={cat.key} cat={cat} isWeekly={false}/>)}
+              {allTimeLeaders.map(cat => <AllTimeCard key={cat.key} cat={cat}/>)}
             </div>
           </div>
         </div>
