@@ -35,11 +35,11 @@ export default function HomePage({ entries=[], orgs=[] }) {
   ];
 
   const weeklyLeaders = CATEGORIES.map(cat => {
-    const best = approved
+    const top3 = approved
       .filter(e => getWeekNumber(e.date) === currentWeek && new Date(e.date).getFullYear() === currentYear)
       .filter(cat.filter)
-      .sort((a,b) => Number(b.dist) - Number(a.dist))[0] || null;
-    return { ...cat, entry: best };
+      .sort((a,b) => Number(b.dist) - Number(a.dist)).slice(0,3);
+    return { ...cat, top3 };
   });
 
   const allTimeLeaders = CATEGORIES.map(cat => {
@@ -62,28 +62,33 @@ export default function HomePage({ entries=[], orgs=[] }) {
 
   // Weekly card — single best entry
   const WeeklyCard = ({ cat }) => {
-    const e = cat.entry;
-    const org = e ? orgFor(e.orgId) : null;
+    const { top3 } = cat;
     return (
-      <div style={{background:BG2,border:`1px solid ${e?'rgba(163,230,53,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:6,minWidth:0}}>
-        <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase'}}>{cat.icon} {cat.label}</span>
-        {e ? (
-          <>
-            <div style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT,display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
-              {e.player}{org?.country && countryFlag(org.country)}
-            </div>
-            <div style={{fontFamily:SANS,fontSize:11,color:DIM}}>
-              {e.is_simulator ? <span style={{color:'rgba(163,230,53,0.6)'}}>🖥️ Simulator</span> : org?.courseName||'—'}
-              {e.club && <span style={{marginLeft:6}}>· {e.club}</span>}
-            </div>
-            <div style={{display:'flex',alignItems:'baseline',gap:4,marginTop:4}}>
-              <span style={{fontFamily:DISP,fontSize:36,color:ORG,letterSpacing:1,lineHeight:1}}>{Number(e.dist)}</span>
-              <span style={{fontFamily:SANS,fontSize:11,color:DIM}}>yds</span>
-            </div>
-            <div style={{fontFamily:SANS,fontSize:10,color:DIM,marginTop:2}}>{fmtDate(e.date)}</div>
-          </>
+      <div style={{background:BG2,border:`1px solid ${top3.length?'rgba(163,230,53,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0}}>
+        <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.icon} {cat.label}</span>
+        {top3.length === 0 ? (
+          <div style={{fontFamily:SANS,fontSize:12,color:DIM,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
         ) : (
-          <div style={{fontFamily:SANS,fontSize:12,color:DIM,marginTop:4,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
+          top3.map((e, i) => {
+            const org = orgFor(e.orgId);
+            return (
+              <div key={e.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none'}}>
+                <span style={{fontSize:16,width:22,flexShrink:0,textAlign:'center'}}>{MEDALS[i]}</span>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,display:'flex',alignItems:'center',gap:4,flexWrap:'wrap'}}>
+                    {e.player}{org?.country && countryFlag(org.country)}
+                  </div>
+                  <div style={{fontFamily:SANS,fontSize:10,color:DIM,marginTop:1}}>
+                    {e.is_simulator ? <span style={{color:'rgba(163,230,53,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
+                  </div>
+                </div>
+                <div style={{textAlign:'right',flexShrink:0}}>
+                  <span style={{fontFamily:DISP,fontSize:22,color:i===0?ORG:MUT,letterSpacing:.5}}>{Number(e.dist)}</span>
+                  <span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:3}}>yds</span>
+                </div>
+              </div>
+            );
+          })
         )}
       </div>
     );
