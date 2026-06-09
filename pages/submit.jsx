@@ -86,6 +86,11 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, un
               </div>
             )}
 
+            {/* Facility — optional, for all account types */}
+            <div style={{ gridColumn:'1/-1' }}>
+              <Field label="Facility Name (optional)" value={form.facility||''} onChange={e=>setForm({...form,facility:e.target.value})} placeholder="e.g. TopGolf Manchester, GolfZon World, The Range Dubai"/>
+            </div>
+
             {/* Player name — pre-filled and locked for simulator accounts */}
             {isSimulator ? (
               <div style={{ gridColumn:'1/-1' }}>

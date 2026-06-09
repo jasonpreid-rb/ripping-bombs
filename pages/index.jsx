@@ -6,7 +6,7 @@ import { fmtDate } from '../lib/constants';
 import EmailSignup from '../components/EmailSignup';
 import { countryFlag } from '../components/UI';
 
-export default function HomePage({ entries=[], orgs=[] }) {
+export default function HomePage({ entries=[], orgs=[], setDetEnt, cvt, unitLbl }) {
   const router = useRouter();
   const approvedOrgs = orgs.filter(o=>o.status==='approved');
   const [openFaq, setOpenFaq] = useState(null);
@@ -72,7 +72,11 @@ export default function HomePage({ entries=[], orgs=[] }) {
           top3.map((e, i) => {
             const org = orgFor(e.orgId);
             return (
-              <div key={e.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none'}}>
+              <div key={e.id}
+                onClick={()=>setDetEnt && setDetEnt(e)}
+                style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',cursor:'pointer',transition:'opacity .15s'}}
+                onMouseEnter={ev=>ev.currentTarget.style.opacity='.7'}
+                onMouseLeave={ev=>ev.currentTarget.style.opacity='1'}>
                 <span style={{fontSize:16,width:22,flexShrink:0,textAlign:'center'}}>{MEDALS[i]}</span>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,display:'flex',alignItems:'center',gap:4,flexWrap:'wrap'}}>
@@ -106,7 +110,11 @@ export default function HomePage({ entries=[], orgs=[] }) {
           top3.map((e, i) => {
             const org = orgFor(e.orgId);
             return (
-              <div key={e.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none'}}>
+              <div key={e.id}
+                onClick={()=>setDetEnt && setDetEnt(e)}
+                style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',cursor:'pointer',transition:'opacity .15s'}}
+                onMouseEnter={ev=>ev.currentTarget.style.opacity='.7'}
+                onMouseLeave={ev=>ev.currentTarget.style.opacity='1'}>
                 <span style={{fontSize:16,width:22,flexShrink:0,textAlign:'center'}}>{MEDALS[i]}</span>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,display:'flex',alignItems:'center',gap:4,flexWrap:'wrap'}}>

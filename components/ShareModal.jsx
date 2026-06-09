@@ -67,9 +67,10 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
       ctx.fillText(entry.player.toUpperCase(), W/2, 790);
       ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='34px Arial';
       ctx.fillText(org?.courseName||'', W/2, 845);
-      if (entry.tournament) { ctx.fillStyle='rgba(163,230,53,0.7)'; ctx.font='italic 28px Arial'; ctx.fillText(entry.tournament, W/2, 892); }
+      if (entry.facility) { ctx.fillStyle='rgba(163,230,53,0.6)'; ctx.font='italic 26px Arial'; ctx.fillText(entry.facility, W/2, 886); }
+      if (entry.tournament) { ctx.fillStyle='rgba(163,230,53,0.7)'; ctx.font='italic 28px Arial'; ctx.fillText(entry.tournament, W/2, entry.facility ? 922 : 892); }
       ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font='24px Arial';
-      ctx.fillText(fmtDate(entry.date), W/2, entry.tournament?935:900);
+      ctx.fillText(fmtDate(entry.date), W/2, (entry.tournament && entry.facility) ? 958 : entry.tournament ? 935 : entry.facility ? 922 : 900);
       ctx.strokeStyle='rgba(163,230,53,0.3)'; ctx.lineWidth=1;
       ctx.beginPath(); ctx.moveTo(80,950); ctx.lineTo(W-80,950); ctx.stroke();
       ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='24px Arial';

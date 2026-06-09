@@ -31,6 +31,7 @@ export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl 
           ['Course', org?.courseName||'—'],
           ['Location', org?.location||'—'],
           ['Date', fmtDate(entry.date)],
+          ...(entry.facility ? [['Facility', entry.facility]] : []),
         ].map(([k,v])=>(
           <div key={k} style={{ background:BG3, padding:'10px 14px' }}>
             <div style={{ fontFamily:SANS, fontSize:9, fontWeight:700, color:DIM, letterSpacing:1.2, marginBottom:3, textTransform:'uppercase' }}>{k}</div>
