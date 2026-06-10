@@ -6,7 +6,9 @@ import { fmtDate } from '../lib/constants';
 import EmailSignup from '../components/EmailSignup';
 import { countryFlag } from '../components/UI';
 
-export default function HomePage({ entries=[], orgs=[], setDetEnt, cvt, unitLbl }) {
+export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], setDetEnt, cvt, unitLbl, staticEntries=[], staticOrgs=[] }) {
+  const entries = staticEntries.length ? staticEntries : propEntries;
+  const orgs = staticOrgs.length ? staticOrgs : propOrgs;
   const router = useRouter();
   const approvedOrgs = orgs.filter(o=>o.status==='approved');
   const [openFaq, setOpenFaq] = useState(null);
@@ -157,16 +159,16 @@ export default function HomePage({ entries=[], orgs=[], setDetEnt, cvt, unitLbl 
           <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(0,0,0,0.1),rgba(0,0,0,0.55))'}}/>
           <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'clamp(60px,12vw,80px) 20px',textAlign:'center'}}>
             <div style={{fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:4,color:ORG,textTransform:'uppercase',marginBottom:16,background:'rgba(163,230,53,0.15)',border:'1px solid rgba(163,230,53,0.4)',padding:'5px 16px',display:'inline-block'}}>
-              The Global Home of Competition Longest Drives
+              The World's Longest Drive Leaderboard
             </div>
-            <h1 style={{fontFamily:DISP,fontSize:'clamp(56px,10vw,110px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:20,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
-              COMPETE LOCALLY.<br/>RANK GLOBALLY.
+            <h1 style={{fontFamily:DISP,fontSize:'clamp(56px,10vw,100px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:20,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
+              REGISTER. SUBMIT.<br/>GO LIVE.
             </h1>
             <p style={{fontFamily:SANS,fontSize:16,color:'rgba(255,255,255,0.85)',maxWidth:520,margin:'0 auto 32px',lineHeight:1.7}}>
-              Submit your longest drives from simulators, events, or qualifying locations worldwide.
+              Register, submit drives, and appear instantly on the live leaderboard.
             </p>
             <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
-              <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 32px',borderRadius:0,cursor:'pointer',letterSpacing:.5}}>REGISTER NOW FREE →</button>
+              <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 32px',borderRadius:0,cursor:'pointer',letterSpacing:.5}}>GET STARTED FREE →</button>
               <button onClick={()=>router.push('/leaderboard')} style={{background:'rgba(255,255,255,0.12)',border:'1px solid rgba(255,255,255,0.3)',color:'#fff',fontFamily:SANS,fontWeight:600,fontSize:14,padding:'14px 28px',borderRadius:0,cursor:'pointer',letterSpacing:.5}}>View Leaderboard</button>
             </div>
           </div>
@@ -253,4 +255,33 @@ export default function HomePage({ entries=[], orgs=[], setDetEnt, cvt, unitLbl 
       </div>
     </>
   );
+}
+
+export async function getStaticProps() {
+  try {
+    const { supabase } = await import('../lib/supabaseClient');
+
+    const { data: entries } = await supabase
+      .from('entries')
+      .select('id, orgId, player, dist, club, hcp, age, gender, is_simulator, date, tournament')
+      .order('dist', { ascending: false });
+
+    const { data: orgs } = await supabase
+      .from('clubs')
+      .select('id, courseName, country, status, badge, accountType')
+      .eq('status', 'approved');
+
+    return {
+      props: {
+        staticEntries: entries || [],
+        staticOrgs: orgs || [],
+      },
+      revalidate: 600, // rebuild every 10 minutes
+    };
+  } catch {
+    return {
+      props: { staticEntries: [], staticOrgs: [] },
+      revalidate: 60,
+    };
+  }
 }
