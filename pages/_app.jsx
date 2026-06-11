@@ -195,7 +195,7 @@ export default function App({ Component, pageProps }) {
   }
 
   const sharedProps = {
-    orgs, setOrgs, entries, setEntries, unit, setUnit, cvt, unitLbl,
+    orgs, setOrgs, entries, setEntries, loading, unit, setUnit, cvt, unitLbl,
     approvedOrgs, orgFor, pendingCount, loggedOrg, setLoggedOrg,
     toast, shareEnt, setShareEnt, detEnt, setDetEnt,
     reg, setReg, lgn, setLgn, form, setForm,
@@ -206,12 +206,6 @@ export default function App({ Component, pageProps }) {
     fSimulator, setFSimulator,
     sortBy, setSortBy,
   };
-
-  if (loading) return (
-    <div style={{ minHeight:'100vh', background:'#1a1a1a', display:'flex', alignItems:'center', justifyContent:'center' }}>
-      <div style={{ fontFamily:SANS, color:MUT, fontSize:13, letterSpacing:2 }}>LOADING...</div>
-    </div>
-  );
 
   if (showAdmin) return (
     <AdminPanel orgs={orgs} entries={entries} setOrgs={setOrgs} setEntries={setEntries}

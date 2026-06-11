@@ -75,6 +75,7 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
 
 export default function LeaderboardPage(props) {
   const { entries=[], orgs=[], approvedOrgs=[], orgFor=()=>null, cvt=d=>d, unitLbl='yds',
+    loading=false,
     detEnt, setDetEnt, shareEnt, setShareEnt,
     week, setWeek, allTime, setAllTime,
     fCountry, setFCountry, fHcp, setFHcp, fAge, setFAge,
@@ -108,6 +109,45 @@ export default function LeaderboardPage(props) {
   const allTimeBest=[...entries].filter(e=>approvedOrgs.find(o=>o.id===e.orgId)).sort((a,b)=>Number(b.dist)-Number(a.dist));
   const visibleRows = tableRows.slice(0, page * PAGE_SIZE);
   const hasMore = visibleRows.length < tableRows.length;
+
+  const skeletonRows = Array.from({ length: 8 });
+
+  if (loading) return (
+    <>
+      <Head>
+        <title>Global Golf Longest Drive Leaderboard | Ripping Bombs</title>
+        <meta name="description" content="The global longest drive leaderboard. See verified competition results from clubs and tournaments worldwide on Ripping Bombs."/>
+      </Head>
+      <div style={{padding:'28px 18px 80px',maxWidth:1000,margin:'0 auto'}}>
+        {/* Hero skeleton */}
+        <div style={{background:'rgba(163,230,53,0.06)',border:'1px solid rgba(163,230,53,0.12)',padding:'24px 28px',marginBottom:28,height:110}}/>
+        {/* Controls skeleton */}
+        <div style={{display:'flex',gap:10,marginBottom:20}}>
+          {[80,60,60].map((w,i)=><div key={i} style={{height:34,width:w,background:BG2,border:`1px solid ${BDR}`}}/>)}
+        </div>
+        {/* Filters skeleton */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:8,marginBottom:20}}>
+          {Array.from({length:8}).map((_,i)=><div key={i} style={{height:36,background:BG2,border:`1px solid ${BDR}`}}/>)}
+        </div>
+        {/* Table skeleton */}
+        <div style={{border:`1px solid ${BDR}`,background:BG2}}>
+          <div style={{padding:'11px 14px',borderBottom:`2px solid ${BDR}`,display:'flex',gap:16}}>
+            {[40,160,90,120,50,50].map((w,i)=><div key={i} style={{height:12,width:w,background:BDR}}/>)}
+          </div>
+          {skeletonRows.map((_,i)=>(
+            <div key={i} style={{padding:'14px',borderBottom:`1px solid ${BDR}`,display:'flex',gap:16,alignItems:'center',opacity:1-(i*0.08)}}>
+              <div style={{width:30,height:14,background:BDR,flexShrink:0}}/>
+              <div style={{width:140,height:14,background:BDR,flexShrink:0}}/>
+              <div style={{width:60,height:20,background:'rgba(163,230,53,0.15)',flexShrink:0}}/>
+              <div style={{width:100,height:12,background:BDR}}/>
+              <div style={{width:30,height:12,background:BDR}}/>
+              <div style={{width:30,height:12,background:BDR}}/>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
 
   return (
     <>
