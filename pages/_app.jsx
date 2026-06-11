@@ -66,16 +66,11 @@ export default function App({ Component, pageProps }) {
   const [sortBy, setSortBy] = useState('dist');
 
   useEffect(() => {
-    // Homepage gets its own data via getStaticProps — skip the global fetch there
-    if (router.pathname === '/') {
+    initData().then(({ orgs, entries }) => {
+      setOrgs(orgs);
+      setEntries(entries);
       setLoading(false);
-    } else {
-      initData().then(({ orgs, entries }) => {
-        setOrgs(orgs);
-        setEntries(entries);
-        setLoading(false);
-      });
-    }
+    });
     if (typeof window !== 'undefined') {
       if (localStorage.getItem('rb_admin_auth') === '1') setShowAdmin(true);
       if (!sessionStorage.getItem('rb_launch_seen')) {
