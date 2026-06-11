@@ -1,10 +1,8 @@
 import Link from 'next/link'
+import { SeoPage } from '../components/SeoPageLayout'
 
-export const metadata = {
-  title: 'How to Register & Submit Your Drive | Ripping Bombs',
-  description:
-    'Join the world\'s largest amateur long drive registry. Register your club or simulator, submit your longest drive, and appear on the global leaderboard in minutes.',
-}
+const PAGE_TITLE = 'How to Register & Submit Your Drive | Ripping Bombs'
+const PAGE_DESC = "Join the world's largest amateur long drive registry. Register your club or simulator, submit your longest drive, and appear on the global leaderboard in minutes."
 
 const steps = [
   {
@@ -61,7 +59,7 @@ const steps = [
     done: false,
     tag: { label: 'Required', cls: 'tagRequired' },
     title: 'Submit Your Entry',
-    desc: 'Log in and click &ldquo;Submit Drive.&rdquo; Enter the distance, date, location, and measurement method. If you beat a previous entry, your personal best updates automatically on the leaderboard.',
+    desc: 'Log in and click "Submit Drive." Enter the distance, date, location, and measurement method. If you beat a previous entry, your personal best updates automatically on the leaderboard.',
     note: null,
     reqs: {
       heading: 'Required for every submission',
@@ -146,7 +144,7 @@ const faqs = [
 
 export default function HowToRegisterPage() {
   return (
-    <>
+    <SeoPage title={PAGE_TITLE} description={PAGE_DESC}>
       <style>{`
         .htr-hero {
           padding: 72px 24px 56px;
@@ -530,6 +528,6 @@ export default function HowToRegisterPage() {
           View Leaderboard
         </Link>
       </div>
-    </>
+    </SeoPage>
   )
 }
