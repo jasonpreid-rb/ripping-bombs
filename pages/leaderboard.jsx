@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { fmtDate, tier, nowWeek, weekLabel, prevWeek, nextWeek, sameWeek } from '../lib/constants';
@@ -83,6 +84,11 @@ export default function LeaderboardPage(props) {
 
   const router = useRouter();
   const currentWeek = week || nowWeek();
+  const PAGE_SIZE = 25;
+  const [page, setPage] = useState(1);
+
+  // Reset to page 1 whenever any filter or view changes
+  useEffect(() => { setPage(1); }, [fCountry, fHcp, fAge, fClub, fPlayer, fGender, fSimulator, sortBy, allTime, week]);
 
   const hcpIn=(hcp,b)=>{if(!b)return true;if(b==='scratch')return hcp<=0;if(b==='low')return hcp>0&&hcp<=5;if(b==='mid')return hcp>5&&hcp<=14;if(b==='high')return hcp>14&&hcp<=28;if(b==='beginner')return hcp>28;return true;};
   const ageIn=(age,b)=>{if(!b)return true;if(b==='u25')return age<25;if(b==='25-40')return age>=25&&age<40;if(b==='40-55')return age>=40&&age<55;if(b==='55+')return age>=55;return true;};
@@ -100,6 +106,8 @@ export default function LeaderboardPage(props) {
     .sort((a,b)=>{if(sortBy==='hcp')return a.hcp-b.hcp;if(sortBy==='age')return a.age-b.age;if(sortBy==='club')return a.club.localeCompare(b.club);if(sortBy==='date')return new Date(b.date)-new Date(a.date);return b.dist-a.dist;});
 
   const allTimeBest=[...entries].filter(e=>approvedOrgs.find(o=>o.id===e.orgId)).sort((a,b)=>Number(b.dist)-Number(a.dist));
+  const visibleRows = tableRows.slice(0, page * PAGE_SIZE);
+  const hasMore = visibleRows.length < tableRows.length;
 
   return (
     <>
@@ -180,7 +188,23 @@ export default function LeaderboardPage(props) {
           ))}
         </div>
 
-        <LeaderTable rows={tableRows} orgFor={orgFor} onView={e=>setDetEnt&&setDetEnt(e)} onShare={e=>setShareEnt&&setShareEnt(e)} cvt={cvt} unitLbl={unitLbl}/>
+        <LeaderTable rows={visibleRows} orgFor={orgFor} onView={e=>setDetEnt&&setDetEnt(e)} onShare={e=>setShareEnt&&setShareEnt(e)} cvt={cvt} unitLbl={unitLbl}/>
+
+        {hasMore && (
+          <div style={{textAlign:'center', marginTop:20}}>
+            <button
+              onClick={() => setPage(p => p + 1)}
+              style={{background:'transparent', border:`1px solid ${BDR}`, color:MUT, fontFamily:SANS, fontWeight:600, fontSize:13, padding:'12px 36px', cursor:'pointer', letterSpacing:.5}}
+            >
+              LOAD MORE <span style={{color:DIM, fontWeight:400}}>({tableRows.length - visibleRows.length} remaining)</span>
+            </button>
+          </div>
+        )}
+        {!hasMore && tableRows.length > PAGE_SIZE && (
+          <div style={{textAlign:'center', marginTop:20, fontFamily:SANS, fontSize:12, color:DIM}}>
+            All {tableRows.length} drives loaded
+          </div>
+        )}
 
         {detEnt&&<EntryModal entry={detEnt} org={orgFor(detEnt.orgId)} onClose={()=>setDetEnt(null)} onShare={e=>{setDetEnt(null);setShareEnt(e);}} cvt={cvt} unitLbl={unitLbl}/>}
         {shareEnt&&<ShareModal entry={shareEnt} org={orgFor(shareEnt.orgId)} cvt={cvt} unitLbl={unitLbl} onClose={()=>setShareEnt(null)}/>}
