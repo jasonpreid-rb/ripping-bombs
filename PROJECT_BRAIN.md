@@ -64,40 +64,111 @@ Stores individual drive submissions.
 
 ---
 
-## 📁 Key File Structure
+## 📁 File Structure
 
+### Core App Files
 ```
-pages/
-  _app.jsx          — root app, GA4 scripts, shared state, login/register/submit logic
-  index.jsx         — homepage: weekly + all-time category leaders, hero, FAQ
-  leaderboard.jsx   — full leaderboard with filters, week nav, all-time hero
-  submit.jsx        — drive submission form (simulator weekly limit enforced)
-  register.jsx      — club/simulator registration
-  login.jsx         — login page
-
-components/
-  Layout.jsx        — site-wide nav and footer
-  AdminPanel.jsx    — admin dashboard (password protected, has logout button)
-  EntryModal.jsx    — drive detail popup
-  ShareModal.jsx    — social share popup with canvas image generation
-  UI.jsx            — shared UI primitives (Card, Field, Btn, Overlay, BadgePill, countryFlag)
-  EmailSignup.jsx   — email capture component
-  DemoSubmit.jsx    — demo drive submission (no login required)
-  LaunchModal.jsx   — launch announcement modal
-
-lib/
-  data.js           — initData(), db.insertOrg(), db.insertEntry()
-  supabaseClient.js — Supabase client initialisation
-  constants.js      — design tokens (SANS, DISP, ORG, TXT, MUT, BG2, BG3, BDR, DIM)
-                      utility functions (todayStr, fmtDate, tier, toB64, nowWeek,
-                      weekLabel, prevWeek, nextWeek, sameWeek)
-  email.js          — sendRegistrationNotification()
-
-public/
-  robots.txt        — allows all crawlers except blocked AI agents (handled in middleware)
-
+_app.jsx            — root app, GA4 scripts, shared state, login/register/submit logic
+                      ⚠️ FILE ON DISK IS NAMED _app.jsx.jsx — needs renaming to _app.jsx
+_document.jsx       — custom Next.js document
 middleware.js       — blocks AI crawlers at the edge (GPTBot, ClaudeBot, etc.)
                       does NOT affect GA4 (client-side) or normal users
+```
+
+### pages/ — Core Routes
+```
+index.jsx                         — homepage: weekly + all-time category leaders, hero, FAQ
+leaderboard.jsx                   — full leaderboard with filters, week nav, all-time hero
+submit.jsx                        — drive submission form (simulator weekly limit enforced)
+register.jsx                      — club/simulator registration
+login.jsx                         — login page
+dashboard.jsx                     — user/club dashboard
+contact.jsx                       — contact page
+longest-drives-this-week.jsx      — this week's top drives
+how-to-register-page.jsx          — registration guide
+                                    ⚠️ URL is /how-to-register-page (note trailing -page)
+test-db.jsx                       — dev/debug page ⚠️ remove or protect before launch
+
+drive/
+  [id].jsx                        — individual drive page (rippingbombs.com/drive/[id])
+
+clubs/
+  index.jsx                       — clubs listing page
+  [slug].jsx                      — individual club page (rippingbombs.com/clubs/[slug])
+```
+
+### pages/ — SEO Content Pages
+These pages target organic search traffic for golf-related keywords:
+```
+average-driver-distance-by-handicap.jsx
+average-golf-drive-distance.jsx
+golf-club-longest-drive-competition-ideas.jsx
+golf-handicap-driving-distance.jsx
+golf-longest-drive-competition.jsx
+how-is-golf-evolving.jsx
+how-to-hit-a-golf-ball-farther.jsx
+how-to-promote-your-golf-event.jsx
+long-drive-golf-equipment.jsx
+longest-drive-amateur.jsx
+longest-drive-australia.jsx
+longest-drive-canada.jsx
+longest-drive-china.jsx
+longest-drive-germany.jsx
+longest-drive-high-handicap.jsx
+longest-drive-india.jsx
+longest-drive-ireland.jsx
+longest-drive-japan.jsx
+longest-drive-juniors-13-16.jsx
+longest-drive-juniors-17-18.jsx
+longest-drive-juniors-u12.jsx
+longest-drive-low-handicap.jsx
+longest-drive-mexico.jsx
+longest-drive-mid-handicap.jsx
+longest-drive-nigeria.jsx
+longest-drive-over-50.jsx
+longest-drive-portugal.jsx
+longest-drive-scratch-golfer.jsx
+longest-drive-seniors.jsx
+longest-drive-south-africa.jsx
+longest-drive-sweden.jsx
+longest-drive-uae.jsx
+longest-drive-uk.jsx
+longest-drive-usa.jsx
+longest-golf-drive-ever.jsx
+longest-mens-drive.jsx
+longest-womens-drive.jsx
+popularity-of-golf.jsx
+recommended-range-finders.jsx
+what-is-a-good-drive-in-golf.jsx
+```
+
+### components/
+```
+Layout.jsx          — site-wide nav and footer
+AdminPanel.jsx      — admin dashboard (password protected, has logout button)
+EntryModal.jsx      — drive detail popup
+ShareModal.jsx      — social share popup with canvas image generation
+UI.jsx              — shared UI primitives (Card, Field, Btn, Overlay, BadgePill, countryFlag)
+EmailSignup.jsx     — email capture component
+DemoSubmit.jsx      — demo drive submission (no login required)
+LaunchModal.jsx     — launch announcement modal
+Logo.jsx            — logo component
+SeoPageLayout.jsx   — shared layout wrapper for SEO content pages
+```
+
+### lib/
+```
+data.js             — initData(), db.insertOrg(), db.insertEntry()
+supabaseClient.js   — Supabase client initialisation
+constants.js        — design tokens (SANS, DISP, ORG, TXT, MUT, BG2, BG3, BDR, DIM)
+                      utility functions (todayStr, fmtDate, tier, toB64, nowWeek,
+                      weekLabel, prevWeek, nextWeek, sameWeek)
+email.js            — sendRegistrationNotification()
+```
+
+### public/
+```
+robots.txt          — allows all crawlers except blocked AI agents (handled in middleware)
 ```
 
 ---
@@ -145,7 +216,10 @@ middleware.js       — blocks AI crawlers at the edge (GPTBot, ClaudeBot, etc.)
 
 ---
 
-## 🚨 Known Limitations & Legacy Items
+## 🚨 Known Issues & Legacy Items
+- `_app.jsx` is saved on disk as `_app.jsx.jsx` — rename immediately
+- `how-to-register-page.jsx` has a `-page` suffix in the filename, making its URL `/how-to-register-page` not `/how-to-register` — rename if needed
+- `test-db.jsx` is a dev page — remove or password-protect before launch
 - Passwords stored in plain text in Supabase (no auth system yet)
 - Photos stored as base64 strings in the database (not cloud storage)
 - No real-time updates — page must be refreshed to see new entries
@@ -179,4 +253,4 @@ middleware.js       — blocks AI crawlers at the edge (GPTBot, ClaudeBot, etc.)
   - Proper image storage via Supabase Storage buckets
   - Authentication system to replace plain-text passwords
   - Real-time updates (Supabase subscriptions)
-  - Individual player profile pages (`/drive/[id]`)
+  - Individual player profile pages (`/drive/[id]`) ← drive/[id].jsx already exists
