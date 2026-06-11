@@ -205,6 +205,41 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             </div>
           </div>
         </div>
+        </div>
+
+        {/* 2027 CHAMPIONSHIP PROMO */}
+        <div style={{background:'#0a1200',borderTop:'1px solid rgba(163,230,53,0.15)',borderBottom:'1px solid rgba(163,230,53,0.15)',padding:'56px 18px'}}>
+          <div style={{maxWidth:1000,margin:'0 auto',display:'grid',gridTemplateColumns:'1fr auto',alignItems:'center',gap:32,flexWrap:'wrap'}}>
+            <div>
+              <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>Launching January 2027</div>
+              <div style={{fontFamily:DISP,fontSize:'clamp(28px,4vw,48px)',color:TXT,letterSpacing:1,lineHeight:1,marginBottom:14}}>
+                THE WORLD'S BIGGEST<br/><span style={{color:ORG}}>DRIVE COMPETITION</span>
+              </div>
+              <div style={{fontFamily:SANS,fontSize:14,color:MUT,lineHeight:1.8,maxWidth:560,marginBottom:20}}>
+                The Ripping Bombs 2027 Simulator Championship — six categories, one drive per week, points accumulating all season. Open to any registered simulator user, anywhere in the world, completely free. This could be the largest amateur golf competition ever run.
+              </div>
+              <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
+                {['🥇 100pts','🥈 70pts','🥉 50pts','4th 40pts','5th 30pts','6th 20pts','Any entry 10pts'].map((label,i)=>(
+                  <div key={i} style={{fontFamily:SANS,fontSize:11,fontWeight:700,color:i===0?ORG:MUT,background:'rgba(255,255,255,0.04)',border:`1px solid ${i===0?'rgba(163,230,53,0.3)':'rgba(255,255,255,0.08)'}`,padding:'5px 10px',letterSpacing:.3}}>
+                    {label}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{display:'flex',flexDirection:'column',gap:10,flexShrink:0}}>
+              <button onClick={()=>router.push('/2027-championship')} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 28px',border:'none',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>
+                FIND OUT MORE →
+              </button>
+              <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid rgba(163,230,53,0.3)`,color:ORG,fontFamily:SANS,fontWeight:600,fontSize:13,padding:'12px 28px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>
+                Register Free
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div style={{padding:'0 18px'}}>
+
+          {/* FEATURE CARDS */}
 
         <div style={{padding:'0 18px'}}>
 
