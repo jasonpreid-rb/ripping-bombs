@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { RBLogoWhite } from './Logo';
-import { ORG, MUT, BDR, DIM, SANS, DISP, GRN, EJS_TEMPLATE_CONTACT } from '../lib/constants';
-import { sendEmail } from '../lib/email';
+import { ORG, MUT, BDR, DIM, SANS, DISP } from '../lib/constants';
 
 export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, onAdminClick, pendingCount, onShowDemo }) {
   const router = useRouter();
@@ -82,9 +81,21 @@ function SiteFooter() {
 
   async function sendEnquiry() {
     if (!enquiry.name||!enquiry.email||!enquiry.message) return;
-    const ok = await sendEmail(`Ripping Bombs Enquiry from ${enquiry.name}`, `Name: ${enquiry.name}\nEmail: ${enquiry.email}\n\nMessage:\n${enquiry.message}`, EJS_TEMPLATE_CONTACT);
-    setSent(ok ? 'success' : 'error');
-    if (ok) setEnquiry({ name: '', email: '', message: '' });
+    try {
+      const res = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'contact',
+          subject: `Ripping Bombs Enquiry from ${enquiry.name}`,
+          message: `Name: ${enquiry.name}\nEmail: ${enquiry.email}\n\nMessage:\n${enquiry.message}`,
+        }),
+      });
+      setSent(res.ok ? 'success' : 'error');
+      if (res.ok) setEnquiry({ name: '', email: '', message: '' });
+    } catch {
+      setSent('error');
+    }
     setTimeout(() => setSent(false), 5000);
   }
 

@@ -1,18 +1,30 @@
 import { useState } from 'react';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
-import { EJS_TEMPLATE_CONTACT } from '../lib/constants';
-import { sendEmail } from '../lib/email';
 
 export default function Page() {
   const [form,setForm]=useState({name:'',email:'',event:'',location:'',date:''});
   const [status,setStatus]=useState(null);
+
   async function submit(){
     if(!form.name||!form.email||!form.event){setStatus('invalid');return;}
     setStatus('sending');
-    const ok=await sendEmail(`Event Registration Request: ${form.event}`,`A golfer has requested an event be added to Ripping Bombs:\n\nEvent: ${form.event}\nLocation: ${form.location||'—'}\nDate: ${form.date||'—'}\nSubmitted by: ${form.name}\nEmail: ${form.email}\n\nContact the organiser and invite them to register at https://www.rippingbombs.com`,EJS_TEMPLATE_CONTACT);
-    setStatus(ok?'success':'error');
+    try {
+      const res = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'contact',
+          subject: `Event Registration Request: ${form.event}`,
+          message: `A golfer has requested an event be added to Ripping Bombs:\n\nEvent: ${form.event}\nLocation: ${form.location||'—'}\nDate: ${form.date||'—'}\nSubmitted by: ${form.name}\nEmail: ${form.email}\n\nContact the organiser and invite them to register at https://www.rippingbombs.com`,
+        }),
+      });
+      setStatus(res.ok ? 'success' : 'error');
+    } catch {
+      setStatus('error');
+    }
   }
+
   return (
     <SeoPage title="How To Promote Your Golf Event | Ripping Bombs" description="Learn how to promote your golf event and give it global exposure. Ripping Bombs connects golf events with players worldwide through verified longest drive leaderboards.">
       <SeoH1>How To Promote Your Golf Event</SeoH1>
