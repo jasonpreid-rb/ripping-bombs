@@ -6,6 +6,7 @@ import { ORG, MUT, BDR, DIM, SANS, DISP } from '../lib/constants';
 export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, onAdminClick, pendingCount, onShowDemo }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
   const isM = unit === 'm';
   const isActive = path => router.pathname === path;
   const navTo = path => { router.push(path); setMenuOpen(false); };
@@ -26,6 +27,20 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
 
   return (
     <div style={{ minHeight: '100vh', background: '#1a1a1a', color: '#f0f0f0', fontFamily: SANS }}>
+
+      {/* Announcement Banner */}
+      {!bannerDismissed && (
+        <div style={{ background: '#dc2626', padding: '9px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 101 }}>
+          <div onClick={() => router.push('/register')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: '#fff', letterSpacing: .5, textTransform: 'uppercase' }}>
+              🏌️ Submit Your Drive — Rank Globally, Instantly — FREE
+            </span>
+            <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.75)', textDecoration: 'underline' }}>Register now →</span>
+          </div>
+          <button onClick={() => setBannerDismissed(true)} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: 16, cursor: 'pointer', lineHeight: 1, padding: '0 4px' }}>✕</button>
+        </div>
+      )}
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
         .desktop-nav{display:flex}.burger-btn{display:none}

@@ -12,6 +12,7 @@ The platform is currently in pre-launch demo mode (launching September 2026) wit
 - Hosting: Vercel (auto-deploys from GitHub on push)
 - Database: Supabase (Postgres) — LIVE
 - Image Storage: Supabase Storage (planned)
+- Email: Resend (via `pages/api/send-email.js`) — API key stored in Vercel env as `RESEND_API_KEY`
 - Analytics: Google Analytics GA4 (ID: G-5RCJDKVBER) — injected via next/script in _app.jsx
 
 ---
@@ -69,7 +70,6 @@ Stores individual drive submissions.
 ### Core App Files
 ```
 _app.jsx            — root app, GA4 scripts, shared state, login/register/submit logic
-                      ⚠️ FILE ON DISK IS NAMED _app.jsx.jsx — needs renaming to _app.jsx
 _document.jsx       — custom Next.js document
 middleware.js       — blocks AI crawlers at the edge (GPTBot, ClaudeBot, etc.)
                       does NOT affect GA4 (client-side) or normal users
@@ -95,6 +95,16 @@ drive/
 clubs/
   index.jsx                       — clubs listing page
   [slug].jsx                      — individual club page (rippingbombs.com/clubs/[slug])
+```
+
+### pages/api/
+```
+send-email.js       — Resend email handler. Accepts POST with { type, ...payload }.
+                      Supported types:
+                        'registration' — sends notification to team@ + welcome to registrant
+                        'approval'     — sends approval confirmation to club email
+                        'contact'      — sends contact/enquiry notification to team@
+                      All emails send from team@rippingbombs.com (domain verified via Cloudflare)
 ```
 
 ### pages/ — SEO Content Pages
@@ -144,12 +154,12 @@ what-is-a-good-drive-in-golf.jsx
 
 ### components/
 ```
-Layout.jsx          — site-wide nav and footer
+Layout.jsx          — site-wide nav and footer (footer has inline enquiry form → send-email API)
 AdminPanel.jsx      — admin dashboard (password protected, has logout button)
 EntryModal.jsx      — drive detail popup
 ShareModal.jsx      — social share popup with canvas image generation
 UI.jsx              — shared UI primitives (Card, Field, Btn, Overlay, BadgePill, countryFlag)
-EmailSignup.jsx     — email capture component
+EmailSignup.jsx     — email capture component (sends to team@ via send-email API)
 DemoSubmit.jsx      — demo drive submission (no login required)
 LaunchModal.jsx     — launch announcement modal
 Logo.jsx            — logo component
@@ -163,7 +173,9 @@ supabaseClient.js   — Supabase client initialisation
 constants.js        — design tokens (SANS, DISP, ORG, TXT, MUT, BG2, BG3, BDR, DIM)
                       utility functions (todayStr, fmtDate, tier, toB64, nowWeek,
                       weekLabel, prevWeek, nextWeek, sameWeek)
-email.js            — sendRegistrationNotification()
+                      ⚠️ EJS constants have been removed — do not re-add
+email.js            — sendRegistrationNotification(), sendApprovalEmail()
+                      Both call /api/send-email internally via fetch — no client-side secrets
 ```
 
 ### public/
@@ -178,7 +190,8 @@ robots.txt          — allows all crawlers except blocked AI agents (handled in
 ### 1. Club / Simulator Registration
 - Two account types: `club` (requires admin approval) and `simulator` (auto-approved)
 - Simulator accounts are limited to one submission per week
-- On approval, clubs can submit drives on behalf of players
+- On registration: team@ gets a notification, registrant gets a welcome email
+- On club approval: club gets an approval confirmation email
 
 ### 2. Drive Submission
 - Club accounts: submit for named players with tournament, club, hcp, age, gender, photo
@@ -214,10 +227,17 @@ robots.txt          — allows all crawlers except blocked AI agents (handled in
 - Share to WhatsApp, Facebook, Instagram (download), or copy link
 - Each drive has a unique URL: `rippingbombs.com/drive/[id]`
 
+### 7. Email System (Resend)
+- All emails sent server-side via `pages/api/send-email.js`
+- Sending domain: `rippingbombs.com` — verified via Cloudflare DNS auto-config
+- From address: `team@rippingbombs.com`
+- API key stored in Vercel environment variables as `RESEND_API_KEY`
+- Also add to `.env.local` for local development
+- Three email types: `registration`, `approval`, `contact`
+
 ---
 
 ## 🚨 Known Issues & Legacy Items
-- `_app.jsx` is saved on disk as `_app.jsx.jsx` — rename immediately
 - `how-to-register-page.jsx` has a `-page` suffix in the filename, making its URL `/how-to-register-page` not `/how-to-register` — rename if needed
 - `test-db.jsx` is a dev page — remove or password-protect before launch
 - Passwords stored in plain text in Supabase (no auth system yet)
@@ -234,6 +254,7 @@ robots.txt          — allows all crawlers except blocked AI agents (handled in
 4. Preserve current UI/UX unless redesign is requested
 5. Ask before introducing new infrastructure (auth, DB changes, new tables)
 6. Always use `Number()` when comparing or sorting `dist` or any numeric field from entries
+7. Never import `sendEmail` or any EJS constants — these have been removed. Use `sendRegistrationNotification` or `sendApprovalEmail` from `lib/email.js`, or fetch `/api/send-email` directly with a `type` of `contact`
 
 ---
 
