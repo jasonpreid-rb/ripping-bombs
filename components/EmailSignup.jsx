@@ -1,17 +1,34 @@
 import { useState } from 'react';
-import { ORG, MUT, DIM, SANS, DISP, EJS_TEMPLATE_CONTACT } from '../lib/constants';
-import { sendEmail } from '../lib/email';
+import { ORG, MUT, DIM, SANS, DISP } from '../lib/constants';
 
 export default function EmailSignup() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState(null);
+
   async function handleSignup() {
     if (!email||!email.includes('@')) { setStatus('invalid'); return; }
     setStatus('sending');
-    const ok = await sendEmail(`New Weekly Digest Subscriber: ${email}`,`Email: ${email}\n\nAdd them to your mailing list.`,EJS_TEMPLATE_CONTACT);
-    setStatus(ok?'success':'error');
-    if (ok) setEmail('');
+    try {
+      const res = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'contact',
+          subject: `New Weekly Digest Subscriber: ${email}`,
+          message: `Email: ${email}\n\nAdd them to your mailing list.`,
+        }),
+      });
+      if (res.ok) {
+        setStatus('success');
+        setEmail('');
+      } else {
+        setStatus('error');
+      }
+    } catch {
+      setStatus('error');
+    }
   }
+
   return (
     <div style={{background:'#0e0e0e',margin:'0',padding:'52px 18px'}}>
       <div style={{maxWidth:560,margin:'0 auto',textAlign:'center'}}>

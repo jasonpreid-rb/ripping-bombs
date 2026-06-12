@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { type, org } = req.body;
+  const { type, org, subject, message } = req.body;
 
   try {
     if (type === 'registration') {
@@ -35,6 +35,15 @@ export default async function handler(req, res) {
         to: org.email,
         subject: `You're approved on Ripping Bombs!`,
         text: `Hi ${org.fullName},\n\nGreat news — ${org.courseName} has been approved on Ripping Bombs!\n\nYou can now log in and start submitting your longest drive competition results.\n\nLogin at: https://www.rippingbombs.com\nEmail: ${org.email}\n\nWelcome!\nThe Ripping Bombs Team`,
+      });
+    }
+
+    if (type === 'contact') {
+      await resend.emails.send({
+        from: 'Ripping Bombs <team@rippingbombs.com>',
+        to: 'team@rippingbombs.com',
+        subject: subject,
+        text: message,
       });
     }
 

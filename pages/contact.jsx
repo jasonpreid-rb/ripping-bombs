@@ -2,8 +2,6 @@ import Head from 'next/head';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP } from '../lib/constants';
-import { EJS_TEMPLATE_CONTACT } from '../lib/constants';
-import { sendEmail } from '../lib/email';
 
 export default function ContactPage() {
   const router = useRouter();
@@ -14,9 +12,25 @@ export default function ContactPage() {
     if (!form.name||!form.email||!form.message) { setStatus('invalid'); return; }
     setStatus('sending');
     const typeLabel = { general:'General Enquiry', partnership:'Partnership / Sponsorship', press:'Press Enquiry', club:'Club Registration Query' }[form.type]||'Enquiry';
-    const ok = await sendEmail(`${typeLabel}: ${form.name}`, `Type: ${typeLabel}\nName: ${form.name}\nEmail: ${form.email}\n\nMessage:\n${form.message}`, EJS_TEMPLATE_CONTACT);
-    setStatus(ok?'success':'error');
-    if (ok) setForm({ name:'', email:'', type:'general', message:'' });
+    try {
+      const res = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'contact',
+          subject: `${typeLabel}: ${form.name}`,
+          message: `Type: ${typeLabel}\nName: ${form.name}\nEmail: ${form.email}\n\nMessage:\n${form.message}`,
+        }),
+      });
+      if (res.ok) {
+        setStatus('success');
+        setForm({ name:'', email:'', type:'general', message:'' });
+      } else {
+        setStatus('error');
+      }
+    } catch {
+      setStatus('error');
+    }
   }
 
   const inp = (val, onChange, placeholder, type='text') => (
