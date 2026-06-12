@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { type, org, subject, message } = req.body;
+  const { type, org, entry, subject, message } = req.body;
 
   try {
     if (type === 'registration') {
@@ -44,6 +44,17 @@ export default async function handler(req, res) {
         to: 'team@rippingbombs.com',
         subject: subject,
         text: message,
+      });
+    }
+
+    if (type === 'submission') {
+      const distYds = entry.dist;
+      const distM = Math.round(distYds * 0.9144);
+      await resend.emails.send({
+        from: 'Ripping Bombs <team@rippingbombs.com>',
+        to: org.email,
+        subject: `Your drive is on the board! 🏌️`,
+        text: `Hi ${org.fullName},\n\nYour drive has been submitted to the Ripping Bombs World Registry!\n\nPlayer: ${entry.player}\nDistance: ${distYds} yds (${distM} m)\nClub: ${entry.club}\nHandicap: ${entry.hcp}\nDate: ${entry.date}${entry.tournament ? `\nEvent: ${entry.tournament}` : ''}\n\nCheck the weekly leaderboard to see how you rank against golfers worldwide.\n\nView leaderboard: https://www.rippingbombs.com/leaderboard\n\nThe Ripping Bombs Team`,
       });
     }
 

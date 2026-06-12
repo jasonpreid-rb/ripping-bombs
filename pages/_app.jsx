@@ -185,6 +185,14 @@ export default function App({ Component, pageProps }) {
     if (!ok) { toast('Submission failed — please try again'); return; }
 
     setEntries(prev => [...prev, e]);
+
+    // Send submission confirmation email to the club/simulator account
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'submission', org: loggedOrg, entry: e }),
+    }).catch(() => {}); // fire and forget — don't block the UI
+
     setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male' });
     toast('Drive submitted to the World Registry!');
   }
