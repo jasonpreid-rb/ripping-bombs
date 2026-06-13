@@ -457,8 +457,6 @@ export default function DashboardPage() {
         {/* Drive history */}
         <DriveHistory entries={entries} />
 
-      </div>
-
         {/* Danger Zone */}
         <div style={{ border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '1.25rem 1.5rem' }}>
           <h2 style={{ margin: '0 0 6px', fontSize: '0.9rem', fontWeight: 700, color: '#f87171' }}>Danger Zone</h2>
