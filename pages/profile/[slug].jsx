@@ -83,14 +83,51 @@ export default function PlayerProfile({ org, playerEntries }) {
   const profileName = org.fullName;
   const metaDesc = `${profileName}'s golf drive stats on Ripping Bombs. Personal best: ${best ? best.dist + ' yds' : 'N/A'}. ${playerEntries.length} recorded drives.`;
   const hasSocials = org.instagram || org.tiktok || org.twitter || org.youtube;
+  const canonicalUrl = `https://www.rippingbombs.com/profile/${nameToSlug(org.fullName)}`;
+
+  const sameAs = [
+    org.instagram ? `https://instagram.com/${org.instagram.replace(/^@/,'')}` : null,
+    org.twitter   ? `https://x.com/${org.twitter.replace(/^@/,'')}` : null,
+    org.youtube   ? `https://youtube.com/@${org.youtube.replace(/^@/,'')}` : null,
+    org.tiktok    ? `https://tiktok.com/@${org.tiktok.replace(/^@/,'')}` : null,
+  ].filter(Boolean);
+
+  const personSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: profileName,
+    url: canonicalUrl,
+    description: metaDesc,
+    ...(org.location && { homeLocation: { '@type': 'Place', name: org.location } }),
+    ...(sameAs.length && { sameAs }),
+    ...(best && {
+      knowsAbout: 'Golf',
+      additionalProperty: [
+        { '@type': 'PropertyValue', name: 'Personal Best Drive', value: `${best.dist} yards` },
+        { '@type': 'PropertyValue', name: 'Total Drives', value: playerEntries.length },
+        ...(avgDist ? [{ '@type': 'PropertyValue', name: 'Average Drive', value: `${avgDist} yards` }] : []),
+      ],
+    }),
+  };
 
   return (
     <>
       <Head>
         <title>{profileName} - Golf Drive Stats | Ripping Bombs</title>
         <meta name="description" content={metaDesc} />
-        <meta property="og:title" content={`${profileName} - Golf Drive Stats`} />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:type" content="profile" />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:title" content={`${profileName} - Golf Drive Stats | Ripping Bombs`} />
         <meta property="og:description" content={metaDesc} />
+        <meta property="og:site_name" content="Ripping Bombs" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={`${profileName} - Golf Drive Stats`} />
+        <meta name="twitter:description" content={metaDesc} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+        />
       </Head>
 
       <div style={{ padding: '28px 18px 80px', maxWidth: 900, margin: '0 auto' }}>
