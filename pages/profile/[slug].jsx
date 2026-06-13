@@ -32,7 +32,6 @@ export async function getServerSideProps({ params }) {
 
   if (!org) return { notFound: true };
 
-  // Only fetch entries that belong to this org AND are simulator entries
   const { data: entries } = await supabase
     .from('entries')
     .select('*')
@@ -58,19 +57,18 @@ function StatCard({ label, value, accent }) {
   );
 }
 
-function SocialHandle({ platform, handle, href, icon }) {
+function SocialHandle({ handle, href, icon }) {
   if (!handle) return null;
+  const clean = handle.replace(/^@/, '');
   return (
     <a
-      href={`${href}${handle.replace(/^@/, '')}`}
+      href={`${href}${clean}`}
       target="_blank"
       rel="noopener noreferrer"
-      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: SANS, fontSize: 12, color: MUT, textDecoration: 'none', border: `1px solid ${BDR}`, padding: '6px 12px', borderRadius: 4, transition: 'border-color .15s' }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = ORG}
-      onMouseLeave={e => e.currentTarget.style.borderColor = BDR}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: SANS, fontSize: 12, color: MUT, textDecoration: 'none', border: `1px solid ${BDR}`, padding: '6px 12px', borderRadius: 4 }}
     >
-      <span style={{ fontSize: 14 }}>{icon}</span>
-      <span>@{handle.replace(/^@/, '')}</span>
+      <span>{icon}</span>
+      <span>@{clean}</span>
     </a>
   );
 }
@@ -84,27 +82,24 @@ export default function PlayerProfile({ org, entries }) {
 
   const profileName = org.fullName;
   const metaDesc = `${profileName}'s golf drive stats on Ripping Bombs. Personal best: ${best ? best.dist + ' yds' : 'N/A'}. ${entries.length} recorded drives.`;
-
   const hasSocials = org.instagram || org.tiktok || org.twitter || org.youtube;
 
   return (
     <>
       <Head>
-        <title>{profileName} — Golf Drive Stats | Ripping Bombs</title>
+        <title>{profileName} - Golf Drive Stats | Ripping Bombs</title>
         <meta name="description" content={metaDesc} />
-        <meta property="og:title" content={`${profileName} — Golf Drive Stats`} />
+        <meta property="og:title" content={`${profileName} - Golf Drive Stats`} />
         <meta property="og:description" content={metaDesc} />
       </Head>
 
       <div style={{ padding: '28px 18px 80px', maxWidth: 900, margin: '0 auto' }}>
 
-        {/* Back link */}
         <Link href="/leaderboard" style={{ fontFamily: SANS, fontSize: 12, color: DIM, textDecoration: 'none', letterSpacing: 1, textTransform: 'uppercase' }}>
-          ← Leaderboard
+          &larr; Leaderboard
         </Link>
 
-        {/* Hero */}
-        <div style={{ marginTop: 24, marginBottom: 32, background: 'linear-gradient(135deg,rgba(163,230,53,0.1),rgba(163,230,53,0.03))', border: `1px solid rgba(163,230,53,0.2)`, padding: '28px 28px' }}>
+        <div style={{ marginTop: 24, marginBottom: 32, background: 'linear-gradient(135deg,rgba(163,230,53,0.1),rgba(163,230,53,0.03))', border: '1px solid rgba(163,230,53,0.2)', padding: '28px 28px' }}>
           <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 2, color: ORG, textTransform: 'uppercase', marginBottom: 10 }}>Player Profile</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 8 }}>
             <div style={{ fontFamily: DISP, fontSize: 'clamp(28px,5vw,42px)', color: TXT, letterSpacing: 0.5, lineHeight: 1 }}>
@@ -118,27 +113,23 @@ export default function PlayerProfile({ org, entries }) {
               {org.location}{org.simulator ? ` · ${org.simulator}` : ''}
             </div>
           )}
-
-          {/* Social handles */}
           {hasSocials && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14 }}>
-              <SocialHandle platform="instagram" handle={org.instagram} href="https://instagram.com/" icon="📸" />
-              <SocialHandle platform="tiktok"    handle={org.tiktok}    href="https://tiktok.com/@"   icon="🎵" />
-              <SocialHandle platform="twitter"   handle={org.twitter}   href="https://x.com/"         icon="𝕏" />
-              <SocialHandle platform="youtube"   handle={org.youtube}   href="https://youtube.com/@"  icon="▶" />
+              <SocialHandle handle={org.instagram} href="https://instagram.com/" icon="Instagram" />
+              <SocialHandle handle={org.tiktok}    href="https://tiktok.com/@"   icon="TikTok" />
+              <SocialHandle handle={org.twitter}   href="https://x.com/"         icon="X" />
+              <SocialHandle handle={org.youtube}   href="https://youtube.com/@"  icon="YouTube" />
             </div>
           )}
         </div>
 
-        {/* Stat cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10, marginBottom: 32 }}>
-          <StatCard label="Personal Best" value={best ? `${best.dist} yds` : '—'} accent />
-          <StatCard label="Avg Distance"  value={avgDist ? `${avgDist} yds` : '—'} />
-          <StatCard label="Total Drives"  value={entries.length || '—'} />
+          <StatCard label="Personal Best" value={best ? `${best.dist} yds` : '-'} accent />
+          <StatCard label="Avg Distance"  value={avgDist ? `${avgDist} yds` : '-'} />
+          <StatCard label="Total Drives"  value={entries.length || '-'} />
           {best && <StatCard label="Best Tier" value={tier(best.dist)} />}
         </div>
 
-        {/* Drive history */}
         <div>
           <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 2, color: DIM, textTransform: 'uppercase', marginBottom: 12 }}>Drive History</div>
           {entries.length === 0 ? (
@@ -163,11 +154,11 @@ export default function PlayerProfile({ org, entries }) {
                         <span style={{ fontFamily: DISP, fontSize: 18, color: i === 0 ? ORG : TXT }}>{e.dist}</span>
                         <span style={{ fontFamily: SANS, fontSize: 10, color: DIM, marginLeft: 3 }}>yds</span>
                       </td>
-                      <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: MUT }}>{e.club || '—'}</td>
+                      <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: MUT }}>{e.club || '-'}</td>
                       <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: MUT }}>{e.hcp}</td>
                       <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: MUT }}>{e.age}</td>
-                      <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: MUT }}>{e.gender === 'female' ? '♀ Female' : '♂ Male'}</td>
-                      <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: DIM }}>{e.tournament || '—'}</td>
+                      <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: MUT }}>{e.gender === 'female' ? 'Female' : 'Male'}</td>
+                      <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: DIM }}>{e.tournament || '-'}</td>
                       <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 10, fontWeight: 600, color: ORG }}>{tier(e.dist)}</td>
                     </tr>
                   ))}
@@ -177,11 +168,10 @@ export default function PlayerProfile({ org, entries }) {
           )}
         </div>
 
-        {/* Footer CTA */}
         <div style={{ marginTop: 40, borderTop: `1px solid ${BDR}`, paddingTop: 28, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start' }}>
           <div style={{ fontFamily: SANS, fontSize: 12, color: DIM }}>Want your drives on the global leaderboard?</div>
           <Link href="/register" style={{ fontFamily: SANS, fontWeight: 700, fontSize: 12, color: ORG, textDecoration: 'none', border: `1px solid ${ORG}`, padding: '10px 20px', letterSpacing: 0.5 }}>
-            REGISTER FREE →
+            REGISTER FREE
           </Link>
         </div>
 
