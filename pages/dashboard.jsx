@@ -68,15 +68,24 @@ function FoundingBadge() {
 }
 
 function ProfileModal({ club, onSave, onClose }) {
-  const [form, setForm] = useState({ fullName: club?.fullName || '', location: club?.location || '', position: club?.position || '' });
+  const [form, setForm] = useState({
+    fullName: club?.fullName || '',
+    location: club?.location || '',
+    position: club?.position || '',
+    instagram: club?.instagram || '',
+    tiktok: club?.tiktok || '',
+    twitter: club?.twitter || '',
+    youtube: club?.youtube || '',
+  });
   const [saving, setSaving] = useState(false);
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const handleSave = async () => { setSaving(true); await onSave(form); setSaving(false); };
   const inputStyle = { width: '100%', boxSizing: 'border-box', background: BG3, border: `1px solid ${BDR}`, borderRadius: 6, padding: '0.6rem 0.8rem', color: TXT, fontSize: '0.9rem', outline: 'none' };
   const labelStyle = { fontSize: '0.72rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 8, display: 'block' };
+  const isSimulator = club?.accountType === 'simulator';
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '1rem' }}>
-      <div onClick={(e) => e.stopPropagation()} style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 14, padding: '2rem', width: '100%', maxWidth: 420, display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 14, padding: '2rem', width: '100%', maxWidth: 420, display: 'flex', flexDirection: 'column', gap: 8, maxHeight: '90vh', overflowY: 'auto' }}>
         <h2 style={{ margin: '0 0 8px', fontSize: '1.1rem', fontWeight: 700 }}>Edit Profile</h2>
         <label style={labelStyle}>Full Name</label>
         <input style={inputStyle} value={form.fullName} onChange={(e) => set('fullName', e.target.value)} placeholder="Your name" />
@@ -84,6 +93,21 @@ function ProfileModal({ club, onSave, onClose }) {
         <input style={inputStyle} value={form.location} onChange={(e) => set('location', e.target.value)} placeholder="City, Country" />
         <label style={labelStyle}>Position / Role</label>
         <input style={inputStyle} value={form.position} onChange={(e) => set('position', e.target.value)} placeholder="e.g. Club Manager" />
+        {isSimulator && (
+          <>
+            <div style={{ borderTop: `1px solid ${BDR}`, marginTop: 8, paddingTop: 12 }}>
+              <div style={{ fontSize: '0.7rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Social Media <span style={{ color: DIM, fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional — shown on your public profile)</span></div>
+            </div>
+            <label style={labelStyle}>📸 Instagram handle</label>
+            <input style={inputStyle} value={form.instagram} onChange={(e) => set('instagram', e.target.value)} placeholder="@yourusername" />
+            <label style={labelStyle}>🎵 TikTok handle</label>
+            <input style={inputStyle} value={form.tiktok} onChange={(e) => set('tiktok', e.target.value)} placeholder="@yourusername" />
+            <label style={labelStyle}>𝕏 X / Twitter handle</label>
+            <input style={inputStyle} value={form.twitter} onChange={(e) => set('twitter', e.target.value)} placeholder="@yourusername" />
+            <label style={labelStyle}>▶ YouTube handle</label>
+            <input style={inputStyle} value={form.youtube} onChange={(e) => set('youtube', e.target.value)} placeholder="@yourchannel" />
+          </>
+        )}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 }}>
           <button onClick={onClose} style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.45rem 0.9rem', borderRadius: 6, cursor: 'pointer', fontSize: '0.82rem' }}>Cancel</button>
           <button onClick={handleSave} disabled={saving} style={{ background: ORG, color: '#000', fontWeight: 700, padding: '0.5rem 1.1rem', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: '0.85rem', opacity: saving ? 0.6 : 1 }}>{saving ? 'Saving…' : 'Save Changes'}</button>
@@ -363,7 +387,15 @@ export default function DashboardPage() {
   };
 
   const handleProfileSave = async (form) => {
-    const { error } = await supabase.from('clubs').update({ fullName: form.fullName, location: form.location, position: form.position }).eq('id', club.id);
+    const { error } = await supabase.from('clubs').update({
+      fullName: form.fullName,
+      location: form.location,
+      position: form.position,
+      instagram: form.instagram || null,
+      tiktok: form.tiktok || null,
+      twitter: form.twitter || null,
+      youtube: form.youtube || null,
+    }).eq('id', club.id);
     if (!error) {
       const updated = { ...club, ...form };
       setClub(updated);

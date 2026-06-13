@@ -5,7 +5,6 @@ import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../../lib/constan
 import { fmtDate, tier } from '../../lib/constants';
 import { countryFlag, BadgePill } from '../../components/UI';
 
-// Generate slug from a name: "John Smith" → "john-smith"
 export function nameToSlug(name) {
   return name
     .toLowerCase()
@@ -17,7 +16,6 @@ export function nameToSlug(name) {
 export async function getServerSideProps({ params }) {
   const { slug } = params;
 
-  // Fetch all simulator clubs
   const { data: clubs } = await supabase
     .from('clubs')
     .select('*')
@@ -26,7 +24,6 @@ export async function getServerSideProps({ params }) {
 
   if (!clubs) return { notFound: true };
 
-  // Find the club whose fullName slug matches
   const org = clubs.find(c => {
     const base = nameToSlug(c.fullName);
     const withId = `${base}-${c.id}`;
@@ -35,11 +32,12 @@ export async function getServerSideProps({ params }) {
 
   if (!org) return { notFound: true };
 
-  // Fetch all entries for this org
+  // Only fetch entries that belong to this org AND are simulator entries
   const { data: entries } = await supabase
     .from('entries')
     .select('*')
     .eq('orgId', org.id)
+    .eq('is_simulator', true)
     .order('date', { ascending: false });
 
   return {
@@ -60,31 +58,34 @@ function StatCard({ label, value, accent }) {
   );
 }
 
-const CATEGORIES = [
-  { label: 'Men (HCP < 20)',        filter: e => e.gender === 'male'   && e.hcp < 20  && e.age >= 16 && e.age < 55 },
-  { label: 'Men High HCP (≥ 20)',   filter: e => e.gender === 'male'   && e.hcp >= 20 && e.age >= 16 && e.age < 55 },
-  { label: 'Women (HCP < 20)',      filter: e => e.gender === 'female' && e.hcp < 20  && e.age >= 16 && e.age < 55 },
-  { label: 'Women High HCP (≥ 20)', filter: e => e.gender === 'female' && e.hcp >= 20 && e.age >= 16 && e.age < 55 },
-  { label: 'Youth (Under 16)',      filter: e => e.age < 16 },
-  { label: 'Senior (55+)',          filter: e => e.age >= 55 },
-];
+function SocialHandle({ platform, handle, href, icon }) {
+  if (!handle) return null;
+  return (
+    <a
+      href={`${href}${handle.replace(/^@/, '')}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: SANS, fontSize: 12, color: MUT, textDecoration: 'none', border: `1px solid ${BDR}`, padding: '6px 12px', borderRadius: 4, transition: 'border-color .15s' }}
+      onMouseEnter={e => e.currentTarget.style.borderColor = ORG}
+      onMouseLeave={e => e.currentTarget.style.borderColor = BDR}
+    >
+      <span style={{ fontSize: 14 }}>{icon}</span>
+      <span>@{handle.replace(/^@/, '')}</span>
+    </a>
+  );
+}
 
-export default function PlayerProfile({ org, entries, slug }) {
+export default function PlayerProfile({ org, entries }) {
   const sorted = [...entries].sort((a, b) => Number(b.dist) - Number(a.dist));
   const best = sorted[0];
-  const avg = entries.length
+  const avgDist = entries.length
     ? Math.round(entries.reduce((sum, e) => sum + Number(e.dist), 0) / entries.length)
     : null;
 
-  const categoryBests = CATEGORIES
-    .map(cat => {
-      const matches = sorted.filter(cat.filter);
-      return matches.length ? { label: cat.label, entry: matches[0] } : null;
-    })
-    .filter(Boolean);
-
   const profileName = org.fullName;
   const metaDesc = `${profileName}'s golf drive stats on Ripping Bombs. Personal best: ${best ? best.dist + ' yds' : 'N/A'}. ${entries.length} recorded drives.`;
+
+  const hasSocials = org.instagram || org.tiktok || org.twitter || org.youtube;
 
   return (
     <>
@@ -113,8 +114,18 @@ export default function PlayerProfile({ org, entries, slug }) {
             {org.badge && <BadgePill badge={org.badge} />}
           </div>
           {org.location && (
-            <div style={{ fontFamily: SANS, fontSize: 13, color: MUT }}>
+            <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: hasSocials ? 16 : 0 }}>
               {org.location}{org.simulator ? ` · ${org.simulator}` : ''}
+            </div>
+          )}
+
+          {/* Social handles */}
+          {hasSocials && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14 }}>
+              <SocialHandle platform="instagram" handle={org.instagram} href="https://instagram.com/" icon="📸" />
+              <SocialHandle platform="tiktok"    handle={org.tiktok}    href="https://tiktok.com/@"   icon="🎵" />
+              <SocialHandle platform="twitter"   handle={org.twitter}   href="https://x.com/"         icon="𝕏" />
+              <SocialHandle platform="youtube"   handle={org.youtube}   href="https://youtube.com/@"  icon="▶" />
             </div>
           )}
         </div>
@@ -122,26 +133,10 @@ export default function PlayerProfile({ org, entries, slug }) {
         {/* Stat cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10, marginBottom: 32 }}>
           <StatCard label="Personal Best" value={best ? `${best.dist} yds` : '—'} accent />
-          <StatCard label="Avg Distance" value={avg ? `${avg} yds` : '—'} />
-          <StatCard label="Total Drives" value={entries.length} />
+          <StatCard label="Avg Distance"  value={avgDist ? `${avgDist} yds` : '—'} />
+          <StatCard label="Total Drives"  value={entries.length || '—'} />
           {best && <StatCard label="Best Tier" value={tier(best.dist)} />}
         </div>
-
-        {/* Category bests */}
-        {categoryBests.length > 0 && (
-          <div style={{ marginBottom: 32 }}>
-            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 2, color: DIM, textTransform: 'uppercase', marginBottom: 12 }}>Best by Category</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 8 }}>
-              {categoryBests.map(({ label, entry }) => (
-                <div key={label} style={{ background: BG2, border: `1px solid ${BDR}`, padding: '14px 16px' }}>
-                  <div style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, color: DIM, letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
-                  <div style={{ fontFamily: DISP, fontSize: 22, color: ORG }}>{entry.dist} <span style={{ fontFamily: SANS, fontSize: 11, color: MUT }}>yds</span></div>
-                  <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 4 }}>{fmtDate(entry.date)}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Drive history */}
         <div>
