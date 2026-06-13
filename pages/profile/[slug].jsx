@@ -42,7 +42,7 @@ export async function getServerSideProps({ params }) {
   return {
     props: {
       org,
-      entries: entries || [],
+      playerEntries: entries || [],
       slug,
     },
   };
@@ -73,15 +73,15 @@ function SocialHandle({ handle, href, icon }) {
   );
 }
 
-export default function PlayerProfile({ org, entries }) {
-  const sorted = [...entries].sort((a, b) => Number(b.dist) - Number(a.dist));
+export default function PlayerProfile({ org, playerEntries }) {
+  const sorted = [...playerEntries].sort((a, b) => Number(b.dist) - Number(a.dist));
   const best = sorted[0];
-  const avgDist = entries.length
-    ? Math.round(entries.reduce((sum, e) => sum + Number(e.dist), 0) / entries.length)
+  const avgDist = playerEntries.length
+    ? Math.round(playerEntries.reduce((sum, e) => sum + Number(e.dist), 0) / playerEntries.length)
     : null;
 
   const profileName = org.fullName;
-  const metaDesc = `${profileName}'s golf drive stats on Ripping Bombs. Personal best: ${best ? best.dist + ' yds' : 'N/A'}. ${entries.length} recorded drives.`;
+  const metaDesc = `${profileName}'s golf drive stats on Ripping Bombs. Personal best: ${best ? best.dist + ' yds' : 'N/A'}. ${playerEntries.length} recorded drives.`;
   const hasSocials = org.instagram || org.tiktok || org.twitter || org.youtube;
 
   return (
@@ -126,13 +126,13 @@ export default function PlayerProfile({ org, entries }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10, marginBottom: 32 }}>
           <StatCard label="Personal Best" value={best ? `${best.dist} yds` : '-'} accent />
           <StatCard label="Avg Distance"  value={avgDist ? `${avgDist} yds` : '-'} />
-          <StatCard label="Total Drives"  value={entries.length || '-'} />
+          <StatCard label="Total Drives"  value={playerEntries.length || '-'} />
           {best && <StatCard label="Best Tier" value={tier(best.dist)} />}
         </div>
 
         <div>
           <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 2, color: DIM, textTransform: 'uppercase', marginBottom: 12 }}>Drive History</div>
-          {entries.length === 0 ? (
+          {playerEntries.length === 0 ? (
             <div style={{ fontFamily: SANS, fontSize: 13, color: DIM, padding: '32px 0' }}>No drives recorded yet.</div>
           ) : (
             <div style={{ border: `1px solid ${BDR}`, background: BG2, overflowX: 'auto' }}>
