@@ -33,9 +33,9 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
         <div style={{ background: '#dc2626', padding: '9px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 101 }}>
           <div onClick={() => router.push('/register')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: '#fff', letterSpacing: .5, textTransform: 'uppercase' }}>
-              🏌️ Submit Your Drive — Rank Globally, Instantly — FREE
+              Submit Your Drive — Rank Globally, Instantly — FREE
             </span>
-            <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.75)', textDecoration: 'underline' }}>Register now →</span>
+            <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 600, color: '#000', textDecoration: 'underline' }}>Register now</span>
           </div>
           <button onClick={() => setBannerDismissed(true)} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: 16, cursor: 'pointer', lineHeight: 1, padding: '0 4px' }}>✕</button>
         </div>
