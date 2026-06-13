@@ -39,9 +39,8 @@ export default function App({ Component, pageProps }) {
     logo: '',
     simulator: '',
     gender: 'male',
-    profileConsent: false,
   });
-  const [lgn, setLgn] = useState({ email:'', pw:'' });
+  const [lgn, setLgn] = useState({ email:'', pw:'', rememberMe: false });
   const [form, setForm] = useState({
     player: '',
     dist: '',
@@ -77,6 +76,18 @@ export default function App({ Component, pageProps }) {
       if (!sessionStorage.getItem('rb_launch_seen')) {
         setTimeout(() => setShowLaunch(true), 10000);
       }
+      // Restore remembered session
+      const stored = localStorage.getItem('rb_club');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed._expiry && Date.now() < parsed._expiry) {
+            setLoggedOrg(parsed);
+          } else {
+            localStorage.removeItem('rb_club');
+          }
+        } catch {}
+      }
     }
   }, []);
 
@@ -110,7 +121,6 @@ export default function App({ Component, pageProps }) {
       accountType: reg.type,
       simulator: reg.simulator || '',
       gender: reg.gender || 'male',
-      profile_consent: isSimulator ? (reg.profileConsent || false) : false,
     };
 
     const ok = await db.insertOrg(newOrg);
@@ -118,7 +128,7 @@ export default function App({ Component, pageProps }) {
 
     setOrgs(prev => [...prev, newOrg]);
     await sendRegistrationNotification(newOrg);
-    setReg({ type:'club', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'', gender:'male', profileConsent: false });
+    setReg({ type:'club', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'', gender:'male' });
 
     if (isSimulator) {
       setLoggedOrg(newOrg);
@@ -131,10 +141,8 @@ export default function App({ Component, pageProps }) {
   }
 
   async function doLogin() {
-    // Search loaded orgs state first
     let org = orgs.find(o => o.email === lgn.email && o.pw === lgn.pw);
 
-    // If not found in state, query Supabase directly
     if (!org) {
       try {
         const { supabase } = await import('../lib/supabaseClient');
@@ -153,9 +161,45 @@ export default function App({ Component, pageProps }) {
     if (org.status !== 'approved') { toast('Account not active'); return; }
 
     setLoggedOrg(org);
-    setLgn({ email:'', pw:'' });
+
+    if (lgn.rememberMe) {
+      const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
+      localStorage.setItem('rb_club', JSON.stringify({ ...org, _expiry: expiry }));
+    } else {
+      sessionStorage.setItem('rb_club', JSON.stringify(org));
+    }
+
+    setLgn({ email:'', pw:'', rememberMe: false });
     toast(`Welcome, ${org.fullName}!`);
     router.push('/submit');
+  }
+
+  async function doForgotPassword() {
+    if (!lgn.email) { toast('Enter your email address first'); return; }
+
+    let org = orgs.find(o => o.email === lgn.email);
+    if (!org) {
+      try {
+        const { supabase } = await import('../lib/supabaseClient');
+        const { data } = await supabase
+          .from('clubs')
+          .select('*')
+          .eq('email', lgn.email)
+          .single();
+        org = data;
+      } catch {}
+    }
+
+    // Always show success to avoid email enumeration
+    toast('If that email is registered, we\'ve sent your password.');
+
+    if (org) {
+      fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'forgot_password', org }),
+      }).catch(() => {});
+    }
   }
 
   async function doSubmit() {
@@ -204,7 +248,7 @@ export default function App({ Component, pageProps }) {
     approvedOrgs, orgFor, pendingCount, loggedOrg, setLoggedOrg,
     toast, shareEnt, setShareEnt, detEnt, setDetEnt,
     reg, setReg, lgn, setLgn, form, setForm,
-    doRegister, doLogin, doSubmit,
+    doRegister, doLogin, doForgotPassword, doSubmit,
     week, setWeek, allTime, setAllTime,
     fCountry, setFCountry, fHcp, setFHcp, fAge, setFAge,
     fClub, setFClub, fPlayer, setFPlayer, fGender, setFGender,
@@ -234,7 +278,7 @@ export default function App({ Component, pageProps }) {
         `}
       </Script>
 
-      <Layout loggedOrg={loggedOrg} onLogout={()=>setLoggedOrg(null)} unit={unit} setUnit={setUnit}
+      <Layout loggedOrg={loggedOrg} onLogout={()=>{ setLoggedOrg(null); localStorage.removeItem('rb_club'); sessionStorage.removeItem('rb_club'); }} unit={unit} setUnit={setUnit}
         onAdminClick={()=>setAdminPw({show:true,val:''})} pendingCount={pendingCount} onShowDemo={()=>setShowDemo(true)}>
         <Component {...pageProps} {...sharedProps}/>
       </Layout>

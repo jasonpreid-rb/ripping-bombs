@@ -47,6 +47,15 @@ export default async function handler(req, res) {
       });
     }
 
+    if (type === 'forgot_password') {
+      await resend.emails.send({
+        from: 'Ripping Bombs <team@rippingbombs.com>',
+        to: org.email,
+        subject: 'Your Ripping Bombs password',
+        text: `Hi ${org.fullName},\n\nHere are your login details for Ripping Bombs:\n\nEmail: ${org.email}\nPassword: ${org.pw}\n\nLogin at: https://www.rippingbombs.com/login\n\nIf you did not request this, you can ignore this email.\n\nThe Ripping Bombs Team`,
+      });
+    }
+
     if (type === 'submission') {
       const distYds = entry.dist;
       const distM = Math.round(distYds * 0.9144);
