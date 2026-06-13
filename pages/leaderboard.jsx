@@ -1,6 +1,15 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+
+function nameToSlug(name) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-');
+}
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { fmtDate, tier, nowWeek, weekLabel, prevWeek, nextWeek, sameWeek } from '../lib/constants';
 import { countryFlag, BadgePill } from '../components/UI';
@@ -48,7 +57,16 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
                   {medal||`#${ri+1}`}
                 </td>
                 <td data-sticky="1" style={{...tdSticky(RANK_W),padding:'12px 14px',minWidth:PLAYER_W}}>
-                  <span style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>{e.player}</span>
+                  {e.is_simulator && org?.fullName ? (
+                    <Link
+                      href={`/profile/${nameToSlug(org.fullName)}`}
+                      onClick={ev=>ev.stopPropagation()}
+                      style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:ORG,textDecoration:'none',borderBottom:`1px solid rgba(163,230,53,0.3)`}}>
+                      {e.player}
+                    </Link>
+                  ) : (
+                    <span style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>{e.player}</span>
+                  )}
                   {org?.country&&countryFlag(org.country)}
                 </td>
                 <td style={{padding:'12px 14px'}}><span style={{fontFamily:DISP,fontSize:20,color:ORG}}>{cvt(e.dist)}</span><span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:3}}>{unitLbl}</span></td>

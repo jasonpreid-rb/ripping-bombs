@@ -93,6 +93,64 @@ function ProfileModal({ club, onSave, onClose }) {
   );
 }
 
+function DeleteModal({ club, onClose }) {
+  const router = useRouter();
+  const [input, setInput] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState('');
+  const confirmed = input === 'DELETE';
+
+  const handleDelete = async () => {
+    if (!confirmed) return;
+    setDeleting(true);
+    setError('');
+    try {
+      // Delete all entries first (FK constraint)
+      const { error: entriesErr } = await supabase.from('entries').delete().eq('orgId', club.id);
+      if (entriesErr) throw entriesErr;
+      // Delete the club record
+      const { error: clubErr } = await supabase.from('clubs').delete().eq('id', club.id);
+      if (clubErr) throw clubErr;
+      // Clear local session
+      localStorage.removeItem('rb_club');
+      router.replace('/');
+    } catch (err) {
+      setError('Something went wrong. Please try again or contact team@rippingbombs.com');
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '1rem' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: BG2, border: '1px solid rgba(239,68,68,0.4)', borderRadius: 14, padding: '2rem', width: '100%', maxWidth: 420 }}>
+        <div style={{ fontSize: '1.3rem', marginBottom: 8 }}>⚠️</div>
+        <h2 style={{ margin: '0 0 8px', fontSize: '1.1rem', fontWeight: 700, color: '#f87171' }}>Delete Account</h2>
+        <p style={{ margin: '0 0 16px', fontSize: '0.85rem', color: MUT, lineHeight: 1.6 }}>
+          This will permanently delete your account and <strong style={{ color: TXT }}>all {club?.accountType === 'simulator' ? 'drives and your public profile page' : 'submitted drives'}</strong>.
+          This action cannot be undone.
+        </p>
+        <div style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8, padding: '12px 14px', marginBottom: 16, fontSize: '0.82rem', color: '#fca5a5', lineHeight: 1.6 }}>
+          Type <strong>DELETE</strong> to confirm
+        </div>
+        <input
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          placeholder="Type DELETE here"
+          autoFocus
+          style={{ width: '100%', boxSizing: 'border-box', background: BG3, border: `1px solid ${confirmed ? '#f87171' : BDR}`, borderRadius: 6, padding: '0.6rem 0.8rem', color: TXT, fontSize: '0.9rem', outline: 'none', marginBottom: 12, fontFamily: 'monospace', letterSpacing: 1 }}
+        />
+        {error && <p style={{ margin: '0 0 10px', fontSize: '0.8rem', color: '#f87171' }}>{error}</p>}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+          <button onClick={onClose} disabled={deleting} style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.45rem 0.9rem', borderRadius: 6, cursor: 'pointer', fontSize: '0.82rem' }}>Cancel</button>
+          <button onClick={handleDelete} disabled={!confirmed || deleting} style={{ background: confirmed ? '#dc2626' : BG3, color: confirmed ? '#fff' : DIM, fontWeight: 700, padding: '0.5rem 1.1rem', borderRadius: 6, border: `1px solid ${confirmed ? '#dc2626' : BDR}`, cursor: confirmed ? 'pointer' : 'not-allowed', fontSize: '0.85rem', opacity: deleting ? 0.6 : 1, transition: 'all .15s' }}>
+            {deleting ? 'Deleting…' : 'Delete My Account'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Distance bar — shows your best vs global average
 function VsAverageBar({ myBest, globalAvg, label }) {
   if (!myBest || !globalAvg) return null;
@@ -265,6 +323,7 @@ export default function DashboardPage() {
   const [globalAvgBest, setGlobalAvgBest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     const raw = typeof window !== 'undefined' && localStorage.getItem('rb_club');
@@ -400,8 +459,28 @@ export default function DashboardPage() {
 
       </div>
 
+        {/* Danger Zone */}
+        <div style={{ border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '1.25rem 1.5rem' }}>
+          <h2 style={{ margin: '0 0 6px', fontSize: '0.9rem', fontWeight: 700, color: '#f87171' }}>Danger Zone</h2>
+          <p style={{ margin: '0 0 14px', fontSize: '0.82rem', color: MUT, lineHeight: 1.6 }}>
+            Permanently delete your account and all associated data.
+            {club?.accountType === 'simulator' && ' Your public profile page will also be removed.'}{' '}
+            This cannot be undone.
+          </p>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            style={{ background: 'transparent', border: '1px solid rgba(239,68,68,0.5)', color: '#f87171', fontWeight: 600, padding: '0.5rem 1.1rem', borderRadius: 6, cursor: 'pointer', fontSize: '0.82rem', letterSpacing: 0.3 }}>
+            Delete Account →
+          </button>
+        </div>
+
+      </div>
+
       {showModal && (
         <ProfileModal club={club} onSave={handleProfileSave} onClose={() => setShowModal(false)} />
+      )}
+      {showDeleteModal && (
+        <DeleteModal club={club} onClose={() => setShowDeleteModal(false)} />
       )}
     </Layout>
   );

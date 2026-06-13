@@ -39,6 +39,7 @@ export default function App({ Component, pageProps }) {
     logo: '',
     simulator: '',
     gender: 'male',
+    profileConsent: false,
   });
   const [lgn, setLgn] = useState({ email:'', pw:'' });
   const [form, setForm] = useState({
@@ -109,6 +110,7 @@ export default function App({ Component, pageProps }) {
       accountType: reg.type,
       simulator: reg.simulator || '',
       gender: reg.gender || 'male',
+      profile_consent: isSimulator ? (reg.profileConsent || false) : false,
     };
 
     const ok = await db.insertOrg(newOrg);
@@ -116,7 +118,7 @@ export default function App({ Component, pageProps }) {
 
     setOrgs(prev => [...prev, newOrg]);
     await sendRegistrationNotification(newOrg);
-    setReg({ type:'club', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'', gender:'male' });
+    setReg({ type:'club', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'', gender:'male', profileConsent: false });
 
     if (isSimulator) {
       setLoggedOrg(newOrg);

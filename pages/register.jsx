@@ -184,6 +184,25 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
             required
           />
 
+          {/* Profile page consent — simulator only */}
+          {isSimulator && (
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={!!reg.profileConsent}
+                  onChange={e => setReg({ ...reg, profileConsent: e.target.checked })}
+                  style={{ marginTop: 3, accentColor: ORG, flexShrink: 0, width: 15, height: 15 }}
+                />
+                <span style={{ fontFamily: SANS, fontSize: 12, color: MUT, lineHeight: 1.6 }}>
+                  I consent to a <strong style={{ color: TXT }}>public player profile page</strong> being created
+                  at <span style={{ color: ORG }}>rippingbombs.com/profile/my-name</span> showing my submitted
+                  drives, stats, and country. This page will be publicly accessible and indexed by search engines.
+                </span>
+              </label>
+            </div>
+          )}
+
           <Btn full onClick={doRegister}>
             {isSimulator ? 'Create Account →' : 'Submit Registration →'}
           </Btn>

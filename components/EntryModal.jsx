@@ -1,9 +1,23 @@
+import { useRouter } from 'next/router';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { fmtDate, tier } from '../lib/constants';
 import { Overlay, BadgePill, countryFlag } from './UI';
 
+function nameToSlug(name) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-');
+}
+
 export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl }) {
+  const router = useRouter();
   if (!entry) return null;
+
+  const isSimulator = entry.is_simulator === true;
+  const profileSlug = isSimulator && org?.fullName ? nameToSlug(org.fullName) : null;
+
   return (
     <Overlay onClose={onClose}>
       <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:2, color:ORG, marginBottom:6, textTransform:'uppercase' }}>Drive Detail</div>
@@ -45,6 +59,13 @@ export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl 
       )}
 
       <div style={{ marginTop:18, display:'flex', flexDirection:'column', gap:8 }}>
+        {profileSlug && (
+          <button
+            onClick={() => { onClose(); router.push(`/profile/${profileSlug}`); }}
+            style={{ width:'100%', background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:12, padding:'11px', cursor:'pointer', letterSpacing:.5 }}>
+            👤 VIEW PLAYER PROFILE
+          </button>
+        )}
         {onShare && (
           <button onClick={()=>{ onClose(); onShare(entry); }}
             style={{ width:'100%', background:`linear-gradient(135deg,${ORG},#bef264)`, border:'none', color:'#111', fontFamily:SANS, fontWeight:700, fontSize:12, padding:'11px', cursor:'pointer', letterSpacing:.5 }}>
