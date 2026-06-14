@@ -47,6 +47,9 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
         @media(max-width:680px){.desktop-nav{display:none!important}.burger-btn{display:flex!important;align-items:center;justify-content:center}}
         @keyframes fi{from{opacity:0}to{opacity:1}}
         @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+        .marquee-track{display:flex;width:max-content;animation:marquee 36s linear infinite;}
+        .marquee-track:hover{animation-play-state:paused;}
       `}</style>
 
       {/* HEADER */}
@@ -84,6 +87,23 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
       )}
 
       <main>{children}</main>
+      <div style={{ background:'#0e0e0e', borderTop:'1px solid rgba(255,255,255,0.06)', borderBottom:'1px solid rgba(255,255,255,0.06)', padding:'18px 0', overflow:'hidden', position:'relative' }}>
+        <div style={{ position:'absolute', left:0, top:0, bottom:0, width:80, background:'linear-gradient(to right,#0e0e0e,transparent)', zIndex:2, pointerEvents:'none' }}/>
+        <div style={{ position:'absolute', right:0, top:0, bottom:0, width:80, background:'linear-gradient(to left,#0e0e0e,transparent)', zIndex:2, pointerEvents:'none' }}/>
+        <div style={{ fontFamily:SANS, fontSize:9, fontWeight:700, letterSpacing:2, color:'rgba(255,255,255,0.18)', textTransform:'uppercase', textAlign:'center', marginBottom:12 }}>Compatible with</div>
+        <div style={{ overflow:'hidden' }}>
+          <div className="marquee-track">
+            {['Trackman','Flightscope','GCQuad','Full Swing','Foresight Sports','SkyTrak','Uneekor','Bushnell Launch Pro','Garmin Approach','TaylorMade','Callaway','Titleist','Ping','Cobra','Srixon','Mizuno','Cleveland',
+              'Trackman','Flightscope','GCQuad','Full Swing','Foresight Sports','SkyTrak','Uneekor','Bushnell Launch Pro','Garmin Approach','TaylorMade','Callaway','Titleist','Ping','Cobra','Srixon','Mizuno','Cleveland'
+            ].map((brand, i) => (
+              <div key={i} style={{ display:'inline-flex', alignItems:'center', padding:'0 32px', whiteSpace:'nowrap' }}>
+                <span style={{ fontFamily:'Arial Black, Arial', fontSize:13, fontWeight:900, color:'rgba(255,255,255,0.5)', letterSpacing:0.5, textTransform:'uppercase' }}>{brand}</span>
+                <span style={{ marginLeft:32, color:'rgba(255,255,255,0.15)', fontSize:8 }}>&#9679;</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
       <SiteFooter/>
     </div>
   );
