@@ -5,7 +5,7 @@ import { TXT, MUT, ORG, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { tier, todayStr, toB64 } from '../lib/constants';
 import { Card, Field, PhotoField, Btn } from '../components/UI';
 
-export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, unitLbl, entries=[] }) {
+export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, unitLbl, entries=[], approvedOrgs=[] }) {
   const [consent, setConsent] = useState(false);
   const router = useRouter();
 
@@ -90,6 +90,35 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, un
             <div style={{ gridColumn:'1/-1' }}>
               <Field label="Facility Name (optional)" value={form.facility||''} onChange={e=>setForm({...form,facility:e.target.value})} placeholder="e.g. TopGolf Manchester, GolfZon World, The Range Dubai"/>
             </div>
+
+            {/* Venue tag — simulator accounts can tag a club venue */}
+            {isSimulator && (
+              <div style={{ gridColumn: '1/-1' }}>
+                <label style={{ display: 'block', fontFamily: SANS, fontSize: 11, fontWeight: 600, color: MUT, marginBottom: 5, textTransform: 'uppercase', letterSpacing: .8 }}>
+                  Simulator Venue <span style={{ color: DIM, fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional)</span>
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <select
+                    value={form.venueId || ''}
+                    onChange={e => setForm({ ...form, venueId: e.target.value || null })}
+                    style={{ width: '100%', background: BG3, border: `1px solid ${BDR}`, padding: '10px 36px 10px 14px', color: form.venueId ? TXT : DIM, fontFamily: SANS, fontSize: 14, outline: 'none', appearance: 'none', boxSizing: 'border-box' }}
+                  >
+                    <option value="">No venue / playing at home</option>
+                    {approvedOrgs
+                      .filter(o => o.accountType === 'club')
+                      .sort((a, b) => a.courseName.localeCompare(b.courseName))
+                      .map(o => (
+                        <option key={o.id} value={o.id}>{o.courseName}{o.location ? ` — ${o.location}` : ''}</option>
+                      ))
+                    }
+                  </select>
+                  <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: DIM, fontSize: 10 }}>&#9662;</span>
+                </div>
+                <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 5 }}>
+                  Tagging a venue adds your drive to that venue's leaderboard.
+                </div>
+              </div>
+            )}
 
             {/* Player name — pre-filled and locked for simulator accounts */}
             {isSimulator ? (

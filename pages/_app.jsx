@@ -10,7 +10,6 @@ import { initData, db } from '../lib/data';
 import { ORGS_KEY, ENT_KEY, ADMIN_PW, SANS, ORG, MUT, BG2, BDR, TXT, DIM, DISP } from '../lib/constants';
 import { todayStr } from '../lib/constants';
 import { sendRegistrationNotification } from '../lib/email';
-import { Analytics } from '@vercel/analytics/react';
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
@@ -41,7 +40,7 @@ export default function App({ Component, pageProps }) {
     simulator: '',
     gender: 'male',
   });
-  const [lgn, setLgn] = useState({ email:'', pw:'', rememberMe: false });
+  const [lgn, setLgn] = useState({ email:'', pw:'' });
   const [form, setForm] = useState({
     player: '',
     dist: '',
@@ -52,6 +51,7 @@ export default function App({ Component, pageProps }) {
     date: todayStr(),
     tournament: '',
     gender: 'male',
+    venueId: null,
   });
 
   // Leaderboard filter state
@@ -76,18 +76,6 @@ export default function App({ Component, pageProps }) {
       if (localStorage.getItem('rb_admin_auth') === '1') setShowAdmin(true);
       if (!sessionStorage.getItem('rb_launch_seen')) {
         setTimeout(() => setShowLaunch(true), 10000);
-      }
-      // Restore remembered session
-      const stored = localStorage.getItem('rb_club');
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          if (parsed._expiry && Date.now() < parsed._expiry) {
-            setLoggedOrg(parsed);
-          } else {
-            localStorage.removeItem('rb_club');
-          }
-        } catch {}
       }
     }
   }, []);
@@ -142,8 +130,10 @@ export default function App({ Component, pageProps }) {
   }
 
   async function doLogin() {
+    // Search loaded orgs state first
     let org = orgs.find(o => o.email === lgn.email && o.pw === lgn.pw);
 
+    // If not found in state, query Supabase directly
     if (!org) {
       try {
         const { supabase } = await import('../lib/supabaseClient');
@@ -162,45 +152,9 @@ export default function App({ Component, pageProps }) {
     if (org.status !== 'approved') { toast('Account not active'); return; }
 
     setLoggedOrg(org);
-
-    if (lgn.rememberMe) {
-      const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
-      localStorage.setItem('rb_club', JSON.stringify({ ...org, _expiry: expiry }));
-    } else {
-      sessionStorage.setItem('rb_club', JSON.stringify(org));
-    }
-
-    setLgn({ email:'', pw:'', rememberMe: false });
+    setLgn({ email:'', pw:'' });
     toast(`Welcome, ${org.fullName}!`);
     router.push('/submit');
-  }
-
-  async function doForgotPassword() {
-    if (!lgn.email) { toast('Enter your email address first'); return; }
-
-    let org = orgs.find(o => o.email === lgn.email);
-    if (!org) {
-      try {
-        const { supabase } = await import('../lib/supabaseClient');
-        const { data } = await supabase
-          .from('clubs')
-          .select('*')
-          .eq('email', lgn.email)
-          .single();
-        org = data;
-      } catch {}
-    }
-
-    // Always show success to avoid email enumeration
-    toast('If that email is registered, we\'ve sent your password.');
-
-    if (org) {
-      fetch('/api/send-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'forgot_password', org }),
-      }).catch(() => {});
-    }
   }
 
   async function doSubmit() {
@@ -226,6 +180,7 @@ export default function App({ Component, pageProps }) {
       tournament: isSimulator ? 'Simulator' : form.tournament,
       gender: isSimulator ? (loggedOrg.gender || 'male') : form.gender,
       is_simulator: isSimulator,
+      venueId: form.venueId || null,
     };
 
     const ok = await db.insertEntry(e);
@@ -240,7 +195,7 @@ export default function App({ Component, pageProps }) {
       body: JSON.stringify({ type: 'submission', org: loggedOrg, entry: e }),
     }).catch(() => {}); // fire and forget — don't block the UI
 
-    setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male' });
+    setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male', venueId: null });
     toast('Drive submitted to the World Registry!');
   }
 
@@ -249,7 +204,7 @@ export default function App({ Component, pageProps }) {
     approvedOrgs, orgFor, pendingCount, loggedOrg, setLoggedOrg,
     toast, shareEnt, setShareEnt, detEnt, setDetEnt,
     reg, setReg, lgn, setLgn, form, setForm,
-    doRegister, doLogin, doForgotPassword, doSubmit,
+    doRegister, doLogin, doSubmit,
     week, setWeek, allTime, setAllTime,
     fCountry, setFCountry, fHcp, setFHcp, fAge, setFAge,
     fClub, setFClub, fPlayer, setFPlayer, fGender, setFGender,
@@ -279,7 +234,7 @@ export default function App({ Component, pageProps }) {
         `}
       </Script>
 
-      <Layout loggedOrg={loggedOrg} onLogout={()=>{ setLoggedOrg(null); localStorage.removeItem('rb_club'); sessionStorage.removeItem('rb_club'); }} unit={unit} setUnit={setUnit}
+      <Layout loggedOrg={loggedOrg} onLogout={()=>setLoggedOrg(null)} unit={unit} setUnit={setUnit}
         onAdminClick={()=>setAdminPw({show:true,val:''})} pendingCount={pendingCount} onShowDemo={()=>setShowDemo(true)}>
         <Component {...pageProps} {...sharedProps}/>
       </Layout>
@@ -306,9 +261,6 @@ export default function App({ Component, pageProps }) {
 
       {/* Launch modal */}
       {showLaunch && <LaunchModal onClose={()=>{setShowLaunch(false);sessionStorage.setItem('rb_launch_seen','1');}}/>}
-
-      {/* Vercel Analytics */}
-      <Analytics />
 
       {/* Toast */}
       {toastMsg && (
