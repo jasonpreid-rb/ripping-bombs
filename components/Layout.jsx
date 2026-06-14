@@ -3,6 +3,48 @@ import { useRouter } from 'next/router';
 import { RBLogoWhite } from './Logo';
 import { ORG, MUT, BDR, DIM, SANS, DISP } from '../lib/constants';
 
+// "Compatible with" marquee — brand logos live in /public/logos/.
+// If a logo file is missing or fails to load, falls back to the brand name as text.
+const SIM_BRANDS = [
+  { name: 'Trackman', logo: '/logos/trackman.svg' },
+  { name: 'Flightscope', logo: '/logos/flightscope.svg' },
+  { name: 'GCQuad', logo: '/logos/gcquad.svg' },
+  { name: 'Full Swing', logo: '/logos/full-swing.svg' },
+  { name: 'Foresight Sports', logo: '/logos/foresight-sports.svg' },
+  { name: 'SkyTrak', logo: '/logos/skytrak.svg' },
+  { name: 'Uneekor', logo: '/logos/uneekor.svg' },
+  { name: 'Bushnell Launch Pro', logo: '/logos/bushnell-launch-pro.svg' },
+  { name: 'Garmin Approach', logo: '/logos/garmin-approach.svg' },
+  { name: 'TaylorMade', logo: '/logos/taylormade.svg' },
+  { name: 'Callaway', logo: '/logos/callaway.svg' },
+  { name: 'Titleist', logo: '/logos/titleist.svg' },
+  { name: 'Ping', logo: '/logos/ping.svg' },
+  { name: 'Cobra', logo: '/logos/cobra.svg' },
+  { name: 'Srixon', logo: '/logos/srixon.svg' },
+  { name: 'Mizuno', logo: '/logos/mizuno.svg' },
+  { name: 'Cleveland', logo: '/logos/cleveland.svg' },
+];
+const MARQUEE_BRANDS = [...SIM_BRANDS, ...SIM_BRANDS];
+
+function MarqueeLogo({ name, logo }) {
+  const [failed, setFailed] = useState(false);
+  const showLogo = logo && !failed;
+  return (
+    <div className="brand-chip" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', height: 34, minWidth: 112, padding: '0 18px', border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.02)', transition: 'border-color .2s, background .2s' }}>
+      {showLogo ? (
+        <img
+          src={logo}
+          alt={name}
+          onError={() => setFailed(true)}
+          style={{ height: 18, width: 'auto', maxWidth: 110, objectFit: 'contain', display: 'block', filter: 'grayscale(1)', opacity: 0.6, transition: 'opacity .2s, filter .2s' }}
+        />
+      ) : (
+        <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: 1.5, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{name}</span>
+      )}
+    </div>
+  );
+}
+
 export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, onAdminClick, pendingCount, onShowDemo }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -48,8 +90,10 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
         @keyframes fi{from{opacity:0}to{opacity:1}}
         @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
         @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-        .marquee-track{display:flex;width:max-content;animation:marquee 36s linear infinite;}
+        .marquee-track{display:flex;width:max-content;gap:10px;animation:marquee 36s linear infinite;}
         .marquee-track:hover{animation-play-state:paused;}
+        .marquee-track:hover img{opacity:1;filter:none;}
+        .marquee-track:hover .brand-chip{border-color:rgba(163,230,53,0.25);background:rgba(163,230,53,0.04);}
       `}</style>
 
       {/* HEADER */}
@@ -93,13 +137,8 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
         <div style={{ fontFamily:SANS, fontSize:9, fontWeight:700, letterSpacing:2, color:'rgba(255,255,255,0.18)', textTransform:'uppercase', textAlign:'center', marginBottom:12 }}>Compatible with</div>
         <div style={{ overflow:'hidden' }}>
           <div className="marquee-track">
-            {['Trackman','Flightscope','GCQuad','Full Swing','Foresight Sports','SkyTrak','Uneekor','Bushnell Launch Pro','Garmin Approach','TaylorMade','Callaway','Titleist','Ping','Cobra','Srixon','Mizuno','Cleveland',
-              'Trackman','Flightscope','GCQuad','Full Swing','Foresight Sports','SkyTrak','Uneekor','Bushnell Launch Pro','Garmin Approach','TaylorMade','Callaway','Titleist','Ping','Cobra','Srixon','Mizuno','Cleveland'
-            ].map((brand, i) => (
-              <div key={i} style={{ display:'inline-flex', alignItems:'center', padding:'0 32px', whiteSpace:'nowrap' }}>
-                <span style={{ fontFamily:'Arial Black, Arial', fontSize:13, fontWeight:900, color:'rgba(255,255,255,0.5)', letterSpacing:0.5, textTransform:'uppercase' }}>{brand}</span>
-                <span style={{ marginLeft:32, color:'rgba(255,255,255,0.15)', fontSize:8 }}>&#9679;</span>
-              </div>
+            {MARQUEE_BRANDS.map((brand, i) => (
+              <MarqueeLogo key={i} name={brand.name} logo={brand.logo}/>
             ))}
           </div>
         </div>
