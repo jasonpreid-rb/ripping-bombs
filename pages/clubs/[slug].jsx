@@ -45,92 +45,120 @@ export async function getServerSideProps({ params }) {
   return { props: { org, clubEntries: entries } };
 }
 
-function generateShareImage(org, best, ul) {
+function drawRBLogo(ctx, x, y, w) {
+  const h = w * (595.28 / 841.89);
+  const scaleX = w / 841.89;
+  const scaleY = h / 595.28;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(scaleX, scaleY);
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.moveTo(146.662,300.557); ctx.lineTo(22.035,521.864); ctx.lineTo(155.217,521.864);
+  ctx.lineTo(279.933,300.406); ctx.lineTo(216.568,188.458); ctx.lineTo(369.538,188.458);
+  ctx.lineTo(421.032,72.414); ctx.lineTo(17.521,72.414); ctx.closePath(); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(695.492,293.872); ctx.lineTo(824.537,72.414); ctx.lineTo(820.016,72.414);
+  ctx.lineTo(820.029,72.414); ctx.lineTo(686.834,72.414); ctx.lineTo(421.032,72.414);
+  ctx.lineTo(472.527,188.458); ctx.lineTo(621.49,188.458); ctx.lineTo(562.133,293.872);
+  ctx.lineTo(623.367,405.807); ctx.lineTo(472.527,405.807); ctx.lineTo(421.032,521.864);
+  ctx.lineTo(686.834,521.851); ctx.lineTo(820.029,521.864); ctx.lineTo(820.016,521.851);
+  ctx.lineTo(824.537,521.851); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+function generateClubShareImage(org, best, ul) {
   return new Promise(resolve => {
-    const size = 1080;
+    const W = 1080, H = 1080;
     const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
+    canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
 
-    // Background
-    ctx.fillStyle = '#0e0e0e';
-    ctx.fillRect(0, 0, size, size);
+    // Background + accent bars + grid
+    ctx.fillStyle = '#0e0e0e'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#a3e635'; ctx.fillRect(0, 0, W, 8); ctx.fillRect(0, H - 8, W, 8);
+    ctx.strokeStyle = 'rgba(163,230,53,0.04)'; ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
 
-    // Lime accent bar top
-    ctx.fillStyle = '#a3e635';
-    ctx.fillRect(0, 0, size, 8);
+    const draw = (flagImg, logoImg) => {
+      // RB logo top left, flag top right
+      drawRBLogo(ctx, 80, 58, 80);
+      if (flagImg) ctx.drawImage(flagImg, W - 160, 58, 80, 60);
 
-    // Grid lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < size; i += 80) {
-      ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, size); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(size, i); ctx.stroke();
-    }
+      // Top divider
+      ctx.strokeStyle = 'rgba(163,230,53,0.3)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(80, 150); ctx.lineTo(W - 80, 150); ctx.stroke();
 
-    // Club name
-    ctx.fillStyle = '#ffffff';
-    ctx.font = `bold 62px Arial Black, Arial`;
-    ctx.textAlign = 'center';
-    const name = org.courseName.toUpperCase();
-    ctx.fillText(name.length > 22 ? name.slice(0, 22) + '...' : name, size / 2, 200);
+      // Club logo if available
+      if (logoImg) {
+        const aspect = logoImg.naturalWidth / logoImg.naturalHeight;
+        const lh = 90, lw = lh * aspect;
+        ctx.drawImage(logoImg, (W - lw) / 2, 168, lw, lh);
+      }
 
-    // Location
-    ctx.fillStyle = '#a0a0a0';
-    ctx.font = '28px Arial';
-    ctx.fillText(`${org.location || ''}${org.country ? '  ' + org.country.toUpperCase() : ''}`, size / 2, 260);
+      // CLUB LEADERBOARD label
+      ctx.fillStyle = '#a3e635'; ctx.font = 'bold 20px Arial'; ctx.textAlign = 'center';
+      ctx.fillText('CLUB LEADERBOARD', W / 2, logoImg ? 290 : 210);
 
-    // Divider
-    ctx.fillStyle = 'rgba(163,230,53,0.3)';
-    ctx.fillRect(140, 300, size - 280, 1);
+      // Club name
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 58px Arial Black, Arial';
+      const name = org.courseName.toUpperCase();
+      const displayName = name.length > 20 ? name.slice(0, 20) + '...' : name;
+      ctx.fillText(displayName, W / 2, logoImg ? 370 : 290);
 
-    if (best) {
-      // Club record label
-      ctx.fillStyle = '#a3e635';
-      ctx.font = 'bold 18px Arial';
-      ctx.letterSpacing = '4px';
-      ctx.fillText('CLUB RECORD', size / 2, 370);
+      // Location
+      ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.font = '30px Arial';
+      ctx.fillText(org.location || '', W / 2, logoImg ? 420 : 340);
 
-      // Distance
-      ctx.fillStyle = '#a3e635';
-      ctx.font = `bold 180px Arial Black, Arial`;
-      ctx.fillText(best.dist, size / 2, 570);
+      if (best) {
+        // Record label
+        ctx.fillStyle = 'rgba(163,230,53,0.7)'; ctx.font = 'bold 22px Arial';
+        ctx.fillText('CLUB RECORD', W / 2, 490);
 
-      // Yards label
-      ctx.fillStyle = '#a0a0a0';
-      ctx.font = '36px Arial';
-      ctx.fillText(ul || 'yds', size / 2, 625);
+        // Big distance number
+        ctx.fillStyle = '#a3e635'; ctx.font = 'bold 280px Arial Black, Arial';
+        ctx.fillText(String(best.dist), W / 2, 760);
 
-      // Player name
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 42px Arial';
-      ctx.fillText(best.player, size / 2, 710);
+        // Units
+        ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.font = 'bold 48px Arial';
+        ctx.fillText((ul || 'yds').toUpperCase(), W / 2, 820);
 
-      // Details
-      ctx.fillStyle = '#666666';
-      ctx.font = '26px Arial';
-      ctx.fillText(`${best.club}  |  HCP ${best.hcp}  |  ${fmtDate(best.date)}`, size / 2, 760);
-    }
+        // Verified badge
+        const badgeW = 320, badgeH = 44, badgeX = (W - badgeW) / 2, badgeY = 845;
+        ctx.strokeStyle = 'rgba(163,230,53,0.5)'; ctx.lineWidth = 1; ctx.strokeRect(badgeX, badgeY, badgeW, badgeH);
+        ctx.fillStyle = 'rgba(163,230,53,0.08)'; ctx.fillRect(badgeX, badgeY, badgeW, badgeH);
+        ctx.fillStyle = '#a3e635'; ctx.font = 'bold 18px Arial';
+        ctx.fillText('RECORD HOLDER', W / 2, badgeY + 29);
 
-    // Divider
-    ctx.fillStyle = 'rgba(163,230,53,0.3)';
-    ctx.fillRect(140, 820, size - 280, 1);
+        // Player name
+        ctx.fillStyle = '#ffffff'; ctx.font = 'bold 52px Arial Black, Arial';
+        ctx.fillText(best.player.toUpperCase(), W / 2, 960);
 
-    // Branding
-    ctx.fillStyle = '#a3e635';
-    ctx.font = 'bold 32px Arial Black, Arial';
-    ctx.fillText('RIPPINGBOMBS.COM', size / 2, 890);
+        // Details
+        ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = '26px Arial';
+        ctx.fillText(`${best.club}  |  HCP ${best.hcp}  |  ${fmtDate(best.date)}`, W / 2, 1000);
+      }
 
-    ctx.fillStyle = '#555555';
-    ctx.font = '22px Arial';
-    ctx.fillText('The Global Home of Longest Drives', size / 2, 930);
+      // Bottom divider + URL
+      ctx.strokeStyle = 'rgba(163,230,53,0.3)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(80, 1030); ctx.lineTo(W - 80, 1030); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = '24px Arial';
+      ctx.fillText('rippingbombs.com', W / 2, 1058);
 
-    // Lime accent bar bottom
-    ctx.fillStyle = '#a3e635';
-    ctx.fillRect(0, size - 8, size, 8);
+      resolve(canvas.toDataURL('image/png'));
+    };
 
-    resolve(canvas.toDataURL('image/png'));
+    const loadImg = src => new Promise(res => {
+      if (!src) return res(null);
+      const img = new Image(); img.crossOrigin = 'anonymous';
+      img.onload = () => res(img); img.onerror = () => res(null); img.src = src;
+    });
+
+    Promise.all([
+      loadImg(org.country ? `https://flagcdn.com/80x60/${org.country.toLowerCase()}.png` : null),
+      loadImg(org.logo || null),
+    ]).then(([flagImg, logoImg]) => draw(flagImg, logoImg));
   });
 }
 
@@ -138,67 +166,56 @@ function ShareBar({ org, best, canonicalUrl, ul }) {
   const [copied, setCopied] = useState(false);
   const [generating, setGenerating] = useState(false);
 
-  const recordText = best
-    ? `${best.player} holds the club record at ${best.dist} ${ul || 'yds'}`
-    : 'Check out the leaderboard';
-
-  const shareText = `${org.courseName} Longest Drive Leaderboard - ${recordText}. Powered by Ripping Bombs`;
+  const shareText = `${org.courseName} Longest Drive Leaderboard${best ? ` — Club record: ${best.player} with ${best.dist} ${ul || 'yds'}` : ''}. Powered by Ripping Bombs`;
   const encoded = encodeURIComponent(canonicalUrl);
   const encodedText = encodeURIComponent(shareText);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(canonicalUrl).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 2500);
     });
   };
 
   const handleImage = async () => {
     setGenerating(true);
-    const dataUrl = await generateShareImage(org, best, ul);
+    const dataUrl = await generateClubShareImage(org, best, ul);
     const a = document.createElement('a');
     a.href = dataUrl;
-    a.download = `${org.courseName.toLowerCase().replace(/\s+/g, '-')}-leaderboard.png`;
+    a.download = `rippingbombs-${org.courseName.toLowerCase().replace(/\s+/g, '-')}-leaderboard.png`;
     a.click();
     setGenerating(false);
   };
 
-  const btnStyle = (bg, color, border) => ({
-    display: 'inline-flex', alignItems: 'center', gap: 6,
-    background: bg, color, border: `1px solid ${border || bg}`,
-    fontFamily: SANS, fontWeight: 700, fontSize: 11,
-    padding: '8px 14px', cursor: 'pointer', letterSpacing: 0.4,
-    textDecoration: 'none', whiteSpace: 'nowrap',
-  });
+  const iconBtn = (href, onClick, icon, label) => {
+    const style = {
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+      background: 'transparent', border: `1px solid ${BDR}`,
+      color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 11,
+      padding: '9px 16px', cursor: 'pointer', letterSpacing: 0.4,
+      textDecoration: 'none', whiteSpace: 'nowrap', transition: 'border-color .15s',
+    };
+    return href
+      ? <a href={href} target="_blank" rel="noopener noreferrer" style={style}>{icon}<span>{label}</span></a>
+      : <button onClick={onClick} style={style}>{icon}<span>{label}</span></button>;
+  };
+
+  // SVG icons in ORG green
+  const IconLink   = <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={ORG} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>;
+  const IconWA     = <svg width="14" height="14" viewBox="0 0 24 24" fill={ORG}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>;
+  const IconFB     = <svg width="14" height="14" viewBox="0 0 24 24" fill={ORG}><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>;
+  const IconX      = <svg width="14" height="14" viewBox="0 0 24 24" fill={ORG}><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.631 5.905-5.631zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>;
+  const IconDL     = <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={ORG} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
 
   return (
     <div style={{ margin: '24px 0', padding: '16px 20px', background: BG2, border: `1px solid ${BDR}` }}>
       <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 2, color: DIM, textTransform: 'uppercase', marginBottom: 12 }}>Share This Leaderboard</div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-        <button onClick={handleCopy} style={btnStyle('transparent', copied ? '#4ade80' : ORG, copied ? '#4ade80' : ORG)}>
-          {copied ? 'Copied!' : 'Copy Link'}
-        </button>
-        <a
-          href={`https://wa.me/?text=${encodedText}%20${encoded}`}
-          target="_blank" rel="noopener noreferrer"
-          style={btnStyle('#25D366', '#fff', '#25D366')}>
-          WhatsApp
-        </a>
-        <a
-          href={`https://www.facebook.com/sharer/sharer.php?u=${encoded}`}
-          target="_blank" rel="noopener noreferrer"
-          style={btnStyle('#1877F2', '#fff', '#1877F2')}>
-          Facebook
-        </a>
-        <a
-          href={`https://x.com/intent/tweet?text=${encodedText}&url=${encoded}`}
-          target="_blank" rel="noopener noreferrer"
-          style={btnStyle('#000', '#fff', '#333')}>
-          X / Twitter
-        </a>
-        <button onClick={handleImage} disabled={generating} style={btnStyle(ORG, '#111', ORG)}>
-          {generating ? 'Generating...' : 'Download Image'}
-        </button>
+        {iconBtn(null, handleCopy, IconLink, copied ? 'Copied!' : 'Copy Link')}
+        {iconBtn(`https://wa.me/?text=${encodedText}%20${encoded}`, null, IconWA, 'WhatsApp')}
+        {iconBtn(`https://www.facebook.com/sharer/sharer.php?u=${encoded}`, null, IconFB, 'Facebook')}
+        {iconBtn(`https://x.com/intent/tweet?text=${encodedText}&url=${encoded}`, null, IconX, 'X / Twitter')}
+        {iconBtn(null, handleImage, IconDL, generating ? 'Generating...' : 'Download Image')}
       </div>
     </div>
   );
