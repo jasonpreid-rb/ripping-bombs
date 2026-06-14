@@ -42,24 +42,24 @@ export async function getServerSideProps({ params }) {
     return true;
   });
 
-  return { props: { org, entries } };
+  return { props: { org, clubEntries: entries } };
 }
 
-export default function ClubPage({ org, entries, cvt, unitLbl }) {
+export default function ClubPage({ org, clubEntries, cvt, unitLbl }) {
   const [week, setWeek] = useState(nowWeek());
   const [allTime, setAllTime] = useState(false);
 
-  const sorted = [...entries].sort((a, b) => Number(b.dist) - Number(a.dist));
+  const sorted = [...clubEntries].sort((a, b) => Number(b.dist) - Number(a.dist));
   const best = sorted[0];
   const weekEntries = allTime ? sorted : sorted.filter(e => sameWeek(e.date, week));
-  const totalPlayers = new Set(entries.map(e => e.player)).size;
-  const simCount = entries.filter(e => e.is_simulator).length;
-  const officialCount = entries.filter(e => !e.is_simulator).length;
+  const totalPlayers = new Set(clubEntries.map(e => e.player)).size;
+  const simCount = clubEntries.filter(e => e.is_simulator).length;
+  const officialCount = clubEntries.filter(e => !e.is_simulator).length;
 
   const cv = cvt || (d => d);
   const ul = unitLbl || 'yds';
   const canonicalUrl = `https://www.rippingbombs.com/clubs/${toSlug(org.courseName)}`;
-  const metaDesc = `Longest drive leaderboard for ${org.courseName}, ${org.location}. ${entries.length} drives recorded on Ripping Bombs.`;
+  const metaDesc = `Longest drive leaderboard for ${org.courseName}, ${org.location}. ${clubEntries.length} drives recorded on Ripping Bombs.`;
 
   const schema = {
     '@context': 'https://schema.org',
@@ -108,7 +108,7 @@ export default function ClubPage({ org, entries, cvt, unitLbl }) {
               <span style={{ fontFamily: SANS, fontSize: 12, color: ORG }}>&#10022; Founding Member</span>
             )}
             <span style={{ fontFamily: SANS, fontSize: 11, color: MUT, background: BG3, border: `1px solid ${BDR}`, padding: '2px 9px' }}>
-              {entries.length} drives &middot; {totalPlayers} players
+              {clubEntries.length} drives &middot; {totalPlayers} players
             </span>
             {simCount > 0 && (
               <span style={{ fontFamily: SANS, fontSize: 11, color: DIM, background: BG3, border: `1px solid ${BDR}`, padding: '2px 9px' }}>
