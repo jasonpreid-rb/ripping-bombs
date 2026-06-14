@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../../lib/constants';
 import { fmtDate, tier, nowWeek, weekLabel, prevWeek, nextWeek, sameWeek } from '../../lib/constants';
@@ -43,6 +43,165 @@ export async function getServerSideProps({ params }) {
   });
 
   return { props: { org, clubEntries: entries } };
+}
+
+function generateShareImage(org, best, ul) {
+  return new Promise(resolve => {
+    const size = 1080;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#0e0e0e';
+    ctx.fillRect(0, 0, size, size);
+
+    // Lime accent bar top
+    ctx.fillStyle = '#a3e635';
+    ctx.fillRect(0, 0, size, 8);
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < size; i += 80) {
+      ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, size); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(size, i); ctx.stroke();
+    }
+
+    // Club name
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `bold 62px Arial Black, Arial`;
+    ctx.textAlign = 'center';
+    const name = org.courseName.toUpperCase();
+    ctx.fillText(name.length > 22 ? name.slice(0, 22) + '...' : name, size / 2, 200);
+
+    // Location
+    ctx.fillStyle = '#a0a0a0';
+    ctx.font = '28px Arial';
+    ctx.fillText(`${org.location || ''}${org.country ? '  ' + org.country.toUpperCase() : ''}`, size / 2, 260);
+
+    // Divider
+    ctx.fillStyle = 'rgba(163,230,53,0.3)';
+    ctx.fillRect(140, 300, size - 280, 1);
+
+    if (best) {
+      // Club record label
+      ctx.fillStyle = '#a3e635';
+      ctx.font = 'bold 18px Arial';
+      ctx.letterSpacing = '4px';
+      ctx.fillText('CLUB RECORD', size / 2, 370);
+
+      // Distance
+      ctx.fillStyle = '#a3e635';
+      ctx.font = `bold 180px Arial Black, Arial`;
+      ctx.fillText(best.dist, size / 2, 570);
+
+      // Yards label
+      ctx.fillStyle = '#a0a0a0';
+      ctx.font = '36px Arial';
+      ctx.fillText(ul || 'yds', size / 2, 625);
+
+      // Player name
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 42px Arial';
+      ctx.fillText(best.player, size / 2, 710);
+
+      // Details
+      ctx.fillStyle = '#666666';
+      ctx.font = '26px Arial';
+      ctx.fillText(`${best.club}  |  HCP ${best.hcp}  |  ${fmtDate(best.date)}`, size / 2, 760);
+    }
+
+    // Divider
+    ctx.fillStyle = 'rgba(163,230,53,0.3)';
+    ctx.fillRect(140, 820, size - 280, 1);
+
+    // Branding
+    ctx.fillStyle = '#a3e635';
+    ctx.font = 'bold 32px Arial Black, Arial';
+    ctx.fillText('RIPPINGBOMBS.COM', size / 2, 890);
+
+    ctx.fillStyle = '#555555';
+    ctx.font = '22px Arial';
+    ctx.fillText('The Global Home of Longest Drives', size / 2, 930);
+
+    // Lime accent bar bottom
+    ctx.fillStyle = '#a3e635';
+    ctx.fillRect(0, size - 8, size, 8);
+
+    resolve(canvas.toDataURL('image/png'));
+  });
+}
+
+function ShareBar({ org, best, canonicalUrl, ul }) {
+  const [copied, setCopied] = useState(false);
+  const [generating, setGenerating] = useState(false);
+
+  const recordText = best
+    ? `${best.player} holds the club record at ${best.dist} ${ul || 'yds'}`
+    : 'Check out the leaderboard';
+
+  const shareText = `${org.courseName} Longest Drive Leaderboard - ${recordText}. Powered by Ripping Bombs`;
+  const encoded = encodeURIComponent(canonicalUrl);
+  const encodedText = encodeURIComponent(shareText);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(canonicalUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const handleImage = async () => {
+    setGenerating(true);
+    const dataUrl = await generateShareImage(org, best, ul);
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = `${org.courseName.toLowerCase().replace(/\s+/g, '-')}-leaderboard.png`;
+    a.click();
+    setGenerating(false);
+  };
+
+  const btnStyle = (bg, color, border) => ({
+    display: 'inline-flex', alignItems: 'center', gap: 6,
+    background: bg, color, border: `1px solid ${border || bg}`,
+    fontFamily: SANS, fontWeight: 700, fontSize: 11,
+    padding: '8px 14px', cursor: 'pointer', letterSpacing: 0.4,
+    textDecoration: 'none', whiteSpace: 'nowrap',
+  });
+
+  return (
+    <div style={{ margin: '24px 0', padding: '16px 20px', background: BG2, border: `1px solid ${BDR}` }}>
+      <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 2, color: DIM, textTransform: 'uppercase', marginBottom: 12 }}>Share This Leaderboard</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <button onClick={handleCopy} style={btnStyle('transparent', copied ? '#4ade80' : ORG, copied ? '#4ade80' : ORG)}>
+          {copied ? 'Copied!' : 'Copy Link'}
+        </button>
+        <a
+          href={`https://wa.me/?text=${encodedText}%20${encoded}`}
+          target="_blank" rel="noopener noreferrer"
+          style={btnStyle('#25D366', '#fff', '#25D366')}>
+          WhatsApp
+        </a>
+        <a
+          href={`https://www.facebook.com/sharer/sharer.php?u=${encoded}`}
+          target="_blank" rel="noopener noreferrer"
+          style={btnStyle('#1877F2', '#fff', '#1877F2')}>
+          Facebook
+        </a>
+        <a
+          href={`https://x.com/intent/tweet?text=${encodedText}&url=${encoded}`}
+          target="_blank" rel="noopener noreferrer"
+          style={btnStyle('#000', '#fff', '#333')}>
+          X / Twitter
+        </a>
+        <button onClick={handleImage} disabled={generating} style={btnStyle(ORG, '#111', ORG)}>
+          {generating ? 'Generating...' : 'Download Image'}
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export default function ClubPage({ org, clubEntries, cvt, unitLbl }) {
@@ -134,6 +293,8 @@ export default function ClubPage({ org, clubEntries, cvt, unitLbl }) {
             </div>
           </div>
         )}
+
+        <ShareBar org={org} best={best} canonicalUrl={canonicalUrl} ul={ul} />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
           <button onClick={() => setAllTime(v => !v)}
