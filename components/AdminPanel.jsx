@@ -215,6 +215,313 @@ function FoundingTab({ toast }) {
   );
 }
 
+// ── Mini bar chart (pure CSS/SVG) ────────────────────────────────────────────
+function MiniBarChart({ data, color = '#a3e635', height = 80 }) {
+  if (!data || data.length === 0) return null;
+  const max = Math.max(...data.map(d => d.value), 1);
+  return (
+    <div style={{ display:'flex', alignItems:'flex-end', gap:3, height, paddingTop:4 }}>
+      {data.map((d, i) => (
+        <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:2 }}>
+          <div style={{ width:'100%', background:`${color}22`, position:'relative', height: height - 20, display:'flex', alignItems:'flex-end' }}>
+            <div style={{
+              width:'100%',
+              height:`${Math.max((d.value / max) * 100, d.value > 0 ? 4 : 0)}%`,
+              background: d.highlight ? color : `${color}88`,
+              transition:'height .3s ease',
+            }}/>
+          </div>
+          <div style={{ fontFamily:SANS, fontSize:8, color:DIM, textAlign:'center', letterSpacing:.3, whiteSpace:'nowrap', overflow:'hidden', maxWidth:'100%' }}>{d.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Launch readiness score ────────────────────────────────────────────────────
+function LaunchScore({ orgs, entries }) {
+  const approved   = orgs.filter(o => o.status === 'approved');
+  const clubs      = approved.filter(o => o.accountType === 'club');
+  const sims       = approved.filter(o => o.accountType === 'simulator');
+  const withDrives = approved.filter(o => entries.some(e => e.orgId === o.id));
+  const countries  = new Set(approved.map(o => o.country).filter(Boolean)).size;
+
+  const checks = [
+    { label: '10+ approved accounts',       done: approved.length >= 10,  weight: 15 },
+    { label: '25+ approved accounts',       done: approved.length >= 25,  weight: 10 },
+    { label: '5+ club accounts',            done: clubs.length >= 5,      weight: 15 },
+    { label: '50+ total drives',            done: entries.length >= 50,   weight: 15 },
+    { label: '200+ total drives',           done: entries.length >= 200,  weight: 10 },
+    { label: '10+ accounts submitting',     done: withDrives.length >= 10,weight: 15 },
+    { label: '5+ countries represented',   done: countries >= 5,          weight: 10 },
+    { label: '10+ countries represented',  done: countries >= 10,         weight: 10 },
+  ];
+
+  const score = checks.reduce((s, c) => s + (c.done ? c.weight : 0), 0);
+  const color = score >= 80 ? '#4ade80' : score >= 50 ? ORG : '#fb923c';
+
+  return (
+    <div style={{ background:BG2, border:`1px solid ${BDR}`, padding:'20px 22px' }}>
+      <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:2, color:DIM, textTransform:'uppercase', marginBottom:12 }}>Launch Readiness</div>
+      <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:16 }}>
+        <div style={{ fontFamily:DISP, fontSize:52, color, letterSpacing:1, lineHeight:1 }}>{score}<span style={{ fontFamily:SANS, fontSize:18, color:MUT }}>%</span></div>
+        <div style={{ flex:1 }}>
+          <div style={{ height:6, background:BDR, borderRadius:99, overflow:'hidden', marginBottom:6 }}>
+            <div style={{ height:'100%', width:`${score}%`, background:color, borderRadius:99, transition:'width .5s ease' }}/>
+          </div>
+          <div style={{ fontFamily:SANS, fontSize:11, color:MUT }}>
+            {score >= 80 ? 'Ready to launch!' : score >= 50 ? 'Getting there — keep building' : 'Early stage — focus on registrations'}
+          </div>
+        </div>
+      </div>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6 }}>
+        {checks.map(c => (
+          <div key={c.label} style={{ display:'flex', alignItems:'center', gap:6 }}>
+            <span style={{ color: c.done ? '#4ade80' : BDR, fontSize:12, flexShrink:0 }}>{c.done ? '✓' : '○'}</span>
+            <span style={{ fontFamily:SANS, fontSize:11, color: c.done ? MUT : DIM }}>{c.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Overview tab ──────────────────────────────────────────────────────────────
+function OverviewTab({ orgs, entries, pending, approved, noSubmissions, setStatus, sendApprovalEmail, sendRegistrationNotification, toast, cvt, unitLbl }) {
+  // ── derived stats ──
+  const clubs      = orgs.filter(o => o.accountType === 'club');
+  const sims       = orgs.filter(o => o.accountType === 'simulator');
+  const approvedClubs = approved.filter(o => o.accountType === 'club');
+  const approvedSims  = approved.filter(o => o.accountType === 'simulator');
+  const officialDrives   = entries.filter(e => !e.is_simulator);
+  const simDrives        = entries.filter(e => e.is_simulator);
+  const avgDist = entries.length ? Math.round(entries.reduce((s,e) => s + Number(e.dist), 0) / entries.length) : 0;
+  const bestDrive = entries.length ? entries.reduce((b,e) => Number(e.dist) > Number(b.dist) ? e : b, entries[0]) : null;
+
+  // ── country breakdown ──
+  const countryMap = {};
+  approved.forEach(o => { if (o.country) countryMap[o.country] = (countryMap[o.country]||0) + 1; });
+  const topCountries = Object.entries(countryMap).sort((a,b) => b[1]-a[1]).slice(0, 8);
+  const totalCountries = Object.keys(countryMap).length;
+
+  // ── weekly drives chart (last 12 weeks) ──
+  function getISOWeek(dateStr) {
+    const d = new Date(dateStr);
+    const day = d.getDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - day);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return `${d.getUTCFullYear()}-W${String(Math.ceil((((d - yearStart) / 86400000) + 1) / 7)).padStart(2,'0')}`;
+  }
+
+  const weekMap = {};
+  entries.forEach(e => {
+    const w = getISOWeek(e.date);
+    weekMap[w] = (weekMap[w]||0) + 1;
+  });
+  const sortedWeeks = Object.keys(weekMap).sort().slice(-12);
+  const currentWeek = getISOWeek(new Date().toISOString().split('T')[0]);
+  const weekChartData = sortedWeeks.map(w => ({
+    label: w.split('-W')[1] ? `W${w.split('-W')[1]}` : w,
+    value: weekMap[w] || 0,
+    highlight: w === currentWeek,
+  }));
+
+  // ── weekly active submitters ──
+  const activeThisWeek = new Set(
+    entries.filter(e => getISOWeek(e.date) === currentWeek).map(e => e.orgId)
+  ).size;
+  const lastWeekStr = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    return getISOWeek(d.toISOString().split('T')[0]);
+  })();
+  const activeLastWeek = new Set(
+    entries.filter(e => getISOWeek(e.date) === lastWeekStr).map(e => e.orgId)
+  ).size;
+
+  // ── registrations per week chart ──
+  const regWeekMap = {};
+  orgs.forEach(o => {
+    if (!o.id) return;
+    // Use id as timestamp proxy (numeric ids)
+    const ts = Number(o.id);
+    if (!isNaN(ts) && ts > 1000000000000) {
+      const d = new Date(ts).toISOString().split('T')[0];
+      const w = getISOWeek(d);
+      regWeekMap[w] = (regWeekMap[w]||0) + 1;
+    }
+  });
+  const regWeeks = Object.keys(regWeekMap).sort().slice(-12);
+  const regChartData = regWeeks.map(w => ({
+    label: `W${w.split('-W')[1]||w}`,
+    value: regWeekMap[w]||0,
+    highlight: w === currentWeek,
+  }));
+
+  // ── top players ──
+  const playerBest = {};
+  entries.forEach(e => {
+    if (!playerBest[e.player] || Number(e.dist) > Number(playerBest[e.player].dist)) {
+      playerBest[e.player] = e;
+    }
+  });
+  const topPlayers = Object.values(playerBest).sort((a,b) => Number(b.dist)-Number(a.dist)).slice(0,5);
+
+  const SectionTitle = ({ children, color }) => (
+    <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:2, color:color||DIM, textTransform:'uppercase', marginBottom:12 }}>{children}</div>
+  );
+
+  const BigStat = ({ val, label, sub, accent, warn }) => (
+    <div style={{ background:BG2, border:`1px solid ${warn?'rgba(248,113,113,0.3)':BDR}`, padding:'18px 20px' }}>
+      <div style={{ fontFamily:DISP, fontSize:38, color:accent||(warn?'#f87171':ORG), letterSpacing:1, lineHeight:1 }}>{val}</div>
+      <div style={{ fontFamily:SANS, fontSize:10, color:MUT, marginTop:5, letterSpacing:.8, textTransform:'uppercase' }}>{label}</div>
+      {sub && <div style={{ fontFamily:SANS, fontSize:11, color:DIM, marginTop:3 }}>{sub}</div>}
+    </div>
+  );
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:28 }}>
+
+      {/* ── Pending alert ── */}
+      {pending.length > 0 && (
+        <div style={{ background:'rgba(248,113,113,0.06)', border:'1px solid rgba(248,113,113,0.3)', padding:'16px 20px' }}>
+          <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:2, color:'#f87171', textTransform:'uppercase', marginBottom:10 }}>⚠ {pending.length} Pending Approval{pending.length>1?'s':''}</div>
+          {pending.map(org => (
+            <div key={org.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:10, padding:'8px 0', borderBottom:`1px solid rgba(248,113,113,0.1)` }}>
+              <div>
+                <div style={{ fontFamily:SANS, fontWeight:700, fontSize:13, color:TXT }}>{org.courseName} {org.country&&countryFlag(org.country)}</div>
+                <div style={{ fontFamily:SANS, fontSize:11, color:MUT }}>{org.fullName} · {org.email}</div>
+              </div>
+              <div style={{ display:'flex', gap:8 }}>
+                <Btn variant="approve" small onClick={async()=>{ await setStatus(org.id,'approved'); await sendRegistrationNotification(org); const ok=await sendApprovalEmail(org); toast(ok?'Approved & notified':'Approved (email failed)'); }}>✓ Approve</Btn>
+                <Btn variant="danger" small onClick={async()=>{ await setStatus(org.id,'rejected'); toast('Rejected'); }}>✕ Reject</Btn>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Key metrics ── */}
+      <div>
+        <SectionTitle>Platform at a Glance</SectionTitle>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:10 }}>
+          <BigStat val={approved.length}       label="Approved Accounts"   sub={`${approvedClubs.length} clubs · ${approvedSims.length} sims`} />
+          <BigStat val={pending.length}        label="Pending Approval"    warn={pending.length>0} />
+          <BigStat val={entries.length}        label="Total Drives"        sub={`${officialDrives.length} official · ${simDrives.length} sim`} />
+          <BigStat val={activeThisWeek}        label="Active This Week"    sub={`${activeLastWeek} last week`} />
+          <BigStat val={totalCountries}        label="Countries"           sub="represented" />
+          <BigStat val={avgDist ? `${avgDist}` : '—'} label="Avg Drive"   sub={avgDist ? unitLbl : ''} />
+        </div>
+      </div>
+
+      {/* ── Charts row ── */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+        <div style={{ background:BG2, border:`1px solid ${BDR}`, padding:'18px 20px' }}>
+          <SectionTitle>Drives Per Week</SectionTitle>
+          {weekChartData.length > 0
+            ? <MiniBarChart data={weekChartData} color={ORG} height={100} />
+            : <div style={{ fontFamily:SANS, fontSize:12, color:DIM, padding:'20px 0' }}>No drive data yet</div>
+          }
+        </div>
+        <div style={{ background:BG2, border:`1px solid ${BDR}`, padding:'18px 20px' }}>
+          <SectionTitle>Registrations Per Week</SectionTitle>
+          {regChartData.length > 0
+            ? <MiniBarChart data={regChartData} color="#60a5fa" height={100} />
+            : <div style={{ fontFamily:SANS, fontSize:12, color:DIM, padding:'20px 0' }}>No registration data yet</div>
+          }
+        </div>
+      </div>
+
+      {/* ── Launch readiness + Country breakdown ── */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+        <LaunchScore orgs={orgs} entries={entries} />
+
+        <div style={{ background:BG2, border:`1px solid ${BDR}`, padding:'20px 22px' }}>
+          <SectionTitle>Top Countries</SectionTitle>
+          {topCountries.length === 0
+            ? <div style={{ fontFamily:SANS, fontSize:12, color:DIM }}>No data yet</div>
+            : topCountries.map(([code, count]) => {
+                const pct = Math.round((count / approved.length) * 100);
+                return (
+                  <div key={code} style={{ marginBottom:8 }}>
+                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:3 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                        {countryFlag(code)}
+                        <span style={{ fontFamily:SANS, fontSize:12, color:TXT, textTransform:'uppercase', letterSpacing:.5 }}>{code}</span>
+                      </div>
+                      <span style={{ fontFamily:SANS, fontSize:11, color:MUT }}>{count} account{count>1?'s':''}</span>
+                    </div>
+                    <div style={{ height:3, background:BDR, borderRadius:99, overflow:'hidden' }}>
+                      <div style={{ height:'100%', width:`${pct}%`, background:ORG, borderRadius:99 }}/>
+                    </div>
+                  </div>
+                );
+              })
+          }
+        </div>
+      </div>
+
+      {/* ── Top players + No submissions ── */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+        <div style={{ background:BG2, border:`1px solid ${BDR}`, padding:'20px 22px' }}>
+          <SectionTitle>Top 5 Drives</SectionTitle>
+          {topPlayers.length === 0
+            ? <div style={{ fontFamily:SANS, fontSize:12, color:DIM }}>No drives yet</div>
+            : topPlayers.map((e, i) => {
+                const org = orgs.find(o => o.id === e.orgId);
+                return (
+                  <div key={e.id} style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 0', borderBottom:`1px solid ${BDR}` }}>
+                    <div style={{ fontFamily:DISP, fontSize:18, color:i===0?ORG:DIM, width:24, flexShrink:0 }}>{i+1}</div>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ fontFamily:SANS, fontWeight:700, fontSize:12, color:TXT, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{e.player}</div>
+                      <div style={{ fontFamily:SANS, fontSize:10, color:DIM }}>{org?.courseName||'—'} · {fmtDate(e.date)}</div>
+                    </div>
+                    <div style={{ fontFamily:DISP, fontSize:20, color:i===0?ORG:MUT, flexShrink:0 }}>{cvt(e.dist)}<span style={{ fontFamily:SANS, fontSize:9, color:DIM, marginLeft:2 }}>{unitLbl}</span></div>
+                  </div>
+                );
+              })
+          }
+        </div>
+
+        <div style={{ background:BG2, border:`1px solid ${BDR}`, padding:'20px 22px' }}>
+          <SectionTitle color="#fb923c">No Drives Submitted Yet ({noSubmissions.length})</SectionTitle>
+          {noSubmissions.length === 0
+            ? <div style={{ fontFamily:SANS, fontSize:12, color:'#4ade80' }}>✓ All approved accounts have submitted</div>
+            : <div style={{ display:'flex', flexDirection:'column', gap:6, maxHeight:220, overflowY:'auto' }}>
+                {noSubmissions.map(org => (
+                  <div key={org.id} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 0', borderBottom:`1px solid ${BDR}` }}>
+                    {org.country && countryFlag(org.country)}
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ fontFamily:SANS, fontSize:12, color:TXT, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{org.courseName}</div>
+                      <div style={{ fontFamily:SANS, fontSize:10, color:DIM }}>{org.email}</div>
+                    </div>
+                    <span style={{ fontFamily:SANS, fontSize:9, color:DIM, border:`1px solid ${BDR}`, padding:'1px 5px', flexShrink:0 }}>{org.accountType==='simulator'?'SIM':'CLUB'}</span>
+                  </div>
+                ))}
+              </div>
+          }
+        </div>
+      </div>
+
+      {/* ── Best drive callout ── */}
+      {bestDrive && (
+        <div style={{ background:'linear-gradient(135deg,rgba(163,230,53,0.08),rgba(163,230,53,0.02))', border:`1px solid rgba(163,230,53,0.25)`, padding:'20px 24px', display:'flex', alignItems:'center', gap:20, flexWrap:'wrap' }}>
+          <div>
+            <div style={{ fontFamily:SANS, fontSize:9, fontWeight:700, letterSpacing:2, color:ORG, textTransform:'uppercase', marginBottom:4 }}>All-Time Record Drive</div>
+            <div style={{ fontFamily:DISP, fontSize:48, color:ORG, letterSpacing:1, lineHeight:1 }}>{cvt(bestDrive.dist)} <span style={{ fontFamily:SANS, fontSize:16, color:MUT }}>{unitLbl}</span></div>
+          </div>
+          <div>
+            <div style={{ fontFamily:SANS, fontWeight:700, fontSize:15, color:TXT }}>{bestDrive.player}</div>
+            <div style={{ fontFamily:SANS, fontSize:12, color:MUT }}>{fmtDate(bestDrive.date)}</div>
+            <div style={{ fontFamily:SANS, fontSize:12, color:DIM }}>{bestDrive.club}</div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
 // ── main component ───────────────────────────────────────────────────────────
 export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, onClose, cvt, unitLbl }) {
   const [tab, setTab]       = useState('Overview');
@@ -309,53 +616,7 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
 
         {/* ── OVERVIEW ── */}
         {tab==='Overview'&&(
-          <div>
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', gap:12, marginBottom:24 }}>
-              <Stat val={orgs.length} label="Registered"/>
-              <Stat val={approved.length} label="Approved"/>
-              <Stat val={pending.length} label="Pending" accent={pending.length>0?'#f87171':ORG}/>
-              <Stat val={disabled.length} label="Disabled" accent={MUT}/>
-              <Stat val={entries.length} label="Total Drives"/>
-              <Stat val={noSubmissions.length} label="No Submissions Yet" accent={noSubmissions.length>0?'#fb923c':ORG}/>
-            </div>
-
-            {pending.length>0&&(
-              <div style={{ marginBottom:24 }}>
-                <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:2, color:'#f87171', textTransform:'uppercase', marginBottom:10 }}>⚠ Awaiting Approval</div>
-                {pending.map(org=>(
-                  <div key={org.id} style={{ background:'rgba(248,113,113,0.06)', border:'1px solid rgba(248,113,113,0.2)', padding:'14px 18px', marginBottom:8, display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:12 }}>
-                    <div>
-                      <div style={{ fontFamily:SANS, fontWeight:700, fontSize:14, color:TXT }}>{org.courseName}{org.country&&countryFlag(org.country)}</div>
-                      <div style={{ fontFamily:SANS, fontSize:12, color:MUT, marginTop:2 }}>{org.fullName} · {org.email} · {org.location}</div>
-                    </div>
-                    <div style={{ display:'flex', gap:8 }}>
-                      <Btn variant="approve" small onClick={async()=>{ await setStatus(org.id,'approved'); await sendRegistrationNotification(org); const ok=await sendApprovalEmail(org); toast(ok?'Approved & notified':'Approved (email failed)'); }}>✓ Approve</Btn>
-                      <Btn variant="danger" small onClick={async()=>{ await setStatus(org.id,'rejected'); toast('Rejected'); }}>✕ Reject</Btn>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {noSubmissions.length>0&&(
-              <div>
-                <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:2, color:'#fb923c', textTransform:'uppercase', marginBottom:10 }}>📭 Approved — No Drives Submitted Yet</div>
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(240px,1fr))', gap:8 }}>
-                  {noSubmissions.map(org=>(
-                    <div key={org.id} style={{ background:BG2, border:`1px solid ${BDR}`, padding:'12px 14px' }}>
-                      <div style={{ fontFamily:SANS, fontWeight:700, fontSize:13, color:TXT }}>{org.courseName}{org.country&&countryFlag(org.country)}</div>
-                      <div style={{ fontFamily:SANS, fontSize:11, color:MUT, marginTop:2 }}>{org.location}</div>
-                      <div style={{ fontFamily:SANS, fontSize:11, color:DIM, marginTop:2 }}>{org.email}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {pending.length===0&&noSubmissions.length===0&&(
-              <div style={{ fontFamily:SANS, fontSize:13, color:DIM, textAlign:'center', padding:'40px 0' }}>✓ All caught up — no pending approvals or missing submissions.</div>
-            )}
-          </div>
+          <OverviewTab orgs={orgs} entries={entries} pending={pending} approved={approved} noSubmissions={noSubmissions} setStatus={setStatus} sendApprovalEmail={sendApprovalEmail} sendRegistrationNotification={sendRegistrationNotification} toast={toast} cvt={cvt} unitLbl={unitLbl} />
         )}
 
         {/* ── APPROVALS ── */}
