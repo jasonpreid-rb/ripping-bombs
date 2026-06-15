@@ -1,7 +1,7 @@
 import '../styles/globals.css';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Script from 'next/script';
+import { Analytics } from '@vercel/analytics/react';
 import Layout from '../components/Layout';
 import AdminPanel from '../components/AdminPanel';
 import LaunchModal from '../components/LaunchModal';
@@ -27,32 +27,9 @@ export default function App({ Component, pageProps }) {
   const [detEnt, setDetEnt] = useState(null);
 
   // Form state
-  const [reg, setReg] = useState({
-    type: 'club',
-    fullName: '',
-    position: '',
-    courseName: '',
-    location: '',
-    country: '',
-    email: '',
-    pw: '',
-    logo: '',
-    simulator: '',
-    gender: 'male',
-  });
+  const [reg, setReg] = useState({ type:'club', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
   const [lgn, setLgn] = useState({ email:'', pw:'' });
-  const [form, setForm] = useState({
-    player: '',
-    dist: '',
-    club: '',
-    hcp: '',
-    age: '',
-    photo: '',
-    date: todayStr(),
-    tournament: '',
-    gender: 'male',
-    venueId: null,
-  });
+  const [form, setForm] = useState({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male' });
 
   // Leaderboard filter state
   const [week, setWeek] = useState(null);
@@ -63,7 +40,6 @@ export default function App({ Component, pageProps }) {
   const [fClub, setFClub] = useState('');
   const [fPlayer, setFPlayer] = useState('');
   const [fGender, setFGender] = useState('');
-  const [fSimulator, setFSimulator] = useState('');
   const [sortBy, setSortBy] = useState('dist');
 
   useEffect(() => {
@@ -92,6 +68,7 @@ export default function App({ Component, pageProps }) {
 
     // Validation
     if (!reg.fullName || !reg.email || !reg.pw) { toast('Fill all required fields'); return; }
+    if (isSimulator && !reg.simulator) { toast('Please select your simulator brand'); return; }
     if (!isSimulator && (!reg.position || !reg.courseName || !reg.location || !reg.country)) { toast('Fill all required fields'); return; }
     if (orgs.find(o => o.email === reg.email)) { toast('Email already registered'); return; }
 
@@ -99,7 +76,7 @@ export default function App({ Component, pageProps }) {
       id: Date.now().toString(),
       fullName: reg.fullName,
       position: isSimulator ? 'Individual / Simulator' : reg.position,
-      courseName: isSimulator ? `${reg.simulator ? reg.simulator + ' — ' : ''}${reg.fullName}` : reg.courseName,
+      courseName: isSimulator ? `${reg.simulator} — ${reg.fullName}` : reg.courseName,
       location: reg.location || '',
       country: reg.country || '',
       email: reg.email,
@@ -109,7 +86,6 @@ export default function App({ Component, pageProps }) {
       badge: isSimulator ? 'simulator' : null,
       accountType: reg.type,
       simulator: reg.simulator || '',
-      gender: reg.gender || 'male',
     };
 
     const ok = await db.insertOrg(newOrg);
@@ -117,7 +93,7 @@ export default function App({ Component, pageProps }) {
 
     setOrgs(prev => [...prev, newOrg]);
     await sendRegistrationNotification(newOrg);
-    setReg({ type:'club', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'', gender:'male' });
+    setReg({ type:'club', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
 
     if (isSimulator) {
       setLoggedOrg(newOrg);
@@ -130,10 +106,10 @@ export default function App({ Component, pageProps }) {
   }
 
   async function doLogin() {
-    // Search loaded orgs state first
+    // Search loaded orgs state first (already fetched from Supabase)
     let org = orgs.find(o => o.email === lgn.email && o.pw === lgn.pw);
 
-    // If not found in state, query Supabase directly
+    // If not found in state, query Supabase directly (handles edge case of stale state)
     if (!org) {
       try {
         const { supabase } = await import('../lib/supabaseClient');
@@ -159,48 +135,33 @@ export default function App({ Component, pageProps }) {
 
   async function doSubmit() {
     if (!loggedOrg) { toast('Not logged in'); return; }
-    if (!form.dist || !form.club || !form.hcp || !form.age) { toast('Fill all required fields'); return; }
+    if (!form.player || !form.dist || !form.club || !form.hcp || !form.age) { toast('Fill all required fields'); return; }
     if (!form.photo) { toast('Photo evidence required'); return; }
-
-    const isSimulator = loggedOrg.accountType === 'simulator';
-
-    // For club accounts, player name is required
-    if (!isSimulator && !form.player) { toast('Fill all required fields'); return; }
 
     const e = {
       id: Date.now().toString(),
       orgId: loggedOrg.id,
-      player: isSimulator ? loggedOrg.fullName : form.player,
+      player: form.player,
       dist: Number(form.dist),
       club: form.club,
       hcp: Number(form.hcp),
       age: Number(form.age),
       photo: form.photo,
       date: form.date,
-      tournament: isSimulator ? 'Simulator' : form.tournament,
-      gender: isSimulator ? (loggedOrg.gender || 'male') : form.gender,
-      is_simulator: isSimulator,
-      venueId: form.venueId || null,
+      tournament: form.tournament,
+      gender: form.gender,
     };
 
     const ok = await db.insertEntry(e);
     if (!ok) { toast('Submission failed — please try again'); return; }
 
     setEntries(prev => [...prev, e]);
-
-    // Send submission confirmation email to the club/simulator account
-    fetch('/api/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'submission', org: loggedOrg, entry: e }),
-    }).catch(() => {}); // fire and forget — don't block the UI
-
-    setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male', venueId: null });
+    setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male' });
     toast('Drive submitted to the World Registry!');
   }
 
   const sharedProps = {
-    orgs, setOrgs, entries, setEntries, loading, unit, setUnit, cvt, unitLbl,
+    orgs, setOrgs, entries, setEntries, unit, setUnit, cvt, unitLbl,
     approvedOrgs, orgFor, pendingCount, loggedOrg, setLoggedOrg,
     toast, shareEnt, setShareEnt, detEnt, setDetEnt,
     reg, setReg, lgn, setLgn, form, setForm,
@@ -208,32 +169,23 @@ export default function App({ Component, pageProps }) {
     week, setWeek, allTime, setAllTime,
     fCountry, setFCountry, fHcp, setFHcp, fAge, setFAge,
     fClub, setFClub, fPlayer, setFPlayer, fGender, setFGender,
-    fSimulator, setFSimulator,
     sortBy, setSortBy,
   };
+
+  if (loading) return (
+    <div style={{ minHeight:'100vh', background:'#1a1a1a', display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <div style={{ fontFamily:SANS, color:MUT, fontSize:13, letterSpacing:2 }}>LOADING...</div>
+    </div>
+  );
 
   if (showAdmin) return (
     <AdminPanel orgs={orgs} entries={entries} setOrgs={setOrgs} setEntries={setEntries}
       toast={toast} cvt={cvt} unitLbl={unitLbl}
-      onClose={() => setShowAdmin(false)}/>
+      onClose={() => { setShowAdmin(false); localStorage.removeItem('rb_admin_auth'); }}/>
   );
 
   return (
     <>
-      {/* Google Analytics */}
-      <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-5RCJDKVBER"
-        strategy="afterInteractive"
-      />
-      <Script id="ga4-init" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-5RCJDKVBER');
-        `}
-      </Script>
-
       <Layout loggedOrg={loggedOrg} onLogout={()=>setLoggedOrg(null)} unit={unit} setUnit={setUnit}
         onAdminClick={()=>setAdminPw({show:true,val:''})} pendingCount={pendingCount} onShowDemo={()=>setShowDemo(true)}>
         <Component {...pageProps} {...sharedProps}/>
@@ -269,6 +221,8 @@ export default function App({ Component, pageProps }) {
           <span style={{marginLeft:12,cursor:'pointer',opacity:.6}} onClick={()=>setToastMsg(null)}>✕</span>
         </div>
       )}
+
+      <Analytics />
     </>
   );
 }
