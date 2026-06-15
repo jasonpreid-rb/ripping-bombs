@@ -1,6 +1,7 @@
 import '../styles/globals.css';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { Analytics } from '@vercel/analytics/react';
 import Layout from '../components/Layout';
 import AdminPanel from '../components/AdminPanel';
 import LaunchModal from '../components/LaunchModal';
@@ -220,6 +221,8 @@ export default function App({ Component, pageProps }) {
           <span style={{marginLeft:12,cursor:'pointer',opacity:.6}} onClick={()=>setToastMsg(null)}>✕</span>
         </div>
       )}
+
+      <Analytics />
     </>
   );
 }
