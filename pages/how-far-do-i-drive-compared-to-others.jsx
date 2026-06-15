@@ -66,6 +66,17 @@ export default function PercentileCalculator() {
     const pct = Math.max(1, Math.min(99, percentileFromZ(z)));
 
     setResult({ pct, avg, ag, hb });
+
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'percentile_calculated', {
+        event_category: 'engagement',
+        distance: d,
+        handicap: h,
+        age_group: ag,
+        gender,
+        percentile: pct,
+      });
+    }
   }
 
   function reset() {
@@ -137,7 +148,15 @@ export default function PercentileCalculator() {
           Register your club or simulator for free and start submitting verified drives to the global
           Ripping Bombs leaderboard — see how you stack up against players around the world.
         </div>
-        <button onClick={()=>router.push('/register')} style={{ background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:13, padding:'12px 28px', cursor:'pointer', letterSpacing:.5 }}>
+        <button onClick={()=>{
+          if (typeof window !== 'undefined' && window.gtag) {
+            window.gtag('event', 'calculator_register_cta_click', {
+              event_category: 'engagement',
+              page: '/how-far-do-i-drive-compared-to-others',
+            });
+          }
+          router.push('/register');
+        }} style={{ background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:13, padding:'12px 28px', cursor:'pointer', letterSpacing:.5 }}>
           REGISTER FREE →
         </button>
       </div>
