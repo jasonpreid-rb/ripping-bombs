@@ -79,7 +79,7 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:11,color:DIM}}>{fmtDate(e.date)}</td>
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:10,fontWeight:600,color:ORG}}>{tier(e.dist)}</td>
                 <td style={{padding:'12px 14px'}}>
-                  <button onClick={ev=>{ev.stopPropagation();onShare(e);}} style={{background:`linear-gradient(135deg,${ORG},#bef264)`,border:'none',color:'#111',padding:'6px 12px',cursor:'pointer',fontSize:11,fontFamily:SANS,fontWeight:700,letterSpacing:.5}}>↗ SHARE</button>
+                  <button onClick={ev=>{ev.stopPropagation();onShare(e);}} style={{background:`linear-gradient(135deg,#FF0090,#ff66c4)`,border:'none',color:'#fff',padding:'6px 12px',cursor:'pointer',fontSize:11,fontFamily:SANS,fontWeight:700,letterSpacing:.5}}>↗ SHARE</button>
                 </td>
               </tr>
             );
@@ -208,7 +208,7 @@ export default function LeaderboardPage(props) {
                 <div style={{fontFamily:DISP,fontSize:56,color:ORG,letterSpacing:1,lineHeight:1}}>{cvt(best.dist)}</div>
                 <div style={{fontFamily:SANS,fontSize:14,color:MUT,marginTop:2}}>{unitLbl}</div>
               </div>
-              <button onClick={e=>{e.stopPropagation();setShareEnt&&setShareEnt(best);}} style={{background:`linear-gradient(135deg,${ORG},#bef264)`,border:'none',color:'#111',padding:'8px 16px',cursor:'pointer',fontSize:11,fontFamily:SANS,fontWeight:700,letterSpacing:.5}}>↗ SHARE</button>
+              <button onClick={e=>{e.stopPropagation();setShareEnt&&setShareEnt(best);}} style={{background:`linear-gradient(135deg,#FF0090,#ff66c4)`,border:'none',color:'#fff',padding:'8px 16px',cursor:'pointer',fontSize:11,fontFamily:SANS,fontWeight:700,letterSpacing:.5}}>↗ SHARE</button>
             </div>
           </div>
         );})()}
