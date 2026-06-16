@@ -46,7 +46,7 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
             return (
               <tr key={e.id} onClick={()=>onView(e)} style={{cursor:'pointer',borderBottom:`1px solid ${BDR}`}}
                 onMouseEnter={el=>{
-                  el.currentTarget.style.background='rgba(163,230,53,0.04)';
+                  el.currentTarget.style.background='rgba(255,0,144,0.04)';
                   [...el.currentTarget.querySelectorAll('td[data-sticky]')].forEach(td=>td.style.background='#1c201a');
                 }}
                 onMouseLeave={el=>{
@@ -61,7 +61,7 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
                     <Link
                       href={`/profile/${nameToSlug(org.fullName)}`}
                       onClick={ev=>ev.stopPropagation()}
-                      style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:ORG,textDecoration:'none',borderBottom:`1px solid rgba(163,230,53,0.3)`}}>
+                      style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:ORG,textDecoration:'none',borderBottom:`1px solid rgba(255,0,144,0.3)`}}>
                       {e.player}
                     </Link>
                   ) : (
@@ -138,7 +138,7 @@ export default function LeaderboardPage(props) {
       </Head>
       <div style={{padding:'28px 18px 80px',maxWidth:1000,margin:'0 auto'}}>
         {/* Hero skeleton */}
-        <div style={{background:'rgba(163,230,53,0.06)',border:'1px solid rgba(163,230,53,0.12)',padding:'24px 28px',marginBottom:28,height:110}}/>
+        <div style={{background:'rgba(255,0,144,0.06)',border:'1px solid rgba(255,0,144,0.12)',padding:'24px 28px',marginBottom:28,height:110}}/>
         {/* Controls skeleton */}
         <div style={{display:'flex',gap:10,marginBottom:20}}>
           {[80,60,60].map((w,i)=><div key={i} style={{height:34,width:w,background:BG2,border:`1px solid ${BDR}`}}/>)}
@@ -156,7 +156,7 @@ export default function LeaderboardPage(props) {
             <div key={i} style={{padding:'14px',borderBottom:`1px solid ${BDR}`,display:'flex',gap:16,alignItems:'center',opacity:1-(i*0.08)}}>
               <div style={{width:30,height:14,background:BDR,flexShrink:0}}/>
               <div style={{width:140,height:14,background:BDR,flexShrink:0}}/>
-              <div style={{width:60,height:20,background:'rgba(163,230,53,0.15)',flexShrink:0}}/>
+              <div style={{width:60,height:20,background:'rgba(255,0,144,0.15)',flexShrink:0}}/>
               <div style={{width:100,height:12,background:BDR}}/>
               <div style={{width:30,height:12,background:BDR}}/>
               <div style={{width:30,height:12,background:BDR}}/>
@@ -175,7 +175,8 @@ export default function LeaderboardPage(props) {
       </Head>
       <div style={{padding:'28px 18px 80px',maxWidth:1000,margin:'0 auto'}}>
         {/* Sample data CTA */}
-        <div style={{background:'#0e0e0e',border:'1px solid rgba(163,230,53,0.2)',padding:'28px 28px 24px',marginBottom:28}}>
+        <h1 style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:1,marginBottom:20,fontWeight:400}}>Global Golf Longest Drive Leaderboard</h1>
+        <div style={{background:'#0e0e0e',border:'1px solid rgba(255,0,144,0.2)',padding:'28px 28px 24px',marginBottom:28}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:20}}>
             <div style={{flex:1,minWidth:220}}>
               <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:8}}>Sample Data — Launching September 2026</div>
@@ -191,9 +192,9 @@ export default function LeaderboardPage(props) {
 
         {/* World record hero */}
         {allTimeBest[0]&&(()=>{ const best=allTimeBest[0]; const bestOrg=orgFor(best.orgId); return (
-          <div onClick={()=>setDetEnt&&setDetEnt(best)} style={{background:'linear-gradient(135deg,rgba(163,230,53,0.12),rgba(163,230,53,0.04))',border:'1px solid rgba(163,230,53,0.25)',padding:'24px 28px',marginBottom:28,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:18,cursor:'pointer'}}
-            onMouseEnter={e=>e.currentTarget.style.background='linear-gradient(135deg,rgba(163,230,53,0.18),rgba(163,230,53,0.08))'}
-            onMouseLeave={e=>e.currentTarget.style.background='linear-gradient(135deg,rgba(163,230,53,0.12),rgba(163,230,53,0.04))'}>
+          <div onClick={()=>setDetEnt&&setDetEnt(best)} style={{background:'linear-gradient(135deg,rgba(255,0,144,0.12),rgba(255,0,144,0.04))',border:'1px solid rgba(255,0,144,0.25)',padding:'24px 28px',marginBottom:28,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:18,cursor:'pointer'}}
+            onMouseEnter={e=>e.currentTarget.style.background='linear-gradient(135deg,rgba(255,0,144,0.18),rgba(255,0,144,0.08))'}
+            onMouseLeave={e=>e.currentTarget.style.background='linear-gradient(135deg,rgba(255,0,144,0.12),rgba(255,0,144,0.04))'}>
             <div>
               <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:ORG,marginBottom:8,textTransform:'uppercase'}}>🏆 All-Time Record</div>
               <div style={{fontFamily:DISP,fontSize:34,color:TXT,letterSpacing:.5,display:'flex',alignItems:'center',gap:8}}>
