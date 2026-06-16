@@ -209,8 +209,8 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
 
         {/* 2027 CHAMPIONSHIP PROMO */}
         <div style={{background:'#120009',borderTop:'1px solid rgba(255,0,144,0.15)',borderBottom:'1px solid rgba(255,0,144,0.15)',padding:'56px 18px'}}>
-          <div style={{maxWidth:1000,margin:'0 auto',display:'grid',gridTemplateColumns:'1fr auto',alignItems:'center',gap:32,flexWrap:'wrap'}}>
-            <div>
+          <div style={{maxWidth:1000,margin:'0 auto',display:'flex',flexWrap:'wrap',alignItems:'center',gap:32}}>
+            <div style={{flex:'1 1 280px',minWidth:0}}>
               <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>Launching January 2027</div>
               <div style={{fontFamily:DISP,fontSize:'clamp(28px,4vw,48px)',color:TXT,letterSpacing:1,lineHeight:1,marginBottom:14}}>
                 THE WORLD'S BIGGEST<br/><span style={{color:ORG}}>DRIVE COMPETITION</span>
@@ -226,11 +226,11 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                 ))}
               </div>
             </div>
-            <div style={{display:'flex',flexDirection:'column',gap:10,flexShrink:0}}>
-              <button onClick={()=>router.push('/2027-championship')} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 28px',border:'none',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>
+            <div style={{display:'flex',flexDirection:'column',gap:10,flexShrink:0,width:'100%',maxWidth:260}}>
+              <button onClick={()=>router.push('/2027-championship')} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 28px',border:'none',cursor:'pointer',letterSpacing:.5}}>
                 FIND OUT MORE →
               </button>
-              <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid rgba(255,0,144,0.3)`,color:ORG,fontFamily:SANS,fontWeight:600,fontSize:13,padding:'12px 28px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>
+              <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid rgba(255,0,144,0.3)`,color:ORG,fontFamily:SANS,fontWeight:600,fontSize:13,padding:'12px 28px',cursor:'pointer',letterSpacing:.5}}>
                 Register Free
               </button>
             </div>

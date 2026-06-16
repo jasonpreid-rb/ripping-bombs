@@ -211,8 +211,8 @@ export default function App({ Component, pageProps }) {
       {/* Demo */}
       {showDemo && <DemoSubmit onClose={()=>setShowDemo(false)} cvt={cvt} unitLbl={unitLbl} toast={toast}/>}
 
-      {/* Launch modal */}
-      {showLaunch && <LaunchModal onClose={()=>{setShowLaunch(false);sessionStorage.setItem('rb_launch_seen','1');}}/>}
+      {/* Launch modal — hidden */}
+      {/* {showLaunch && <LaunchModal onClose={()=>{setShowLaunch(false);sessionStorage.setItem('rb_launch_seen','1');}}/>} */}
 
       {/* Toast */}
       {toastMsg && (
