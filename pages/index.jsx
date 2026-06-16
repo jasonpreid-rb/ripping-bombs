@@ -237,6 +237,16 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           </div>
         </div>
 
+        {/* DISTANCE CALCULATOR TEASER */}
+        <div style={{background:'#0d0d0d',borderTop:'1px solid rgba(255,255,255,0.06)',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'52px 18px',textAlign:'center'}}>
+          <div style={{maxWidth:560,margin:'0 auto'}}>
+            <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>Free Tool</div>
+            <div style={{fontFamily:DISP,fontSize:'clamp(22px,4vw,36px)',color:TXT,letterSpacing:.5,marginBottom:12}}>HOW FAR DO YOU DRIVE<br/>COMPARED TO OTHERS?</div>
+            <div style={{fontFamily:SANS,fontSize:14,color:MUT,lineHeight:1.7,marginBottom:28}}>Enter your driver distance, handicap, age, and gender to instantly see how you rank against golfers like you — no account needed.</div>
+            <button onClick={()=>router.push('/how-far-do-i-drive-compared-to-others')} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 32px',border:'none',cursor:'pointer',letterSpacing:.5}}>TRY THE CALCULATOR →</button>
+          </div>
+        </div>
+
         <div style={{padding:'0 18px'}}>
 
           {/* FEATURE CARDS */}
