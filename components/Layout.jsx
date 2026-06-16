@@ -93,7 +93,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
         .marquee-track{display:flex;width:max-content;gap:10px;animation:marquee 36s linear infinite;}
         .marquee-track:hover{animation-play-state:paused;}
         .marquee-track:hover img{opacity:1;filter:none;}
-        .marquee-track:hover .brand-chip{border-color:rgba(163,230,53,0.25);background:rgba(163,230,53,0.04);}
+        .marquee-track:hover .brand-chip{border-color:rgba(255,0,144,0.25);background:rgba(255,0,144,0.04);}
       `}</style>
 
       {/* HEADER */}
@@ -103,7 +103,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           <UnitToggle/>
           <NavBtn href="/leaderboard" label="Leaderboard"/>
           <NavBtn href="/contact" label="Contact"/>
-          <button onClick={onShowDemo} style={{ background: 'transparent', border: '1px solid rgba(163,230,53,0.4)', color: ORG, fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', borderRadius: 0, cursor: 'pointer' }}>Try Demo</button>
+          <button onClick={onShowDemo} style={{ background: 'transparent', border: '1px solid rgba(255,0,144,0.4)', color: ORG, fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', borderRadius: 0, cursor: 'pointer' }}>Try Demo</button>
           {loggedOrg
             ? <><NavBtn href="/submit" label="Submit Drive"/><button onClick={onLogout} style={{ background: 'none', border: '1px solid rgba(220,80,80,0.3)', color: '#f87171', fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', cursor: 'pointer', borderRadius: 0 }}>Log Out</button></>
             : <><NavBtn href="/login" label="Login"/><button onClick={() => navTo('/register')} style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 12, padding: '7px 16px', borderRadius: 0, cursor: 'pointer' }}>Register</button></>
@@ -122,7 +122,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           {[['Leaderboard','/leaderboard'],['Contact','/contact'],['Login','/login'],['Register','/register']].map(([label,href]) => (
             <button key={href} onClick={() => navTo(href)} style={{ background: isActive(href) ? ORG : 'transparent', border: isActive(href) ? 'none' : '1px solid rgba(255,255,255,0.12)', color: isActive(href) ? '#111' : 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>{label}</button>
           ))}
-          <button onClick={() => { onShowDemo(); setMenuOpen(false); }} style={{ background: 'transparent', border: '1px solid rgba(163,230,53,0.4)', color: ORG, fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Try Demo</button>
+          <button onClick={() => { onShowDemo(); setMenuOpen(false); }} style={{ background: 'transparent', border: '1px solid rgba(255,0,144,0.4)', color: ORG, fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Try Demo</button>
           {loggedOrg && <>
             <button onClick={() => navTo('/submit')} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Submit Drive</button>
             <button onClick={() => { onLogout(); setMenuOpen(false); }} style={{ background: 'none', border: '1px solid rgba(220,80,80,0.3)', color: '#f87171', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', cursor: 'pointer', textAlign: 'left', borderRadius: 0 }}>Log Out</button>
@@ -221,7 +221,7 @@ function SiteFooter() {
           <div>
             <div style={{ fontFamily: DISP, fontSize: 18, color: '#fff', letterSpacing: 1, marginBottom: 14 }}>GET IN TOUCH</div>
             {sent === 'success'
-              ? <div style={{ background: 'rgba(163,230,53,0.1)', border: '1px solid rgba(163,230,53,0.3)', padding: 16, fontFamily: SANS, fontSize: 13, color: ORG }}>✓ Message sent!</div>
+              ? <div style={{ background: 'rgba(255,0,144,0.1)', border: '1px solid rgba(255,0,144,0.3)', padding: 16, fontFamily: SANS, fontSize: 13, color: ORG }}>✓ Message sent!</div>
               : <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {inp(enquiry.name, e=>setEnquiry({...enquiry,name:e.target.value}), 'Your name')}
                   {inp(enquiry.email, e=>setEnquiry({...enquiry,email:e.target.value}), 'Your email', 'email')}

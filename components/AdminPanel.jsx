@@ -106,7 +106,7 @@ function FoundingTab({ toast }) {
 
   const filterBtn = (key, label) => (
     <button key={key} onClick={() => setFilter(key)} style={{
-      background: filter === key ? 'rgba(163,230,53,0.08)' : 'transparent',
+      background: filter === key ? 'rgba(255,0,144,0.08)' : 'transparent',
       border: `1px solid ${filter === key ? ORG : BDR}`,
       color: filter === key ? ORG : MUT,
       fontFamily: SANS, fontSize: 11, padding: '5px 11px',
@@ -166,7 +166,7 @@ function FoundingTab({ toast }) {
               display:'flex', alignItems:'center', justifyContent:'space-between',
               padding:'12px 16px', gap:12,
               borderBottom: i < filtered.length - 1 ? `1px solid ${BDR}` : 'none',
-              background: c.is_founding_member ? 'rgba(163,230,53,0.025)' : 'transparent',
+              background: c.is_founding_member ? 'rgba(255,0,144,0.025)' : 'transparent',
             }}>
               {/* Info */}
               <div style={{ flex:1, minWidth:0 }}>
@@ -198,8 +198,8 @@ function FoundingTab({ toast }) {
                     fontFamily:SANS, fontSize:11, fontWeight:700,
                     padding:'5px 12px', cursor: spinning || atCap ? 'not-allowed' : 'pointer',
                     opacity: spinning || atCap ? 0.45 : 1,
-                    border: `1px solid ${c.is_founding_member ? 'rgba(248,113,113,0.4)' : atCap ? BDR : 'rgba(163,230,53,0.4)'}`,
-                    background: c.is_founding_member ? 'rgba(248,113,113,0.08)' : atCap ? 'transparent' : 'rgba(163,230,53,0.08)',
+                    border: `1px solid ${c.is_founding_member ? 'rgba(248,113,113,0.4)' : atCap ? BDR : 'rgba(255,0,144,0.4)'}`,
+                    background: c.is_founding_member ? 'rgba(248,113,113,0.08)' : atCap ? 'transparent' : 'rgba(255,0,144,0.08)',
                     color: c.is_founding_member ? '#f87171' : atCap ? DIM : ORG,
                     minWidth:58, textAlign:'center',
                   }}
@@ -216,7 +216,7 @@ function FoundingTab({ toast }) {
 }
 
 // ── Mini bar chart (pure CSS/SVG) ────────────────────────────────────────────
-function MiniBarChart({ data, color = '#a3e635', height = 80 }) {
+function MiniBarChart({ data, color = '#FF0090', height = 80 }) {
   if (!data || data.length === 0) return null;
   const max = Math.max(...data.map(d => d.value), 1);
   return (
@@ -505,7 +505,7 @@ function OverviewTab({ orgs, entries, pending, approved, noSubmissions, setStatu
 
       {/* ── Best drive callout ── */}
       {bestDrive && (
-        <div style={{ background:'linear-gradient(135deg,rgba(163,230,53,0.08),rgba(163,230,53,0.02))', border:`1px solid rgba(163,230,53,0.25)`, padding:'20px 24px', display:'flex', alignItems:'center', gap:20, flexWrap:'wrap' }}>
+        <div style={{ background:'linear-gradient(135deg,rgba(255,0,144,0.08),rgba(255,0,144,0.02))', border:`1px solid rgba(255,0,144,0.25)`, padding:'20px 24px', display:'flex', alignItems:'center', gap:20, flexWrap:'wrap' }}>
           <div>
             <div style={{ fontFamily:SANS, fontSize:9, fontWeight:700, letterSpacing:2, color:ORG, textTransform:'uppercase', marginBottom:4 }}>All-Time Record Drive</div>
             <div style={{ fontFamily:DISP, fontSize:48, color:ORG, letterSpacing:1, lineHeight:1 }}>{cvt(bestDrive.dist)} <span style={{ fontFamily:SANS, fontSize:16, color:MUT }}>{unitLbl}</span></div>
