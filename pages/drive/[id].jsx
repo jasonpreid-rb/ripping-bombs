@@ -52,8 +52,8 @@ export default function DrivePage({ staticEntry, staticOrg, entries, orgs, cvt, 
           ← Back
         </button>
 
-        <div style={{ background:BG2, border:'1px solid rgba(163,230,53,0.25)', padding:'32px 28px', marginBottom:20, position:'relative', overflow:'hidden' }}>
-          <div style={{ position:'absolute', top:0, right:0, width:200, height:200, background:'rgba(163,230,53,0.03)', borderRadius:'0 0 0 200px' }}/>
+        <div style={{ background:BG2, border:'1px solid rgba(255,0,144,0.25)', padding:'32px 28px', marginBottom:20, position:'relative', overflow:'hidden' }}>
+          <div style={{ position:'absolute', top:0, right:0, width:200, height:200, background:'rgba(255,0,144,0.03)', borderRadius:'0 0 0 200px' }}/>
           <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:3, color:ORG, textTransform:'uppercase', marginBottom:12 }}>Verified Competition Drive</div>
           <div style={{ fontFamily:DISP, fontSize:'clamp(28px,6vw,42px)', color:TXT, letterSpacing:.5, lineHeight:1.1, marginBottom:6 }}>
             {entry.player}
@@ -82,7 +82,7 @@ export default function DrivePage({ staticEntry, staticOrg, entries, orgs, cvt, 
           {entry.photo && <img src={entry.photo} alt="Drive evidence" style={{ width:'100%', maxHeight:240, objectFit:'cover', marginBottom:16 }}/>}
 
           <button onClick={()=>setShareOpen(true)}
-            style={{ background:`linear-gradient(135deg,${ORG},#bef264)`, border:'none', color:'#111', fontFamily:SANS, fontWeight:700, fontSize:13, padding:'14px 24px', cursor:'pointer', letterSpacing:.5, width:'100%' }}>
+            style={{ background:`linear-gradient(135deg,#FF0090,#ff66c4)`, border:'none', color:'#fff', fontFamily:SANS, fontWeight:700, fontSize:13, padding:'14px 24px', cursor:'pointer', letterSpacing:.5, width:'100%' }}>
             ↗ SHARE THIS DRIVE
           </button>
         </div>
@@ -98,7 +98,7 @@ export default function DrivePage({ staticEntry, staticOrg, entries, orgs, cvt, 
           </div>
         )}
 
-        <div style={{ background:'#0e0e0e', border:'1px solid rgba(163,230,53,0.2)', padding:'24px 20px', textAlign:'center' }}>
+        <div style={{ background:'#0e0e0e', border:'1px solid rgba(255,0,144,0.2)', padding:'24px 20px', textAlign:'center' }}>
           <div style={{ fontFamily:DISP, fontSize:22, color:'#fff', letterSpacing:1, marginBottom:8 }}>GOT A BIG HITTER AT YOUR CLUB?</div>
           <div style={{ fontFamily:SANS, fontSize:13, color:'rgba(255,255,255,0.5)', marginBottom:16 }}>Register free and submit your competition results to the global leaderboard.</div>
           <button onClick={()=>router.push('/register')} style={{ background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:12, padding:'11px 24px', cursor:'pointer', letterSpacing:.5 }}>
