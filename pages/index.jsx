@@ -66,7 +66,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
   const WeeklyCard = ({ cat }) => {
     const { top3 } = cat;
     return (
-      <div style={{background:BG2,border:`1px solid ${top3.length?'rgba(163,230,53,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0}}>
+      <div style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0}}>
         <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.icon} {cat.label}</span>
         {top3.length === 0 ? (
           <div style={{fontFamily:SANS,fontSize:12,color:DIM,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
@@ -85,7 +85,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                     {e.player}{org?.country && countryFlag(org.country)}
                   </div>
                   <div style={{fontFamily:SANS,fontSize:10,color:DIM,marginTop:1}}>
-                    {e.is_simulator ? <span style={{color:'rgba(163,230,53,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
+                    {e.is_simulator ? <span style={{color:'rgba(255,0,144,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
                   </div>
                 </div>
                 <div style={{textAlign:'right',flexShrink:0}}>
@@ -104,7 +104,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
   const AllTimeCard = ({ cat }) => {
     const { top3 } = cat;
     return (
-      <div style={{background:BG2,border:`1px solid ${top3.length?'rgba(163,230,53,0.15)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0}}>
+      <div style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.15)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0}}>
         <span style={{fontFamily:SANS,fontSize:10,color:MUT,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.icon} {cat.label}</span>
         {top3.length === 0 ? (
           <div style={{fontFamily:SANS,fontSize:12,color:DIM,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
@@ -123,7 +123,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                     {e.player}{org?.country && countryFlag(org.country)}
                   </div>
                   <div style={{fontFamily:SANS,fontSize:10,color:DIM,marginTop:1}}>
-                    {e.is_simulator ? <span style={{color:'rgba(163,230,53,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
+                    {e.is_simulator ? <span style={{color:'rgba(255,0,144,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
                   </div>
                 </div>
                 <div style={{textAlign:'right',flexShrink:0}}>
@@ -158,7 +158,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           </video>
           <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(0,0,0,0.1),rgba(0,0,0,0.55))'}}/>
           <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'clamp(60px,12vw,80px) 20px',textAlign:'center'}}>
-            <div style={{fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:4,color:ORG,textTransform:'uppercase',marginBottom:16,background:'rgba(163,230,53,0.15)',border:'1px solid rgba(163,230,53,0.4)',padding:'5px 16px',display:'inline-block'}}>
+            <div style={{fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:4,color:ORG,textTransform:'uppercase',marginBottom:16,background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
               The World's Longest Drive Leaderboard
             </div>
             <h1 style={{fontFamily:DISP,fontSize:'clamp(56px,10vw,100px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:20,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
@@ -208,7 +208,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
         </div>
 
         {/* 2027 CHAMPIONSHIP PROMO */}
-        <div style={{background:'#0a1200',borderTop:'1px solid rgba(163,230,53,0.15)',borderBottom:'1px solid rgba(163,230,53,0.15)',padding:'56px 18px'}}>
+        <div style={{background:'#120009',borderTop:'1px solid rgba(255,0,144,0.15)',borderBottom:'1px solid rgba(255,0,144,0.15)',padding:'56px 18px'}}>
           <div style={{maxWidth:1000,margin:'0 auto',display:'grid',gridTemplateColumns:'1fr auto',alignItems:'center',gap:32,flexWrap:'wrap'}}>
             <div>
               <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>Launching January 2027</div>
@@ -220,7 +220,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
               </div>
               <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
                 {['🥇 100pts','🥈 70pts','🥉 50pts','4th 40pts','5th 30pts','6th 20pts','Any entry 10pts'].map((label,i)=>(
-                  <div key={i} style={{fontFamily:SANS,fontSize:11,fontWeight:700,color:i===0?ORG:MUT,background:'rgba(255,255,255,0.04)',border:`1px solid ${i===0?'rgba(163,230,53,0.3)':'rgba(255,255,255,0.08)'}`,padding:'5px 10px',letterSpacing:.3}}>
+                  <div key={i} style={{fontFamily:SANS,fontSize:11,fontWeight:700,color:i===0?ORG:MUT,background:'rgba(255,255,255,0.04)',border:`1px solid ${i===0?'rgba(255,0,144,0.3)':'rgba(255,255,255,0.08)'}`,padding:'5px 10px',letterSpacing:.3}}>
                     {label}
                   </div>
                 ))}
@@ -230,7 +230,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
               <button onClick={()=>router.push('/2027-championship')} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 28px',border:'none',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>
                 FIND OUT MORE →
               </button>
-              <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid rgba(163,230,53,0.3)`,color:ORG,fontFamily:SANS,fontWeight:600,fontSize:13,padding:'12px 28px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>
+              <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid rgba(255,0,144,0.3)`,color:ORG,fontFamily:SANS,fontWeight:600,fontSize:13,padding:'12px 28px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>
                 Register Free
               </button>
             </div>
@@ -263,7 +263,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           </div>
 
           {/* CTA STRIP */}
-          <div style={{background:'rgba(163,230,53,0.05)',border:'1px solid rgba(163,230,53,0.2)',padding:'40px 32px',textAlign:'center',marginBottom:60}}>
+          <div style={{background:'rgba(255,0,144,0.05)',border:'1px solid rgba(255,0,144,0.2)',padding:'40px 32px',textAlign:'center',marginBottom:60}}>
             <div style={{fontFamily:DISP,fontSize:'clamp(24px,5vw,40px)',color:TXT,letterSpacing:1,marginBottom:10}}>FREE TO JOIN. FREE TO SUBMIT.</div>
             <div style={{fontFamily:SANS,fontSize:14,color:MUT,marginBottom:28}}>Built for golfers who love sending it.</div>
             <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 36px',borderRadius:0,cursor:'pointer'}}>REGISTER NOW FREE →</button>
@@ -274,7 +274,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:20}}>FAQ</div>
             <div style={{display:'flex',flexDirection:'column',gap:8}}>
               {faqs.map(({q,a},i)=>(
-                <div key={i} style={{background:BG2,border:`1px solid ${openFaq===i?'rgba(163,230,53,0.25)':BDR}`,overflow:'hidden'}}>
+                <div key={i} style={{background:BG2,border:`1px solid ${openFaq===i?'rgba(255,0,144,0.25)':BDR}`,overflow:'hidden'}}>
                   <button onClick={()=>setOpenFaq(openFaq===i?null:i)} style={{width:'100%',background:'none',border:'none',padding:'16px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer',gap:16}}>
                     <span style={{fontFamily:SANS,fontSize:14,fontWeight:600,color:TXT,textAlign:'left'}}>{q}</span>
                     <span style={{fontFamily:SANS,fontSize:18,color:ORG,flexShrink:0,transform:openFaq===i?'rotate(45deg)':'none',transition:'transform .2s'}}>+</span>

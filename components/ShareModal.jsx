@@ -39,39 +39,39 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
     canvas.width = W; canvas.height = H;
 
     ctx.fillStyle = '#0e0e0e'; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = '#a3e635'; ctx.fillRect(0, 0, W, 8); ctx.fillRect(0, H-8, W, 8);
-    ctx.strokeStyle = 'rgba(163,230,53,0.04)'; ctx.lineWidth = 1;
+    ctx.fillStyle = '#FF0090'; ctx.fillRect(0, 0, W, 8); ctx.fillRect(0, H-8, W, 8);
+    ctx.strokeStyle = 'rgba(255,0,144,0.04)'; ctx.lineWidth = 1;
     for (let x=0; x<W; x+=60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
     for (let y=0; y<H; y+=60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
 
     const drawContent = (flagImg, courseLogoImg) => {
       drawRBLogo(ctx, 80, 58, 80);
       if (flagImg) ctx.drawImage(flagImg, W-160, 58, 80, 60);
-      ctx.strokeStyle = 'rgba(163,230,53,0.3)'; ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(255,0,144,0.3)'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(80,150); ctx.lineTo(W-80,150); ctx.stroke();
       if (courseLogoImg) {
         const clAspect = courseLogoImg.naturalWidth / courseLogoImg.naturalHeight;
         const clH = 100, clW = clH * clAspect;
         ctx.drawImage(courseLogoImg, (W-clW)/2, 170, clW, clH);
       }
-      ctx.fillStyle = '#a3e635'; ctx.font = 'bold 300px Arial Black, Arial'; ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 300px Arial Black, Arial'; ctx.textAlign = 'center';
       ctx.fillText(String(cvt(entry.dist)), W/2, 560);
       ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.font = 'bold 48px Arial';
       ctx.fillText(unitLbl.toUpperCase(), W/2, 620);
       const badgeW=320, badgeH=44, badgeX=(W-badgeW)/2, badgeY=648;
-      ctx.strokeStyle='rgba(163,230,53,0.5)'; ctx.lineWidth=1; ctx.strokeRect(badgeX,badgeY,badgeW,badgeH);
-      ctx.fillStyle='rgba(163,230,53,0.08)'; ctx.fillRect(badgeX,badgeY,badgeW,badgeH);
-      ctx.fillStyle='#a3e635'; ctx.font='bold 18px Arial'; ctx.letterSpacing='3px';
+      ctx.strokeStyle='rgba(255,0,144,0.5)'; ctx.lineWidth=1; ctx.strokeRect(badgeX,badgeY,badgeW,badgeH);
+      ctx.fillStyle='rgba(255,0,144,0.08)'; ctx.fillRect(badgeX,badgeY,badgeW,badgeH);
+      ctx.fillStyle='#ffffff'; ctx.font='bold 18px Arial'; ctx.letterSpacing='3px';
       ctx.fillText('✓  VERIFIED DISTANCE', W/2, badgeY+29);
       ctx.fillStyle='#ffffff'; ctx.font='bold 72px Arial Black, Arial'; ctx.letterSpacing='0px';
       ctx.fillText(entry.player.toUpperCase(), W/2, 790);
       ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='34px Arial';
       ctx.fillText(org?.courseName||'', W/2, 845);
-      if (entry.facility) { ctx.fillStyle='rgba(163,230,53,0.6)'; ctx.font='italic 26px Arial'; ctx.fillText(entry.facility, W/2, 886); }
-      if (entry.tournament) { ctx.fillStyle='rgba(163,230,53,0.7)'; ctx.font='italic 28px Arial'; ctx.fillText(entry.tournament, W/2, entry.facility ? 922 : 892); }
+      if (entry.facility) { ctx.fillStyle='rgba(255,0,144,0.6)'; ctx.font='italic 26px Arial'; ctx.fillText(entry.facility, W/2, 886); }
+      if (entry.tournament) { ctx.fillStyle='rgba(255,0,144,0.7)'; ctx.font='italic 28px Arial'; ctx.fillText(entry.tournament, W/2, entry.facility ? 922 : 892); }
       ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font='24px Arial';
       ctx.fillText(fmtDate(entry.date), W/2, (entry.tournament && entry.facility) ? 958 : entry.tournament ? 935 : entry.facility ? 922 : 900);
-      ctx.strokeStyle='rgba(163,230,53,0.3)'; ctx.lineWidth=1;
+      ctx.strokeStyle='rgba(255,0,144,0.3)'; ctx.lineWidth=1;
       ctx.beginPath(); ctx.moveTo(80,950); ctx.lineTo(W-80,950); ctx.stroke();
       ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='24px Arial';
       ctx.fillText('rippingbombs.com', W/2, 990);
@@ -125,7 +125,7 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
           <span style={{ fontFamily:SANS, fontWeight:700, fontSize:12, color:'#fff' }}>Save for Instagram</span>
         </button>
         <button onClick={copyLink}
-          style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:copied?'rgba(163,230,53,0.15)':'rgba(255,255,255,0.07)', border:`1px solid ${copied?ORG:BDR}`, padding:'12px', cursor:'pointer', transition:'all .2s' }}>
+          style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:copied?'rgba(255,0,144,0.15)':'rgba(255,255,255,0.07)', border:`1px solid ${copied?ORG:BDR}`, padding:'12px', cursor:'pointer', transition:'all .2s' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={copied?ORG:'#fff'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
           <span style={{ fontFamily:SANS, fontWeight:700, fontSize:12, color:copied?ORG:'#fff' }}>{copied?'Copied!':'Copy Link'}</span>
         </button>
