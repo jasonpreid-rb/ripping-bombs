@@ -150,7 +150,8 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
                 <label style={{ display: 'block', fontFamily: SANS, fontSize: 11, fontWeight: 600, color: MUT, marginBottom: 5, textTransform: 'uppercase', letterSpacing: .8 }}>
                   Course Logo (optional)
                 </label>
-                <div style={{ border: '1px dashed rgba(163,230,53,0.3)', padding: 16, background: 'rgba(163,230,53,0.03)', textAlign: 'center' }}>
+                {/* ✅ Fixed: was rgba(163,230,53,...) lime green — now neon pink */}
+                <div style={{ border: '1px dashed rgba(255,0,144,0.3)', padding: 16, background: 'rgba(255,0,144,0.03)', textAlign: 'center' }}>
                   {reg.logo
                     ? <><img src={reg.logo} alt="" style={{ maxHeight: 80, maxWidth: '100%', marginBottom: 6, objectFit: 'cover' }}/><div style={{ fontFamily: SANS, fontSize: 11, color: ORG }}>Logo uploaded</div></>
                     : <div style={{ color: DIM, fontFamily: SANS, fontSize: 12 }}>No logo selected</div>

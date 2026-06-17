@@ -136,7 +136,8 @@ export default function PlayerProfile({ org, playerEntries }) {
           &larr; Leaderboard
         </Link>
 
-        <div style={{ marginTop: 24, marginBottom: 32, background: 'linear-gradient(135deg,rgba(163,230,53,0.1),rgba(163,230,53,0.03))', border: '1px solid rgba(163,230,53,0.2)', padding: '28px 28px' }}>
+        {/* ✅ Fixed: was rgba(163,230,53,...) lime green — now neon pink */}
+        <div style={{ marginTop: 24, marginBottom: 32, background: 'linear-gradient(135deg,rgba(255,0,144,0.1),rgba(255,0,144,0.03))', border: '1px solid rgba(255,0,144,0.2)', padding: '28px 28px' }}>
           <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 2, color: ORG, textTransform: 'uppercase', marginBottom: 10 }}>Player Profile</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 8 }}>
             <div style={{ fontFamily: DISP, fontSize: 'clamp(28px,5vw,42px)', color: TXT, letterSpacing: 0.5, lineHeight: 1 }}>
