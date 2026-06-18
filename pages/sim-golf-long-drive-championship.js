@@ -1,111 +1,193 @@
-import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
+import { useState } from 'react'
+import { useRouter } from 'next/router'
+import { SeoPage } from '../components/SeoPageLayout'
+import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants'
 
-export default function Page() {
+const POINTS = [
+  { pos: '1st', pts: 100, medal: '🥇' },
+  { pos: '2nd', pts: 70,  medal: '🥈' },
+  { pos: '3rd', pts: 50,  medal: '🥉' },
+  { pos: '4th', pts: 40,  medal: null },
+  { pos: '5th', pts: 30,  medal: null },
+  { pos: '6th', pts: 20,  medal: null },
+  { pos: '7th+', pts: 10, medal: null },
+]
 
-  const formatRows = [
-    ['Defined Attempt Window', 'Players receive a fixed number of swings (usually 3–10 recorded attempts per session or qualifier round)'],
-    ['Driver Requirement', 'Driver is required, but shaft/head setup is typically unrestricted unless specified by event rules'],
-    ['Simulator Compatibility', 'Events are run on approved simulator setups where calibration and conditions are verified'],
-    ['Leaderboard Validation', 'Only officially submitted or verified drives count toward rankings'],
-    ['Standardised Conditions', 'Flat fairway, no wind manipulation, and consistent ball/tee settings where possible']
-  ];
+const CATEGORIES = [
+  { icon: '♂',  label: 'Men',                 desc: 'Age 16–54, handicap under 20' },
+  { icon: '♂',  label: 'Men High Handicap',   desc: 'Age 16–54, handicap 20 and above' },
+  { icon: '♀',  label: 'Women',               desc: 'Age 16–54, handicap under 20' },
+  { icon: '♀',  label: 'Women High Handicap', desc: 'Age 16–54, handicap 20 and above' },
+  { icon: '🌱', label: 'Youth',               desc: 'Under 16' },
+  { icon: '⭐', label: 'Senior',              desc: 'Age 55 and above' },
+]
 
-  const performanceRows = [
-    ['Club Head Speed', 'Key driver of distance; elite players exceed 140–150+ mph'],
-    ['Ball Speed', 'Direct output of strike efficiency; typically 200–240+ mph for top hitters'],
-    ['Launch Angle', 'Optimised launch windows produce maximum carry and total distance'],
-    ['Spin Rate', 'Lower spin generally increases roll and total distance in sim environments'],
-  ];
+const FAQS = [
+  { q: 'Who can enter the 2027 Championship?', a: 'Any registered simulator user. Registration is free and instant.' },
 
-  const simPlatforms = [
-    ['TrackMan', 'Radar-based system widely used in professional fittings and high-end competition'],
-    ['Foresight (GCQuad / GCQuad)', 'Photometric system known for precision strike and spin data used in coaching and competition'],
-    ['SkyTrak', 'Consumer-focused simulator often used for entry-level and home competition formats'],
-    ['GSPro / E6 Connect', 'Software platforms used to run virtual courses and structured competition formats across hardware systems'],
-  ];
+  { q: 'When does the season start?', a: 'The official championship season begins January 2027. Pre-season submissions build your record but do not earn points.' },
+
+  { q: 'How often can I submit?', a: 'One valid drive per week counts toward the leaderboard. Only your best recorded drive of that week is used.' },
+
+  { q: 'How are weekly points awarded?', a: 'Rankings are calculated within each category weekly: 1st = 100, 2nd = 70, 3rd = 50, 4th = 40, 5th = 30, 6th = 20, 7th+ = 10 points.' },
+
+  { q: 'What counts as a valid drive?', a: 'A single driver shot recorded on an approved launch monitor or simulator with visible carry/total distance data.' },
+
+  { q: 'What equipment is allowed?', a: 'TrackMan, Foresight (GCQuad / GC3), SkyTrak, Mevo+, and equivalent calibrated launch monitors.' },
+
+  { q: 'Can I change category mid-season?', a: 'No. Once selected in January 2027, your category is locked for the full season.' },
+
+  { q: 'Is it free to enter?', a: 'Yes — the competition is completely free to join and compete in.' },
+]
+
+export default function Championship2027Page() {
+  const router = useRouter()
+  const [openFaq, setOpenFaq] = useState(null)
 
   return (
     <SeoPage
-      title="Simulator Golf Long Drive Championship | Sim Golf Distance Competition | Ripping Bombs"
-      description="The Simulator Golf Long Drive Championship is a global sim golf competition focused on maximum driving distance. Compete, rank, and test your longest drive in virtual golf environments."
+      title="2027 Simulator Championship | Ripping Bombs"
+      description="The Ripping Bombs 2027 Simulator Championship — a global longest drive leaderboard. One drive per week. Six categories. Seasonal points format."
     >
 
-      <SeoH1>Simulator Golf Long Drive Championship</SeoH1>
+      <div style={{ maxWidth: 760, margin: '0 auto', padding: '0 0 80px' }}>
 
-      <SeoP>
-        The Simulator Golf Long Drive Championship is a competitive format built around one core idea: 
-        <strong>maximum driving distance in a controlled simulator environment</strong>. 
-        It brings together golf simulator players, long drive enthusiasts, and competitive hitters to test how far the ball can travel under standardised conditions.
-      </SeoP>
+        {/* HERO */}
+        <div style={{ textAlign: 'center', padding: '64px 0 56px', borderBottom: `1px solid ${BDR}`, marginBottom: 56 }}>
+          <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 16 }}>
+            Launching January 2027
+          </div>
 
-      <SeoP>
-        Unlike traditional golf, where scoring and course management define success, this format strips the game back to its most explosive element — the tee shot. Each player’s longest valid drive is recorded for ranking purposes.
-      </SeoP>
+          <div style={{ fontFamily: DISP, fontSize: 'clamp(48px,8vw,80px)', color: TXT, letterSpacing: 1, lineHeight: .95, marginBottom: 20 }}>
+            THE WORLD'S<br /><span style={{ color: ORG }}>BIGGEST</span><br />DRIVE COMP
+          </div>
 
-      <SeoH2>How the Championship Format Works</SeoH2>
+          <div style={{ fontFamily: SANS, fontSize: 16, color: MUT, lineHeight: 1.75, maxWidth: 500, margin: '0 auto 32px' }}>
+            A season-long simulator long drive competition. One recorded drive per week. Category-based rankings with cumulative points across the season.
+          </div>
 
-      <SeoTable
-        headers={['Component', 'Description']}
-        rows={formatRows}
-      />
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => router.push('/register')}
+              style={{ background: ORG, color: '#000', fontFamily: SANS, fontWeight: 700, fontSize: 14, padding: '14px 32px', border: 'none', cursor: 'pointer', letterSpacing: .5 }}
+            >
+              REGISTER FREE →
+            </button>
+            <button
+              onClick={() => router.push('/leaderboard')}
+              style={{ background: 'transparent', border: `1px solid ${BDR}`, color: MUT, fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '14px 28px', cursor: 'pointer', letterSpacing: .5 }}
+            >
+              View Leaderboard
+            </button>
+          </div>
+        </div>
 
-      <SeoP>
-        The structure is designed to remove ambiguity and create a fair global comparison of driving distance. 
-        Every participant competes under a consistent ruleset appropriate to their simulator environment.
-      </SeoP>
+        {/* WHY */}
+        <div style={{ marginBottom: 56 }}>
+          <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 12 }}>
+            Why it matters
+          </div>
 
-      <SeoH2>What Determines Distance in Simulator Golf?</SeoH2>
+          <div style={{ fontFamily: DISP, fontSize: 28, color: TXT, letterSpacing: .5, marginBottom: 16 }}>
+            A TRUE SEASON FORMAT, NOT A ONE-OFF EVENT
+          </div>
 
-      <SeoP>
-        Long drive performance in simulator golf is driven by a combination of speed, launch conditions, and strike quality. 
-        While raw strength plays a role, optimisation of swing mechanics and launch data is often more important than brute force.
-      </SeoP>
+          <div style={{ fontFamily: SANS, fontSize: 14, color: MUT, lineHeight: 1.85, marginBottom: 16 }}>
+            The championship runs weekly across an entire season. Each player submits one validated drive per week, and rankings are determined within fixed categories.
+          </div>
 
-      <SeoTable
-        headers={['Metric', 'Role in Distance']}
-        rows={performanceRows}
-      />
+          <div style={{ fontFamily: SANS, fontSize: 14, color: MUT, lineHeight: 1.85 }}>
+            It is designed to reward both peak performance and consistency — not just one big hit.
+          </div>
+        </div>
 
-      <SeoP>
-        In elite simulator long drive conditions, total distance can exceed 400–450 yards depending on settings, strike quality, and launch optimisation.
-      </SeoP>
+        {/* POINTS */}
+        <div style={{ marginBottom: 56 }}>
+          <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 12 }}>
+            Points system
+          </div>
 
-      <SeoH2>Simulator Platforms Used in Competition</SeoH2>
+          <div style={{ fontFamily: DISP, fontSize: 28, color: TXT, letterSpacing: .5, marginBottom: 20 }}>
+            WEEKLY CATEGORY POINTS
+          </div>
 
-      <SeoP>
-        The championship is designed to be platform-agnostic, meaning players can compete across multiple simulator systems as long as conditions are standardised.
-      </SeoP>
+          <div style={{ border: `1px solid ${BDR}`, overflow: 'hidden' }}>
+            {POINTS.map((row, i) => (
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', borderBottom: i < POINTS.length - 1 ? `1px solid ${BDR}` : 'none' }}>
+                <div style={{ padding: '14px 20px', fontFamily: SANS, fontWeight: 700, fontSize: 15, color: TXT }}>
+                  {row.medal && <span>{row.medal} </span>}{row.pos}
+                </div>
+                <div style={{ padding: '14px 20px', fontFamily: DISP, fontSize: 22, color: i === 0 ? ORG : MUT }}>
+                  {row.pts}
+                </div>
+                <div style={{ padding: '14px 20px', fontFamily: SANS, fontSize: 12, color: DIM }}>
+                  Weekly ranking points within category
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-      <SeoTable
-        headers={['Platform', 'Description']}
-        rows={simPlatforms}
-      />
+        {/* HOW IT WORKS */}
+        <div style={{ marginBottom: 56 }}>
+          <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 12 }}>
+            How it works
+          </div>
 
-      <SeoH2>Why Simulator Long Drive Is Growing</SeoH2>
+          <div style={{ fontFamily: DISP, fontSize: 28, color: TXT, marginBottom: 24 }}>
+            SIMPLE WEEKLY FORMAT
+          </div>
 
-      <SeoP>
-        Simulator golf has unlocked a new form of competition that was previously limited by geography, weather, and access to facilities. 
-        Long drive formats are particularly well suited to this environment because they are simple, repeatable, and highly shareable.
-      </SeoP>
+          {[
+            'Register your simulator account',
+            'Select your category in January 2027 (locked for season)',
+            'Submit one validated drive per week'
+          ].map((t, i) => (
+            <div key={i} style={{ fontFamily: SANS, fontSize: 14, color: MUT, marginBottom: 12 }}>
+              {i + 1}. {t}
+            </div>
+          ))}
+        </div>
 
-      <SeoP>
-        Players can now compete in distance-based events year-round, from anywhere in the world, without needing to attend physical tournaments. 
-        This has created a new category of digital-first golf competition that sits between gaming, sport, and performance analytics.
-      </SeoP>
+        {/* CATEGORIES */}
+        <div style={{ marginBottom: 56 }}>
+          <div style={{ fontFamily: DISP, fontSize: 28, color: TXT, marginBottom: 24 }}>
+            SIX COMPETITION CATEGORIES
+          </div>
 
-      <SeoH2>The Future of Long Drive Competition</SeoH2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 2, background: BDR }}>
+            {CATEGORIES.map((cat, i) => (
+              <div key={i} style={{ background: BG2, padding: '20px 22px' }}>
+                <div style={{ fontSize: 22 }}>{cat.icon}</div>
+                <div style={{ fontFamily: DISP, fontSize: 16, color: TXT }}>{cat.label}</div>
+                <div style={{ fontFamily: SANS, fontSize: 12, color: DIM }}>{cat.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-      <SeoP>
-        As simulator accuracy continues to improve, long drive competition is expected to evolve into a recognised digital sport category. 
-        Leaderboards, seasonal championships, and community-driven events will likely become the standard format for participation.
-      </SeoP>
+        {/* FAQ */}
+        <div style={{ fontFamily: DISP, fontSize: 24, color: TXT, marginBottom: 20 }}>
+          FAQ
+        </div>
 
-      <SeoP>
-        The Simulator Golf Long Drive Championship represents the early structure of that shift — where raw driving power becomes a measurable, comparable global metric.
-      </SeoP>
+        {FAQS.map((f, i) => (
+          <div key={i} style={{ border: `1px solid ${BDR}`, marginBottom: 8 }}>
+            <button
+              onClick={() => setOpenFaq(openFaq === i ? null : i)}
+              style={{ width: '100%', padding: 16, textAlign: 'left', background: 'none', border: 'none', color: TXT }}
+            >
+              {f.q}
+            </button>
+            {openFaq === i && (
+              <div style={{ padding: 16, color: MUT, fontFamily: SANS, fontSize: 13 }}>
+                {f.a}
+              </div>
+            )}
+          </div>
+        ))}
 
-      <SeoCTA />
-
+      </div>
     </SeoPage>
-  );
+  )
 }
