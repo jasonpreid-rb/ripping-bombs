@@ -82,8 +82,8 @@ export default function Championship2027Page() {
     inset: 0,
     background: `
       linear-gradient(
-        rgba(0,0,0,0.85),
-        rgba(0,0,0,0.75)
+        rgba(0,0,0,0.55),
+        rgba(0,0,0,0.45)
       )
     `
   }} />
@@ -169,6 +169,8 @@ export default function Championship2027Page() {
     </div>
   </div>
 </div>
+
+<div style={{ marginBottom: "40px" }} />
 
         {/* WHY IT'S BIG */}
         <div style={{ marginBottom: 56 }}>
