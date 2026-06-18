@@ -55,14 +55,15 @@ export default function Championship2027Page() {
  {/* HERO */}
 <div style={{
   position: 'relative',
+  width: '100vw',
   height: '100vh',
-  width: '100%',
+  marginLeft: 'calc(50% - 50vw)',
+  marginRight: 'calc(50% - 50vw)',
+  overflow: 'hidden',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  textAlign: 'center',
-  overflow: 'hidden',
-  borderBottom: `1px solid ${BDR}`
+  textAlign: 'center'
 }}>
 
   {/* Background Image */}
@@ -72,17 +73,14 @@ export default function Championship2027Page() {
     backgroundImage: 'url(https://breezypointresort.com/wp-content/uploads/2025/06/breezy-point-golf-simulator-01.webp)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    transform: 'scale(1.02)',
-    zIndex: 0
+    backgroundRepeat: 'no-repeat'
   }} />
 
-  {/* Dark overlay */}
+  {/* Overlay */}
   <div style={{
     position: 'absolute',
     inset: 0,
-    background: 'rgba(0,0,0,0.55)',
-    zIndex: 1
+    background: 'rgba(0,0,0,0.55)'
   }} />
 
   {/* Content */}
@@ -109,7 +107,6 @@ export default function Championship2027Page() {
       fontFamily: DISP,
       fontSize: 'clamp(44px,7vw,80px)',
       color: '#fff',
-      letterSpacing: 1,
       lineHeight: .95,
       marginBottom: 20
     }}>
