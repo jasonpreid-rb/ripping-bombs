@@ -52,14 +52,17 @@ export default function Championship2027Page() {
 
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '0 0 80px' }}>
 
-      {/* HERO */}
+ {/* HERO */}
 <div style={{
   position: 'relative',
+  height: '100vh',
+  width: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   textAlign: 'center',
-  padding: '64px 0 56px',
-  borderBottom: `1px solid ${BDR}`,
-  marginBottom: 56,
-  overflow: 'hidden'
+  overflow: 'hidden',
+  borderBottom: `1px solid ${BDR}`
 }}>
 
   {/* Background Image */}
@@ -69,22 +72,27 @@ export default function Championship2027Page() {
     backgroundImage: 'url(https://breezypointresort.com/wp-content/uploads/2025/06/breezy-point-golf-simulator-01.webp)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    filter: 'brightness(0.35)',
-    transform: 'scale(1.05)',
+    backgroundRepeat: 'no-repeat',
+    transform: 'scale(1.02)',
     zIndex: 0
   }} />
 
-  {/* Dark overlay for readability */}
+  {/* Dark overlay */}
   <div style={{
     position: 'absolute',
     inset: 0,
-    background: 'rgba(0,0,0,0.45)',
+    background: 'rgba(0,0,0,0.55)',
     zIndex: 1
   }} />
 
   {/* Content */}
-  <div style={{ position: 'relative', zIndex: 2 }}>
-    
+  <div style={{
+    position: 'relative',
+    zIndex: 2,
+    maxWidth: 760,
+    padding: '0 20px'
+  }}>
+
     <div style={{
       fontFamily: SANS,
       fontSize: 10,
@@ -99,7 +107,7 @@ export default function Championship2027Page() {
 
     <div style={{
       fontFamily: DISP,
-      fontSize: 'clamp(48px,8vw,80px)',
+      fontSize: 'clamp(44px,7vw,80px)',
       color: '#fff',
       letterSpacing: 1,
       lineHeight: .95,
@@ -112,9 +120,8 @@ export default function Championship2027Page() {
       fontFamily: SANS,
       fontSize: 16,
       color: 'rgba(255,255,255,0.8)',
-      lineHeight: 1.75,
-      maxWidth: 500,
-      margin: '0 auto 32px'
+      lineHeight: 1.7,
+      marginBottom: 32
     }}>
       A season-long simulator long drive competition. One recorded drive per week. Category-based rankings with cumulative points across the season.
     </div>
@@ -130,8 +137,7 @@ export default function Championship2027Page() {
           fontSize: 14,
           padding: '14px 32px',
           border: 'none',
-          cursor: 'pointer',
-          letterSpacing: .5
+          cursor: 'pointer'
         }}
       >
         REGISTER FREE →
@@ -141,14 +147,13 @@ export default function Championship2027Page() {
         onClick={() => router.push('/leaderboard')}
         style={{
           background: 'transparent',
-          border: `1px solid rgba(255,255,255,0.3)`,
+          border: `1px solid rgba(255,255,255,0.35)`,
           color: '#fff',
           fontFamily: SANS,
           fontWeight: 600,
           fontSize: 14,
           padding: '14px 28px',
-          cursor: 'pointer',
-          letterSpacing: .5
+          cursor: 'pointer'
         }}
       >
         View Leaderboard
