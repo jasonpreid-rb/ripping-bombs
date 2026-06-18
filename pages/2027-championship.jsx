@@ -47,6 +47,20 @@ export default function Championship2027Page() {
         {/* HERO */}
         <div style={{ textAlign: 'center', padding: '64px 0 56px', borderBottom: `1px solid ${BDR}`, marginBottom: 56 }}>
           <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 16 }}>Launching January 2027</div>
+          <div style={{ marginBottom: 24 }}>
+  <img
+    src="https://simlifegolf.com/wp-content/uploads/2022/12/20211013_133305-scaled.jpg"
+    alt="Simulator Long Drive Championship"
+    style={{
+      width: '100%',
+      maxWidth: 520,
+      height: 'auto',
+      margin: '0 auto',
+      display: 'block',
+      borderRadius: 12
+    }}
+  />
+</div>
           <div style={{ fontFamily: DISP, fontSize: 'clamp(48px,8vw,80px)', color: TXT, letterSpacing: 1, lineHeight: .95, marginBottom: 20 }}>
             THE WORLD'S<br /><span style={{ color: ORG }}>BIGGEST</span><br />DRIVE COMP
           </div>
