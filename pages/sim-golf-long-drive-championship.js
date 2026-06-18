@@ -56,7 +56,7 @@ export default function Championship2027Page() {
 <div style={{
   position: 'relative',
   width: '100vw',
-  height: '85vh', // 👈 reduced from 100vh
+  height: '70vh', // 🔥 shorter = less dead space
   marginLeft: 'calc(50% - 50vw)',
   marginRight: 'calc(50% - 50vw)',
   overflow: 'hidden',
@@ -66,22 +66,21 @@ export default function Championship2027Page() {
   textAlign: 'center'
 }}>
 
-  {/* Background Image */}
+  {/* Background */}
   <div style={{
     position: 'absolute',
     inset: 0,
     backgroundImage: 'url(https://breezypointresort.com/wp-content/uploads/2025/06/breezy-point-golf-simulator-01.webp)',
     backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    transform: 'scale(1.05)'
+    backgroundPosition: 'center 35%', // 🔥 shifts focus (less empty ceiling feel)
+    transform: 'scale(1.08)' // 🔥 forces tighter crop
   }} />
 
-  {/* Stronger overlay (key fix) */}
+  {/* Dark overlay (stronger for premium feel) */}
   <div style={{
     position: 'absolute',
     inset: 0,
-    background: 'rgba(0,0,0,0.68)' // 👈 darker
+    background: 'rgba(0,0,0,0.72)'
   }} />
 
   {/* Content */}
@@ -99,17 +98,17 @@ export default function Championship2027Page() {
       letterSpacing: 3,
       color: ORG,
       textTransform: 'uppercase',
-      marginBottom: 14
+      marginBottom: 12
     }}>
       Launching January 2027
     </div>
 
     <div style={{
       fontFamily: DISP,
-      fontSize: 'clamp(44px,7vw,76px)',
+      fontSize: 'clamp(42px,6vw,72px)',
       color: '#fff',
       lineHeight: 0.95,
-      marginBottom: 16
+      marginBottom: 14
     }}>
       THE WORLD'S<br /><span style={{ color: ORG }}>BIGGEST</span><br />DRIVE COMP
     </div>
@@ -118,44 +117,10 @@ export default function Championship2027Page() {
       fontFamily: SANS,
       fontSize: 15,
       color: 'rgba(255,255,255,0.78)',
-      lineHeight: 1.6,
-      marginBottom: 26
+      lineHeight: 1.55,
+      marginBottom: 22
     }}>
       A season-long simulator long drive competition. One recorded drive per week. Category-based rankings with cumulative points across the season.
-    </div>
-
-    <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-      <button
-        onClick={() => router.push('/register')}
-        style={{
-          background: ORG,
-          color: '#000',
-          fontFamily: SANS,
-          fontWeight: 700,
-          fontSize: 14,
-          padding: '12px 28px',
-          border: 'none',
-          cursor: 'pointer'
-        }}
-      >
-        REGISTER FREE →
-      </button>
-
-      <button
-        onClick={() => router.push('/leaderboard')}
-        style={{
-          background: 'transparent',
-          border: `1px solid rgba(255,255,255,0.35)`,
-          color: '#fff',
-          fontFamily: SANS,
-          fontWeight: 600,
-          fontSize: 14,
-          padding: '12px 24px',
-          cursor: 'pointer'
-        }}
-      >
-        View Leaderboard
-      </button>
     </div>
 
   </div>
