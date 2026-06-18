@@ -88,8 +88,15 @@ export default function Championship2027Page() {
     `
   }} />
 
+
   {/* CONTENT */}
-  <div style={{ position: 'relative', zIndex: 2 }}>
+<div
+  style={{
+    position: 'relative',
+    zIndex: 2,
+    padding: '120px 0 100px'
+  }}
+>
     <div
       style={{
         fontFamily: SANS,
@@ -114,9 +121,9 @@ export default function Championship2027Page() {
         marginBottom: 20
       }}
     >
-      THE WORLD'S<br />
-      <span style={{ color: ORG }}>BIGGEST</span><br />
-      DRIVE COMP
+      THE WORLD'S BIGGEST<br />
+      <span style={{ color: ORG }}>SIM DRIVE</span><br />
+      COMP
     </div>
 
     <div
