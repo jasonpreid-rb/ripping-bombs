@@ -11,7 +11,7 @@ export function SeoPage({ title, description, children }) {
         <meta property="og:title" content={title}/>
         <meta property="og:description" content={description}/>
       </Head>
-      <div style={{ padding:'28px 18px 80px', maxWidth:1000, margin:'0 auto' }}>
+      <div style={{ padding:'0 18px 80px', maxWidth:1000, margin:'0 auto' }}>
         {children}
       </div>
     </>
@@ -19,7 +19,7 @@ export function SeoPage({ title, description, children }) {
 }
 
 export function SeoH1({ children }) {
-  return <h1 style={{ fontFamily:DISP, fontSize:'clamp(28px,5vw,48px)', color:TXT, letterSpacing:1, marginBottom:12, lineHeight:1.1 }}>{children}</h1>;
+  return <h1 style={{ fontFamily:DISP, fontSize:'clamp(28px,5vw,48px)', color:TXT, letterSpacing:1, marginBottom:12, lineHeight:1.1, marginTop:28 }}>{children}</h1>;
 }
 
 export function SeoH2({ children }) {
@@ -50,7 +50,7 @@ export function SeoTable({ headers, rows }) {
 export function SeoCTA() {
   const router = useRouter();
   return (
-    <div style={{ background:'rgba(163,230,53,0.05)', border:'1px solid rgba(163,230,53,0.2)', padding:'28px 24px', margin:'32px 0', textAlign:'center' }}>
+    <div style={{ background:'rgba(255,0,144,0.05)', border:'1px solid rgba(255,0,144,0.2)', padding:'28px 24px', margin:'32px 0', textAlign:'center' }}>
       <div style={{ fontFamily:DISP, fontSize:24, color:TXT, letterSpacing:1, marginBottom:8 }}>TRACK YOUR CLUB'S LONGEST DRIVES</div>
       <div style={{ fontFamily:SANS, fontSize:13, color:MUT, marginBottom:18 }}>Free to join. Register your course and start submitting verified drives to the global leaderboard.</div>
       <button onClick={()=>router.push('/register')} style={{ background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:13, padding:'12px 28px', cursor:'pointer', letterSpacing:.5 }}>
@@ -80,7 +80,7 @@ export function FilteredLeaderboard({ title, description, heading, intro, entrie
           {filtered.slice(0,3).map((e,i)=>{
             const org = orgFor(e.orgId);
             return (
-              <div key={e.id} style={{ background:BG2, border:`1px solid ${i===0?'rgba(163,230,53,0.3)':BDR}`, padding:'20px 20px 18px' }}>
+              <div key={e.id} style={{ background:BG2, border:`1px solid ${i===0?'rgba(255,0,144,0.3)':BDR}`, padding:'20px 20px 18px' }}>
                 <div style={{ fontSize:22, marginBottom:6 }}>{['🥇','🥈','🥉'][i]}</div>
                 <div style={{ fontFamily:DISP, fontSize:40, color:ORG, letterSpacing:1, lineHeight:1 }}>{cvt(e.dist)}</div>
                 <div style={{ fontFamily:SANS, fontSize:10, color:DIM, marginBottom:6 }}>{unitLbl}</div>
@@ -106,7 +106,7 @@ export function FilteredLeaderboard({ title, description, heading, intro, entrie
               return (
                 <tr key={e.id} style={{ borderBottom:`1px solid ${BDR}`, cursor:'pointer' }}
                   onClick={()=>router.push(`/drive/${e.id}`)}
-                  onMouseEnter={el=>el.currentTarget.style.background='rgba(163,230,53,0.04)'}
+                  onMouseEnter={el=>el.currentTarget.style.background='rgba(255,0,144,0.04)'}
                   onMouseLeave={el=>el.currentTarget.style.background='transparent'}>
                   <td style={{ padding:'10px 14px', fontFamily:SANS, fontSize:12, color:DIM }}>{i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`}</td>
                   <td style={{ padding:'10px 14px', fontFamily:SANS, fontWeight:700, fontSize:14, color:TXT }}>{e.player}</td>
@@ -124,7 +124,7 @@ export function FilteredLeaderboard({ title, description, heading, intro, entrie
         </table>
       </div>
 
-      <div style={{ background:'#0e0e0e', border:'1px solid rgba(163,230,53,0.2)', padding:'28px 24px', textAlign:'center' }}>
+      <div style={{ background:'#0e0e0e', border:'1px solid rgba(255,0,144,0.2)', padding:'28px 24px', textAlign:'center' }}>
         <div style={{ fontFamily:DISP, fontSize:24, color:'#fff', letterSpacing:1, marginBottom:8 }}>DOES YOUR CLUB HAVE A BIG HITTER?</div>
         <div style={{ fontFamily:SANS, fontSize:13, color:'rgba(255,255,255,0.5)', marginBottom:16 }}>Register free and submit your competition longest drive results to the global leaderboard.</div>
         <button onClick={()=>router.push('/register')} style={{ background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:12, padding:'12px 28px', cursor:'pointer', letterSpacing:.5 }}>
