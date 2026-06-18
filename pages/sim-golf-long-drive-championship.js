@@ -52,35 +52,111 @@ export default function Championship2027Page() {
 
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '0 0 80px' }}>
 
-        {/* HERO */}
-        <div style={{ textAlign: 'center', padding: '64px 0 56px', borderBottom: `1px solid ${BDR}`, marginBottom: 56 }}>
-          <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 16 }}>
-            Launching January 2027
-          </div>
+      {/* HERO */}
+<div style={{
+  position: 'relative',
+  textAlign: 'center',
+  padding: '64px 0 56px',
+  borderBottom: `1px solid ${BDR}`,
+  marginBottom: 56,
+  overflow: 'hidden'
+}}>
 
-          <div style={{ fontFamily: DISP, fontSize: 'clamp(48px,8vw,80px)', color: TXT, letterSpacing: 1, lineHeight: .95, marginBottom: 20 }}>
-            THE WORLD'S<br /><span style={{ color: ORG }}>BIGGEST</span><br />DRIVE COMP
-          </div>
+  {/* Background Image */}
+  <div style={{
+    position: 'absolute',
+    inset: 0,
+    backgroundImage: 'url(https://breezypointresort.com/wp-content/uploads/2025/06/breezy-point-golf-simulator-01.webp)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    filter: 'brightness(0.35)',
+    transform: 'scale(1.05)',
+    zIndex: 0
+  }} />
 
-          <div style={{ fontFamily: SANS, fontSize: 16, color: MUT, lineHeight: 1.75, maxWidth: 500, margin: '0 auto 32px' }}>
-            A season-long simulator long drive competition. One recorded drive per week. Category-based rankings with cumulative points across the season.
-          </div>
+  {/* Dark overlay for readability */}
+  <div style={{
+    position: 'absolute',
+    inset: 0,
+    background: 'rgba(0,0,0,0.45)',
+    zIndex: 1
+  }} />
 
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button
-              onClick={() => router.push('/register')}
-              style={{ background: ORG, color: '#000', fontFamily: SANS, fontWeight: 700, fontSize: 14, padding: '14px 32px', border: 'none', cursor: 'pointer', letterSpacing: .5 }}
-            >
-              REGISTER FREE →
-            </button>
-            <button
-              onClick={() => router.push('/leaderboard')}
-              style={{ background: 'transparent', border: `1px solid ${BDR}`, color: MUT, fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '14px 28px', cursor: 'pointer', letterSpacing: .5 }}
-            >
-              View Leaderboard
-            </button>
-          </div>
-        </div>
+  {/* Content */}
+  <div style={{ position: 'relative', zIndex: 2 }}>
+    
+    <div style={{
+      fontFamily: SANS,
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: 3,
+      color: ORG,
+      textTransform: 'uppercase',
+      marginBottom: 16
+    }}>
+      Launching January 2027
+    </div>
+
+    <div style={{
+      fontFamily: DISP,
+      fontSize: 'clamp(48px,8vw,80px)',
+      color: '#fff',
+      letterSpacing: 1,
+      lineHeight: .95,
+      marginBottom: 20
+    }}>
+      THE WORLD'S<br /><span style={{ color: ORG }}>BIGGEST</span><br />DRIVE COMP
+    </div>
+
+    <div style={{
+      fontFamily: SANS,
+      fontSize: 16,
+      color: 'rgba(255,255,255,0.8)',
+      lineHeight: 1.75,
+      maxWidth: 500,
+      margin: '0 auto 32px'
+    }}>
+      A season-long simulator long drive competition. One recorded drive per week. Category-based rankings with cumulative points across the season.
+    </div>
+
+    <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+      <button
+        onClick={() => router.push('/register')}
+        style={{
+          background: ORG,
+          color: '#000',
+          fontFamily: SANS,
+          fontWeight: 700,
+          fontSize: 14,
+          padding: '14px 32px',
+          border: 'none',
+          cursor: 'pointer',
+          letterSpacing: .5
+        }}
+      >
+        REGISTER FREE →
+      </button>
+
+      <button
+        onClick={() => router.push('/leaderboard')}
+        style={{
+          background: 'transparent',
+          border: `1px solid rgba(255,255,255,0.3)`,
+          color: '#fff',
+          fontFamily: SANS,
+          fontWeight: 600,
+          fontSize: 14,
+          padding: '14px 28px',
+          cursor: 'pointer',
+          letterSpacing: .5
+        }}
+      >
+        View Leaderboard
+      </button>
+    </div>
+
+  </div>
+</div>
 
         {/* WHY */}
         <div style={{ marginBottom: 56 }}>
