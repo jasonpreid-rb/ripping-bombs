@@ -23,46 +23,46 @@ const CATEGORIES = [
 ]
 
 const FAQS = [
-  { q: 'Who can enter the 2027 Championship?', a: 'Any registered simulator account. If you don\'t have an account yet, registration is free and takes under 2 minutes. Simulator accounts are auto-approved instantly.' },
-  { q: 'When do I select my championship category?', a: 'Category selection opens in January 2027. You\'ll be prompted to choose when you log in. Pick the category that fits your age, gender, and handicap — you can only compete in one.' },
-  { q: 'Can I change my category after selecting?', a: 'No. Once you\'ve selected your championship category for the season it is locked. Choose carefully.' },
-  { q: 'How are weekly points awarded?', a: '1st place earns 100 points, 2nd earns 70, 3rd earns 50, 4th earns 40, 5th earns 30, 6th earns 20, and every other submission earns 10 points. You earn points every week you submit — consistency matters as much as distance.' },
-  { q: 'Do my submissions before January 2027 count?', a: 'Points accumulation begins when the championship launches in January 2027. Submitting now builds your record and gets you on the leaderboard ahead of the season.' },
-  { q: 'Is there a limit on weekly submissions?', a: 'One drive per week. Only your best drive of the week counts toward your weekly points total.' },
-  { q: 'What equipment is accepted?', a: 'Any calibrated launch monitor — Trackman, GCQuad, Foresight, Mevo+, and equivalents. A screenshot of the readout showing carry distance is required as evidence.' },
-  { q: 'Is entry free?', a: 'Yes. Registering and competing in the 2027 Championship is completely free.' },
+  { q: 'Who can enter the 2027 Championship?', a: 'Any registered simulator user. Registration is free and instant.' },
+  { q: 'When does the season start?', a: 'The official championship season begins January 2027. Pre-season submissions build your record but do not earn points.' },
+  { q: 'How often can I submit?', a: 'One valid drive per week counts toward the leaderboard. Only your best recorded drive of that week is used.' },
+  { q: 'How are weekly points awarded?', a: 'Rankings are calculated within each category weekly: 1st = 100, 2nd = 70, 3rd = 50, 4th = 40, 5th = 30, 6th = 20, 7th+ = 10 points.' },
+  { q: 'What counts as a valid drive?', a: 'A single driver shot recorded on an approved launch monitor or simulator with visible carry/total distance data.' },
+  { q: 'What equipment is allowed?', a: 'TrackMan, Foresight (GCQuad / GC3), SkyTrak, Mevo+, and equivalent calibrated launch monitors.' },
+  { q: 'Can I change category mid-season?', a: 'No. Once selected in January 2027, your category is locked for the full season.' },
+  { q: 'Is it free to enter?', a: 'Yes — the competition is completely free to join and compete in.' },
 ]
 
-export default function Championship2027Page() {
+export default function SimChampionshipPage() {
   const router = useRouter()
   const [openFaq, setOpenFaq] = useState(null)
 
   return (
     <SeoPage
-      title="2027 Simulator Championship | Ripping Bombs"
-      description="The Ripping Bombs 2027 Simulator Championship — the world's largest online golf longest drive competition. One drive per week. Six categories. Points accumulate all season."
+      title="Longest Sim Golf Drive Competition | Ripping Bombs"
+      description="The Ripping Bombs Simulator Championship — a global longest drive leaderboard. One drive per week. Six categories. Seasonal points format."
     >
       <div style={{maxWidth:760,margin:'0 auto',padding:'0 0 80px'}}>
 
         {/* HERO */}
         <div style={{position:'relative',width:'100vw',marginLeft:'calc(50% - 50vw)',marginRight:'calc(50% - 50vw)',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center'}}>
-          <div style={{position:'absolute',inset:0,backgroundImage:"url('https://simlifegolf.com/wp-content/uploads/2022/12/20211013_133305-scaled.jpg')",backgroundSize:'cover',backgroundPosition:'center',filter:'brightness(0.35)',transform:'scale(1.05)'}}/>
-          <div style={{position:'absolute',inset:0,background:'linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.5))'}}/>
+          <div style={{position:'absolute',inset:0,backgroundImage:"url('https://breezypointresort.com/wp-content/uploads/2025/06/breezy-point-golf-simulator-01.webp')",backgroundSize:'cover',backgroundPosition:'center 40%',filter:'brightness(0.35)',transform:'scale(1.12)'}}/>
+          <div style={{position:'absolute',inset:0,background:'linear-gradient(rgba(0,0,0,0.65),rgba(0,0,0,0.55))'}}/>
           <div style={{position:'relative',zIndex:2,padding:'clamp(72px,12vw,120px) 20px clamp(72px,12vw,100px)',maxWidth:640}}>
             <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:14,background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
-              Launching January 2027
+              Submit anywhere, anytime
             </div>
-            <div style={{fontFamily:DISP,fontSize:'clamp(48px,8vw,80px)',color:'#fff',letterSpacing:1,lineHeight:.95,marginBottom:20,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
-              THE WORLD'S BIGGEST<br/><span style={{color:ORG}}>SIM DRIVE</span><br/>COMP
+            <div style={{fontFamily:DISP,fontSize:'clamp(48px,8vw,80px)',color:'#fff',lineHeight:.95,marginBottom:20,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
+              THE WORLD'S<br/><span style={{color:ORG}}>SIM GOLF</span><br/>DRIVE COMP
             </div>
             <div style={{fontFamily:SANS,fontSize:15,color:'rgba(255,255,255,0.75)',lineHeight:1.75,maxWidth:500,margin:'0 auto 32px'}}>
-              Six categories. One drive per week. Points accumulate all season. The Ripping Bombs 2027 Simulator Championship could be the largest amateur golf competition on the planet.
+              A season-long simulator long drive competition. One recorded drive per week. Category-based rankings with cumulative points across the season.
             </div>
             <div style={{display:'flex',gap:10,justifyContent:'center',flexWrap:'wrap'}}>
               <button onClick={()=>router.push('/register')} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 32px',border:'none',cursor:'pointer',letterSpacing:.5}}>
                 REGISTER FREE →
               </button>
-              <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid rgba(255,255,255,0.3)`,color:'#fff',fontFamily:SANS,fontWeight:600,fontSize:14,padding:'14px 28px',cursor:'pointer',letterSpacing:.5}}>
+              <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:'1px solid rgba(255,255,255,0.3)',color:'#fff',fontFamily:SANS,fontWeight:600,fontSize:14,padding:'14px 28px',cursor:'pointer',letterSpacing:.5}}>
                 View Leaderboard
               </button>
             </div>
@@ -71,22 +71,22 @@ export default function Championship2027Page() {
 
         <div style={{marginBottom:56}}/>
 
-        {/* WHY IT'S BIG */}
+        {/* WHY */}
         <div style={{marginBottom:56}}>
-          <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>Why this is different</div>
-          <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:16}}>A SEASON-LONG COMPETITION, OPEN TO EVERYONE</div>
+          <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>Why it matters</div>
+          <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:16}}>A TRUE SEASON FORMAT, NOT A ONE-OFF EVENT</div>
           <div style={{fontFamily:SANS,fontSize:14,color:MUT,lineHeight:1.85,marginBottom:16}}>
-            Most golf competitions are one-day events. You show up, you hit, you go home. The 2027 Ripping Bombs Simulator Championship is different — it runs all year, with a new weekly leaderboard resetting every Monday. Every drive you submit earns points. Every week is a chance to climb.
+            The championship runs weekly across an entire season. Each player submits one validated drive per week, and rankings are determined within fixed categories.
           </div>
           <div style={{fontFamily:SANS,fontSize:14,color:MUT,lineHeight:1.85}}>
-            Because it's open to any registered simulator user anywhere in the world, with no entry fee and no travel required, this has the potential to become the largest amateur golf competition ever run. If you own a launch monitor, you're eligible.
+            It is designed to reward both peak performance and consistency — not just one big hit.
           </div>
         </div>
 
         {/* POINTS TABLE */}
         <div style={{marginBottom:56}}>
-          <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>Points structure</div>
-          <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:20}}>EARN POINTS EVERY WEEK</div>
+          <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>Points system</div>
+          <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:20}}>WEEKLY CATEGORY POINTS</div>
           <div style={{border:`1px solid ${BDR}`,overflow:'hidden',marginBottom:16}}>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',background:BG3,borderBottom:`2px solid ${BDR}`}}>
               {['Position','Points',''].map((h,i)=>(
@@ -113,7 +113,7 @@ export default function Championship2027Page() {
         {/* HOW IT WORKS */}
         <div style={{marginBottom:56}}>
           <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>How it works</div>
-          <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:24}}>THREE STEPS TO COMPETE</div>
+          <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:24}}>SIMPLE WEEKLY FORMAT</div>
           {[
             {num:1,title:'Register a Simulator Account',body:'Free, takes under 2 minutes, auto-approved instantly. Select "Simulator / Individual" during registration.'},
             {num:2,title:'Choose Your Championship Category',body:'When the championship opens in January 2027, log in and select the one category you want to compete in for the season. This cannot be changed once selected.'},
@@ -135,7 +135,7 @@ export default function Championship2027Page() {
         {/* CATEGORIES */}
         <div style={{marginBottom:56}}>
           <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>Championships</div>
-          <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:8}}>SIX CATEGORIES. ONE FOR YOU.</div>
+          <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:8}}>SIX COMPETITION CATEGORIES</div>
           <div style={{fontFamily:SANS,fontSize:14,color:MUT,lineHeight:1.7,marginBottom:24}}>
             Every player competes in one category only. Pick the one that fits — there's a leaderboard for everyone.
           </div>
@@ -153,10 +153,10 @@ export default function Championship2027Page() {
         {/* CTA STRIP */}
         <div style={{background:'rgba(163,230,53,0.05)',border:'1px solid rgba(163,230,53,0.2)',padding:'40px 32px',textAlign:'center',marginBottom:56}}>
           <div style={{fontFamily:DISP,fontSize:'clamp(24px,4vw,36px)',color:TXT,letterSpacing:1,lineHeight:1.1,marginBottom:12}}>
-            START BUILDING YOUR<br/><span style={{color:ORG}}>RECORD NOW</span>
+            THINK YOU'VE GOT A<br/><span style={{color:ORG}}>LONG DRIVE IN YOU?</span>
           </div>
           <div style={{fontFamily:SANS,fontSize:14,color:MUT,maxWidth:420,margin:'0 auto 24px',lineHeight:1.7}}>
-            Register today, submit weekly, and be ready when the championship opens in January 2027.
+            Register your simulator account for free and start submitting drives to the global leaderboard today.
           </div>
           <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 36px',cursor:'pointer',letterSpacing:.5}}>
             REGISTER FREE →
