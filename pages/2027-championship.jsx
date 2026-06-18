@@ -44,44 +44,131 @@ export default function Championship2027Page() {
     >
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '0 0 80px' }}>
 
-        {/* HERO */}
-        <div style={{ textAlign: 'center', padding: '64px 0 56px', borderBottom: `1px solid ${BDR}`, marginBottom: 56 }}>
-          <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 16 }}>Launching January 2027</div>
-          <div style={{ marginBottom: 24 }}>
-  <img
-    src="https://simlifegolf.com/wp-content/uploads/2022/12/20211013_133305-scaled.jpg"
-    alt="Simulator Long Drive Championship"
+       {/* HERO */}
+<div
+  style={{
+     position: 'relative',
+  width: '100vw',
+  height: '60vh', // 🔥 MUCH shorter crop
+  marginLeft: 'calc(50% - 50vw)',
+  marginRight: 'calc(50% - 50vw)',
+  overflow: 'hidden',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  textAlign: 'center'
+  }}
+>
+  {/* BACKGROUND IMAGE */}
+  <div
     style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
       width: '100%',
-      maxWidth: 520,
-      height: 'auto',
-      margin: '0 auto',
-      display: 'block',
-      borderRadius: 12
+      height: '100%',
+      backgroundImage: "url('https://simlifegolf.com/wp-content/uploads/2022/12/20211013_133305-scaled.jpg')",
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      filter: 'brightness(0.35)',
+      transform: 'scale(1.05)',
+      zIndex: 0
     }}
   />
+
+  {/* DARK OVERLAY (key upgrade) */}
+  <div style={{
+    position: 'absolute',
+    inset: 0,
+    background: `
+      linear-gradient(
+        rgba(0,0,0,0.85),
+        rgba(0,0,0,0.75)
+      )
+    `
+  }} />
+
+  {/* CONTENT */}
+  <div style={{ position: 'relative', zIndex: 2 }}>
+    <div
+      style={{
+        fontFamily: SANS,
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: 3,
+        color: ORG,
+        textTransform: 'uppercase',
+        marginBottom: 16
+      }}
+    >
+      Launching January 2027
+    </div>
+
+    <div
+      style={{
+        fontFamily: DISP,
+        fontSize: 'clamp(48px,8vw,80px)',
+        color: '#fff',
+        letterSpacing: 1,
+        lineHeight: 0.95,
+        marginBottom: 20
+      }}
+    >
+      THE WORLD'S<br />
+      <span style={{ color: ORG }}>BIGGEST</span><br />
+      DRIVE COMP
+    </div>
+
+    <div
+      style={{
+        fontFamily: SANS,
+        fontSize: 16,
+        color: 'rgba(255,255,255,0.75)',
+        lineHeight: 1.75,
+        maxWidth: 500,
+        margin: '0 auto 32px'
+      }}
+    >
+      Six categories. One drive per week. Points accumulate all season. The Ripping Bombs 2027 Simulator Championship could be the largest amateur golf competition on the planet.
+    </div>
+
+    <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+      <button
+        onClick={() => router.push('/register')}
+        style={{
+          background: ORG,
+          color: '#000',
+          fontFamily: SANS,
+          fontWeight: 700,
+          fontSize: 14,
+          padding: '14px 32px',
+          border: 'none',
+          cursor: 'pointer',
+          letterSpacing: 0.5
+        }}
+      >
+        REGISTER FREE →
+      </button>
+
+      <button
+        onClick={() => router.push('/leaderboard')}
+        style={{
+          background: 'transparent',
+          border: `1px solid ${ORG}`,
+          color: ORG,
+          fontFamily: SANS,
+          fontWeight: 600,
+          fontSize: 14,
+          padding: '14px 28px',
+          cursor: 'pointer',
+          letterSpacing: 0.5
+        }}
+      >
+        View Leaderboard
+      </button>
+    </div>
+  </div>
 </div>
-          <div style={{ fontFamily: DISP, fontSize: 'clamp(48px,8vw,80px)', color: TXT, letterSpacing: 1, lineHeight: .95, marginBottom: 20 }}>
-            THE WORLD'S<br /><span style={{ color: ORG }}>BIGGEST</span><br />DRIVE COMP
-          </div>
-          <div style={{ fontFamily: SANS, fontSize: 16, color: MUT, lineHeight: 1.75, maxWidth: 500, margin: '0 auto 32px' }}>
-            Six categories. One drive per week. Points accumulate all season. The Ripping Bombs 2027 Simulator Championship could be the largest amateur golf competition on the planet.
-          </div>
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button
-              onClick={() => router.push('/register')}
-              style={{ background: ORG, color: '#000', fontFamily: SANS, fontWeight: 700, fontSize: 14, padding: '14px 32px', border: 'none', cursor: 'pointer', letterSpacing: .5 }}
-            >
-              REGISTER FREE →
-            </button>
-            <button
-              onClick={() => router.push('/leaderboard')}
-              style={{ background: 'transparent', border: `1px solid ${BDR}`, color: MUT, fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '14px 28px', cursor: 'pointer', letterSpacing: .5 }}
-            >
-              View Leaderboard
-            </button>
-          </div>
-        </div>
 
         {/* WHY IT'S BIG */}
         <div style={{ marginBottom: 56 }}>
