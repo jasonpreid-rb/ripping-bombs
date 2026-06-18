@@ -57,6 +57,7 @@ export default function Championship2027Page() {
   alignItems: 'center',
   justifyContent: 'center',
   textAlign: 'center'
+  padding: '80px 0 60px'
   }}
 >
   {/* BACKGROUND IMAGE */}
