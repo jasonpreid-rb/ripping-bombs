@@ -105,15 +105,15 @@ export default function Championship2027Page() {
       textTransform: 'uppercase',
       marginBottom: 10
     }}>
-      Launching January 2027
+      Submit anywhere, anytime
     </div>
 
     <div style={{
       fontFamily: DISP,
-      fontSize: 'clamp(38px,5.5vw,68px)',
+      fontSize: 'clamp(48px,8vw,80px)',
       color: '#fff',
       lineHeight: 0.95,
-      marginBottom: 14
+      marginBottom: 12
     }}>
       THE WORLD'S<br /><span style={{ color: ORG }}>SIM GOLF</span><br />DRIVE COMP
     </div>
@@ -129,6 +129,7 @@ export default function Championship2027Page() {
     </div>
 
   </div>
+<div></div>
 </div>
 
         {/* WHY */}
