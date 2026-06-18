@@ -50,7 +50,7 @@ export default function Championship2027Page() {
       description="The Ripping Bombs Simulator Championship — a global longest drive leaderboard. One drive per week. Six categories. Seasonal points format."
     >
 
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '0 0 80px' }}>
+      <div style={{ maxWidth: 760, margin: '0 auto', padding: '0 0 0px' }}>
 
 {/* HERO */}
 <div style={{
@@ -129,8 +129,9 @@ export default function Championship2027Page() {
     </div>
 
   </div>
-<div></div>
 </div>
+
+<div style={{ marginBottom: "40px" }} />
 
         {/* WHY */}
         <div style={{ marginBottom: 56 }}>
