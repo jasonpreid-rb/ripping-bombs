@@ -137,7 +137,7 @@ export default function Page() {
         Learn more about the championship and start building your record today.
       </SeoP>
 
-      <SeoCTA
+      <SeoCTA />
         title="Ready To Compete?"
         description="Learn how the 2027 Simulator Championship works and start building your record."
         primaryText="VIEW 2027 CHAMPIONSHIP"
