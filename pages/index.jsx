@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { fmtDate } from '../lib/constants';
@@ -7,6 +7,7 @@ import EmailSignup from '../components/EmailSignup';
 import { countryFlag } from '../components/UI';
 
 // ── Inline percentile calculator (embedded on homepage) ──────────────────────
+
 const CALC_BENCHMARKS = {
   male:   { youth:{scratch:250,low:235,mid:215,high:190}, adult:{scratch:285,low:260,mid:235,high:205}, senior:{scratch:255,low:235,mid:215,high:190} },
   female: { youth:{scratch:195,low:180,mid:165,high:145}, adult:{scratch:225,low:205,mid:185,high:160}, senior:{scratch:200,low:185,mid:170,high:150} },
@@ -27,6 +28,61 @@ function calcVerdict(topPct) {
   return               {label:'📈 ROOM TO GROW',  color:'#666'};
 }
 
+function AnimatedCalcResult({ result, hcp, gender }) {
+  const topPct = 100 - result.pct;
+  const verdict = calcVerdict(topPct);
+  const [displayPct, setDisplayPct] = useState(0);
+  const [barWidth, setBarWidth] = useState(0);
+  const [visible, setVisible] = useState(false);
+  const rafRef = useRef(null);
+
+  useEffect(() => {
+    setDisplayPct(0); setBarWidth(0); setVisible(false);
+    const t = setTimeout(() => {
+      setVisible(true);
+      const duration = 1400, start = performance.now();
+      function tick(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        setDisplayPct(Math.round(eased * topPct));
+        setBarWidth(eased * result.pct);
+        if (progress < 1) rafRef.current = requestAnimationFrame(tick);
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    }, 80);
+    return () => { clearTimeout(t); if(rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [result]);
+
+  return (
+    <div style={{marginTop:28,paddingTop:28,borderTop:'1px solid rgba(255,255,255,0.1)',opacity:visible?1:0,transform:visible?'translateY(0)':'translateY(12px)',transition:'opacity 0.4s ease,transform 0.4s ease'}}>
+      <div style={{textAlign:'center',marginBottom:20}}>
+        <div style={{display:'inline-block',fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:2,color:verdict.color,border:`1px solid ${verdict.color}`,padding:'5px 14px',textTransform:'uppercase',marginBottom:16}}>
+          {verdict.label}
+        </div>
+        <div style={{fontFamily:DISP,fontSize:'clamp(52px,10vw,88px)',color:ORG,letterSpacing:1,lineHeight:1}}>
+          TOP {displayPct}%
+        </div>
+        <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginTop:8,marginBottom:24}}>
+          You out-drive roughly <strong style={{color:TXT}}>{result.pct}%</strong> of similar golfers
+          {' '}({result.ag==='youth'?'under 18':result.ag==='senior'?'55+':'18–54'}, hcp {hcp}, {gender==='male'?'men':'women'}).
+        </div>
+      </div>
+      <div style={{marginBottom:8}}>
+        <div style={{display:'flex',justifyContent:'space-between',fontFamily:SANS,fontSize:10,color:DIM,marginBottom:6,letterSpacing:1}}>
+          <span>SHORT HITTERS</span><span>LONG HITTERS</span>
+        </div>
+        <div style={{height:10,background:'rgba(255,255,255,0.06)',position:'relative',overflow:'hidden'}}>
+          <div style={{position:'absolute',left:0,top:0,bottom:0,width:`${barWidth}%`,background:'linear-gradient(90deg,rgba(255,0,144,0.3),#a3e635)'}}/>
+          <div style={{position:'absolute',top:-2,bottom:-2,left:`${barWidth}%`,width:3,background:'#fff',boxShadow:'0 0 8px rgba(255,255,255,0.8)'}}/>
+        </div>
+        <div style={{fontFamily:SANS,fontSize:11,color:DIM,marginTop:6,textAlign:'center'}}>
+          Estimated average for your group: ~{result.avg} yds
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function InlineCalculator({ router }) {
   const [dist,setDist]     = useState('');
   const [hcp,setHcp]       = useState('');
@@ -40,84 +96,59 @@ function InlineCalculator({ router }) {
     const ag=calcAgeGroup(a),hb=calcHcpBand(h);
     const avg=CALC_BENCHMARKS[gender][ag][hb];
     const z=(d-avg)/CALC_SPREAD;
-    const rawPct=calcPercentile(z);
-    const pct=Math.max(1,Math.min(99,Math.round(rawPct*100)));
-    const topPct=100-pct;
-    setResult({pct,topPct,avg,ag});
-    if(typeof window!=='undefined'&&window.gtag) {
+    const pct=Math.max(1,Math.min(99,Math.round(calcPercentile(z)*100)));
+    setResult({pct,avg,ag});
+    if(typeof window!=='undefined'&&window.gtag)
       window.gtag('event','homepage_percentile_calculated',{event_category:'engagement',distance:d,handicap:h,age_group:ag,gender,percentile:pct});
-    }
   }
 
-  const fieldStyle = {width:'100%',background:'rgba(255,255,255,0.05)',border:`1px solid ${BDR}`,padding:'10px 14px',color:TXT,fontFamily:SANS,fontSize:14,outline:'none',boxSizing:'border-box',borderRadius:0};
-  const labelStyle = {display:'block',fontFamily:SANS,fontSize:11,fontWeight:600,color:MUT,marginBottom:5,textTransform:'uppercase',letterSpacing:.8};
+  const inp = {width:'100%',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.15)',padding:'11px 14px',color:'#fff',fontFamily:SANS,fontSize:14,outline:'none',boxSizing:'border-box',borderRadius:0};
+  const lbl = {display:'block',fontFamily:SANS,fontSize:10,fontWeight:700,color:'rgba(255,255,255,0.5)',marginBottom:5,textTransform:'uppercase',letterSpacing:1};
 
   return (
-    <div style={{background:'#0d0d0d',borderTop:'1px solid rgba(255,255,255,0.06)',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'52px 18px'}}>
-      <div style={{maxWidth:720,margin:'0 auto'}}>
-        <div style={{textAlign:'center',marginBottom:28}}>
-          <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:10}}>Free Tool</div>
-          <div style={{fontFamily:DISP,fontSize:'clamp(22px,4vw,36px)',color:TXT,letterSpacing:.5,marginBottom:10}}>HOW FAR DO YOU DRIVE<br/>COMPARED TO OTHERS?</div>
-          <div style={{fontFamily:SANS,fontSize:14,color:MUT,lineHeight:1.7}}>Enter your details below — see your percentile instantly. No sign-up.</div>
+    <div style={{position:'relative',zIndex:1,maxWidth:700,margin:'0 auto',width:'100%'}}>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))',gap:'0 12px',marginBottom:14}}>
+        <div style={{marginBottom:12}}>
+          <label style={lbl}>Distance (yds)<span style={{color:ORG,marginLeft:2}}>*</span></label>
+          <input type="number" value={dist} onChange={e=>setDist(e.target.value)} placeholder="e.g. 240" min={50} max={400} style={inp}/>
         </div>
-
-        {/* Input row */}
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:'0 16px',marginBottom:16}}>
-          <div style={{marginBottom:14}}>
-            <label style={labelStyle}>Distance (yds)<span style={{color:ORG,marginLeft:2}}>*</span></label>
-            <input type="number" value={dist} onChange={e=>setDist(e.target.value)} placeholder="e.g. 240" min={50} max={400} style={fieldStyle}/>
-          </div>
-          <div style={{marginBottom:14}}>
-            <label style={labelStyle}>Handicap<span style={{color:ORG,marginLeft:2}}>*</span></label>
-            <input type="number" value={hcp} onChange={e=>setHcp(e.target.value)} placeholder="e.g. 14" min={0} max={54} style={fieldStyle}/>
-          </div>
-          <div style={{marginBottom:14}}>
-            <label style={labelStyle}>Age<span style={{color:ORG,marginLeft:2}}>*</span></label>
-            <input type="number" value={age} onChange={e=>setAge(e.target.value)} placeholder="e.g. 35" min={5} max={99} style={fieldStyle}/>
-          </div>
-          <div style={{marginBottom:14}}>
-            <label style={labelStyle}>Gender<span style={{color:ORG,marginLeft:2}}>*</span></label>
-            <select value={gender} onChange={e=>setGender(e.target.value)} style={fieldStyle}>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-            </select>
-          </div>
+        <div style={{marginBottom:12}}>
+          <label style={lbl}>Handicap<span style={{color:ORG,marginLeft:2}}>*</span></label>
+          <input type="number" value={hcp} onChange={e=>setHcp(e.target.value)} placeholder="e.g. 14" min={0} max={54} style={inp}/>
         </div>
-
-        <div style={{display:'flex',gap:10,marginBottom:0}}>
-          <button onClick={calculate} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'12px 28px',border:'none',cursor:'pointer',letterSpacing:.5}}>
-            CALCULATE MY RANK →
-          </button>
-          {result && (
-            <button onClick={()=>{setDist('');setHcp('');setAge('');setGender('male');setResult(null);}}
-              style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:13,padding:'12px 20px',cursor:'pointer'}}>
-              RESET
-            </button>
-          )}
+        <div style={{marginBottom:12}}>
+          <label style={lbl}>Age<span style={{color:ORG,marginLeft:2}}>*</span></label>
+          <input type="number" value={age} onChange={e=>setAge(e.target.value)} placeholder="e.g. 35" min={5} max={99} style={inp}/>
         </div>
-
-        {/* Result */}
-        {result && (() => {
-          const verdict=calcVerdict(result.topPct);
-          return (
-            <div style={{marginTop:28,paddingTop:28,borderTop:`1px solid ${BDR}`,textAlign:'center'}}>
-              <div style={{display:'inline-block',fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:2,color:verdict.color,border:`1px solid ${verdict.color}`,padding:'5px 14px',textTransform:'uppercase',marginBottom:14}}>
-                {verdict.label}
-              </div>
-              <div style={{fontFamily:DISP,fontSize:'clamp(48px,10vw,80px)',color:ORG,letterSpacing:1,lineHeight:1}}>
-                TOP {result.topPct}%
-              </div>
-              <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginTop:8,marginBottom:22}}>
-                You out-drive roughly <strong style={{color:TXT}}>{result.pct}%</strong> of similar golfers.
-                {' '}Average for your group: ~{result.avg} yds.
-              </div>
-              <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:13,padding:'11px 26px',cursor:'pointer',letterSpacing:.5}}>
-                SUBMIT YOUR REAL DRIVE →
-              </button>
-            </div>
-          );
-        })()}
+        <div style={{marginBottom:12}}>
+          <label style={lbl}>Gender<span style={{color:ORG,marginLeft:2}}>*</span></label>
+          <select value={gender} onChange={e=>setGender(e.target.value)} style={inp}>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
       </div>
+      <div style={{display:'flex',gap:10}}>
+        <button onClick={calculate} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'13px 28px',border:'none',cursor:'pointer',letterSpacing:.5}}>
+          CALCULATE MY RANK →
+        </button>
+        {result && (
+          <button onClick={()=>{setDist('');setHcp('');setAge('');setGender('male');setResult(null);}}
+            style={{background:'transparent',border:'1px solid rgba(255,255,255,0.2)',color:'rgba(255,255,255,0.6)',fontFamily:SANS,fontWeight:600,fontSize:13,padding:'13px 20px',cursor:'pointer'}}>
+            RESET
+          </button>
+        )}
+      </div>
+      {result && (
+        <>
+          <AnimatedCalcResult result={result} hcp={hcp} gender={gender}/>
+          <div style={{marginTop:20,textAlign:'center'}}>
+            <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:13,padding:'11px 26px',cursor:'pointer',letterSpacing:.5}}>
+              SUBMIT YOUR REAL DRIVE →
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -266,29 +297,52 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
       </Head>
       <div style={{animation:'fi .4s ease'}}>
 
-        {/* HERO */}
+        {/* HERO — video bg + condensed header + calculator */}
         <div style={{position:'relative',overflow:'hidden'}}>
           <video autoPlay muted loop playsInline poster="https://images.pexels.com/videos/33511561/tee-shot-33511561.jpeg?auto=compress&cs=tinysrgb&h=627&fit=crop&w=1200"
-            style={{width:'100%',height:'clamp(520px,60vw,620px)',objectFit:'cover',display:'block',filter:'brightness(0.45)'}}>
+            style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block',filter:'brightness(0.35)'}}>
             <source src="https://videos.pexels.com/video-files/33511561/14252773_2560_1440_60fps.mp4" type="video/mp4"/>
           </video>
-          <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(0,0,0,0.1),rgba(0,0,0,0.55))'}}/>
-          <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'clamp(60px,12vw,80px) 20px',textAlign:'center'}}>
-            <div style={{fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:4,color:ORG,textTransform:'uppercase',marginBottom:16,background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
+          <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(0,0,0,0.2),rgba(0,0,0,0.7))'}}/>
+          <div style={{position:'relative',zIndex:1,padding:'clamp(40px,8vw,72px) 20px clamp(48px,8vw,72px)',display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center'}}>
+            {/* Condensed brand header */}
+            <div style={{fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:4,color:ORG,textTransform:'uppercase',marginBottom:12,background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
               The World's Longest Drive Leaderboard
             </div>
-            <h1 style={{fontFamily:DISP,fontSize:'clamp(56px,10vw,100px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:20,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
-              REGISTER. SUBMIT.<br/>GO LIVE.
+            <h1 style={{fontFamily:DISP,fontSize:'clamp(42px,8vw,72px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:8,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
+              RIPPING BOMBS
             </h1>
-            <p style={{fontFamily:SANS,fontSize:16,color:'rgba(255,255,255,0.85)',maxWidth:520,margin:'0 auto 32px',lineHeight:1.7}}>
-              Register, submit drives, and appear instantly on the live leaderboard.
+            <p style={{fontFamily:SANS,fontSize:14,color:'rgba(255,255,255,0.65)',maxWidth:440,margin:'0 auto 36px',lineHeight:1.6,letterSpacing:.3}}>
+              See where your drive ranks against golfers your age, handicap &amp; gender — instantly.
             </p>
-            <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
-              <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 32px',borderRadius:0,cursor:'pointer',letterSpacing:.5}}>GET STARTED FREE →</button>
-              <button onClick={()=>router.push('/leaderboard')} style={{background:'rgba(255,255,255,0.12)',border:'1px solid rgba(255,255,255,0.3)',color:'#fff',fontFamily:SANS,fontWeight:600,fontSize:14,padding:'14px 28px',borderRadius:0,cursor:'pointer',letterSpacing:.5}}>View Leaderboard</button>
-            </div>
+            {/* Calculator sits inside the hero */}
+            <InlineCalculator router={router}/>
           </div>
         </div>
+
+        {/* LIVE STATS TICKER */}
+        {(() => {
+          const totalDrives = approved.length;
+          const countries = [...new Set(approvedOrgs.map(o=>o.country).filter(Boolean))].length;
+          const clubs = approvedOrgs.filter(o=>o.accountType==='club').length;
+          const stats = [
+            { value: totalDrives, label: 'Drives Submitted' },
+            { value: countries,   label: 'Countries' },
+            { value: clubs,       label: 'Registered Clubs' },
+          ];
+          return (
+            <div style={{background:'#0a0a0a',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'28px 18px'}}>
+              <div style={{maxWidth:1000,margin:'0 auto',display:'flex',justifyContent:'center',flexWrap:'wrap'}}>
+                {stats.map(({value,label},i)=>(
+                  <div key={label} style={{flex:'1 1 160px',textAlign:'center',padding:'12px 24px',borderRight:i<stats.length-1?`1px solid ${BDR}`:'none'}}>
+                    <div style={{fontFamily:DISP,fontSize:'clamp(36px,6vw,56px)',color:ORG,letterSpacing:1,lineHeight:1}}>{value}</div>
+                    <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,color:MUT,letterSpacing:2,textTransform:'uppercase',marginTop:6}}>{label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* WEEKLY LEADERS */}
         <div style={{background:'#0e0e0e',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'40px 18px'}}>
@@ -322,30 +376,6 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           </div>
         </div>
 
-        {/* LIVE STATS TICKER */}
-        {(() => {
-          const totalDrives = approved.length;
-          const countries = [...new Set(approvedOrgs.map(o=>o.country).filter(Boolean))].length;
-          const clubs = approvedOrgs.filter(o=>o.accountType==='club').length;
-          const stats = [
-            { value: totalDrives, label: 'Drives Submitted' },
-            { value: countries,   label: 'Countries' },
-            { value: clubs,       label: 'Registered Clubs' },
-          ];
-          return (
-            <div style={{background:'#0a0a0a',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'28px 18px'}}>
-              <div style={{maxWidth:1000,margin:'0 auto',display:'flex',justifyContent:'center',flexWrap:'wrap',gap:'0 0'}}>
-                {stats.map(({value,label},i)=>(
-                  <div key={label} style={{flex:'1 1 160px',textAlign:'center',padding:'12px 24px',borderRight:i<stats.length-1?`1px solid ${BDR}`:'none'}}>
-                    <div style={{fontFamily:DISP,fontSize:'clamp(36px,6vw,56px)',color:ORG,letterSpacing:1,lineHeight:1}}>{value}</div>
-                    <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,color:MUT,letterSpacing:2,textTransform:'uppercase',marginTop:6}}>{label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
-
         {/* 2027 CHAMPIONSHIP PROMO */}
         <div style={{background:'#120009',borderTop:'1px solid rgba(255,0,144,0.15)',borderBottom:'1px solid rgba(255,0,144,0.15)',padding:'56px 18px'}}>
           <div style={{maxWidth:1000,margin:'0 auto',display:'flex',flexWrap:'wrap',alignItems:'center',gap:32}}>
@@ -375,9 +405,6 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             </div>
           </div>
         </div>
-
-        {/* INLINE DISTANCE CALCULATOR */}
-        <InlineCalculator router={router} />
 
         <div style={{padding:'0 18px'}}>
 
