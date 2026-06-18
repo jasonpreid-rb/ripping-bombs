@@ -46,8 +46,8 @@ export default function Championship2027Page() {
 
   return (
     <SeoPage
-      title="2027 Simulator Championship | Ripping Bombs"
-      description="The Ripping Bombs 2027 Simulator Championship — a global longest drive leaderboard. One drive per week. Six categories. Seasonal points format."
+      title="Longest Sim Golf Drive Competition| Ripping Bombs"
+      description="The Ripping Bombs Simulator Championship — a global longest drive leaderboard. One drive per week. Six categories. Seasonal points format."
     >
 
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '0 0 80px' }}>
@@ -56,7 +56,7 @@ export default function Championship2027Page() {
 <div style={{
   position: 'relative',
   width: '100vw',
-  height: '70vh', // 🔥 shorter = less dead space
+  height: '60vh', // 🔥 MUCH shorter crop
   marginLeft: 'calc(50% - 50vw)',
   marginRight: 'calc(50% - 50vw)',
   overflow: 'hidden',
@@ -72,15 +72,20 @@ export default function Championship2027Page() {
     inset: 0,
     backgroundImage: 'url(https://breezypointresort.com/wp-content/uploads/2025/06/breezy-point-golf-simulator-01.webp)',
     backgroundSize: 'cover',
-    backgroundPosition: 'center 35%', // 🔥 shifts focus (less empty ceiling feel)
-    transform: 'scale(1.08)' // 🔥 forces tighter crop
+    backgroundPosition: 'center 40%', // 🔥 focuses mid-impact zone
+    transform: 'scale(1.12)' // 🔥 stronger crop
   }} />
 
-  {/* Dark overlay (stronger for premium feel) */}
+  {/* DARK OVERLAY (key upgrade) */}
   <div style={{
     position: 'absolute',
     inset: 0,
-    background: 'rgba(0,0,0,0.72)'
+    background: `
+      linear-gradient(
+        rgba(0,0,0,0.85),
+        rgba(0,0,0,0.75)
+      )
+    `
   }} />
 
   {/* Content */}
@@ -98,27 +103,27 @@ export default function Championship2027Page() {
       letterSpacing: 3,
       color: ORG,
       textTransform: 'uppercase',
-      marginBottom: 12
+      marginBottom: 10
     }}>
       Launching January 2027
     </div>
 
     <div style={{
       fontFamily: DISP,
-      fontSize: 'clamp(42px,6vw,72px)',
+      fontSize: 'clamp(38px,5.5vw,68px)',
       color: '#fff',
       lineHeight: 0.95,
       marginBottom: 14
     }}>
-      THE WORLD'S<br /><span style={{ color: ORG }}>BIGGEST</span><br />DRIVE COMP
+      THE WORLD'S<br /><span style={{ color: ORG }}>SIM GOLF</span><br />DRIVE COMP
     </div>
 
     <div style={{
       fontFamily: SANS,
-      fontSize: 15,
-      color: 'rgba(255,255,255,0.78)',
-      lineHeight: 1.55,
-      marginBottom: 22
+      fontSize: 14,
+      color: 'rgba(255,255,255,0.72)',
+      lineHeight: 1.5,
+      marginBottom: 18
     }}>
       A season-long simulator long drive competition. One recorded drive per week. Category-based rankings with cumulative points across the season.
     </div>
