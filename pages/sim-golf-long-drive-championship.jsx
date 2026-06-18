@@ -42,10 +42,8 @@ export default function SimChampionshipPage() {
       title="Longest Sim Golf Drive Competition | Ripping Bombs"
       description="The Ripping Bombs Simulator Championship — a global longest drive leaderboard. One drive per week. Six categories. Seasonal points format."
     >
-      <div style={{maxWidth:760,margin:'0 auto',padding:'0 0 80px'}}>
-
-        {/* HERO */}
-        <div style={{position:'relative',width:'100vw',marginLeft:'calc(50% - 50vw)',marginRight:'calc(50% - 50vw)',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center'}}>
+      {/* HERO — full bleed, outside content wrapper */}
+      <div style={{position:'relative',width:'100vw',marginLeft:'calc(50% - 50vw)',marginRight:'calc(50% - 50vw)',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center'}}>
           <div style={{position:'absolute',inset:0,backgroundImage:"url('https://breezypointresort.com/wp-content/uploads/2025/06/breezy-point-golf-simulator-01.webp')",backgroundSize:'cover',backgroundPosition:'center 40%',filter:'brightness(0.35)',transform:'scale(1.12)'}}/>
           <div style={{position:'absolute',inset:0,background:'linear-gradient(rgba(0,0,0,0.65),rgba(0,0,0,0.55))'}}/>
           <div style={{position:'relative',zIndex:2,padding:'clamp(72px,12vw,120px) 20px clamp(72px,12vw,100px)',maxWidth:640}}>
@@ -67,7 +65,9 @@ export default function SimChampionshipPage() {
               </button>
             </div>
           </div>
-        </div>
+      </div>
+
+      <div style={{maxWidth:760,margin:'0 auto',padding:'0 0 80px'}}>
 
         <div style={{marginBottom:56}}/>
 
@@ -94,7 +94,7 @@ export default function SimChampionshipPage() {
               ))}
             </div>
             {POINTS.map((row,i)=>(
-              <div key={i} style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',borderBottom:i<POINTS.length-1?`1px solid ${BDR}`:'none',background:i===0?'rgba(163,230,53,0.05)':'transparent'}}>
+              <div key={i} style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',borderBottom:i<POINTS.length-1?`1px solid ${BDR}`:'none',background:i===0?'rgba(255,0,144,0.05)':'transparent'}}>
                 <div style={{padding:'14px 20px',fontFamily:SANS,fontWeight:700,fontSize:15,color:TXT,display:'flex',alignItems:'center',gap:8}}>
                   {row.medal&&<span>{row.medal}</span>}{row.pos}
                 </div>
@@ -121,7 +121,7 @@ export default function SimChampionshipPage() {
           ].map((step,i)=>(
             <div key={step.num} style={{display:'grid',gridTemplateColumns:'48px 1fr',gap:'0 20px'}}>
               <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
-                <div style={{width:48,height:48,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:DISP,fontSize:20,color:ORG,background:'rgba(163,230,53,0.08)',border:`2px solid ${ORG}`,flexShrink:0}}>{step.num}</div>
+                <div style={{width:48,height:48,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:DISP,fontSize:20,color:ORG,background:'rgba(255,0,144,0.08)',border:`2px solid ${ORG}`,flexShrink:0}}>{step.num}</div>
                 {i<2&&<div style={{width:2,flex:1,background:BDR,minHeight:24}}/>}
               </div>
               <div style={{paddingBottom:36,paddingTop:10}}>
@@ -151,7 +151,7 @@ export default function SimChampionshipPage() {
         </div>
 
         {/* CTA STRIP */}
-        <div style={{background:'rgba(163,230,53,0.05)',border:'1px solid rgba(163,230,53,0.2)',padding:'40px 32px',textAlign:'center',marginBottom:56}}>
+        <div style={{background:'rgba(255,0,144,0.05)',border:'1px solid rgba(255,0,144,0.2)',padding:'40px 32px',textAlign:'center',marginBottom:56}}>
           <div style={{fontFamily:DISP,fontSize:'clamp(24px,4vw,36px)',color:TXT,letterSpacing:1,lineHeight:1.1,marginBottom:12}}>
             THINK YOU'VE GOT A<br/><span style={{color:ORG}}>LONG DRIVE IN YOU?</span>
           </div>
