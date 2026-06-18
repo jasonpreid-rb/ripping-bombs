@@ -345,8 +345,8 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
         })()}
 
         {/* WEEKLY LEADERS */}
-        <div style={{background:'#0e0e0e',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'40px 18px'}}>
-          <div style={{maxWidth:1000,margin:'0 auto'}}>
+        <div style={{background:'#0e0e0e',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'40px 0 40px'}}>
+          <div style={{maxWidth:1200,margin:'0 auto',padding:'0 18px'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
               <div>
                 <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:6}}>Live from the Registry</div>
@@ -354,15 +354,17 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
               </div>
               <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
             </div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10}}>
-              {weeklyLeaders.map(cat => <WeeklyCard key={cat.key} cat={cat}/>)}
+            <div style={{overflowX:"auto",WebkitOverflowScrolling:"touch",marginLeft:-18,marginRight:-18,paddingLeft:18,paddingRight:18}}>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(6,minmax(200px,1fr))",gap:10,minWidth:1240}}>
+                {weeklyLeaders.map(cat => <WeeklyCard key={cat.key} cat={cat}/>)}
+              </div>
             </div>
           </div>
         </div>
 
         {/* ALL-TIME LEADERS */}
-        <div style={{background:'#111',borderBottom:`1px solid ${BDR}`,padding:'40px 18px'}}>
-          <div style={{maxWidth:1000,margin:'0 auto'}}>
+        <div style={{background:'#111',borderBottom:`1px solid ${BDR}`,padding:'40px 0 40px'}}>
+          <div style={{maxWidth:1200,margin:'0 auto',padding:'0 18px'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
               <div>
                 <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:MUT,textTransform:'uppercase',marginBottom:6}}>Hall of Records</div>
@@ -370,8 +372,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
               </div>
               <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
             </div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10}}>
-              {allTimeLeaders.map(cat => <AllTimeCard key={cat.key} cat={cat}/>)}
+            <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch',marginLeft:-18,marginRight:-18,paddingLeft:18,paddingRight:18}}>
+              <div style={{display:'grid',gridTemplateColumns:'repeat(6,minmax(200px,1fr))',gap:10,minWidth:1240}}>
+                {allTimeLeaders.map(cat => <AllTimeCard key={cat.key} cat={cat}/>)}
+              </div>
             </div>
           </div>
         </div>
