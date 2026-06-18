@@ -1,111 +1,152 @@
+```jsx
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 
 export default function Page() {
 
-  const formatRows = [
-    ['Single Attempt Format', 'Each player gets a set number of swings (typically 3–6), with only the longest drive counting'],
-    ['Driver Only Rules', 'Standardised driver use to ensure fair competition across players'],
-    ['Simulator Platforms', 'TrackMan, GCQuad, SkyTrak, E6, GSPro and other supported sim environments'],
-    ['Leaderboard System', 'All valid drives are ranked on a global or seasonal leaderboard'],
-    ['Fair Conditions', 'Controlled settings such as flat fairway, standard ball rules, and no mulligans']
+  const steps = [
+    ['Register Free', 'Create a simulator account and join the community'],
+    ['Choose Category', 'Select one championship category when the season opens'],
+    ['Submit Weekly', 'Upload one verified drive each week'],
+    ['Earn Points', 'Weekly rankings determine your points total'],
+    ['Climb Rankings', 'Points accumulate across the entire season'],
   ];
 
-  const performanceRows = [
-    ['Club Head Speed', 'Key driver of distance; elite players exceed 140–150+ mph'],
-    ['Ball Speed', 'Direct output of strike efficiency; typically 200–240+ mph for top hitters'],
-    ['Launch Angle', 'Optimised launch windows produce maximum carry and total distance'],
-    ['Spin Rate', 'Lower spin generally increases roll and total distance in sim environments'],
+  const points = [
+    ['1st', '100'],
+    ['2nd', '70'],
+    ['3rd', '50'],
+    ['4th', '40'],
+    ['5th', '30'],
+    ['6th', '20'],
+    ['All Other Entries', '10'],
   ];
 
-  const simPlatforms = [
-    ['TrackMan', 'Industry-leading radar-based simulator system used by professionals and coaches'],
-    ['Foresight / GCQuad', 'Photometric system known for precision strike and spin data'],
-    ['SkyTrak', 'Widely used consumer simulator with strong affordability and accuracy balance'],
-    ['GSPro / E6 Connect', 'Simulation software platforms that host virtual courses and competition modes'],
+  const categories = [
+    ['Men', 'Age 16–54 · Handicap under 20'],
+    ['Men High Handicap', 'Age 16–54 · Handicap 20+'],
+    ['Women', 'Age 16–54 · Handicap under 20'],
+    ['Women High Handicap', 'Age 16–54 · Handicap 20+'],
+    ['Youth', 'Under 16'],
+    ['Senior', 'Age 55+'],
+  ];
+
+  const equipment = [
+    ['TrackMan', 'Accepted'],
+    ['GCQuad / Foresight', 'Accepted'],
+    ['Mevo+', 'Accepted'],
+    ['Equivalent calibrated launch monitors', 'Accepted'],
   ];
 
   return (
     <SeoPage
-      title="Simulator Golf Long Drive Championship | Sim Golf Distance Competition | Ripping Bombs"
-      description="The Simulator Golf Long Drive Championship is a global sim golf competition focused on maximum driving distance. Compete, rank, and test your longest drive in virtual golf environments."
+      title="Simulator Golf Long Drive Championship | Online Sim Golf Competition | Ripping Bombs"
+      description="Compete in the Simulator Golf Long Drive Championship. Submit one verified drive per week, earn points, climb the leaderboard, and compete all season."
     >
 
       <SeoH1>Simulator Golf Long Drive Championship</SeoH1>
 
       <SeoP>
-        The Simulator Golf Long Drive Championship is a competitive format built around one core idea: 
-        <strong>maximum driving distance in a controlled simulator environment</strong>. 
-        It brings together golf simulator players, long drive enthusiasts, and competitive hitters to test how far the ball can travel under standardised conditions.
+        The Simulator Golf Long Drive Championship is a season-long online golf competition built around one simple concept:
+        submit your best simulator drive each week and earn points toward your championship ranking.
       </SeoP>
 
       <SeoP>
-        Unlike traditional golf, where scoring and course management define success, this format strips the game back to its most explosive element — the tee shot. Each player is given a fixed number of attempts, and only their longest legal drive is recorded for the leaderboard.
+        Unlike traditional long drive events that reward a single standout performance, this format rewards consistency.
+        Every week creates another opportunity to improve your ranking and build your season record.
       </SeoP>
 
-      <SeoH2>How the Championship Format Works</SeoH2>
+      <SeoH2>How Simulator Long Drive Competition Works</SeoH2>
 
       <SeoTable
-        headers={['Component', 'Description']}
-        rows={formatRows}
+        headers={['Step', 'Description']}
+        rows={steps}
       />
 
       <SeoP>
-        The structure is designed to remove ambiguity and create a fair global comparison of driving distance. 
-        Every participant competes under the same ruleset, regardless of simulator brand or location.
+        Weekly leaderboards reset regularly, but championship points continue accumulating throughout the season.
+        The goal is simple: show up, submit consistently, and keep climbing.
       </SeoP>
 
-      <SeoH2>What Determines Distance in Simulator Golf?</SeoH2>
+      <SeoH2>What Makes This Different?</SeoH2>
 
       <SeoP>
-        Long drive performance in simulator golf is driven by a combination of speed, launch conditions, and strike quality. 
-        While raw strength plays a role, optimisation of swing mechanics and launch data is often more important than brute force.
+        Most longest drive competitions are decided in a single day.
+        The Ripping Bombs Simulator Championship is designed as an ongoing season where consistency becomes just as valuable as distance.
       </SeoP>
 
+      <SeoP>
+        Because simulator golf removes weather and travel barriers, competitors can participate from almost anywhere using supported launch monitor technology.
+      </SeoP>
+
+      <SeoH2>Weekly Championship Points</SeoH2>
+
       <SeoTable
-        headers={['Metric', 'Role in Distance']}
-        rows={performanceRows}
+        headers={['Position', 'Points']}
+        rows={points}
       />
 
       <SeoP>
-        In elite simulator long drive conditions, total distance can exceed 400–450 yards depending on settings, strike quality, and launch optimisation.
+        Points are awarded within your selected category only.
+        Every weekly submission contributes toward your overall championship position.
       </SeoP>
 
-      <SeoH2>Simulator Platforms Used in Competition</SeoH2>
-
-      <SeoP>
-        The championship is designed to be platform-agnostic, meaning players can compete across multiple simulator systems as long as conditions are standardised.
-      </SeoP>
+      <SeoH2>Championship Categories</SeoH2>
 
       <SeoTable
-        headers={['Platform', 'Description']}
-        rows={simPlatforms}
+        headers={['Category', 'Eligibility']}
+        rows={categories}
       />
 
-      <SeoH2>Why Simulator Long Drive Is Growing</SeoH2>
+      <SeoP>
+        Players compete in one category for the season.
+        Categories are designed to create fair competition across age, handicap, and player type.
+      </SeoP>
+
+      <SeoH2>Accepted Simulator Equipment</SeoH2>
+
+      <SeoTable
+        headers={['Equipment', 'Status']}
+        rows={equipment}
+      />
 
       <SeoP>
-        Simulator golf has unlocked a new form of competition that was previously limited by geography, weather, and access to facilities. 
-        Long drive formats are particularly well suited to this environment because they are simple, repeatable, and highly shareable.
+        Verified submissions require launch monitor evidence showing measured distance.
+        This creates a consistent and trusted environment for all competitors.
+      </SeoP>
+
+      <SeoH2>Consistency Beats One Massive Drive</SeoH2>
+
+      <SeoP>
+        Winning this championship is not simply about producing one extraordinary shot.
+        Players who consistently submit and accumulate points over months are positioned to move up the rankings.
       </SeoP>
 
       <SeoP>
-        Players can now compete in distance-based events year-round, from anywhere in the world, without needing to attend physical tournaments. 
-        This has created a new category of digital-first golf competition that sits between gaming, sport, and performance analytics.
+        That combination of power and persistence is what makes simulator long drive competition unique.
       </SeoP>
 
-      <SeoH2>The Future of Long Drive Competition</SeoH2>
+      <SeoH2>Prepare Before January 2027</SeoH2>
 
       <SeoP>
-        As simulator accuracy continues to improve, long drive competition is expected to evolve into a recognised digital sport category. 
-        Leaderboards, seasonal championships, and community-driven events will likely become the standard format for participation.
+        Registration is open before points begin accumulating.
+        Joining early lets players establish their profile, submit drives, and become familiar with the leaderboard before the season begins.
       </SeoP>
 
       <SeoP>
-        The Simulator Golf Long Drive Championship represents the early structure of that shift — where raw driving power becomes a measurable, comparable global metric.
+        Ready to see where your distance stacks up?
+        Learn more about the championship and start building your record today.
       </SeoP>
 
-      <SeoCTA />
+      <SeoCTA
+        title="Ready To Compete?"
+        description="Learn how the 2027 Simulator Championship works and start building your record."
+        primaryText="VIEW 2027 CHAMPIONSHIP"
+        primaryHref="/2027-championship"
+        secondaryText="VIEW LEADERBOARD"
+        secondaryHref="/leaderboard"
+      />
 
     </SeoPage>
   );
 }
+```
