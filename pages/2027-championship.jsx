@@ -56,7 +56,7 @@ export default function Championship2027Page() {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  textAlign: 'center'
+  textAlign: 'center',
   padding: '80px 0 60px'
   }}
 >
