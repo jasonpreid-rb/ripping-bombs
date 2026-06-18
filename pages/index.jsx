@@ -321,7 +321,6 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             </div>
           </div>
         </div>
-        </div>
 
         {/* LIVE STATS TICKER */}
         {(() => {
