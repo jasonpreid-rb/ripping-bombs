@@ -28,7 +28,7 @@ const FAQS = [
   { q: 'How often can I submit?', a: 'One valid drive per week counts toward the leaderboard. Only your best recorded drive of that week is used.' },
   { q: 'How are weekly points awarded?', a: 'Rankings are calculated within each category weekly: 1st = 100, 2nd = 70, 3rd = 50, 4th = 40, 5th = 30, 6th = 20, 7th+ = 10 points.' },
   { q: 'What counts as a valid drive?', a: 'A single driver shot recorded on an approved launch monitor or simulator with visible carry/total distance data.' },
-  { q: 'What equipment is allowed?', a: 'TrackMan, Foresight (GCQuad / GC3), SkyTrak, Mevo+, and equivalent calibrated launch monitors.' },
+  { q: 'What equipment is allowed?', a: <>TrackMan, Foresight (GCQuad / GC3), SkyTrak, Mevo+, and equivalent calibrated launch monitors. Not sure if your readings are accurate? See our <a href="/sim-distance-real-or-fake" style={{color:ORG}}>guide on whether your simulator distance is real</a>.</> },
   { q: 'Can I change category mid-season?', a: 'No. Once selected in January 2027, your category is locked for the full season.' },
   { q: 'Is it free to enter?', a: 'Yes — the competition is completely free to join and compete in.' },
 ]

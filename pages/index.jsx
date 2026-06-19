@@ -298,7 +298,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
       <div style={{animation:'fi .4s ease'}}>
 
         {/* HERO — video bg + condensed header + calculator */}
-        <div style={{position:'relative',overflow:'hidden'}}>
+        <div id="distance-calculator" style={{position:'relative',overflow:'hidden'}}>
           <video autoPlay muted loop playsInline poster="https://images.pexels.com/videos/33511561/tee-shot-33511561.jpeg?auto=compress&cs=tinysrgb&h=627&fit=crop&w=1200"
             style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block',filter:'brightness(0.35)'}}>
             <source src="https://videos.pexels.com/video-files/33511561/14252773_2560_1440_60fps.mp4" type="video/mp4"/>
@@ -313,7 +313,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
               RIPPING BOMBS
             </h1>
             <p style={{fontFamily:SANS,fontSize:14,color:'rgba(255,255,255,0.65)',maxWidth:440,margin:'0 auto 36px',lineHeight:1.6,letterSpacing:.3}}>
-              See where your drive ranks against golfers your age, handicap &amp; gender — instantly.
+              See where your drive ranks against golfers your age, handicap &amp; gender — instantly.{' '}
+              <a href="/sim-distance-real-or-fake" style={{color:ORG,textDecoration:'underline'}}>
+                Think your sim number might be inflated?
+              </a>
             </p>
             {/* Calculator sits inside the hero */}
             <InlineCalculator router={router}/>
