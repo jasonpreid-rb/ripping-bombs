@@ -20,13 +20,15 @@ function MarqueeLogo({ name, logo }) {
   return (
     <div className="brand-chip" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', height: 34, minWidth: 112, padding: '0 18px', border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.02)', transition: 'border-color .2s, background .2s' }}>
       {showLogo ? (
-        <img
-          className="brand-logo"
-          src={logo}
-          alt={name}
-          onError={() => setFailed(true)}
-          style={{ height: 18, width: 'auto', maxWidth: 110, objectFit: 'contain', display: 'block', filter: 'grayscale(1) brightness(0) invert(1)', opacity: 0.55, transition: 'opacity .2s, filter .2s' }}
-        />
+        <div style={{ height: 22, width: 76, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <img
+            className="brand-logo"
+            src={logo}
+            alt={name}
+            onError={() => setFailed(true)}
+            style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', display: 'block', filter: 'grayscale(1) brightness(0) invert(1)', opacity: 0.55, transition: 'opacity .2s, filter .2s' }}
+          />
+        </div>
       ) : (
         <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: 1.5, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{name}</span>
       )}
