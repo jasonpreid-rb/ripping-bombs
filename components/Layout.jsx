@@ -12,21 +12,22 @@ const SIM_BRANDS = [
   { name: 'Full Swing', logo: '/logos/full-swing.svg' },
   { name: 'SkyTrak', logo: '/logos/skytrak.svg' },
 ];
-const MARQUEE_BRANDS = [...SIM_BRANDS, ...SIM_BRANDS];
 
 function MarqueeLogo({ name, logo }) {
   const [failed, setFailed] = useState(false);
   const showLogo = logo && !failed;
   return (
-    <div className="brand-chip" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', height: 34, minWidth: 112, padding: '0 18px', border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.02)', transition: 'border-color .2s, background .2s' }}>
+    <div className="brand-chip" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', height: 34, minWidth: 112, padding: '0 18px', border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.02)', transition: 'border-color .2s, background .2s', flexShrink: 0 }}>
       {showLogo ? (
-        <div style={{ height: 22, width: 76, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ height: 22, width: 76, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <img
             className="brand-logo"
             src={logo}
             alt={name}
+            width={76}
+            height={22}
             onError={() => setFailed(true)}
-            style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', display: 'block', filter: 'grayscale(1) brightness(0) invert(1)', opacity: 0.55, transition: 'opacity .2s, filter .2s' }}
+            style={{ maxHeight: '100%', maxWidth: '100%', width: 'auto', height: 'auto', objectFit: 'contain', display: 'block', filter: 'grayscale(1) brightness(0) invert(1)', opacity: 0.55, transition: 'opacity .2s, filter .2s' }}
           />
         </div>
       ) : (
@@ -80,11 +81,8 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
         @media(max-width:680px){.desktop-nav{display:none!important}.burger-btn{display:flex!important;align-items:center;justify-content:center}}
         @keyframes fi{from{opacity:0}to{opacity:1}}
         @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-        .marquee-track{display:flex;width:max-content;gap:10px;animation:marquee 36s linear infinite;}
-        .marquee-track:hover{animation-play-state:paused;}
-        .marquee-track:hover .brand-logo{opacity:1;filter:grayscale(1) brightness(0) invert(1);}
-        .marquee-track:hover .brand-chip{border-color:rgba(255,0,144,0.25);background:rgba(255,0,144,0.04);}
+        .brand-row:hover .brand-logo{opacity:1;filter:grayscale(1) brightness(0) invert(1);}
+        .brand-row:hover .brand-chip{border-color:rgba(255,0,144,0.25);background:rgba(255,0,144,0.04);}
       `}</style>
 
       {/* HEADER */}
@@ -123,16 +121,12 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
       )}
 
       <main>{children}</main>
-      <div style={{ background:'#0e0e0e', borderTop:'1px solid rgba(255,255,255,0.06)', borderBottom:'1px solid rgba(255,255,255,0.06)', padding:'18px 0', overflow:'hidden', position:'relative' }}>
-        <div style={{ position:'absolute', left:0, top:0, bottom:0, width:80, background:'linear-gradient(to right,#0e0e0e,transparent)', zIndex:2, pointerEvents:'none' }}/>
-        <div style={{ position:'absolute', right:0, top:0, bottom:0, width:80, background:'linear-gradient(to left,#0e0e0e,transparent)', zIndex:2, pointerEvents:'none' }}/>
+      <div style={{ background:'#0e0e0e', borderTop:'1px solid rgba(255,255,255,0.06)', borderBottom:'1px solid rgba(255,255,255,0.06)', padding:'18px 16px' }}>
         <div onClick={() => navTo('/supported-simulators')} style={{ fontFamily:SANS, fontSize:9, fontWeight:700, letterSpacing:2, color:'rgba(255,255,255,0.18)', textTransform:'uppercase', textAlign:'center', marginBottom:12, cursor:'pointer' }}>Compatible with →</div>
-        <div style={{ overflow:'hidden' }}>
-          <div className="marquee-track">
-            {MARQUEE_BRANDS.map((brand, i) => (
-              <MarqueeLogo key={i} name={brand.name} logo={brand.logo}/>
-            ))}
-          </div>
+        <div className="brand-row" style={{ display:'flex', flexWrap:'wrap', justifyContent:'center', gap:10 }}>
+          {SIM_BRANDS.map((brand, i) => (
+            <MarqueeLogo key={i} name={brand.name} logo={brand.logo}/>
+          ))}
         </div>
       </div>
       <SiteFooter/>
