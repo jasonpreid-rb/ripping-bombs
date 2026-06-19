@@ -8,12 +8,9 @@ import { ORG, MUT, BDR, DIM, SANS, DISP } from '../lib/constants';
 const SIM_BRANDS = [
   { name: 'Trackman', logo: '/logos/trackman.svg' },
   { name: 'Garmin Approach', logo: '/logos/garmin.svg' },
-  { name: 'Flightscope', logo: '/logos/flightscope.svg' },
-  { name: 'GCQuad', logo: '/logos/gcquad.svg' },
+  { name: 'GCQuad', logo: '/logos/foresight-sports.svg' },
   { name: 'Full Swing', logo: '/logos/full-swing.svg' },
   { name: 'SkyTrak', logo: '/logos/skytrak.svg' },
-  { name: 'Uneekor', logo: '/logos/uneekor.svg' },
-  { name: 'Bushnell Launch Pro', logo: '/logos/bushnell-launch-pro.svg' },
 ];
 const MARQUEE_BRANDS = [...SIM_BRANDS, ...SIM_BRANDS];
 
@@ -24,10 +21,11 @@ function MarqueeLogo({ name, logo }) {
     <div className="brand-chip" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', height: 34, minWidth: 112, padding: '0 18px', border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.02)', transition: 'border-color .2s, background .2s' }}>
       {showLogo ? (
         <img
+          className="brand-logo"
           src={logo}
           alt={name}
           onError={() => setFailed(true)}
-          style={{ height: 18, width: 'auto', maxWidth: 110, objectFit: 'contain', display: 'block', filter: 'grayscale(1)', opacity: 0.6, transition: 'opacity .2s, filter .2s' }}
+          style={{ height: 18, width: 'auto', maxWidth: 110, objectFit: 'contain', display: 'block', filter: 'grayscale(1) brightness(0) invert(1)', opacity: 0.55, transition: 'opacity .2s, filter .2s' }}
         />
       ) : (
         <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: 1.5, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{name}</span>
@@ -83,7 +81,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
         @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
         .marquee-track{display:flex;width:max-content;gap:10px;animation:marquee 36s linear infinite;}
         .marquee-track:hover{animation-play-state:paused;}
-        .marquee-track:hover img{opacity:1;filter:none;}
+        .marquee-track:hover .brand-logo{opacity:1;filter:grayscale(1) brightness(0) invert(1);}
         .marquee-track:hover .brand-chip{border-color:rgba(255,0,144,0.25);background:rgba(255,0,144,0.04);}
       `}</style>
 
