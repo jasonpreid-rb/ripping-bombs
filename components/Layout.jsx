@@ -7,22 +7,13 @@ import { ORG, MUT, BDR, DIM, SANS, DISP } from '../lib/constants';
 // If a logo file is missing or fails to load, falls back to the brand name as text.
 const SIM_BRANDS = [
   { name: 'Trackman', logo: '/logos/trackman.svg' },
+  { name: 'Garmin Approach', logo: '/logos/garmin.svg' },
   { name: 'Flightscope', logo: '/logos/flightscope.svg' },
   { name: 'GCQuad', logo: '/logos/gcquad.svg' },
   { name: 'Full Swing', logo: '/logos/full-swing.svg' },
-  { name: 'Foresight Sports', logo: '/logos/foresight-sports.svg' },
   { name: 'SkyTrak', logo: '/logos/skytrak.svg' },
   { name: 'Uneekor', logo: '/logos/uneekor.svg' },
   { name: 'Bushnell Launch Pro', logo: '/logos/bushnell-launch-pro.svg' },
-  { name: 'Garmin Approach', logo: '/logos/garmin-approach.svg' },
-  { name: 'TaylorMade', logo: '/logos/taylormade.svg' },
-  { name: 'Callaway', logo: '/logos/callaway.svg' },
-  { name: 'Titleist', logo: '/logos/titleist.svg' },
-  { name: 'Ping', logo: '/logos/ping.svg' },
-  { name: 'Cobra', logo: '/logos/cobra.svg' },
-  { name: 'Srixon', logo: '/logos/srixon.svg' },
-  { name: 'Mizuno', logo: '/logos/mizuno.svg' },
-  { name: 'Cleveland', logo: '/logos/cleveland.svg' },
 ];
 const MARQUEE_BRANDS = [...SIM_BRANDS, ...SIM_BRANDS];
 
