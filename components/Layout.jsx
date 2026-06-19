@@ -102,6 +102,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
         <div className="desktop-nav" style={{ gap: 10, alignItems: 'center' }}>
           <UnitToggle/>
           <NavBtn href="/leaderboard" label="Leaderboard"/>
+          <NavBtn href="/hall-of-fame" label="Hall of Fame"/>
           <NavBtn href="/contact" label="Contact"/>
           <button onClick={onShowDemo} style={{ background: 'transparent', border: '1px solid rgba(255,0,144,0.4)', color: ORG, fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', borderRadius: 0, cursor: 'pointer' }}>Try Demo</button>
           {loggedOrg
@@ -119,7 +120,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
 
       {menuOpen && (
         <div style={{ position: 'fixed', top: 58, left: 0, right: 0, background: 'rgba(14,14,14,0.98)', borderBottom: '1px solid rgba(255,255,255,0.08)', zIndex: 99, padding: '16px 22px 20px', display: 'flex', flexDirection: 'column', gap: 10, animation: 'slideDown .2s ease' }}>
-          {[['Leaderboard','/leaderboard'],['Contact','/contact'],['Login','/login'],['Register','/register']].map(([label,href]) => (
+          {[['Leaderboard','/leaderboard'],['Hall of Fame','/hall-of-fame'],['Contact','/contact'],['Login','/login'],['Register','/register']].map(([label,href]) => (
             <button key={href} onClick={() => navTo(href)} style={{ background: isActive(href) ? ORG : 'transparent', border: isActive(href) ? 'none' : '1px solid rgba(255,255,255,0.12)', color: isActive(href) ? '#111' : 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>{label}</button>
           ))}
           <button onClick={() => { onShowDemo(); setMenuOpen(false); }} style={{ background: 'transparent', border: '1px solid rgba(255,0,144,0.4)', color: ORG, fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Try Demo</button>
@@ -134,7 +135,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
       <div style={{ background:'#0e0e0e', borderTop:'1px solid rgba(255,255,255,0.06)', borderBottom:'1px solid rgba(255,255,255,0.06)', padding:'18px 0', overflow:'hidden', position:'relative' }}>
         <div style={{ position:'absolute', left:0, top:0, bottom:0, width:80, background:'linear-gradient(to right,#0e0e0e,transparent)', zIndex:2, pointerEvents:'none' }}/>
         <div style={{ position:'absolute', right:0, top:0, bottom:0, width:80, background:'linear-gradient(to left,#0e0e0e,transparent)', zIndex:2, pointerEvents:'none' }}/>
-        <div style={{ fontFamily:SANS, fontSize:9, fontWeight:700, letterSpacing:2, color:'rgba(255,255,255,0.18)', textTransform:'uppercase', textAlign:'center', marginBottom:12 }}>Compatible with</div>
+        <div onClick={() => navTo('/supported-simulators')} style={{ fontFamily:SANS, fontSize:9, fontWeight:700, letterSpacing:2, color:'rgba(255,255,255,0.18)', textTransform:'uppercase', textAlign:'center', marginBottom:12, cursor:'pointer' }}>Compatible with →</div>
         <div style={{ overflow:'hidden' }}>
           <div className="marquee-track">
             {MARQUEE_BRANDS.map((brand, i) => (
@@ -194,7 +195,7 @@ function SiteFooter() {
           <div>
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 1.5, color: DIM, marginBottom: 12, textTransform: 'uppercase' }}>Leaderboards</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              {[['Global Leaderboard','/leaderboard'],["Longest Men's Drives",'/longest-mens-drive'],["Longest Women's Drives",'/longest-womens-drive'],['Low Handicap','/longest-drive-low-handicap'],['Mid Handicap','/longest-drive-mid-handicap'],['High Handicap','/longest-drive-high-handicap'],['Seniors (55+)','/longest-drive-seniors'],['Juniors (U12)','/longest-drive-juniors-u12'],['Youth (13-16)','/longest-drive-juniors-13-16'],['Cadets (17-18)','/longest-drive-juniors-17-18']].map(([l,h]) => (
+              {[['Global Leaderboard','/leaderboard'],['Hall of Fame','/hall-of-fame'],["Longest Men's Drives",'/longest-mens-drive'],["Longest Women's Drives",'/longest-womens-drive'],['Low Handicap','/longest-drive-low-handicap'],['Mid Handicap','/longest-drive-mid-handicap'],['High Handicap','/longest-drive-high-handicap'],['Seniors (55+)','/longest-drive-seniors'],['Juniors (U12)','/longest-drive-juniors-u12'],['Youth (13-16)','/longest-drive-juniors-13-16'],['Cadets (17-18)','/longest-drive-juniors-17-18']].map(([l,h]) => (
                 <a key={h} href={h} style={{ display: 'block', fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.4)'}>{l}</a>
               ))}
             </div>
@@ -202,7 +203,7 @@ function SiteFooter() {
           <div>
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 1.5, color: DIM, marginBottom: 12, textTransform: 'uppercase' }}>Golf Guides</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginBottom: 20 }}>
-              {[['Avg Distance By Handicap','/average-driver-distance-by-handicap'],['Longest Drives This Week','/longest-drives-this-week'],['How To Hit Farther','/how-to-hit-a-golf-ball-farther'],['Average Drive Distance','/average-golf-drive-distance'],['Longest Drive Ever','/longest-golf-drive-ever'],['What Is A Good Drive?','/what-is-a-good-drive-in-golf'],['Club Competition Ideas','/golf-club-longest-drive-competition-ideas'],['Long Drive Equipment','/long-drive-golf-equipment'],['Handicap & Distance','/golf-handicap-driving-distance'],['Promote Your Event','/how-to-promote-your-golf-event']].map(([l,h]) => (
+              {[['Avg Distance By Handicap','/average-driver-distance-by-handicap'],['Longest Drives This Week','/longest-drives-this-week'],['How To Hit Farther','/how-to-hit-a-golf-ball-farther'],['Average Drive Distance','/average-golf-drive-distance'],['Longest Drive Ever','/longest-golf-drive-ever'],['What Is A Good Drive?','/what-is-a-good-drive-in-golf'],['Club Competition Ideas','/golf-club-longest-drive-competition-ideas'],['Long Drive Equipment','/long-drive-golf-equipment'],['Handicap & Distance','/golf-handicap-driving-distance'],['Promote Your Event','/how-to-promote-your-golf-event'],['Supported Simulators','/supported-simulators']].map(([l,h]) => (
                 <a key={h} href={h} style={{ display: 'block', fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.4)'}>{l}</a>
               ))}
             </div>

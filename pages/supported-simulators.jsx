@@ -86,7 +86,7 @@ export default function SupportedSimulators() {
         Ripping Bombs accepts drive submissions from all major golf simulator and launch monitor
         brands. Whether you're hitting drives on a TrackMan at a fitting bay, an Uneekor setup at
         home, or a commercial Full Swing simulator bay, your numbers count toward the global
-        leaderboard. Here's what's supported.
+        leaderboard — and toward our <a href="/hall-of-fame" style={{ color:ORG, textDecoration:'underline' }}>Hall of Fame</a> records. Here's what's supported.
       </SeoP>
 
       {/* SIMULATOR SECTIONS */}
@@ -148,6 +148,9 @@ export default function SupportedSimulators() {
         Register a free simulator account, then submit your driver distance with a clear screenshot
         of your launch monitor's readout showing carry or total distance. Your submission is reviewed
         and added to the leaderboard in your category — Men, Women, Youth, Senior, or High Handicap.
+        Not sure how your numbers stack up first? Try our{' '}
+        <a href="/how-far-do-i-drive-compared-to-others" style={{ color:ORG, textDecoration:'underline' }}>driving distance percentile calculator</a>,
+        or check out our <a href="/recommended-range-finders" style={{ color:ORG, textDecoration:'underline' }}>recommended range finders</a> if you're dialing in your setup.
       </SeoP>
 
       {/* FAQ */}

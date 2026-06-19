@@ -60,7 +60,9 @@ export default function HallOfFame({ entries: propEntries=[], orgs: propOrgs=[],
         Every record on this page is pulled live from verified drives submitted to the Ripping Bombs
         leaderboard — country records, major distance milestones, and the chase for the first ever
         verified 500-yard drive. No fiction, no estimates: just the real numbers golfers around the
-        world have put on the board.
+        world have put on the board. Drives from any <a href="/supported-simulators" style={{ color:ORG, textDecoration:'underline' }}>supported simulator</a>{' '}
+        count toward these records, alongside drives from the golf course. Curious where you'd rank?
+        Try our <a href="/how-far-do-i-drive-compared-to-others" style={{ color:ORG, textDecoration:'underline' }}>driving distance calculator</a>.
       </SeoP>
 
       {/* ALL-TIME RECORD HERO */}
@@ -95,9 +97,10 @@ export default function HallOfFame({ entries: propEntries=[], orgs: propOrgs=[],
       <SeoH2>The 500-Yard Chase</SeoH2>
       <SeoP>
         500 yards is the milestone every long drive golfer dreams about. Mike Austin's legendary
-        515-yard drive in 1974 remains the most famous unofficial mark in golf history. On Ripping
-        Bombs, we're tracking the first verified drive on our platform to break 500 — here's the
-        progress so far.
+        515-yard drive in 1974 remains the most famous unofficial mark in golf history — read more
+        on our <a href="/longest-golf-drive-ever" style={{ color:ORG, textDecoration:'underline' }}>longest drive ever recorded</a> page.
+        On Ripping Bombs, we're tracking the first verified drive on our platform to break 500 —
+        here's the progress so far.
       </SeoP>
 
       <div style={{ background: has500 ? 'rgba(255,0,144,0.06)' : BG2, border:`1px solid ${has500 ? 'rgba(255,0,144,0.3)' : BDR}`, padding:'24px', textAlign:'center', marginBottom:32 }}>
