@@ -58,11 +58,11 @@ export default function DemoSubmit({ onClose, cvt, unitLbl, toast }) {
       </div>
       <Field label="Course / Club Name" value={form.courseName} onChange={e=>setForm({...form,courseName:e.target.value})} placeholder="Augusta National Golf Club" required/>
       <Field label="Location" value={form.location} onChange={e=>setForm({...form,location:e.target.value})} placeholder="Augusta, Georgia"/>
-      {form.dist&&Number(form.dist)>0&&<div style={{ background:'rgba(163,230,53,0.07)', border:'1px solid rgba(163,230,53,0.2)', padding:'9px 14px', marginBottom:14, fontFamily:SANS, fontSize:12, fontWeight:600, color:ORG }}>{tier(Number(form.dist))}</div>}
+      {form.dist&&Number(form.dist)>0&&<div style={{ background:'rgba(255,0,144,0.07)', border:'1px solid rgba(255,0,144,0.2)', padding:'9px 14px', marginBottom:14, fontFamily:SANS, fontSize:12, fontWeight:600, color:ORG }}>{tier(Number(form.dist))}</div>}
       <PhotoField label="Photo of Drive Marker (optional)" value={form.photo} onChange={async e=>{ if(e.target.files[0]) setForm({...form,photo:await toB64(e.target.files[0])}); }}/>
-      <div style={{ background:'rgba(163,230,53,0.04)', border:'1px solid rgba(163,230,53,0.2)', padding:'14px', marginBottom:14 }}>
+      <div style={{ background:'rgba(255,0,144,0.04)', border:'1px solid rgba(255,0,144,0.2)', padding:'14px', marginBottom:14 }}>
         <label style={{ display:'flex', alignItems:'flex-start', gap:10, cursor:'pointer' }}>
-          <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} style={{ width:16, height:16, accentColor:'#a3e635', cursor:'pointer', flexShrink:0, marginTop:2 }}/>
+          <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} style={{ width:16, height:16, accentColor:'#FF0090', cursor:'pointer', flexShrink:0, marginTop:2 }}/>
           <div style={{ fontFamily:SANS, fontSize:11, color:MUT, lineHeight:1.6 }}>
             <span style={{ fontWeight:700, color:TXT }}>Player Consent Confirmed</span><br/>
             I confirm the player named above has authorised their details to be submitted.
