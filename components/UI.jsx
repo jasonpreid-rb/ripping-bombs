@@ -22,7 +22,7 @@ export function Field({label,type="text",value,onChange,placeholder,min,max,requ
 export function PhotoField({label,value,onChange,required}){
   return <div style={{marginBottom:14}}>
     <label style={{display:"block",fontFamily:SANS,fontSize:11,fontWeight:600,color:MUT,marginBottom:5,textTransform:"uppercase",letterSpacing:.8}}>{label}{required&&<span style={{color:ORG,marginLeft:2}}>*</span>}</label>
-    <div style={{border:`1px dashed rgba(163,230,53,0.3)`,borderRadius:0,padding:16,background:"rgba(163,230,53,0.03)",textAlign:"center"}}>
+    <div style={{border:`1px dashed rgba(255,0,144,0.3)`,borderRadius:0,padding:16,background:"rgba(255,0,144,0.03)",textAlign:"center"}}>
       {value?<><img src={value} alt="" style={{maxHeight:100,maxWidth:"100%",marginBottom:6,objectFit:"cover"}}/><div style={{fontFamily:SANS,fontSize:11,color:GRN}}>Photo uploaded</div></>:<div style={{color:DIM,fontFamily:SANS,fontSize:12}}>No photo selected</div>}
       <input type="file" accept="image/*" onChange={onChange} style={{display:"block",margin:"8px auto 0",fontFamily:SANS,fontSize:11,color:MUT}}/>
     </div>
