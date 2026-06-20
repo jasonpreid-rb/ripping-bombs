@@ -64,7 +64,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
 
       {/* Announcement Banner */}
       {!bannerDismissed && (
-        <div style={{ background: '#dc2626', padding: '9px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 101 }}>
+        <div style={{ background: ORG, padding: '9px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 101 }}>
           <div onClick={() => router.push('/register')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: '#fff', letterSpacing: .5, textTransform: 'uppercase' }}>
               Submit Your Drive — Rank Globally, Instantly — FREE
