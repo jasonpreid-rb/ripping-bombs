@@ -32,8 +32,8 @@ export default function Page({ entries=[], orgs=[], cvt=d=>d, unitLbl='yds' }) {
       
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
-        <Link href="/hall-of-fame" style={linkStyle}>Hall Of Fame</Link>{' · '}
-        <Link href="/longest-drive-amateur" style={linkStyle}>Longest Drive Amateur</Link>{' · '}
+        <Link href="/hall-of-fame" style={linkStyle}>Hall Of Fame</Link>{' | '}
+        <Link href="/longest-drive-amateur" style={linkStyle}>Longest Drive Amateur</Link>{' | '}
         <Link href="/longest-drive-scratch-golfer" style={linkStyle}>Longest Drive Scratch Golfer</Link>
       </SeoP>
       <SeoCTA/>

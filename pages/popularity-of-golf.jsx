@@ -1,3 +1,4 @@
+import { ORG } from '../lib/constants';
 import Link from 'next/link';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 

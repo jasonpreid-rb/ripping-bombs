@@ -37,9 +37,9 @@ export default function Page() {
       
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
-        <Link href="/golf-club-longest-drive-competition-ideas" style={linkStyle}>Longest Drive Competition Ideas</Link>{' · '}
-        <Link href="/golf-longest-drive-competition" style={linkStyle}>Golf Longest Drive Competition</Link>{' · '}
-        <Link href="/longest-drive-amateur" style={linkStyle}>Longest Drive Amateur</Link>{' · '}
+        <Link href="/golf-club-longest-drive-competition-ideas" style={linkStyle}>Longest Drive Competition Ideas</Link>{' | '}
+        <Link href="/golf-longest-drive-competition" style={linkStyle}>Golf Longest Drive Competition</Link>{' | '}
+        <Link href="/longest-drive-amateur" style={linkStyle}>Longest Drive Amateur</Link>{' | '}
         <Link href="/simulator-golf-league" style={linkStyle}>Simulator Golf League</Link>
       </SeoP>
       <SeoCTA/>

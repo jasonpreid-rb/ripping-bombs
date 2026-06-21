@@ -1,3 +1,4 @@
+import { ORG } from '../lib/constants';
 import Link from 'next/link';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 
@@ -68,7 +69,7 @@ export default function Page() {
       
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
-        <Link href="/long-drive-golf-equipment" style={linkStyle}>Long Drive Golf Equipment</Link>{' · '}
+        <Link href="/long-drive-golf-equipment" style={linkStyle}>Long Drive Golf Equipment</Link>{' | '}
         <Link href="/supported-simulators" style={linkStyle}>Supported Simulators</Link>
       </SeoP>
       <SeoCTA />

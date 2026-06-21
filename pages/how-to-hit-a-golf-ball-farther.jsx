@@ -22,11 +22,11 @@ export default function Page({ entries=[] }) {
       
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
-        <Link href="/what-is-a-good-drive-in-golf" style={linkStyle}>What Is A Good Drive In Golf</Link>{' · '}
-        <Link href="/average-driver-distance-by-handicap" style={linkStyle}>Average Driver Distance By Handicap</Link>{' · '}
-        <Link href="/average-golf-drive-distance" style={linkStyle}>Average Golf Drive Distance</Link>{' · '}
-        <Link href="/golf-handicap-driving-distance" style={linkStyle}>Golf Handicap And Driving Distance</Link>{' · '}
-        <Link href="/long-drive-golf-equipment" style={linkStyle}>Long Drive Golf Equipment</Link>{' · '}
+        <Link href="/what-is-a-good-drive-in-golf" style={linkStyle}>What Is A Good Drive In Golf</Link>{' | '}
+        <Link href="/average-driver-distance-by-handicap" style={linkStyle}>Average Driver Distance By Handicap</Link>{' | '}
+        <Link href="/average-golf-drive-distance" style={linkStyle}>Average Golf Drive Distance</Link>{' | '}
+        <Link href="/golf-handicap-driving-distance" style={linkStyle}>Golf Handicap And Driving Distance</Link>{' | '}
+        <Link href="/long-drive-golf-equipment" style={linkStyle}>Long Drive Golf Equipment</Link>{' | '}
         <Link href="/sim-distance-real-or-fake" style={linkStyle}>Is Your Sim Distance Real Or Fake</Link>
       </SeoP>
       <SeoCTA/>

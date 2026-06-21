@@ -4,7 +4,7 @@ import Head from 'next/head';
 import { supabase } from '../lib/supabaseClient';
 import Layout from '../components/Layout';
 
-const ORG = '#a3e635';
+const ORG = '#FF0090';
 const TXT = '#f0f0f0';
 const MUT = '#888';
 const BG2 = '#161616';

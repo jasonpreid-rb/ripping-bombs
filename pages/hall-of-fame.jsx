@@ -253,8 +253,8 @@ export default function HallOfFame({ entries: propEntries=[], orgs: propOrgs=[],
     
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
-        <Link href="/longest-golf-drive-ever" style={linkStyle}>Longest Golf Drive Ever</Link>{' · '}
-        <Link href="/longest-drive-amateur" style={linkStyle}>Longest Drive Amateur</Link>{' · '}
+        <Link href="/longest-golf-drive-ever" style={linkStyle}>Longest Golf Drive Ever</Link>{' | '}
+        <Link href="/longest-drive-amateur" style={linkStyle}>Longest Drive Amateur</Link>{' | '}
         <Link href="/longest-drive-scratch-golfer" style={linkStyle}>Longest Drive Scratch Golfer</Link>
       </SeoP>
     </SeoPage>

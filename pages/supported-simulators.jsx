@@ -170,9 +170,9 @@ export default function SupportedSimulators() {
     
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
-        <Link href="/long-drive-golf-equipment" style={linkStyle}>Long Drive Golf Equipment</Link>{' · '}
-        <Link href="/recommended-range-finders" style={linkStyle}>Recommended Range Finders</Link>{' · '}
-        <Link href="/sim-distance-real-or-fake" style={linkStyle}>Is Your Sim Distance Real Or Fake</Link>{' · '}
+        <Link href="/long-drive-golf-equipment" style={linkStyle}>Long Drive Golf Equipment</Link>{' | '}
+        <Link href="/recommended-range-finders" style={linkStyle}>Recommended Range Finders</Link>{' | '}
+        <Link href="/sim-distance-real-or-fake" style={linkStyle}>Is Your Sim Distance Real Or Fake</Link>{' | '}
         <Link href="/simulator-golf-league" style={linkStyle}>Simulator Golf League</Link>
       </SeoP>
     </SeoPage>

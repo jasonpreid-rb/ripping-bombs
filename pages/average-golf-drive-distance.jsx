@@ -23,10 +23,10 @@ export default function Page({ entries=[] }) {
       
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
-        <Link href="/average-driver-distance-by-handicap" style={linkStyle}>Average Driver Distance By Handicap</Link>{' · '}
-        <Link href="/golf-handicap-driving-distance" style={linkStyle}>Golf Handicap And Driving Distance</Link>{' · '}
-        <Link href="/how-far-do-i-drive-compared-to-others" style={linkStyle}>Driving Distance Percentile Calculator</Link>{' · '}
-        <Link href="/how-to-hit-a-golf-ball-farther" style={linkStyle}>How To Hit A Golf Ball Farther</Link>{' · '}
+        <Link href="/average-driver-distance-by-handicap" style={linkStyle}>Average Driver Distance By Handicap</Link>{' | '}
+        <Link href="/golf-handicap-driving-distance" style={linkStyle}>Golf Handicap And Driving Distance</Link>{' | '}
+        <Link href="/how-far-do-i-drive-compared-to-others" style={linkStyle}>Driving Distance Percentile Calculator</Link>{' | '}
+        <Link href="/how-to-hit-a-golf-ball-farther" style={linkStyle}>How To Hit A Golf Ball Farther</Link>{' | '}
         <Link href="/what-is-a-good-drive-in-golf" style={linkStyle}>What Is A Good Drive In Golf</Link>
       </SeoP>
       <SeoCTA/>

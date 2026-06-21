@@ -26,21 +26,21 @@ export default function Page() {
 
       <SeoH2>Explore By Category</SeoH2>
       <SeoP>
-        <Link href="/longest-drive-low-handicap" style={linkStyle}>Low Handicap</Link>{' · '}
-        <Link href="/longest-drive-high-handicap" style={linkStyle}>High Handicap</Link>{' · '}
-        <Link href="/longest-drive-seniors" style={linkStyle}>Seniors</Link>{' · '}
-        <Link href="/longest-drive-juniors-13-16" style={linkStyle}>Juniors 13–16</Link>{' · '}
-        <Link href="/longest-womens-drive" style={linkStyle}>Women's Longest Drive</Link>{' · '}
+        <Link href="/longest-drive-low-handicap" style={linkStyle}>Low Handicap</Link>{' | '}
+        <Link href="/longest-drive-high-handicap" style={linkStyle}>High Handicap</Link>{' | '}
+        <Link href="/longest-drive-seniors" style={linkStyle}>Seniors</Link>{' | '}
+        <Link href="/longest-drive-juniors-13-16" style={linkStyle}>Juniors 13–16</Link>{' | '}
+        <Link href="/longest-womens-drive" style={linkStyle}>Women's Longest Drive</Link>{' | '}
         <Link href="/hall-of-fame" style={linkStyle}>Hall Of Fame</Link>
       </SeoP>
       
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
-        <Link href="/golf-club-longest-drive-competition-ideas" style={linkStyle}>Longest Drive Competition Ideas</Link>{' · '}
-        <Link href="/golf-longest-drive-competition" style={linkStyle}>Golf Longest Drive Competition</Link>{' · '}
-        <Link href="/how-to-promote-your-golf-event" style={linkStyle}>How To Promote Your Golf Event</Link>{' · '}
-        <Link href="/longest-drive-amateur" style={linkStyle}>Longest Drive Amateur</Link>{' · '}
-        <Link href="/sim-distance-real-or-fake" style={linkStyle}>Is Your Sim Distance Real Or Fake</Link>{' · '}
+        <Link href="/golf-club-longest-drive-competition-ideas" style={linkStyle}>Longest Drive Competition Ideas</Link>{' | '}
+        <Link href="/golf-longest-drive-competition" style={linkStyle}>Golf Longest Drive Competition</Link>{' | '}
+        <Link href="/how-to-promote-your-golf-event" style={linkStyle}>How To Promote Your Golf Event</Link>{' | '}
+        <Link href="/longest-drive-amateur" style={linkStyle}>Longest Drive Amateur</Link>{' | '}
+        <Link href="/sim-distance-real-or-fake" style={linkStyle}>Is Your Sim Distance Real Or Fake</Link>{' | '}
         <Link href="/supported-simulators" style={linkStyle}>Supported Simulators</Link>
       </SeoP>
       <SeoCTA/>
