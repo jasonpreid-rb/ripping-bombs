@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 export default function Page({ entries=[] }) {
   const approved = entries.filter(e=>e.dist>0&&e.club);
@@ -12,6 +13,15 @@ export default function Page({ entries=[] }) {
       <SeoTable headers={['Feature','What To Look For','Why It Matters']} rows={[['Loft','9–10.5° for most golfers','Affects launch angle and spin'],['Shaft','Stiff or X-stiff for fast swingers','Too flexible adds spin and kills distance'],['Head size','460cc maximum (rules legal)','Larger sweet spot for off-centre hits'],['Face technology','Variable thickness face','Faster ball speeds across the face'],['Adjustability','Adjustable hosel and weights','Fine-tune for your optimal launch conditions']]}/>
       <SeoH2>Get Fitted Before You Buy</SeoH2>
       <SeoP>The most important piece of equipment advice: get properly fitted before buying any new driver. A well-fitted 3-year-old driver will outperform a brand new one that doesn't suit your swing. Most major brands offer free fitting sessions and the gains from optimised launch conditions can easily exceed 20 yards.</SeoP>
+      
+      <SeoH2>Explore Related Pages</SeoH2>
+      <SeoP>
+        <Link href="/how-to-hit-a-golf-ball-farther" style={linkStyle}>How To Hit A Golf Ball Farther</Link>{' · '}
+        <Link href="/recommended-range-finders" style={linkStyle}>Recommended Range Finders</Link>{' · '}
+        <Link href="/sim-distance-real-or-fake" style={linkStyle}>Is Your Sim Distance Real Or Fake</Link>{' · '}
+        <Link href="/supported-simulators" style={linkStyle}>Supported Simulators</Link>{' · '}
+        <Link href="/what-is-a-good-drive-in-golf" style={linkStyle}>What Is A Good Drive In Golf</Link>
+      </SeoP>
       <SeoCTA/>
     </SeoPage>
   );

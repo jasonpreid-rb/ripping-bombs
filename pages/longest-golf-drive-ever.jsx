@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { fmtDate } from '../lib/constants';
@@ -28,6 +29,13 @@ export default function Page({ entries=[], orgs=[], cvt=d=>d, unitLbl='yds' }) {
       </div>
       <SeoH2>What Makes A Drive Go Far?</SeoH2>
       <SeoP>The longest drives in history share common factors: high swing speed (130mph+), an upward angle of attack, optimal launch conditions (low spin, high launch), and ideal weather conditions. Professional long drive competitors train specifically for maximum speed, often swinging at 140–150mph with custom equipment.</SeoP>
+      
+      <SeoH2>Explore Related Pages</SeoH2>
+      <SeoP>
+        <Link href="/hall-of-fame" style={linkStyle}>Hall Of Fame</Link>{' · '}
+        <Link href="/longest-drive-amateur" style={linkStyle}>Longest Drive Amateur</Link>{' · '}
+        <Link href="/longest-drive-scratch-golfer" style={linkStyle}>Longest Drive Scratch Golfer</Link>
+      </SeoP>
       <SeoCTA/>
     </SeoPage>
   );

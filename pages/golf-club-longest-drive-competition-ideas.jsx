@@ -1,4 +1,7 @@
+import Link from 'next/link';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
+const linkStyle = { color: ORG, textDecoration: 'underline' };
+
 export default function Page() {
   return (
     <SeoPage title="Golf Club Longest Drive Competition Ideas | Ripping Bombs" description="Fresh ideas for running a golf club longest drive competition. Make your event memorable and get on the global Ripping Bombs leaderboard.">
@@ -10,6 +13,14 @@ export default function Page() {
       <SeoP>Run a seasonal leaderboard — track longest drives at your club throughout the year and crown an annual champion. Submit each result to Ripping Bombs and the global leaderboard handles the ranking automatically.</SeoP>
       <SeoP>Try a club record board — display your all-time longest drives on the clubhouse wall with photos. Ripping Bombs gives every club a permanent page showing their top drives, which you can link to from your club website.</SeoP>
       <SeoP>Consider a junior vs senior shootout — pit your best junior hitters against senior members in a head-to-head longest drive challenge. It's always popular and generates great content for social media.</SeoP>
+      
+      <SeoH2>Explore Related Pages</SeoH2>
+      <SeoP>
+        <Link href="/golf-longest-drive-competition" style={linkStyle}>Golf Longest Drive Competition</Link>{' · '}
+        <Link href="/how-to-promote-your-golf-event" style={linkStyle}>How To Promote Your Golf Event</Link>{' · '}
+        <Link href="/longest-drive-amateur" style={linkStyle}>Longest Drive Amateur</Link>{' · '}
+        <Link href="/simulator-golf-league" style={linkStyle}>Simulator Golf League</Link>
+      </SeoP>
       <SeoCTA/>
     </SeoPage>
   );

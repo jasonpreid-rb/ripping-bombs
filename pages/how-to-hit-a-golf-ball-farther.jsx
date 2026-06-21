@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 export default function Page({ entries=[] }) {
   const approved = entries.filter(e=>e.dist>0&&e.club);
@@ -18,6 +19,16 @@ export default function Page({ entries=[] }) {
       <SeoTable headers={['Driver Brand','Appearances In Top Drives']} rows={brands.map(([brand,count])=>[brand,count])}/>
       <SeoH2>6. Flexibility & Rotation</SeoH2>
       <SeoP>A full shoulder turn with a stable lower body creates the tension needed for an explosive downswing. Hip mobility and thoracic spine rotation are key limiting factors for many golfers. Targeted stretching and mobility work can add meaningful yards with no other changes.</SeoP>
+      
+      <SeoH2>Explore Related Pages</SeoH2>
+      <SeoP>
+        <Link href="/what-is-a-good-drive-in-golf" style={linkStyle}>What Is A Good Drive In Golf</Link>{' · '}
+        <Link href="/average-driver-distance-by-handicap" style={linkStyle}>Average Driver Distance By Handicap</Link>{' · '}
+        <Link href="/average-golf-drive-distance" style={linkStyle}>Average Golf Drive Distance</Link>{' · '}
+        <Link href="/golf-handicap-driving-distance" style={linkStyle}>Golf Handicap And Driving Distance</Link>{' · '}
+        <Link href="/long-drive-golf-equipment" style={linkStyle}>Long Drive Golf Equipment</Link>{' · '}
+        <Link href="/sim-distance-real-or-fake" style={linkStyle}>Is Your Sim Distance Real Or Fake</Link>
+      </SeoP>
       <SeoCTA/>
     </SeoPage>
   );

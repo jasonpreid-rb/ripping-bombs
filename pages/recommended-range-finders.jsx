@@ -1,4 +1,7 @@
+import Link from 'next/link';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
+
+const linkStyle = { color: ORG, textDecoration: 'underline' };
 
 export default function Page() {
   const topPicks = [
@@ -62,6 +65,12 @@ export default function Page() {
         Accuracy should be your first filter — look for units claiming ±1 yard or better. After that, consider whether you want slope compensation (useful for practice and casual rounds), the quality of the optic and magnification level, battery life, and whether the size and weight work for your bag setup. GPS functionality adds cost but genuine value for course management.
       </SeoP>
 
+      
+      <SeoH2>Explore Related Pages</SeoH2>
+      <SeoP>
+        <Link href="/long-drive-golf-equipment" style={linkStyle}>Long Drive Golf Equipment</Link>{' · '}
+        <Link href="/supported-simulators" style={linkStyle}>Supported Simulators</Link>
+      </SeoP>
       <SeoCTA />
     </SeoPage>
   );

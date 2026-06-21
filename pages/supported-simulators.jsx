@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { SeoPage, SeoH1, SeoH2, SeoP } from '../components/SeoPageLayout';
@@ -86,7 +87,7 @@ export default function SupportedSimulators() {
         Ripping Bombs accepts drive submissions from all major golf simulator and launch monitor
         brands. Whether you're hitting drives on a TrackMan at a fitting bay, an Uneekor setup at
         home, or a commercial Full Swing simulator bay, your numbers count toward the global
-        leaderboard — and toward our <a href="/hall-of-fame" style={{ color:ORG, textDecoration:'underline' }}>Hall of Fame</a> records. Here's what's supported.
+        <Link href="/leaderboard" style={linkStyle}>leaderboard</Link> — and toward our <a href="/hall-of-fame" style={{ color:ORG, textDecoration:'underline' }}>Hall of Fame</a> records. Here's what's supported.
       </SeoP>
 
       {/* SIMULATOR SECTIONS */}
@@ -166,6 +167,14 @@ export default function SupportedSimulators() {
           </div>
         ))}
       </div>
+    
+      <SeoH2>Explore Related Pages</SeoH2>
+      <SeoP>
+        <Link href="/long-drive-golf-equipment" style={linkStyle}>Long Drive Golf Equipment</Link>{' · '}
+        <Link href="/recommended-range-finders" style={linkStyle}>Recommended Range Finders</Link>{' · '}
+        <Link href="/sim-distance-real-or-fake" style={linkStyle}>Is Your Sim Distance Real Or Fake</Link>{' · '}
+        <Link href="/simulator-golf-league" style={linkStyle}>Simulator Golf League</Link>
+      </SeoP>
     </SeoPage>
   );
 }

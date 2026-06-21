@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 export default function Page({ entries=[] }) {
   const approved = entries.filter(e=>e.dist>0);
@@ -19,6 +20,15 @@ export default function Page({ entries=[] }) {
       <SeoTable headers={['Gender','Avg Competition Drive','Entries']} rows={genderRows}/>
       <SeoH2>How Does This Compare To Tour Averages?</SeoH2>
       <SeoP>On the PGA Tour, the average driving distance is around 295–315 yards. The LPGA Tour average sits around 245–265 yards. For amateur club golfers, studies suggest average driving distances of around 195–220 yards for men and 140–175 yards for women across all ability levels.</SeoP>
+      
+      <SeoH2>Explore Related Pages</SeoH2>
+      <SeoP>
+        <Link href="/average-driver-distance-by-handicap" style={linkStyle}>Average Driver Distance By Handicap</Link>{' · '}
+        <Link href="/golf-handicap-driving-distance" style={linkStyle}>Golf Handicap And Driving Distance</Link>{' · '}
+        <Link href="/how-far-do-i-drive-compared-to-others" style={linkStyle}>Driving Distance Percentile Calculator</Link>{' · '}
+        <Link href="/how-to-hit-a-golf-ball-farther" style={linkStyle}>How To Hit A Golf Ball Farther</Link>{' · '}
+        <Link href="/what-is-a-good-drive-in-golf" style={linkStyle}>What Is A Good Drive In Golf</Link>
+      </SeoP>
       <SeoCTA/>
     </SeoPage>
   );

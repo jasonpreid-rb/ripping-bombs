@@ -1,4 +1,7 @@
+import Link from 'next/link';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
+
+const linkStyle = { color: ORG, textDecoration: 'underline' };
 
 export default function Page() {
   const participationRows = [
@@ -32,7 +35,7 @@ export default function Page() {
     >
       <SeoH1>Popularity of Golf as a Sport</SeoH1>
       <SeoP>
-        Golf is one of the most widely played sports in the world, with over 67 million active golfers across more than 200 countries. Far from declining, the sport has seen significant growth over the past five years — driven by a post-pandemic surge in participation, a wave of younger players, and the explosive rise of off-course formats like indoor simulators and driving range venues.
+        Golf is one of the most widely played sports in the world, with over 67 million active golfers across more than 200 countries. Far from declining, the sport has seen significant growth over the past five years — driven by a post-pandemic surge in participation, a wave of younger players, and the explosive rise of off-course formats like indoor <Link href="/supported-simulators" style={linkStyle}>simulators</Link> and driving range venues.
       </SeoP>
 
       <SeoH2>Global Golf Participation at a Glance</SeoH2>
@@ -77,6 +80,11 @@ export default function Page() {
         Venues like Topgolf, Drive Shack, and indoor simulator centres have fundamentally changed how people engage with the sport. Many participants at these venues have never played a traditional round of golf and may never do so — but they represent a growing audience that follows the sport, purchases equipment, and contributes to its cultural relevance. The golf industry increasingly treats off-course participation as a legitimate and valuable part of the ecosystem.
       </SeoP>
 
+      
+      <SeoH2>Explore Related Pages</SeoH2>
+      <SeoP>
+        <Link href="/how-is-golf-evolving" style={linkStyle}>How Is Golf Evolving</Link>
+      </SeoP>
       <SeoCTA />
     </SeoPage>
   );

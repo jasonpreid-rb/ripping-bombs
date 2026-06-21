@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { SeoPage, SeoH1, SeoH2, SeoP } from '../components/SeoPageLayout';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { countryFlag } from '../components/UI';
@@ -58,7 +59,7 @@ export default function HallOfFame({ entries: propEntries=[], orgs: propOrgs=[],
       <SeoH1>Hall of Fame</SeoH1>
       <SeoP>
         Every record on this page is pulled live from verified drives submitted to the Ripping Bombs
-        leaderboard — country records, major distance milestones, and the chase for the first ever
+        <Link href="/leaderboard" style={linkStyle}>leaderboard</Link> — country records, major distance milestones, and the chase for the first ever
         verified 500-yard drive. No fiction, no estimates: just the real numbers golfers around the
         world have put on the board. Drives from any <a href="/supported-simulators" style={{ color:ORG, textDecoration:'underline' }}>supported simulator</a>{' '}
         count toward these records, alongside drives from the golf course. Curious where you'd rank?
@@ -249,6 +250,13 @@ export default function HallOfFame({ entries: propEntries=[], orgs: propOrgs=[],
           REGISTER FREE →
         </button>
       </div>
+    
+      <SeoH2>Explore Related Pages</SeoH2>
+      <SeoP>
+        <Link href="/longest-golf-drive-ever" style={linkStyle}>Longest Golf Drive Ever</Link>{' · '}
+        <Link href="/longest-drive-amateur" style={linkStyle}>Longest Drive Amateur</Link>{' · '}
+        <Link href="/longest-drive-scratch-golfer" style={linkStyle}>Longest Drive Scratch Golfer</Link>
+      </SeoP>
     </SeoPage>
   );
 }

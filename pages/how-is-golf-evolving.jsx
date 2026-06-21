@@ -1,4 +1,7 @@
+import Link from 'next/link';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
+
+const linkStyle = { color: ORG, textDecoration: 'underline' };
 
 export default function Page() {
   const trendRows = [
@@ -89,6 +92,11 @@ export default function Page() {
         The result is a sport that is simultaneously more traditional than ever at the club level and more culturally fluid than it has ever been in the wider world. That tension — between the game's heritage and its ambition to grow — is what makes the next decade of golf genuinely fascinating to watch.
       </SeoP>
 
+      
+      <SeoH2>Explore Related Pages</SeoH2>
+      <SeoP>
+        <Link href="/popularity-of-golf" style={linkStyle}>Popularity Of Golf</Link>
+      </SeoP>
       <SeoCTA />
     </SeoPage>
   );

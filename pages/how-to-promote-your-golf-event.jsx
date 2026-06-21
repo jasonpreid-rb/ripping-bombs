@@ -1,6 +1,9 @@
+import Link from 'next/link';
 import { useState } from 'react';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
+
+const linkStyle = { color: ORG, textDecoration: 'underline' };
 
 export default function Page() {
   const [form,setForm]=useState({name:'',email:'',event:'',location:'',date:''});
@@ -31,6 +34,14 @@ export default function Page() {
       <SeoP>Running a golf event is one thing — getting the right players to hear about it, and giving participants something to remember and share, is another. Here's how forward-thinking tournament organisers and golf clubs are using Ripping Bombs to give their events a global audience.</SeoP>
       <SeoH2>Why Add Your Event To Ripping Bombs?</SeoH2>
       <SeoTable headers={['Benefit','What It Means For Your Event']} rows={[['Global Leaderboard Exposure','Your event\'s longest drive appears on a worldwide leaderboard seen by golfers in 50+ countries'],['Dedicated Event Page','A permanent URL for your event — shareable on social media, WhatsApp, and email'],['Google Indexed','Your event page is indexed by Google so players searching for events in your area can find you'],['Player Engagement','Participants can share their result directly from the leaderboard, extending your event\'s reach organically'],['Sponsorship Appeal','A verified, data-rich longest drive leaderboard adds value for distance-related sponsors'],['It\'s Free','No cost to register. No cost to submit results. Free for clubs and organisers during launch.']]}/>
+      
+      <SeoH2>Explore Related Pages</SeoH2>
+      <SeoP>
+        <Link href="/golf-club-longest-drive-competition-ideas" style={linkStyle}>Longest Drive Competition Ideas</Link>{' · '}
+        <Link href="/golf-longest-drive-competition" style={linkStyle}>Golf Longest Drive Competition</Link>{' · '}
+        <Link href="/longest-drive-amateur" style={linkStyle}>Longest Drive Amateur</Link>{' · '}
+        <Link href="/simulator-golf-league" style={linkStyle}>Simulator Golf League</Link>
+      </SeoP>
       <SeoCTA/>
       <div style={{background:BG2,border:`1px solid ${BDR}`,padding:'32px 28px',marginTop:8}}>
         <div style={{fontFamily:DISP,fontSize:24,color:TXT,letterSpacing:1,marginBottom:6}}>Request An Event</div>
