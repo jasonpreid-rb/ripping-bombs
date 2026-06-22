@@ -27,7 +27,7 @@ export default function App({ Component, pageProps }) {
   const [detEnt, setDetEnt] = useState(null);
 
   // Form state
-  const [reg, setReg] = useState({ type:'club', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
+  const [reg, setReg] = useState({ type:'simulator', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
   const [lgn, setLgn] = useState({ email:'', pw:'' });
   const [form, setForm] = useState({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male' });
 
@@ -93,7 +93,7 @@ export default function App({ Component, pageProps }) {
 
     setOrgs(prev => [...prev, newOrg]);
     await sendRegistrationNotification(newOrg);
-    setReg({ type:'club', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
+    setReg({ type:'simulator', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
 
     if (isSimulator) {
       setLoggedOrg(newOrg);

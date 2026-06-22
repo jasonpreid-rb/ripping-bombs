@@ -9,7 +9,7 @@ const SIMULATORS = [
 ];
 
 export default function RegisterPage({ reg, setReg, doRegister }) {
-  const isSimulator = reg.type === 'simulator';
+  const isSimulator = reg.type !== 'club';
 
   const CountrySelect = () => (
     <div style={{ marginBottom: 14 }}>
@@ -50,21 +50,26 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
               Account Type
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              {[['club', '🏌️ Golf Club / Event'], ['simulator', '🖥️ Individual / Simulator']].map(([val, label]) => (
+              {[['simulator', '🖥️ Individual / Simulator'], ['club', '🏌️ Golf Club / Event']].map(([val, label]) => (
                 <button
                   key={val}
                   type="button"
                   onClick={() => setReg({ ...reg, type: val })}
-                  style={{ padding: '12px 8px', background: 'transparent', border: `1px solid ${reg.type === val ? ORG : BDR}`, color: reg.type === val ? ORG : MUT, fontFamily: SANS, fontWeight: 600, fontSize: 12, cursor: 'pointer', letterSpacing: .3, textAlign: 'center', transition: 'all .15s' }}
+                  style={{ position: 'relative', padding: '12px 8px', background: 'transparent', border: `1px solid ${reg.type === val ? ORG : BDR}`, color: reg.type === val ? ORG : MUT, fontFamily: SANS, fontWeight: 600, fontSize: 12, cursor: 'pointer', letterSpacing: .3, textAlign: 'center', transition: 'all .15s' }}
                 >
+                  {val === 'simulator' && (
+                    <span style={{ position: 'absolute', top: -8, right: 6, background: ORG, color: '#000', fontSize: 9, fontWeight: 700, padding: '2px 6px', letterSpacing: .4, textTransform: 'uppercase' }}>
+                      Most Popular
+                    </span>
+                  )}
                   {label}
                 </button>
               ))}
             </div>
             <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 8 }}>
               {isSimulator
-                ? '🖥️ Submit your simulator longest drives. Account approved instantly — no waiting required.'
-                : '🏌️ Register a club, course or event. Submit verified competition longest drives to the global leaderboard.'}
+                ? '🖥️ Submit your own simulator longest drives with screenshot evidence. Account approved instantly — no waiting required.'
+                : '🏌️ Register a club, course or event to submit verified competition winners on behalf of players. Reviewed within 24 hours.'}
             </div>
           </div>
 

@@ -56,7 +56,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, un
 
         {/* Simulator info banner */}
         {isSimulator && (
-          <div style={{ background:'rgba(163,230,53,0.06)', border:'1px solid rgba(163,230,53,0.2)', padding:'12px 16px', marginBottom:20, fontFamily:SANS, fontSize:12, color:MUT, lineHeight:1.6 }}>
+          <div style={{ background:'rgba(255,0,144,0.06)', border:'1px solid rgba(255,0,144,0.2)', padding:'12px 16px', marginBottom:20, fontFamily:SANS, fontSize:12, color:MUT, lineHeight:1.6 }}>
             🖥️ <span style={{ fontWeight:700, color:TXT }}>Simulator Drive</span> — A screenshot of your simulator readout is required as evidence. Your drive will appear on the global leaderboard with the simulator badge.
           </div>
         )}
@@ -155,7 +155,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, un
           </div>
 
           {form.dist&&Number(form.dist)>0&&(
-            <div style={{ background:'rgba(163,230,53,0.07)', border:'1px solid rgba(163,230,53,0.2)', padding:'9px 14px', marginBottom:14, fontFamily:SANS, fontSize:12, fontWeight:600, color:ORG }}>
+            <div style={{ background:'rgba(255,0,144,0.07)', border:'1px solid rgba(255,0,144,0.2)', padding:'9px 14px', marginBottom:14, fontFamily:SANS, fontSize:12, fontWeight:600, color:ORG }}>
               {tier(Number(form.dist))} — {cvt(Number(form.dist))} {unitLbl}
             </div>
           )}
@@ -168,9 +168,9 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, un
           />
 
           {/* Consent */}
-          <div style={{ background:'rgba(163,230,53,0.04)', border:'1px solid rgba(163,230,53,0.2)', padding:'16px', marginBottom:16 }}>
+          <div style={{ background:'rgba(255,0,144,0.04)', border:'1px solid rgba(255,0,144,0.2)', padding:'16px', marginBottom:16 }}>
             <label style={{ display:'flex', alignItems:'flex-start', gap:12, cursor:'pointer' }}>
-              <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} style={{ width:18, height:18, accentColor:'#a3e635', cursor:'pointer', flexShrink:0, marginTop:2 }}/>
+              <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} style={{ width:18, height:18, accentColor:ORG, cursor:'pointer', flexShrink:0, marginTop:2 }}/>
               <div style={{ fontFamily:SANS, fontSize:12, color:MUT, lineHeight:1.6 }}>
                 {isSimulator ? (
                   <>
