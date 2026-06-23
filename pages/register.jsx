@@ -39,8 +39,23 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
 
       <div style={{ maxWidth: 540, margin: '0 auto', padding: '28px 18px 80px' }}>
         <div style={{ fontFamily: DISP, fontSize: 30, color: TXT, letterSpacing: 1, marginBottom: 6 }}>Register</div>
-        <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: 28 }}>
+        <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: 18 }}>
           Free to join. Select your account type below.
+        </div>
+
+        {/* Benefit strip — gives a cold visitor a reason to keep going */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 24 }}>
+          {[
+            ['📊', 'See how you rank', 'against players worldwide'],
+            ['⚡', 'Instant approval', 'no waiting on review'],
+            ['🆓', '100% free', 'no card, no catch'],
+          ].map(([icon, title, sub]) => (
+            <div key={title} style={{ border: `1px solid ${BDR}`, padding: '12px 10px', textAlign: 'center' }}>
+              <div style={{ fontSize: 18, marginBottom: 4 }}>{icon}</div>
+              <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: TXT, lineHeight: 1.3 }}>{title}</div>
+              <div style={{ fontFamily: SANS, fontSize: 10, color: DIM, lineHeight: 1.3, marginTop: 2 }}>{sub}</div>
+            </div>
+          ))}
         </div>
 
         <Card>
@@ -100,16 +115,16 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
                 </div>
               </div>
 
-              {/* Simulator brand — optional */}
-              <div style={{ marginBottom: 14 }}>
-                <label style={{ display: 'block', fontFamily: SANS, fontSize: 11, fontWeight: 600, color: MUT, marginBottom: 5, textTransform: 'uppercase', letterSpacing: .8 }}>
-                  Simulator Brand <span style={{ color: DIM, fontWeight: 400 }}>(optional)</span>
+              {/* Simulator brand — optional, visually de-emphasized */}
+              <div style={{ marginBottom: 14, opacity: 0.8 }}>
+                <label style={{ display: 'block', fontFamily: SANS, fontSize: 10, fontWeight: 500, color: DIM, marginBottom: 5, textTransform: 'uppercase', letterSpacing: .8 }}>
+                  Simulator Brand <span style={{ fontWeight: 400 }}>(optional — skip if unsure)</span>
                 </label>
                 <div style={{ position: 'relative' }}>
                   <select
                     value={reg.simulator}
                     onChange={e => setReg({ ...reg, simulator: e.target.value })}
-                    style={{ width: '100%', background: BG3, border: `1px solid ${BDR}`, padding: '10px 36px 10px 14px', color: reg.simulator ? TXT : DIM, fontFamily: SANS, fontSize: 14, outline: 'none', appearance: 'none', boxSizing: 'border-box' }}
+                    style={{ width: '100%', background: BG3, border: `1px solid ${BDR}`, padding: '8px 36px 8px 14px', color: reg.simulator ? TXT : DIM, fontFamily: SANS, fontSize: 13, outline: 'none', appearance: 'none', boxSizing: 'border-box' }}
                   >
                     <option value="">Select simulator...</option>
                     {SIMULATORS.map(s => <option key={s} value={s}>{s}</option>)}
@@ -190,24 +205,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
             required
           />
 
-          {/* Profile page consent — simulator only */}
-          {isSimulator && (
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  checked={!!reg.profileConsent}
-                  onChange={e => setReg({ ...reg, profileConsent: e.target.checked })}
-                  style={{ marginTop: 3, accentColor: ORG, flexShrink: 0, width: 15, height: 15 }}
-                />
-                <span style={{ fontFamily: SANS, fontSize: 12, color: MUT, lineHeight: 1.6 }}>
-                  I consent to a <strong style={{ color: TXT }}>public player profile page</strong> being created
-                  at <span style={{ color: ORG }}>rippingbombs.com/profile/my-name</span> showing my submitted
-                  drives, stats, and country. This page will be publicly accessible and indexed by search engines.
-                </span>
-              </label>
-            </div>
-          )}
+          {/* Profile consent moved to post-submission flow — see submit.jsx note */}
 
           <Btn full onClick={doRegister}>
             {isSimulator ? 'Create Account →' : 'Submit Registration →'}

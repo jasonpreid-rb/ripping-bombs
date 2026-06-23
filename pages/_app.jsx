@@ -134,9 +134,9 @@ export default function App({ Component, pageProps }) {
   }
 
   async function doSubmit() {
-    if (!loggedOrg) { toast('Not logged in'); return; }
-    if (!form.player || !form.dist || !form.club || !form.hcp || !form.age) { toast('Fill all required fields'); return; }
-    if (!form.photo) { toast('Photo evidence required'); return; }
+    if (!loggedOrg) { toast('Not logged in'); return false; }
+    if (!form.player || !form.dist || !form.club || !form.hcp || !form.age) { toast('Fill all required fields'); return false; }
+    if (!form.photo) { toast('Photo evidence required'); return false; }
 
     const e = {
       id: Date.now().toString(),
@@ -153,11 +153,21 @@ export default function App({ Component, pageProps }) {
     };
 
     const ok = await db.insertEntry(e);
-    if (!ok) { toast('Submission failed — please try again'); return; }
+    if (!ok) { toast('Submission failed — please try again'); return false; }
 
     setEntries(prev => [...prev, e]);
     setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male' });
     toast('Drive submitted to the World Registry!');
+    return true;
+  }
+
+  async function updateProfileConsent(orgId, consent) {
+    const ok = await db.updateOrg(orgId, { profileConsent: consent });
+    if (!ok) { toast('Could not save preference — please try again'); return false; }
+    setOrgs(prev => prev.map(o => o.id === orgId ? { ...o, profileConsent: consent } : o));
+    setLoggedOrg(prev => prev && prev.id === orgId ? { ...prev, profileConsent: consent } : prev);
+    if (consent) toast('Profile page created!');
+    return true;
   }
 
   const sharedProps = {
@@ -165,7 +175,7 @@ export default function App({ Component, pageProps }) {
     approvedOrgs, orgFor, pendingCount, loggedOrg, setLoggedOrg,
     toast, shareEnt, setShareEnt, detEnt, setDetEnt,
     reg, setReg, lgn, setLgn, form, setForm,
-    doRegister, doLogin, doSubmit,
+    doRegister, doLogin, doSubmit, updateProfileConsent,
     week, setWeek, allTime, setAllTime,
     fCountry, setFCountry, fHcp, setFHcp, fAge, setFAge,
     fClub, setFClub, fPlayer, setFPlayer, fGender, setFGender,

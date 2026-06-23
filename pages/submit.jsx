@@ -5,8 +5,9 @@ import { TXT, MUT, ORG, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { tier, todayStr, toB64 } from '../lib/constants';
 import { Card, Field, PhotoField, Btn } from '../components/UI';
 
-export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, unitLbl, entries=[], approvedOrgs=[] }) {
+export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateProfileConsent, cvt, unitLbl, entries=[], approvedOrgs=[] }) {
   const [consent, setConsent] = useState(false);
+  const [showProfilePrompt, setShowProfilePrompt] = useState(false);
   const router = useRouter();
 
   if (!loggedOrg) return (
@@ -189,14 +190,17 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, un
 
           <Btn
             full
-            onClick={() => {
+            onClick={async () => {
               if (isSimulator && simulatorWeeklyBlock) { alert('You have already submitted a drive this week. Simulator accounts are limited to one submission per week.'); return; }
               if (!consent) { alert(isSimulator ? 'Please confirm your consent before submitting.' : 'Please confirm player consent before submitting.'); return; }
               // For simulator accounts, pre-fill player name and tournament from account
               if (isSimulator) {
                 setForm(f => ({ ...f, player: loggedOrg.fullName, tournament: 'Simulator', gender: loggedOrg.gender || 'male' }));
               }
-              doSubmit();
+              const ok = await doSubmit();
+              if (ok && isSimulator && loggedOrg.profileConsent === undefined) {
+                setShowProfilePrompt(true);
+              }
             }}
             style={{ opacity:(consent && !(isSimulator && simulatorWeeklyBlock))?1:0.5 }}
           >
@@ -204,6 +208,30 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, cvt, un
           </Btn>
         </Card>
       </div>
+
+      {/* Post-submission profile consent prompt — framed as a reward, not a gate */}
+      {showProfilePrompt && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.8)', zIndex:700, display:'flex', alignItems:'center', justifyContent:'center', padding:20, backdropFilter:'blur(4px)' }}>
+          <div style={{ background:BG3, border:`1px solid ${BDR}`, width:'100%', maxWidth:440, padding:30 }}>
+            <div style={{ fontFamily:DISP, fontSize:22, color:TXT, letterSpacing:.5, marginBottom:10 }}>
+              🎉 Nice drive!
+            </div>
+            <div style={{ fontFamily:SANS, fontSize:13, color:MUT, lineHeight:1.7, marginBottom:20 }}>
+              Want a shareable public profile page at{' '}
+              <span style={{ color:ORG, fontWeight:600 }}>rippingbombs.com/profile/{loggedOrg.fullName.toLowerCase().replace(/\s+/g,'-')}</span>{' '}
+              showing your stats and submitted drives? It's a great way to track your progress and show off your best results.
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+              <Btn full onClick={async () => { await updateProfileConsent(loggedOrg.id, false); setShowProfilePrompt(false); }} style={{ background:'transparent', border:`1px solid ${BDR}`, color:MUT }}>
+                Not Now
+              </Btn>
+              <Btn full onClick={async () => { await updateProfileConsent(loggedOrg.id, true); setShowProfilePrompt(false); }}>
+                Yes, Create It →
+              </Btn>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
