@@ -6,6 +6,8 @@ import { useRouter } from 'next/router';
 
 const MILESTONES = [300, 350, 400, 450, 500];
 
+const linkStyle = { color: ORG, textDecoration: 'underline' };
+
 export default function HallOfFame({ entries: propEntries=[], orgs: propOrgs=[], cvt, unitLbl, staticEntries=[], staticOrgs=[] }) {
   const router = useRouter();
   const entries = staticEntries.length ? staticEntries : propEntries;
