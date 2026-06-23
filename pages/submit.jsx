@@ -8,6 +8,7 @@ import { Card, Field, PhotoField, Btn } from '../components/UI';
 export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateProfileConsent, cvt, unitLbl, entries=[], approvedOrgs=[] }) {
   const [consent, setConsent] = useState(false);
   const [showProfilePrompt, setShowProfilePrompt] = useState(false);
+  const [rankResult, setRankResult] = useState(null);
   const router = useRouter();
 
   if (!loggedOrg) return (
@@ -54,6 +55,16 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
             ? `${loggedOrg.fullName} · Simulator Drive`
             : `${loggedOrg.courseName} · ${loggedOrg.location}`}
         </div>
+
+        {/* Post-registration welcome banner */}
+        {isSimulator && router.query.welcome === '1' && (
+          <div style={{ background:'rgba(255,0,144,0.08)', border:`1px solid ${ORG}`, padding:'16px 18px', marginBottom:20, fontFamily:SANS }}>
+            <div style={{ fontSize:15, fontWeight:700, color:ORG, marginBottom:4 }}>🎉 You're in! Submit your first bomb.</div>
+            <div style={{ fontSize:12, color:MUT, lineHeight:1.6 }}>
+              Fill in the details below — you'll be live on the global leaderboard the moment you submit.
+            </div>
+          </div>
+        )}
 
         {/* Simulator info banner */}
         {isSimulator && (
@@ -197,9 +208,9 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
               if (isSimulator) {
                 setForm(f => ({ ...f, player: loggedOrg.fullName, tournament: 'Simulator', gender: loggedOrg.gender || 'male' }));
               }
-              const ok = await doSubmit();
-              if (ok && isSimulator && loggedOrg.profileConsent === undefined) {
-                setShowProfilePrompt(true);
+              const result = await doSubmit();
+              if (result && result.ok) {
+                setRankResult(result);
               }
             }}
             style={{ opacity:(consent && !(isSimulator && simulatorWeeklyBlock))?1:0.5 }}
@@ -208,6 +219,37 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
           </Btn>
         </Card>
       </div>
+
+      {/* Rank reveal — shown immediately after a successful submission */}
+      {rankResult && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.8)', zIndex:700, display:'flex', alignItems:'center', justifyContent:'center', padding:20, backdropFilter:'blur(4px)' }}>
+          <div style={{ background:BG3, border:`1px solid ${BDR}`, width:'100%', maxWidth:440, padding:30, textAlign:'center' }}>
+            <div style={{ fontFamily:DISP, fontSize:24, color:TXT, letterSpacing:.5, marginBottom:10 }}>
+              🔥 You're Live!
+            </div>
+            <div style={{ fontFamily:SANS, fontSize:13, color:MUT, lineHeight:1.7, marginBottom:8 }}>
+              Your drive just hit the global leaderboard.
+            </div>
+            <div style={{ fontFamily:DISP, fontSize:42, color:ORG, letterSpacing:1, margin:'14px 0 6px' }}>
+              #{rankResult.rank}
+            </div>
+            <div style={{ fontFamily:SANS, fontSize:12, color:MUT, marginBottom:24, textTransform:'uppercase', letterSpacing:.6 }}>
+              of {rankResult.total} in {rankResult.gender === 'female' ? "Women's" : "Men's"} Longest Drive
+            </div>
+            <Btn
+              full
+              onClick={() => {
+                setRankResult(null);
+                if (isSimulator && loggedOrg.profileConsent === undefined) {
+                  setShowProfilePrompt(true);
+                }
+              }}
+            >
+              Continue →
+            </Btn>
+          </div>
+        </div>
+      )}
 
       {/* Post-submission profile consent prompt — framed as a reward, not a gate */}
       {showProfilePrompt && (

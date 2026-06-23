@@ -98,7 +98,7 @@ export default function App({ Component, pageProps }) {
     if (isSimulator) {
       setLoggedOrg(newOrg);
       toast('Account created! You can now submit simulator drives.');
-      router.push('/submit');
+      router.push('/submit?welcome=1');
     } else {
       toast('Registration submitted — awaiting admin approval');
       router.push('/');
@@ -155,10 +155,19 @@ export default function App({ Component, pageProps }) {
     const ok = await db.insertEntry(e);
     if (!ok) { toast('Submission failed — please try again'); return false; }
 
-    setEntries(prev => [...prev, e]);
+    const updatedEntries = [...entries, e];
+    setEntries(updatedEntries);
+
+    // Rank within gender category (male/female), by distance desc
+    const sameGender = updatedEntries
+      .filter(x => x.gender === e.gender)
+      .sort((a, b) => b.dist - a.dist);
+    const rank = sameGender.findIndex(x => x.id === e.id) + 1;
+    const total = sameGender.length;
+
     setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male' });
     toast('Drive submitted to the World Registry!');
-    return true;
+    return { ok: true, rank, total, gender: e.gender };
   }
 
   async function updateProfileConsent(orgId, consent) {
