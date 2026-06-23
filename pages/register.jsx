@@ -43,17 +43,31 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
           Free to join. Select your account type below.
         </div>
 
-        {/* Benefit strip — gives a cold visitor a reason to keep going */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 24 }}>
-          {[
-            ['📊', 'See how you rank', 'against players worldwide'],
-            ['⚡', 'Instant approval', 'no waiting on review'],
-            ['🆓', '100% free', 'no card, no catch'],
-          ].map(([icon, title, sub]) => (
-            <div key={title} style={{ border: `1px solid ${BDR}`, padding: '12px 10px', textAlign: 'center' }}>
-              <div style={{ fontSize: 18, marginBottom: 4 }}>{icon}</div>
-              <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: TXT, lineHeight: 1.3 }}>{title}</div>
-              <div style={{ fontFamily: SANS, fontSize: 10, color: DIM, lineHeight: 1.3, marginTop: 2 }}>{sub}</div>
+        {/* Benefit strip — gives a cold visitor a reason to keep going, reacts to account type */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 24 }}>
+          {(isSimulator
+            ? [
+                ['📊', 'See your rank', 'vs players worldwide'],
+                ['⚡', 'Instant access', 'submit in minutes'],
+                ['🆓', '100% free', 'no card, no catch'],
+              ]
+            : [
+                ['🏆', 'Global exposure', 'for your club or event'],
+                ['✅', 'Verified results', 'reviewed within 24h'],
+                ['🆓', '100% free', 'no card, no catch'],
+              ]
+          ).map(([icon, title, sub]) => (
+            <div key={title} style={{
+              border: `1px solid ${BDR}`,
+              borderTop: `2px solid ${ORG}`,
+              background: 'rgba(255,0,144,0.04)',
+              padding: '14px 10px',
+              textAlign: 'center',
+              transition: 'transform .15s',
+            }}>
+              <div style={{ fontSize: 22, marginBottom: 6 }}>{icon}</div>
+              <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: TXT, lineHeight: 1.3 }}>{title}</div>
+              <div style={{ fontFamily: SANS, fontSize: 10, color: MUT, lineHeight: 1.3, marginTop: 3 }}>{sub}</div>
             </div>
           ))}
         </div>
