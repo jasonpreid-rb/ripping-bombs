@@ -5,6 +5,15 @@ import { TXT, MUT, ORG, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { tier, todayStr, toB64 } from '../lib/constants';
 import { Card, Field, PhotoField, Btn } from '../components/UI';
 
+// Mirrors nameToSlug() in pages/profile/[slug].jsx — keep in sync
+function nameToSlug(name) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-');
+}
+
 export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateProfileConsent, cvt, unitLbl, entries=[], approvedOrgs=[] }) {
   const [consent, setConsent] = useState(false);
   const [showProfilePrompt, setShowProfilePrompt] = useState(false);
@@ -260,7 +269,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
             </div>
             <div style={{ fontFamily:SANS, fontSize:13, color:MUT, lineHeight:1.7, marginBottom:20 }}>
               Want a shareable public profile page at{' '}
-              <span style={{ color:ORG, fontWeight:600 }}>rippingbombs.com/profile/{loggedOrg.fullName.toLowerCase().replace(/\s+/g,'-')}</span>{' '}
+              <span style={{ color:ORG, fontWeight:600 }}>rippingbombs.com/profile/{nameToSlug(loggedOrg.fullName)}</span>{' '}
               showing your stats and submitted drives? It's a great way to track your progress and show off your best results.
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>

@@ -37,6 +37,15 @@ function MarqueeLogo({ name, logo }) {
   );
 }
 
+// Mirrors nameToSlug() in pages/profile/[slug].jsx — keep in sync
+function nameToSlug(name) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-');
+}
+
 export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, onAdminClick, pendingCount, onShowDemo }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -62,9 +71,9 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
   return (
     <div style={{ minHeight: '100vh', background: '#1a1a1a', color: '#f0f0f0', fontFamily: SANS }}>
 
-      {/* Announcement Banner */}
+      {/* Announcement Banner — hidden on mobile via .promo-banner CSS rule */}
       {!bannerDismissed && (
-        <div style={{ background: ORG, padding: '9px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 101 }}>
+        <div className="promo-banner" style={{ background: ORG, padding: '9px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 101 }}>
           <div onClick={() => router.push('/register')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: '#fff', letterSpacing: .5, textTransform: 'uppercase' }}>
               Submit Your Drive — Rank Globally, Instantly — FREE
@@ -77,8 +86,24 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
-        .desktop-nav{display:flex}.burger-btn{display:none}
-        @media(max-width:680px){.desktop-nav{display:none!important}.burger-btn{display:flex!important;align-items:center;justify-content:center}}
+        .desktop-nav{display:flex}
+        .bottom-tabbar{display:none}
+        @media(max-width:680px){
+          .desktop-nav{display:none!important}
+          .promo-banner{display:none!important}
+          .site-header{padding:10px 14px!important}
+          main{padding-bottom:calc(64px + env(safe-area-inset-bottom))!important}
+          .bottom-tabbar{
+            display:flex!important;
+            position:fixed;left:0;right:0;bottom:0;z-index:200;
+            background:rgba(14,14,14,0.98);
+            border-top:1px solid rgba(255,255,255,0.08);
+            backdrop-filter:blur(16px);
+            padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+            justify-content:space-between;
+            align-items:flex-end;
+          }
+        }
         @keyframes fi{from{opacity:0}to{opacity:1}}
         @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
         .brand-row:hover .brand-logo{opacity:1;filter:grayscale(1) brightness(0) invert(1);}
@@ -86,7 +111,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
       `}</style>
 
       {/* HEADER */}
-      <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(14,14,14,0.97)', position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(16px)', padding: '14px 22px' }}>
+      <div className="site-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(14,14,14,0.97)', position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(16px)', padding: '14px 22px' }}>
         <div style={{ cursor: 'pointer' }} onClick={() => navTo('/')}><RBLogoWhite height={30}/></div>
         <div className="desktop-nav" style={{ gap: 10, alignItems: 'center' }}>
           <UnitToggle/>
@@ -102,13 +127,15 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
             ⚙{pendingCount > 0 && <span style={{ position: 'absolute', top: -4, right: -4, width: 9, height: 9, background: ORG, borderRadius: '50%', display: 'block' }}/>}
           </button>
         </div>
-        <button className="burger-btn" onClick={() => setMenuOpen(m => !m)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 0, padding: '6px 10px', cursor: 'pointer', flexDirection: 'column', gap: 4 }}>
-          {[0,1,2].map(i => <span key={i} style={{ display: 'block', width: 18, height: 2, background: '#fff' }}/>)}
-        </button>
       </div>
 
+      <style>{`
+        .more-panel{top:58px}
+        @media(max-width:680px){.more-panel{top:50px}}
+      `}</style>
+
       {menuOpen && (
-        <div style={{ position: 'fixed', top: 58, left: 0, right: 0, background: 'rgba(14,14,14,0.98)', borderBottom: '1px solid rgba(255,255,255,0.08)', zIndex: 99, padding: '16px 22px 20px', display: 'flex', flexDirection: 'column', gap: 10, animation: 'slideDown .2s ease' }}>
+        <div className="more-panel" style={{ position: 'fixed', left: 0, right: 0, background: 'rgba(14,14,14,0.98)', borderBottom: '1px solid rgba(255,255,255,0.08)', zIndex: 99, padding: '16px 22px 20px', display: 'flex', flexDirection: 'column', gap: 10, animation: 'slideDown .2s ease' }}>
           {[['Leaderboard','/leaderboard'],['Hall of Fame','/hall-of-fame'],['Contact','/contact'],['Login','/login'],['Register','/register']].map(([label,href]) => (
             <button key={href} onClick={() => navTo(href)} style={{ background: isActive(href) ? ORG : 'transparent', border: isActive(href) ? 'none' : '1px solid rgba(255,255,255,0.12)', color: isActive(href) ? '#111' : 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>{label}</button>
           ))}
@@ -121,6 +148,35 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
       )}
 
       <main>{children}</main>
+
+      {/* Bottom tab bar — mobile only, app-style nav */}
+      <div className="bottom-tabbar">
+        {[
+          { href: '/', label: 'Home', icon: '⌂' },
+          { href: '/leaderboard', label: 'Ranks', icon: '☰' },
+        ].map(t => (
+          <button key={t.href} onClick={() => navTo(t.href)} style={{ flex: 1, background: 'none', border: 'none', color: isActive(t.href) ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
+            <span style={{ fontSize: 18, lineHeight: 1 }}>{t.icon}</span>
+            <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600 }}>{t.label}</span>
+          </button>
+        ))}
+
+        {/* Center raised submit button */}
+        <button onClick={() => navTo('/submit')} style={{ flex: 1, display: 'flex', justifyContent: 'center', position: 'relative', top: -16, background: 'none', border: 'none', cursor: 'pointer' }}>
+          <span style={{ width: 50, height: 50, borderRadius: '50%', background: ORG, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: '#111', boxShadow: '0 4px 16px rgba(255,0,144,0.45)', border: '3px solid #1a1a1a' }}>＋</span>
+        </button>
+
+        <button onClick={() => navTo(loggedOrg ? `/profile/${nameToSlug(loggedOrg.fullName)}` : '/login')} style={{ flex: 1, background: 'none', border: 'none', color: 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
+          <span style={{ fontSize: 18, lineHeight: 1 }}>☻</span>
+          <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600 }}>{loggedOrg ? 'Profile' : 'Login'}</span>
+        </button>
+
+        <button onClick={() => setMenuOpen(m => !m)} style={{ flex: 1, background: 'none', border: 'none', color: menuOpen ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
+          <span style={{ fontSize: 18, lineHeight: 1 }}>⋯</span>
+          <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600 }}>More</span>
+        </button>
+      </div>
+
       <div style={{ background:'#0e0e0e', borderTop:'1px solid rgba(255,255,255,0.06)', borderBottom:'1px solid rgba(255,255,255,0.06)', padding:'18px 16px' }}>
         <div onClick={() => navTo('/supported-simulators')} style={{ fontFamily:SANS, fontSize:9, fontWeight:700, letterSpacing:2, color:'rgba(255,255,255,0.18)', textTransform:'uppercase', textAlign:'center', marginBottom:12, cursor:'pointer' }}>Compatible with →</div>
         <div className="brand-row" style={{ display:'flex', flexWrap:'wrap', justifyContent:'center', gap:10 }}>
