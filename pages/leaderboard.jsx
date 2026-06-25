@@ -1,7 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 
 function nameToSlug(name) {
   return name
@@ -101,7 +100,6 @@ export default function LeaderboardPage(props) {
     fSimulator, setFSimulator,
     sortBy, setSortBy } = props;
 
-  const router = useRouter();
   const currentWeek = week || nowWeek();
   const PAGE_SIZE = 25;
   const [page, setPage] = useState(1);
@@ -126,7 +124,6 @@ export default function LeaderboardPage(props) {
     .filter(e=>!fClub||e.club.toLowerCase().includes(fClub.toLowerCase()))
     .sort((a,b)=>{if(sortBy==='hcp')return a.hcp-b.hcp;if(sortBy==='age')return a.age-b.age;if(sortBy==='club')return a.club.localeCompare(b.club);if(sortBy==='date')return new Date(b.date)-new Date(a.date);return b.dist-a.dist;});
 
-  const allTimeBest=[...entries].filter(e=>approvedOrgs.find(o=>o.id===e.orgId)).sort((a,b)=>Number(b.dist)-Number(a.dist));
   const visibleRows = tableRows.slice(0, page * PAGE_SIZE);
   const hasMore = visibleRows.length < tableRows.length;
 
@@ -139,8 +136,6 @@ export default function LeaderboardPage(props) {
         <meta name="description" content="The global longest drive leaderboard. See verified competition results from clubs and tournaments worldwide on Ripping Bombs."/>
       </Head>
       <div style={{padding:'28px 18px 80px',maxWidth:1000,margin:'0 auto'}}>
-        {/* Hero skeleton */}
-        <div style={{background:'rgba(255,0,144,0.06)',border:'1px solid rgba(255,0,144,0.12)',padding:'24px 28px',marginBottom:28,height:110}}/>
         {/* Controls skeleton */}
         <div style={{display:'flex',gap:10,marginBottom:20}}>
           {[80,60,60].map((w,i)=><div key={i} style={{height:34,width:w,background:BG2,border:`1px solid ${BDR}`}}/>)}
@@ -180,42 +175,6 @@ export default function LeaderboardPage(props) {
         {/* Sample data CTA */}
         <h1 style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:1,marginBottom:8,fontWeight:400}}>Global Golf Longest Drive Leaderboard</h1>
         <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginBottom:20}}>New rankings every week — submit your drive to compete in this week's championship.</div>
-        <div style={{background:'#0e0e0e',border:'1px solid rgba(255,0,144,0.2)',padding:'28px 28px 24px',marginBottom:28}}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:20}}>
-            <div style={{flex:1,minWidth:220}}>
-              <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:8}}>Sample Data — Launching September 2026</div>
-              <div style={{fontFamily:DISP,fontSize:'clamp(18px,3vw,28px)',color:'#fff',letterSpacing:.5,lineHeight:1.15,marginBottom:10}}>IS YOUR CLUB'S BIGGEST HITTER ON THE LEADERBOARD?</div>
-              <div style={{fontFamily:SANS,fontSize:13,color:'rgba(255,255,255,0.5)',lineHeight:1.7,maxWidth:480}}>Register your club or event free on Ripping Bombs. Submit your longest drive competition winner to the global leaderboard.</div>
-            </div>
-            <div style={{display:'flex',flexDirection:'column',gap:10,flexShrink:0}}>
-              <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:12,padding:'12px 24px',cursor:'pointer',letterSpacing:.5}}>REGISTER YOUR CLUB FREE →</button>
-              <button onClick={()=>router.push('/register')} style={{background:'transparent',border:'1px solid rgba(255,255,255,0.15)',color:'rgba(255,255,255,0.6)',fontFamily:SANS,fontWeight:600,fontSize:12,padding:'12px 24px',cursor:'pointer',letterSpacing:.5}}>SUBMIT AN EVENT RESULT →</button>
-            </div>
-          </div>
-        </div>
-
-        {/* World record hero */}
-        {allTimeBest[0]&&(()=>{ const best=allTimeBest[0]; const bestOrg=orgFor(best.orgId); return (
-          <div onClick={()=>setDetEnt&&setDetEnt(best)} style={{background:'linear-gradient(135deg,rgba(255,0,144,0.12),rgba(255,0,144,0.04))',border:'1px solid rgba(255,0,144,0.25)',padding:'24px 28px',marginBottom:28,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:18,cursor:'pointer'}}
-            onMouseEnter={e=>e.currentTarget.style.background='linear-gradient(135deg,rgba(255,0,144,0.18),rgba(255,0,144,0.08))'}
-            onMouseLeave={e=>e.currentTarget.style.background='linear-gradient(135deg,rgba(255,0,144,0.12),rgba(255,0,144,0.04))'}>
-            <div>
-              <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:ORG,marginBottom:8,textTransform:'uppercase'}}>🏆 All-Time Record</div>
-              <div style={{fontFamily:DISP,fontSize:34,color:TXT,letterSpacing:.5,display:'flex',alignItems:'center',gap:8}}>
-                {best.player}
-                {bestOrg?.country&&<span style={{fontSize:24}}>{countryFlag(bestOrg.country)}</span>}
-              </div>
-              <div style={{fontFamily:SANS,fontSize:12,color:MUT,marginTop:4}}>{bestOrg?.courseName} · {best.club} · HCP {best.hcp}</div>
-            </div>
-            <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:10}}>
-              <div style={{textAlign:'right'}}>
-                <div style={{fontFamily:DISP,fontSize:56,color:ORG,letterSpacing:1,lineHeight:1}}>{cvt(best.dist)}</div>
-                <div style={{fontFamily:SANS,fontSize:14,color:MUT,marginTop:2}}>{unitLbl}</div>
-              </div>
-              <button onClick={e=>{e.stopPropagation();setShareEnt&&setShareEnt(best);}} style={{background:`linear-gradient(135deg,#FF0090,#ff66c4)`,border:'none',color:'#fff',padding:'8px 16px',cursor:'pointer',fontSize:11,fontFamily:SANS,fontWeight:700,letterSpacing:.5}}>↗ SHARE</button>
-            </div>
-          </div>
-        );})()}
 
         {/* Week nav */}
         <div style={{background:allTime?BG2:'linear-gradient(135deg,rgba(255,0,144,0.14),rgba(255,0,144,0.03))',border:`1px solid ${allTime?BDR:'rgba(255,0,144,0.3)'}`,padding:'16px 20px',marginBottom:20,display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:14}}>
