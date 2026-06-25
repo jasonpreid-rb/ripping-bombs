@@ -310,7 +310,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
               The World's Longest Drive Leaderboard
             </div>
             <h1 style={{fontFamily:DISP,fontSize:'clamp(42px,8vw,72px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:8,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
-              RIPPING BOMBS
+              EVERY DRIVE RANKS
             </h1>
             <p style={{fontFamily:SANS,fontSize:14,color:'rgba(255,255,255,0.65)',maxWidth:440,margin:'0 auto 36px',lineHeight:1.6,letterSpacing:.3}}>
               See where your drive ranks against golfers your age, handicap &amp; gender — instantly.{' '}
@@ -322,30 +322,6 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             <InlineCalculator router={router}/>
           </div>
         </div>
-
-        {/* LIVE STATS TICKER */}
-        {(() => {
-          const totalDrives = approved.length;
-          const countries = [...new Set(approvedOrgs.map(o=>o.country).filter(Boolean))].length;
-          const clubs = approvedOrgs.filter(o=>o.accountType==='club').length;
-          const stats = [
-            { value: totalDrives, label: 'Drives Submitted' },
-            { value: countries,   label: 'Countries' },
-            { value: clubs,       label: 'Registered Clubs' },
-          ];
-          return (
-            <div style={{background:'#0a0a0a',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'28px 18px'}}>
-              <div style={{maxWidth:1000,margin:'0 auto',display:'flex',justifyContent:'center',flexWrap:'wrap'}}>
-                {stats.map(({value,label},i)=>(
-                  <div key={label} style={{flex:'1 1 160px',textAlign:'center',padding:'12px 24px',borderRight:i<stats.length-1?`1px solid ${BDR}`:'none'}}>
-                    <div style={{fontFamily:DISP,fontSize:'clamp(36px,6vw,56px)',color:ORG,letterSpacing:1,lineHeight:1}}>{value}</div>
-                    <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,color:MUT,letterSpacing:2,textTransform:'uppercase',marginTop:6}}>{label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
 
         {/* WEEKLY LEADERS */}
         <div style={{background:'#0e0e0e',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'40px 0 40px'}}>
@@ -382,6 +358,30 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             </div>
           </div>
         </div>
+
+        {/* LIVE STATS TICKER */}
+        {(() => {
+          const totalDrives = approved.length;
+          const countries = [...new Set(approvedOrgs.map(o=>o.country).filter(Boolean))].length;
+          const clubs = approvedOrgs.filter(o=>o.accountType==='club').length;
+          const stats = [
+            { value: totalDrives, label: 'Drives Submitted' },
+            { value: countries,   label: 'Countries' },
+            { value: clubs,       label: 'Registered Clubs' },
+          ];
+          return (
+            <div style={{background:'#0a0a0a',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'28px 18px'}}>
+              <div style={{maxWidth:1000,margin:'0 auto',display:'flex',justifyContent:'center',flexWrap:'wrap'}}>
+                {stats.map(({value,label},i)=>(
+                  <div key={label} style={{flex:'1 1 160px',textAlign:'center',padding:'12px 24px',borderRight:i<stats.length-1?`1px solid ${BDR}`:'none'}}>
+                    <div style={{fontFamily:DISP,fontSize:'clamp(36px,6vw,56px)',color:ORG,letterSpacing:1,lineHeight:1}}>{value}</div>
+                    <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,color:MUT,letterSpacing:2,textTransform:'uppercase',marginTop:6}}>{label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* 2027 CHAMPIONSHIP PROMO */}
         <div style={{background:'#120009',borderTop:'1px solid rgba(255,0,144,0.15)',borderBottom:'1px solid rgba(255,0,144,0.15)',padding:'56px 18px'}}>
