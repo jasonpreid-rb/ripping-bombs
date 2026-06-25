@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { fmtDate } from '../lib/constants';
+
+const linkStyle = { color: ORG };
 export default function Page({ entries=[], orgs=[], cvt=d=>d, unitLbl='yds' }) {
   const approvedOrgs = orgs.filter(o=>o.status==='approved');
   const orgFor = id => orgs.find(o=>o.id===id);

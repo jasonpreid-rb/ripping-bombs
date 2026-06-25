@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
+import { ORG } from '../lib/constants';
+
+const linkStyle = { color: ORG };
 export default function Page({ entries=[] }) {
   const approved = entries.filter(e=>e.dist>0);
   const avgAll = approved.length?Math.round(approved.reduce((s,e)=>s+e.dist,0)/approved.length):230;

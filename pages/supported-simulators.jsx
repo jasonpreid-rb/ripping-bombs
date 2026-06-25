@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import { SeoPage, SeoH1, SeoH2, SeoP } from '../components/SeoPageLayout';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 
+const linkStyle = { color: ORG };
+
 const SIMULATORS = [
   {
     id: 'trackman',

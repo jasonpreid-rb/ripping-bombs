@@ -5,6 +5,8 @@ import { SeoPage, SeoH1, SeoH2, SeoP } from '../components/SeoPageLayout';
 import { Card, Field, Btn } from '../components/UI';
 import { ORG, TXT, MUT, DIM, BG3, BDR, SANS, DISP } from '../lib/constants';
 
+const linkStyle = { color: ORG };
+
 const BENCHMARKS = {
   male: {
     youth:  { scratch: 250, low: 235, mid: 215, high: 190 },

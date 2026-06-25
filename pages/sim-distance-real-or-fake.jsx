@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { SeoPage } from '../components/SeoPageLayout'
+import { SeoPage, SeoH2, SeoP } from '../components/SeoPageLayout'
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants'
+
+const linkStyle = { color: ORG }
 
 const SIGNALS = [
   { signal: 'Drive exceeds 350 yards on a flat hole', meaning: 'Worth double-checking spin/launch readings' },
@@ -131,16 +133,16 @@ export default function SimDistanceRealOrFake() {
           ))}
         </div>
 
+        <SeoH2>Explore Related Pages</SeoH2>
+        <SeoP>
+          <Link href="/how-to-hit-a-golf-ball-farther" style={linkStyle}>How To Hit A Golf Ball Farther</Link>{' | '}
+          <Link href="/long-drive-golf-equipment" style={linkStyle}>Long Drive Golf Equipment</Link>{' | '}
+          <Link href="/simulator-golf-league" style={linkStyle}>Simulator Golf League</Link>{' | '}
+          <Link href="/supported-simulators" style={linkStyle}>Supported Simulators</Link>{' | '}
+          <Link href="/what-is-a-good-drive-in-golf" style={linkStyle}>What Is A Good Drive In Golf</Link>
+        </SeoP>
+
       </div>
-    
-      <SeoH2>Explore Related Pages</SeoH2>
-      <SeoP>
-        <Link href="/how-to-hit-a-golf-ball-farther" style={linkStyle}>How To Hit A Golf Ball Farther</Link>{' | '}
-        <Link href="/long-drive-golf-equipment" style={linkStyle}>Long Drive Golf Equipment</Link>{' | '}
-        <Link href="/simulator-golf-league" style={linkStyle}>Simulator Golf League</Link>{' | '}
-        <Link href="/supported-simulators" style={linkStyle}>Supported Simulators</Link>{' | '}
-        <Link href="/what-is-a-good-drive-in-golf" style={linkStyle}>What Is A Good Drive In Golf</Link>
-      </SeoP>
     </SeoPage>
   )
 }
