@@ -105,6 +105,8 @@ export default function LeaderboardPage(props) {
   const currentWeek = week || nowWeek();
   const PAGE_SIZE = 25;
   const [page, setPage] = useState(1);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const activeFilterCount = [fCountry,fHcp,fAge,fClub,fPlayer,fGender,fSimulator].filter(Boolean).length;
 
   // Reset to page 1 whenever any filter or view changes
   useEffect(() => { setPage(1); }, [fCountry, fHcp, fAge, fClub, fPlayer, fGender, fSimulator, sortBy, allTime, week]);
@@ -144,8 +146,9 @@ export default function LeaderboardPage(props) {
           {[80,60,60].map((w,i)=><div key={i} style={{height:34,width:w,background:BG2,border:`1px solid ${BDR}`}}/>)}
         </div>
         {/* Filters skeleton */}
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:8,marginBottom:20}}>
-          {Array.from({length:8}).map((_,i)=><div key={i} style={{height:36,background:BG2,border:`1px solid ${BDR}`}}/>)}
+        <div style={{display:'flex',gap:10,marginBottom:20}}>
+          <div style={{height:36,width:100,background:BG2,border:`1px solid ${BDR}`}}/>
+          <div style={{height:36,width:160,background:BG2,border:`1px solid ${BDR}`}}/>
         </div>
         {/* Table skeleton */}
         <div style={{border:`1px solid ${BDR}`,background:BG2}}>
@@ -175,7 +178,8 @@ export default function LeaderboardPage(props) {
       </Head>
       <div style={{padding:'28px 18px 80px',maxWidth:1000,margin:'0 auto'}}>
         {/* Sample data CTA */}
-        <h1 style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:1,marginBottom:20,fontWeight:400}}>Global Golf Longest Drive Leaderboard</h1>
+        <h1 style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:1,marginBottom:8,fontWeight:400}}>Global Golf Longest Drive Leaderboard</h1>
+        <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginBottom:20}}>New rankings every week — submit your drive to compete in this week's championship.</div>
         <div style={{background:'#0e0e0e',border:'1px solid rgba(255,0,144,0.2)',padding:'28px 28px 24px',marginBottom:28}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:20}}>
             <div style={{flex:1,minWidth:220}}>
@@ -214,38 +218,68 @@ export default function LeaderboardPage(props) {
         );})()}
 
         {/* Week nav */}
-        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:20,flexWrap:'wrap'}}>
-          <button onClick={()=>setAllTime(v=>!v)} style={{background:allTime?ORG:'transparent',border:`1px solid ${allTime?ORG:BDR}`,color:allTime?'#111':MUT,fontFamily:SANS,fontWeight:600,fontSize:12,padding:'7px 14px',cursor:'pointer'}}>{allTime?'All Time ✓':'All Time'}</button>
-          {!allTime&&<>
-            <button onClick={()=>setWeek(prevWeek(currentWeek))} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontSize:13,padding:'7px 12px',cursor:'pointer'}}>‹</button>
-            <span style={{fontFamily:SANS,fontSize:13,color:TXT,fontWeight:600}}>{weekLabel(currentWeek)}</span>
-            <button onClick={()=>setWeek(nextWeek(currentWeek))} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontSize:13,padding:'7px 12px',cursor:'pointer'}}>›</button>
-          </>}
+        <div style={{background:allTime?BG2:'linear-gradient(135deg,rgba(255,0,144,0.14),rgba(255,0,144,0.03))',border:`1px solid ${allTime?BDR:'rgba(255,0,144,0.3)'}`,padding:'16px 20px',marginBottom:20,display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:14}}>
+          <div style={{display:'flex',alignItems:'center',gap:14,flexWrap:'wrap'}}>
+            <button onClick={()=>setWeek(prevWeek(currentWeek))} disabled={allTime} style={{background:'transparent',border:`1px solid ${BDR}`,color:allTime?DIM:MUT,fontFamily:SANS,fontSize:14,padding:'8px 13px',cursor:allTime?'default':'pointer',opacity:allTime?0.4:1}}>‹</button>
+            <div>
+              <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:allTime?DIM:ORG,textTransform:'uppercase',marginBottom:3}}>🏆 Weekly Championship</div>
+              <div style={{fontFamily:DISP,fontSize:22,color:allTime?MUT:TXT,letterSpacing:.5}}>{allTime?'All-Time Leaderboard':weekLabel(currentWeek)}</div>
+            </div>
+            <button onClick={()=>setWeek(nextWeek(currentWeek))} disabled={allTime} style={{background:'transparent',border:`1px solid ${BDR}`,color:allTime?DIM:MUT,fontFamily:SANS,fontSize:14,padding:'8px 13px',cursor:allTime?'default':'pointer',opacity:allTime?0.4:1}}>›</button>
+          </div>
+          <button onClick={()=>setAllTime(v=>!v)} style={{background:allTime?ORG:'transparent',border:`1px solid ${allTime?ORG:BDR}`,color:allTime?'#111':MUT,fontFamily:SANS,fontWeight:600,fontSize:12,padding:'8px 16px',cursor:'pointer',whiteSpace:'nowrap'}}>{allTime?'All Time ✓':'View All-Time →'}</button>
         </div>
 
-        {/* Filters */}
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:8,marginBottom:20}}>
-          {[
-            {label:'Search Player',val:fPlayer,set:setFPlayer,ph:'Player name'},
-            {label:'Gender',val:fGender,set:setFGender,ph:'All',opts:[['','All'],['male','♂ Male'],['female','♀ Female']]},
-            {label:'Country/Region',val:fCountry,set:setFCountry,ph:'Filter by location'},
-            {label:'Handicap',val:fHcp,set:setFHcp,ph:'All',opts:[['','All'],['scratch','Scratch'],['low','Low (1–5)'],['mid','Mid (6–14)'],['high','High (15–28)'],['beginner','Beginner (28+']]},
-            {label:'Age Group',val:fAge,set:setFAge,ph:'All',opts:[['','All'],['u25','Under 25'],['25-40','25–40'],['40-55','40–55'],['55+','55+']]},
-            {label:'Club Brand',val:fClub,set:setFClub,ph:'e.g. TaylorMade'},
-            {label:'Sort By',val:sortBy,set:setSortBy,ph:'Distance',opts:[['dist','Distance'],['date','Date'],['hcp','Handicap'],['age','Age'],['club','Club']]},
-            {label:'Entry Type',val:fSimulator,set:setFSimulator,ph:'All',opts:[['','All'],['official','🏌️ Official Only'],['simulator','🖥️ Simulator Only']]},
-          ].map(({label,val,set,ph,opts})=>(
-            <div key={label}>
-              <div style={{fontFamily:SANS,fontSize:9,fontWeight:700,color:DIM,letterSpacing:1.2,marginBottom:5,textTransform:'uppercase'}}>{label}</div>
-              {opts
-                ?<div style={{position:'relative'}}><select value={val} onChange={e=>set(e.target.value)} style={{width:'100%',background:BG2,border:`1px solid ${BDR}`,padding:'8px 28px 8px 10px',color:val?TXT:DIM,fontFamily:SANS,fontSize:13,outline:'none',cursor:'pointer',appearance:'none'}}>
-                  {opts.map(([v,l])=><option key={v} value={v}>{l}</option>)}
-                </select><span style={{position:'absolute',right:8,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',color:DIM,fontSize:10}}>▾</span></div>
-                :<input value={val} onChange={e=>set(e.target.value)} placeholder={ph} style={{width:'100%',background:BG2,border:`1px solid ${BDR}`,padding:'8px 10px',color:TXT,fontFamily:SANS,fontSize:13,outline:'none'}}/>
-              }
+        {/* Filter bar */}
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:filtersOpen?12:20,flexWrap:'wrap'}}>
+          <button onClick={()=>setFiltersOpen(v=>!v)} style={{display:'flex',alignItems:'center',gap:8,background:filtersOpen?BG3:'transparent',border:`1px solid ${BDR}`,color:TXT,fontFamily:SANS,fontWeight:600,fontSize:13,padding:'9px 14px',cursor:'pointer'}}>
+            <span style={{display:'flex',flexDirection:'column',gap:3,width:14}}>
+              <span style={{height:2,background:TXT}}/>
+              <span style={{height:2,background:TXT}}/>
+              <span style={{height:2,background:TXT}}/>
+            </span>
+            Filters
+            {activeFilterCount>0&&<span style={{background:ORG,color:'#111',fontSize:10,fontWeight:700,borderRadius:10,padding:'1px 7px'}}>{activeFilterCount}</span>}
+            <span style={{fontSize:10,color:DIM,marginLeft:2}}>{filtersOpen?'▴':'▾'}</span>
+          </button>
+
+          <div style={{minWidth:160}}>
+            <div style={{position:'relative'}}>
+              <select value={sortBy} onChange={e=>setSortBy(e.target.value)} style={{width:'100%',background:BG2,border:`1px solid ${BDR}`,padding:'9px 28px 9px 12px',color:TXT,fontFamily:SANS,fontSize:13,outline:'none',cursor:'pointer',appearance:'none'}}>
+                {[['dist','Sort: Distance'],['date','Sort: Date'],['hcp','Sort: Handicap'],['age','Sort: Age'],['club','Sort: Club']].map(([v,l])=><option key={v} value={v}>{l}</option>)}
+              </select>
+              <span style={{position:'absolute',right:8,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',color:DIM,fontSize:10}}>▾</span>
             </div>
-          ))}
+          </div>
+
+          {activeFilterCount>0&&(
+            <button onClick={()=>{setFCountry('');setFHcp('');setFAge('');setFClub('');setFPlayer('');setFGender('');setFSimulator('');}} style={{background:'transparent',border:'none',color:DIM,fontFamily:SANS,fontSize:12,textDecoration:'underline',cursor:'pointer',padding:'9px 4px'}}>Clear filters</button>
+          )}
         </div>
+
+        {filtersOpen&&(
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:8,marginBottom:20,padding:'16px',background:BG2,border:`1px solid ${BDR}`}}>
+            {[
+              {label:'Search Player',val:fPlayer,set:setFPlayer,ph:'Player name'},
+              {label:'Gender',val:fGender,set:setFGender,ph:'All',opts:[['','All'],['male','♂ Male'],['female','♀ Female']]},
+              {label:'Country/Region',val:fCountry,set:setFCountry,ph:'Filter by location'},
+              {label:'Handicap',val:fHcp,set:setFHcp,ph:'All',opts:[['','All'],['scratch','Scratch'],['low','Low (1–5)'],['mid','Mid (6–14)'],['high','High (15–28)'],['beginner','Beginner (28+']]},
+              {label:'Age Group',val:fAge,set:setFAge,ph:'All',opts:[['','All'],['u25','Under 25'],['25-40','25–40'],['40-55','40–55'],['55+','55+']]},
+              {label:'Club Brand',val:fClub,set:setFClub,ph:'e.g. TaylorMade'},
+              {label:'Entry Type',val:fSimulator,set:setFSimulator,ph:'All',opts:[['','All'],['official','🏌️ Official Only'],['simulator','🖥️ Simulator Only']]},
+            ].map(({label,val,set,ph,opts})=>(
+              <div key={label}>
+                <div style={{fontFamily:SANS,fontSize:9,fontWeight:700,color:DIM,letterSpacing:1.2,marginBottom:5,textTransform:'uppercase'}}>{label}</div>
+                {opts
+                  ?<div style={{position:'relative'}}><select value={val} onChange={e=>set(e.target.value)} style={{width:'100%',background:BG3,border:`1px solid ${BDR}`,padding:'8px 28px 8px 10px',color:val?TXT:DIM,fontFamily:SANS,fontSize:13,outline:'none',cursor:'pointer',appearance:'none'}}>
+                    {opts.map(([v,l])=><option key={v} value={v}>{l}</option>)}
+                  </select><span style={{position:'absolute',right:8,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',color:DIM,fontSize:10}}>▾</span></div>
+                  :<input value={val} onChange={e=>set(e.target.value)} placeholder={ph} style={{width:'100%',background:BG3,border:`1px solid ${BDR}`,padding:'8px 10px',color:TXT,fontFamily:SANS,fontSize:13,outline:'none'}}/>
+                }
+              </div>
+            ))}
+          </div>
+        )}
 
         <LeaderTable rows={visibleRows} orgFor={orgFor} onView={e=>setDetEnt&&setDetEnt(e)} onShare={e=>setShareEnt&&setShareEnt(e)} cvt={cvt} unitLbl={unitLbl}/>
 
