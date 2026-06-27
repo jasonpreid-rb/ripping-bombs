@@ -109,7 +109,7 @@ export default async function handler(req, res) {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #0a0a0a; padding: 32px 16px;">
 
         <div style="text-align: center; margin-bottom: 28px;">
-          <img src="https://rippingbombs.com/logo.png" alt="Ripping Bombs" style="height: 40px; margin-bottom: 12px;" />
+          <img src="https://rippingbombs.com/favicon.png" alt="Ripping Bombs" style="height: 40px; margin-bottom: 12px;" />
           <h1 style="color: #ffffff; font-size: 24px; margin: 0;">Monthly Snapshot (TEST SEND)</h1>
           <div style="color: #888; font-size: 14px; margin-top: 4px;">${monthLabel}</div>
         </div>
