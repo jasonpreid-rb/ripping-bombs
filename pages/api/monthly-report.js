@@ -69,29 +69,58 @@ export default async function handler(req, res) {
 
     const monthLabel = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
+    const growthIsPositive = submissionGrowth !== 'N/A' && parseFloat(submissionGrowth) >= 0;
+    const growthArrow = submissionGrowth === 'N/A' ? '' : (growthIsPositive ? '▲' : '▼');
+    const growthColor = submissionGrowth === 'N/A' ? '#888' : (growthIsPositive ? '#22c55e' : '#ef4444');
+
+    const statCard = (label, value, sublabel) => `
+      <td style="padding: 8px;" width="50%">
+        <div style="background-color: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 20px; text-align: center;">
+          <div style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-family: Arial, sans-serif;">${label}</div>
+          <div style="color: #ffffff; font-size: 32px; font-weight: 700; font-family: Arial, sans-serif; line-height: 1;">${value}</div>
+          ${sublabel ? `<div style="color: #FF0090; font-size: 13px; margin-top: 6px; font-family: Arial, sans-serif;">${sublabel}</div>` : ''}
+        </div>
+      </td>
+    `;
+
     const html = `
-      <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #111;">
-        <h1 style="color: #FF0090;">Ripping Bombs — Monthly Snapshot</h1>
-        <h2 style="font-weight: normal; color: #555;">${monthLabel}</h2>
+      <body style="margin: 0; padding: 0; background-color: #0a0a0a;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #0a0a0a; padding: 32px 16px;">
 
-        <h3>Marketplace Growth</h3>
-        <ul>
-          <li>Total clubs: <b>${totalClubs}</b> (+${newClubsThisMonth} this month)</li>
-          <li>Total individuals/sims: <b>${totalIndividuals}</b> (+${newIndividualsThisMonth} this month)</li>
-        </ul>
+        <div style="text-align: center; margin-bottom: 28px;">
+          <div style="color: #FF0090; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px;">Ripping Bombs</div>
+          <h1 style="color: #ffffff; font-size: 24px; margin: 0;">Monthly Snapshot</h1>
+          <div style="color: #888; font-size: 14px; margin-top: 4px;">${monthLabel}</div>
+        </div>
 
-        <h3>Engagement</h3>
-        <ul>
-          <li>Total submissions (all-time): <b>${totalSubmissions}</b></li>
-          <li>Submissions this month: <b>${submissionsThisMonth}</b></li>
-          <li>Submissions last month: <b>${submissionsLastMonth}</b></li>
-          <li>Month-over-month growth: <b>${submissionGrowth}${submissionGrowth !== 'N/A' ? '%' : ''}</b></li>
-        </ul>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 8px;">
+          <tr>
+            ${statCard('Total Clubs', totalClubs, `+${newClubsThisMonth} this month`)}
+            ${statCard('Individuals / Sims', totalIndividuals, `+${newIndividualsThisMonth} this month`)}
+          </tr>
+        </table>
 
-        <p style="color: #888; font-size: 12px; margin-top: 32px;">
-          Auto-generated on ${now.toLocaleDateString()}. Note: club/individual growth tracking started ${now.toLocaleDateString()} — earlier history wasn't tracked, so this month's "new" counts may be inflated by backfilled accounts.
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
+          <tr>
+            ${statCard('Total Submissions', totalSubmissions, 'all-time')}
+            ${statCard('Submissions This Month', submissionsThisMonth, `vs ${submissionsLastMonth} last month`)}
+          </tr>
+        </table>
+
+        <div style="background-color: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
+          <div style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Month-over-Month Growth</div>
+          <div style="color: ${growthColor}; font-size: 28px; font-weight: 700;">
+            ${growthArrow} ${submissionGrowth}${submissionGrowth !== 'N/A' ? '%' : ''}
+          </div>
+        </div>
+
+        <p style="color: #555; font-size: 11px; text-align: center; line-height: 1.5; margin-top: 32px;">
+          Auto-generated on ${now.toLocaleDateString()}.<br/>
+          Note: club/individual growth tracking started ${now.toLocaleDateString()} — earlier history wasn't tracked, so this month's "new" counts may be inflated by backfilled accounts.
         </p>
+
       </div>
+      </body>
     `;
 
     await resend.emails.send({
