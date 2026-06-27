@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../../lib/constants';
 import { fmtDate, tier, nowWeek, weekLabel, prevWeek, nextWeek, sameWeek } from '../../lib/constants';
@@ -46,7 +46,6 @@ export async function getServerSideProps({ params }) {
     return true;
   });
 
-  // Fetch simulator orgs for any simulator entries so we can link to their profiles
   const simOrgIds = [...new Set(entries.filter(e => e.is_simulator).map(e => e.orgId))];
   let simOrgs = [];
   if (simOrgIds.length) {
@@ -98,55 +97,42 @@ function generateClubShareImage(org, best, ul) {
     const draw = (flagImg, logoImg) => {
       drawRBLogo(ctx, 80, 58, 80);
       if (flagImg) ctx.drawImage(flagImg, W - 160, 58, 80, 60);
-
       ctx.strokeStyle = 'rgba(163,230,53,0.3)'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(80, 150); ctx.lineTo(W - 80, 150); ctx.stroke();
-
       if (logoImg) {
         const aspect = logoImg.naturalWidth / logoImg.naturalHeight;
         const lh = 90, lw = lh * aspect;
         ctx.drawImage(logoImg, (W - lw) / 2, 168, lw, lh);
       }
-
       ctx.fillStyle = '#a3e635'; ctx.font = 'bold 20px Arial'; ctx.textAlign = 'center';
       ctx.fillText('CLUB LEADERBOARD', W / 2, logoImg ? 290 : 210);
-
       ctx.fillStyle = '#ffffff'; ctx.font = 'bold 58px Arial Black, Arial';
       const name = org.courseName.toUpperCase();
       const displayName = name.length > 20 ? name.slice(0, 20) + '...' : name;
       ctx.fillText(displayName, W / 2, logoImg ? 370 : 290);
-
       ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.font = '30px Arial';
       ctx.fillText(org.location || '', W / 2, logoImg ? 420 : 340);
-
       if (best) {
         ctx.fillStyle = 'rgba(163,230,53,0.7)'; ctx.font = 'bold 22px Arial';
         ctx.fillText('CLUB RECORD', W / 2, 490);
-
         ctx.fillStyle = '#a3e635'; ctx.font = 'bold 280px Arial Black, Arial';
         ctx.fillText(String(best.dist), W / 2, 760);
-
         ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.font = 'bold 48px Arial';
         ctx.fillText((ul || 'yds').toUpperCase(), W / 2, 820);
-
         const badgeW = 320, badgeH = 44, badgeX = (W - badgeW) / 2, badgeY = 845;
         ctx.strokeStyle = 'rgba(163,230,53,0.5)'; ctx.lineWidth = 1; ctx.strokeRect(badgeX, badgeY, badgeW, badgeH);
         ctx.fillStyle = 'rgba(163,230,53,0.08)'; ctx.fillRect(badgeX, badgeY, badgeW, badgeH);
         ctx.fillStyle = '#a3e635'; ctx.font = 'bold 18px Arial';
         ctx.fillText('RECORD HOLDER', W / 2, badgeY + 29);
-
         ctx.fillStyle = '#ffffff'; ctx.font = 'bold 52px Arial Black, Arial';
         ctx.fillText(best.player.toUpperCase(), W / 2, 960);
-
         ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = '26px Arial';
         ctx.fillText(`${best.club}  |  HCP ${best.hcp}  |  ${fmtDate(best.date)}`, W / 2, 1000);
       }
-
       ctx.strokeStyle = 'rgba(163,230,53,0.3)'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(80, 1030); ctx.lineTo(W - 80, 1030); ctx.stroke();
       ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = '24px Arial';
       ctx.fillText('rippingbombs.com', W / 2, 1058);
-
       resolve(canvas.toDataURL('image/png'));
     };
 
@@ -158,7 +144,6 @@ function generateClubShareImage(org, best, ul) {
 
     const flagCode = (org.country || '').toLowerCase().trim();
     const flagSrc = flagCode ? `https://flagcdn.com/80x60/${flagCode}.png` : null;
-
     Promise.all([loadImg(flagSrc), loadImg(org.logo || null)]).then(([flagImg, logoImg]) => draw(flagImg, logoImg));
   });
 }
@@ -189,7 +174,7 @@ function ShareBar({ org, best, canonicalUrl, ul }) {
       <button onClick={handleCopy} style={{ background: 'transparent', border: `1px solid ${BDR}`, color: copied ? ORG : MUT, fontFamily: SANS, fontSize: 11, fontWeight: 600, padding: '7px 14px', cursor: 'pointer', letterSpacing: 0.5 }}>
         {copied ? '✓ COPIED' : '⎘ COPY LINK'}
       </button>
-      <button onClick={handleImage} disabled={generating} style={{ background: `linear-gradient(135deg,#FF0090,#ff66c4)`, border: 'none', color: '#fff', fontFamily: SANS, fontSize: 11, fontWeight: 700, padding: '7px 14px', cursor: 'pointer', letterSpacing: 0.5, opacity: generating ? 0.7 : 1 }}>
+      <button onClick={handleImage} disabled={generating} style={{ background: 'linear-gradient(135deg,#FF0090,#ff66c4)', border: 'none', color: '#fff', fontFamily: SANS, fontSize: 11, fontWeight: 700, padding: '7px 14px', cursor: 'pointer', letterSpacing: 0.5, opacity: generating ? 0.7 : 1 }}>
         {generating ? 'GENERATING...' : '↗ SHARE IMAGE'}
       </button>
     </div>
@@ -198,19 +183,63 @@ function ShareBar({ org, best, canonicalUrl, ul }) {
 
 export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
   const [week, setWeek] = useState(nowWeek());
-  const [allTime, setAllTime] = useState(true); // default all-time for low submission counts
+  const [allTime, setAllTime] = useState(true);
 
-  const sorted = [...clubEntries].sort((a, b) => Number(b.dist) - Number(a.dist));
-  const best = sorted[0];
-  const weekEntries = allTime ? sorted : sorted.filter(e => sameWeek(e.date, week));
+  // Filters
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [fPlayer, setFPlayer] = useState('');
+  const [fGender, setFGender] = useState('');
+  const [fHcp, setFHcp] = useState('');
+  const [fAge, setFAge] = useState('');
+  const [fClub, setFClub] = useState('');
+  const [sortBy, setSortBy] = useState('dist');
+
+  // Reset filters when view changes
+  useEffect(() => {}, [allTime, week]);
+
+  const hcpIn = (hcp, b) => {
+    if (!b) return true;
+    if (b === 'scratch') return hcp <= 0;
+    if (b === 'low') return hcp > 0 && hcp <= 5;
+    if (b === 'mid') return hcp > 5 && hcp <= 14;
+    if (b === 'high') return hcp > 14 && hcp <= 28;
+    if (b === 'beginner') return hcp > 28;
+    return true;
+  };
+
+  const ageIn = (age, b) => {
+    if (!b) return true;
+    if (b === 'u25') return age < 25;
+    if (b === '25-40') return age >= 25 && age < 40;
+    if (b === '40-55') return age >= 40 && age < 55;
+    if (b === '55+') return age >= 55;
+    return true;
+  };
+
+  const sorted = [...clubEntries]
+    .filter(e => allTime || sameWeek(e.date, week))
+    .filter(e => !fPlayer || e.player.toLowerCase().includes(fPlayer.toLowerCase()))
+    .filter(e => !fGender || e.gender === fGender)
+    .filter(e => hcpIn(e.hcp, fHcp))
+    .filter(e => ageIn(e.age, fAge))
+    .filter(e => !fClub || e.club.toLowerCase().includes(fClub.toLowerCase()))
+    .sort((a, b) => {
+      if (sortBy === 'hcp') return a.hcp - b.hcp;
+      if (sortBy === 'age') return a.age - b.age;
+      if (sortBy === 'date') return new Date(b.date) - new Date(a.date);
+      return Number(b.dist) - Number(a.dist);
+    });
+
+  const allSorted = [...clubEntries].sort((a, b) => Number(b.dist) - Number(a.dist));
+  const best = allSorted[0];
   const totalPlayers = new Set(clubEntries.map(e => e.player)).size;
   const simCount = clubEntries.filter(e => e.is_simulator).length;
   const officialCount = clubEntries.filter(e => !e.is_simulator).length;
+  const activeFilterCount = [fPlayer, fGender, fHcp, fAge, fClub].filter(Boolean).length;
 
   const ul = 'yds';
   const canonicalUrl = `https://www.rippingbombs.com/clubs/${toSlug(org.courseName)}`;
   const metaDesc = `Longest drive leaderboard for ${org.courseName}, ${org.location}. ${clubEntries.length} drives recorded on Ripping Bombs.`;
-
   const simOrgMap = Object.fromEntries((simOrgs || []).map(o => [o.id, o]));
 
   const schema = {
@@ -270,7 +299,7 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
           </div>
         </div>
 
-        {/* Club record — pink style, no green gradient */}
+        {/* Club record */}
         {best && (
           <div style={{ background: 'linear-gradient(135deg,rgba(255,0,144,0.1),rgba(255,0,144,0.03))', border: '1px solid rgba(255,0,144,0.2)', padding: '20px 24px', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
             <div>
@@ -290,7 +319,7 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
 
         <ShareBar org={org} best={best} canonicalUrl={canonicalUrl} ul={ul} />
 
-        {/* Weekly championship banner — styled like leaderboard.jsx */}
+        {/* Weekly championship banner */}
         <div style={{ background: allTime ? BG2 : 'linear-gradient(135deg,rgba(255,0,144,0.14),rgba(255,0,144,0.03))', border: `1px solid ${allTime ? BDR : 'rgba(255,0,144,0.3)'}`, padding: '16px 20px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
             <button onClick={() => setWeek(prevWeek(week))} disabled={allTime} style={{ background: 'transparent', border: `1px solid ${BDR}`, color: allTime ? DIM : MUT, fontFamily: SANS, fontSize: 14, padding: '8px 13px', cursor: allTime ? 'default' : 'pointer', opacity: allTime ? 0.4 : 1 }}>‹</button>
@@ -305,6 +334,60 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
           </button>
         </div>
 
+        {/* Filter bar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: filtersOpen ? 12 : 20, flexWrap: 'wrap' }}>
+          <button onClick={() => setFiltersOpen(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: filtersOpen ? BG3 : 'transparent', border: `1px solid ${BDR}`, color: TXT, fontFamily: SANS, fontWeight: 600, fontSize: 13, padding: '9px 14px', cursor: 'pointer' }}>
+            <span style={{ display: 'flex', flexDirection: 'column', gap: 3, width: 14 }}>
+              <span style={{ height: 2, background: TXT }} />
+              <span style={{ height: 2, background: TXT }} />
+              <span style={{ height: 2, background: TXT }} />
+            </span>
+            Filters
+            {activeFilterCount > 0 && <span style={{ background: ORG, color: '#111', fontSize: 10, fontWeight: 700, borderRadius: 10, padding: '1px 7px' }}>{activeFilterCount}</span>}
+            <span style={{ fontSize: 10, color: DIM, marginLeft: 2 }}>{filtersOpen ? '▴' : '▾'}</span>
+          </button>
+
+          <div style={{ minWidth: 160 }}>
+            <div style={{ position: 'relative' }}>
+              <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ width: '100%', background: BG2, border: `1px solid ${BDR}`, padding: '9px 28px 9px 12px', color: TXT, fontFamily: SANS, fontSize: 13, outline: 'none', cursor: 'pointer', appearance: 'none' }}>
+                {[['dist','Sort: Distance'],['date','Sort: Date'],['hcp','Sort: Handicap'],['age','Sort: Age']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
+              </select>
+              <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: DIM, fontSize: 10 }}>▾</span>
+            </div>
+          </div>
+
+          {activeFilterCount > 0 && (
+            <button onClick={() => { setFPlayer(''); setFGender(''); setFHcp(''); setFAge(''); setFClub(''); }} style={{ background: 'transparent', border: 'none', color: DIM, fontFamily: SANS, fontSize: 12, textDecoration: 'underline', cursor: 'pointer', padding: '9px 4px' }}>
+              Clear filters
+            </button>
+          )}
+        </div>
+
+        {filtersOpen && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 8, marginBottom: 20, padding: '16px', background: BG2, border: `1px solid ${BDR}` }}>
+            {[
+              { label: 'Search Player', val: fPlayer, set: setFPlayer, ph: 'Player name' },
+              { label: 'Gender', val: fGender, set: setFGender, ph: 'All', opts: [['','All'],['male','♂ Male'],['female','♀ Female']] },
+              { label: 'Handicap', val: fHcp, set: setFHcp, ph: 'All', opts: [['','All'],['scratch','Scratch'],['low','Low (1–5)'],['mid','Mid (6–14)'],['high','High (15–28)'],['beginner','Beginner (28+']] },
+              { label: 'Age Group', val: fAge, set: setFAge, ph: 'All', opts: [['','All'],['u25','Under 25'],['25-40','25–40'],['40-55','40–55'],['55+','55+']] },
+              { label: 'Club Brand', val: fClub, set: setFClub, ph: 'e.g. TaylorMade' },
+            ].map(({ label, val, set, ph, opts }) => (
+              <div key={label}>
+                <div style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, color: DIM, letterSpacing: 1.2, marginBottom: 5, textTransform: 'uppercase' }}>{label}</div>
+                {opts
+                  ? <div style={{ position: 'relative' }}>
+                      <select value={val} onChange={e => set(e.target.value)} style={{ width: '100%', background: BG3, border: `1px solid ${BDR}`, padding: '8px 28px 8px 10px', color: val ? TXT : DIM, fontFamily: SANS, fontSize: 13, outline: 'none', cursor: 'pointer', appearance: 'none' }}>
+                        {opts.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                      </select>
+                      <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: DIM, fontSize: 10 }}>▾</span>
+                    </div>
+                  : <input value={val} onChange={e => set(e.target.value)} placeholder={ph} style={{ width: '100%', background: BG3, border: `1px solid ${BDR}`, padding: '8px 10px', color: TXT, fontFamily: SANS, fontSize: 13, outline: 'none' }} />
+                }
+              </div>
+            ))}
+          </div>
+        )}
+
         <div style={{ overflowX: 'auto', border: `1px solid ${BDR}`, background: BG2 }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 560 }}>
             <thead>
@@ -315,7 +398,7 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
               </tr>
             </thead>
             <tbody>
-              {weekEntries.map((e, i) => {
+              {sorted.map((e, i) => {
                 const simOrg = e.is_simulator ? simOrgMap[e.orgId] : null;
                 const profileSlug = simOrg?.fullName ? nameToSlug(simOrg.fullName) : null;
                 return (
@@ -345,9 +428,9 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
               })}
             </tbody>
           </table>
-          {weekEntries.length === 0 && (
+          {sorted.length === 0 && (
             <div style={{ padding: '48px 0', textAlign: 'center', color: DIM, fontFamily: SANS, fontSize: 13 }}>
-              No drives for this period
+              No drives match your filters
             </div>
           )}
         </div>
