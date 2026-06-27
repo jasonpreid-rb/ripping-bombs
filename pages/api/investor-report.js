@@ -74,7 +74,7 @@ export default async function handler(req, res) {
 
     const countryCounts = {};
     (countryRows || []).forEach(row => {
-      const c = (row.country || 'Unknown').trim();
+      const c = (row.country || 'Unknown').trim().toUpperCase();
       if (!c) return;
       countryCounts[c] = (countryCounts[c] || 0) + 1;
     });
