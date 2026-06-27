@@ -128,9 +128,10 @@ export default function App({ Component, pageProps }) {
     if (org.status !== 'approved') { toast('Account not active'); return; }
 
     setLoggedOrg(org);
+    localStorage.setItem('rb_club', JSON.stringify(org));
     setLgn({ email:'', pw:'' });
     toast(`Welcome, ${org.fullName}!`);
-    router.push('/submit');
+    router.push('/dashboard');
   }
 
   async function doSubmit() {
