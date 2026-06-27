@@ -90,7 +90,7 @@ export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl 
         )}
         {onShare && (
           <button onClick={()=>{ onClose(); onShare(entry); }}
-            style={{ width:'100%', background:`linear-gradient(135deg,${ORG},#bef264)`, border:'none', color:'#111', fontFamily:SANS, fontWeight:700, fontSize:12, padding:'11px', cursor:'pointer', letterSpacing:.5 }}>
+            style={{ width:'100%', background:`linear-gradient(135deg,${ORG},#ff66c4)`, border:'none', color:'#fff', fontFamily:SANS, fontWeight:700, fontSize:12, padding:'11px', cursor:'pointer', letterSpacing:.5 }}>
             ↗ SHARE THIS DRIVE
           </button>
         )}

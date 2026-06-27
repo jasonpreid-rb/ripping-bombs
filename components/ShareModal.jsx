@@ -91,24 +91,51 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
       ctx.fillText(String(cvt(entry.dist)), W/2, 560);
       ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.font = 'bold 48px Arial';
       ctx.fillText(unitLbl.toUpperCase(), W/2, 620);
+
+      // From here on, lay everything out with a running cursor so optional
+      // fields (facility/tournament) and the avatar never collide.
       const badgeW=320, badgeH=44, badgeX=(W-badgeW)/2, badgeY=648;
       ctx.strokeStyle='rgba(255,0,144,0.5)'; ctx.lineWidth=1; ctx.strokeRect(badgeX,badgeY,badgeW,badgeH);
       ctx.fillStyle='rgba(255,0,144,0.08)'; ctx.fillRect(badgeX,badgeY,badgeW,badgeH);
       ctx.fillStyle='#ffffff'; ctx.font='bold 18px Arial'; ctx.letterSpacing='3px';
       ctx.fillText('✓  VERIFIED DISTANCE', W/2, badgeY+29);
-      drawAvatarCircle(ctx, avatarImg, W/2, 725, 50, org?.fullName || entry.player);
-      ctx.fillStyle='#ffffff'; ctx.font='bold 72px Arial Black, Arial'; ctx.letterSpacing='0px';
-      ctx.fillText(entry.player.toUpperCase(), W/2, 790);
-      ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='34px Arial';
-      ctx.fillText(org?.courseName||'', W/2, 845);
-      if (entry.facility) { ctx.fillStyle='rgba(255,0,144,0.6)'; ctx.font='italic 26px Arial'; ctx.fillText(entry.facility, W/2, 886); }
-      if (entry.tournament) { ctx.fillStyle='rgba(255,0,144,0.7)'; ctx.font='italic 28px Arial'; ctx.fillText(entry.tournament, W/2, entry.facility ? 922 : 892); }
+      ctx.letterSpacing='0px';
+
+      let cursorY = badgeY + badgeH; // bottom of badge
+
+      const avatarR = 46;
+      const avatarCy = cursorY + 56 + avatarR; // gap below badge, then to circle center
+      drawAvatarCircle(ctx, avatarImg, W/2, avatarCy, avatarR, org?.fullName || entry.player);
+      cursorY = avatarCy + avatarR; // bottom of avatar circle
+
+      cursorY += 56; // gap before player name baseline
+      ctx.fillStyle='#ffffff'; ctx.font='bold 64px Arial Black, Arial';
+      ctx.fillText(entry.player.toUpperCase(), W/2, cursorY);
+
+      cursorY += 45;
+      ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='32px Arial';
+      ctx.fillText(org?.courseName||'', W/2, cursorY);
+
+      if (entry.facility) {
+        cursorY += 38;
+        ctx.fillStyle='rgba(255,0,144,0.6)'; ctx.font='italic 26px Arial';
+        ctx.fillText(entry.facility, W/2, cursorY);
+      }
+      if (entry.tournament) {
+        cursorY += 36;
+        ctx.fillStyle='rgba(255,0,144,0.7)'; ctx.font='italic 28px Arial';
+        ctx.fillText(entry.tournament, W/2, cursorY);
+      }
+
+      cursorY += 32;
       ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font='24px Arial';
-      ctx.fillText(fmtDate(entry.date), W/2, (entry.tournament && entry.facility) ? 958 : entry.tournament ? 935 : entry.facility ? 922 : 900);
+      ctx.fillText(fmtDate(entry.date), W/2, cursorY);
+
+      const lineY = Math.max(cursorY + 35, 950);
       ctx.strokeStyle='rgba(255,0,144,0.3)'; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.moveTo(80,950); ctx.lineTo(W-80,950); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(80,lineY); ctx.lineTo(W-80,lineY); ctx.stroke();
       ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='24px Arial';
-      ctx.fillText('rippingbombs.com', W/2, 990);
+      ctx.fillText('rippingbombs.com', W/2, lineY + 40);
       setImageUrl(canvas.toDataURL('image/png'));
     };
 
