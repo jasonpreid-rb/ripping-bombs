@@ -26,11 +26,11 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Upload parse failed' });
     }
 
-    const entryId = Array.isArray(fields.entryId) ? fields.entryId[0] : fields.entryId;
+    const orgId = Array.isArray(fields.orgId) ? fields.orgId[0] : fields.orgId;
     const file = Array.isArray(files.avatar) ? files.avatar[0] : files.avatar;
 
-    if (!file || !entryId) {
-      return res.status(400).json({ error: 'Missing file or entryId' });
+    if (!file || !orgId) {
+      return res.status(400).json({ error: 'Missing file or orgId' });
     }
 
     if (!ALLOWED_TYPES.includes(file.mimetype)) {
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
     try {
       const fileBuffer = fs.readFileSync(file.filepath);
       const fileExt = file.mimetype.split('/')[1];
-      const fileName = `${entryId}-${Date.now()}.${fileExt}`;
+      const fileName = `${orgId}-${Date.now()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
@@ -64,9 +64,9 @@ export default async function handler(req, res) {
       const avatarUrl = publicUrlData.publicUrl;
 
       const { error: dbError } = await supabase
-        .from('entries')
+        .from('clubs')
         .update({ avatarUrl })
-        .eq('id', entryId);
+        .eq('id', orgId);
 
       if (dbError) {
         return res.status(500).json({ error: dbError.message });

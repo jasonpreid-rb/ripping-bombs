@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { supabase } from '../lib/supabaseClient';
-import Layout from '../components/Layout';
 import PlayerAvatar from '../components/PlayerAvatar';
 import AvatarUploader from '../components/AvatarUploader';
 
@@ -438,16 +437,14 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <Layout>
-        <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: MUT }}>
-          Loading your dashboard…
-        </div>
-      </Layout>
+      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: MUT }}>
+        Loading your dashboard…
+      </div>
     );
   }
 
   return (
-    <Layout>
+    <>
       <Head>
         <title>{club?.courseName || 'Dashboard'} — Ripping Bombs</title>
       </Head>
@@ -532,6 +529,6 @@ export default function DashboardPage() {
       {showDeleteModal && (
         <DeleteModal club={club} onClose={() => setShowDeleteModal(false)} />
       )}
-    </Layout>
+    </>
   );
 }
