@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { supabase } from '../lib/supabaseClient';
-import Layout from '../components/Layout';
 import PlayerAvatar from '../components/PlayerAvatar';
 import AvatarUploader from '../components/AvatarUploader';
 
@@ -224,27 +223,6 @@ function VsAverageBar({ myBest, globalAvg, label }) {
   );
 }
 
-// Submit CTA banner
-function SubmitCTA({ isSimulator, lastDriveDate }) {
-  const daysSince = lastDriveDate ? Math.floor((Date.now() - new Date(lastDriveDate)) / 86400000) : null;
-  const msg = daysSince === null
-    ? "You haven't submitted a drive yet — get on the board!"
-    : daysSince > 14
-    ? `It's been ${daysSince} days since your last submission. Time to rip another one?`
-    : "Keep the momentum going — submit your next drive.";
-  return (
-    <div style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-      <div>
-        <p style={{ margin: '0 0 4px', fontWeight: 700, fontSize: '0.95rem', color: TXT }}>🏌️ Ready to rip?</p>
-        <p style={{ margin: 0, fontSize: '0.82rem', color: MUT }}>{msg}</p>
-      </div>
-      <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.85rem', padding: '0.55rem 1.2rem', borderRadius: 7, textDecoration: 'none', whiteSpace: 'nowrap' }}>
-        + Submit a Drive
-      </a>
-    </div>
-  );
-}
-
 // Per-player breakdown table (for club accounts)
 function PlayerBreakdown({ entries }) {
   const players = {};
@@ -298,11 +276,20 @@ function PlayerBreakdown({ entries }) {
 }
 
 // Recent drives table
-function DriveHistory({ entries }) {
+function DriveHistory({ entries, lastDriveDate }) {
+  const daysSince = lastDriveDate ? Math.floor((Date.now() - new Date(lastDriveDate)) / 86400000) : null;
+  const nudge = daysSince === null
+    ? "You haven't submitted a drive yet — get on the board!"
+    : daysSince > 14
+    ? `It's been ${daysSince} days since your last submission. Time to rip another one?`
+    : null;
   return (
     <div style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, overflow: 'hidden' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', borderBottom: `1px solid ${BDR}` }}>
-        <h2 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>All Submitted Drives</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', borderBottom: `1px solid ${BDR}`, flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div>
+          <h2 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>All Submitted Drives</h2>
+          {nudge && <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: MUT }}>{nudge}</p>}
+        </div>
         <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.78rem', padding: '0.38rem 0.85rem', borderRadius: 6, textDecoration: 'none' }}>+ Submit Drive</a>
       </div>
 
@@ -438,16 +425,14 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <Layout>
-        <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: MUT }}>
-          Loading your dashboard…
-        </div>
-      </Layout>
+      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: MUT }}>
+        Loading your dashboard…
+      </div>
     );
   }
 
   return (
-    <Layout>
+    <>
       <Head>
         <title>{club?.courseName || 'Dashboard'} — Ripping Bombs</title>
       </Head>
@@ -498,16 +483,13 @@ export default function DashboardPage() {
           <VsAverageBar myBest={longest} globalAvg={globalAvgBest} label="All Clubs on Platform" />
         )}
 
-        {/* Submit CTA */}
-        <SubmitCTA isSimulator={club?.badge === 'simulator'} lastDriveDate={lastDriveDate} />
-
         {/* Player breakdown (club accounts with multiple players) */}
         {club?.accountType === 'club' && entries.length > 0 && (
           <PlayerBreakdown entries={entries} />
         )}
 
         {/* Drive history */}
-        <DriveHistory entries={entries} />
+        <DriveHistory entries={entries} lastDriveDate={lastDriveDate} />
 
         {/* Danger Zone */}
         <div style={{ border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '1.25rem 1.5rem' }}>
@@ -532,6 +514,6 @@ export default function DashboardPage() {
       {showDeleteModal && (
         <DeleteModal club={club} onClose={() => setShowDeleteModal(false)} />
       )}
-    </Layout>
+    </>
   );
 }
