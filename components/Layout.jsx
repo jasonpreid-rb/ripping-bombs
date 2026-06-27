@@ -120,7 +120,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           <NavBtn href="/contact" label="Contact"/>
           <button onClick={onShowDemo} style={{ background: 'transparent', border: '1px solid rgba(255,0,144,0.4)', color: ORG, fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', borderRadius: 0, cursor: 'pointer' }}>Try Demo</button>
           {loggedOrg
-            ? <><NavBtn href="/submit" label="Submit Drive"/><button onClick={onLogout} style={{ background: 'none', border: '1px solid rgba(220,80,80,0.3)', color: '#f87171', fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', cursor: 'pointer', borderRadius: 0 }}>Log Out</button></>
+            ? <><NavBtn href="/dashboard" label="Dashboard"/><NavBtn href="/submit" label="Submit Drive"/><button onClick={onLogout} style={{ background: 'none', border: '1px solid rgba(220,80,80,0.3)', color: '#f87171', fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', cursor: 'pointer', borderRadius: 0 }}>Log Out</button></>
             : <><NavBtn href="/login" label="Login"/><button onClick={() => navTo('/register')} style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 12, padding: '7px 16px', borderRadius: 0, cursor: 'pointer' }}>Register</button></>
           }
           <button onClick={onAdminClick} style={{ position: 'relative', background: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 0, color: 'rgba(255,255,255,0.5)', fontSize: 14, padding: '6px 10px', cursor: 'pointer' }}>
@@ -141,6 +141,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           ))}
           <button onClick={() => { onShowDemo(); setMenuOpen(false); }} style={{ background: 'transparent', border: '1px solid rgba(255,0,144,0.4)', color: ORG, fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Try Demo</button>
           {loggedOrg && <>
+            <button onClick={() => navTo('/dashboard')} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Dashboard</button>
             <button onClick={() => navTo('/submit')} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Submit Drive</button>
             <button onClick={() => { onLogout(); setMenuOpen(false); }} style={{ background: 'none', border: '1px solid rgba(220,80,80,0.3)', color: '#f87171', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', cursor: 'pointer', textAlign: 'left', borderRadius: 0 }}>Log Out</button>
           </>}
@@ -166,9 +167,9 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           <span style={{ width: 50, height: 50, borderRadius: '50%', background: ORG, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: '#111', boxShadow: '0 4px 16px rgba(255,0,144,0.45)', border: '3px solid #1a1a1a' }}>＋</span>
         </button>
 
-        <button onClick={() => navTo(loggedOrg ? `/profile/${nameToSlug(loggedOrg.fullName)}` : '/login')} style={{ flex: 1, background: 'none', border: 'none', color: 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
+        <button onClick={() => navTo(loggedOrg ? '/dashboard' : '/login')} style={{ flex: 1, background: 'none', border: 'none', color: isActive('/dashboard') ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
           <span style={{ fontSize: 18, lineHeight: 1 }}>☻</span>
-          <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600 }}>{loggedOrg ? 'Profile' : 'Login'}</span>
+          <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600 }}>{loggedOrg ? 'Dashboard' : 'Login'}</span>
         </button>
 
         <button onClick={() => setMenuOpen(m => !m)} style={{ flex: 1, background: 'none', border: 'none', color: menuOpen ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>

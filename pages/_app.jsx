@@ -49,11 +49,8 @@ export default function App({ Component, pageProps }) {
       setLoading(false);
     });
     if (typeof window !== 'undefined') {
-      // Rehydrate logged-in user from localStorage
       const raw = localStorage.getItem('rb_club');
-      if (raw) {
-        try { setLoggedOrg(JSON.parse(raw)); } catch {}
-      }
+      if (raw) { try { setLoggedOrg(JSON.parse(raw)); } catch {} }
       if (localStorage.getItem('rb_admin_auth') === '1') setShowAdmin(true);
       if (!sessionStorage.getItem('rb_launch_seen')) {
         setTimeout(() => setShowLaunch(true), 10000);
@@ -133,9 +130,10 @@ export default function App({ Component, pageProps }) {
     if (org.status !== 'approved') { toast('Account not active'); return; }
 
     setLoggedOrg(org);
+    localStorage.setItem('rb_club', JSON.stringify(org));
     setLgn({ email:'', pw:'' });
     toast(`Welcome, ${org.fullName}!`);
-    router.push('/submit');
+    router.push('/dashboard');
   }
 
   async function doSubmit() {
