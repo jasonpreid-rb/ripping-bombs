@@ -2,7 +2,7 @@
   "framework": "nextjs",
   "crons": [
     {
-      "path": "/api/monthly-report",
+      "path": "/api/investor-report",
       "schedule": "0 8 1 * *"
     }
   ]
