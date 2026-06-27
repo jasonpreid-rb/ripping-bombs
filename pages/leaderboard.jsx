@@ -14,6 +14,7 @@ import { fmtDate, tier, nowWeek, weekLabel, prevWeek, nextWeek, sameWeek } from 
 import { countryFlag, BadgePill } from '../components/UI';
 import EntryModal from '../components/EntryModal';
 import ShareModal from '../components/ShareModal';
+import PlayerAvatar from '../components/PlayerAvatar';
 
 const STICKY = { position:'sticky', zIndex:2 };
 const RANK_W = 52;
@@ -56,17 +57,22 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
                   {medal||`#${ri+1}`}
                 </td>
                 <td data-sticky="1" style={{...tdSticky(RANK_W),padding:'12px 14px',minWidth:PLAYER_W}}>
-                  {e.is_simulator && org?.fullName ? (
-                    <Link
-                      href={`/profile/${nameToSlug(org.fullName)}`}
-                      onClick={ev=>ev.stopPropagation()}
-                      style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:ORG,textDecoration:'none',borderBottom:`1px solid rgba(255,0,144,0.3)`}}>
-                      {e.player}
-                    </Link>
-                  ) : (
-                    <span style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>{e.player}</span>
-                  )}
-                  {org?.country&&countryFlag(org.country)}
+                  <div style={{display:'flex',alignItems:'center',gap:8}}>
+                    <PlayerAvatar fullName={org?.fullName || e.player} avatarUrl={org?.avatarUrl} size={28} />
+                    <div>
+                      {e.is_simulator && org?.fullName ? (
+                        <Link
+                          href={`/profile/${nameToSlug(org.fullName)}`}
+                          onClick={ev=>ev.stopPropagation()}
+                          style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:ORG,textDecoration:'none',borderBottom:`1px solid rgba(255,0,144,0.3)`}}>
+                          {e.player}
+                        </Link>
+                      ) : (
+                        <span style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>{e.player}</span>
+                      )}
+                      {org?.country&&countryFlag(org.country)}
+                    </div>
+                  </div>
                 </td>
                 <td style={{padding:'12px 14px'}}><span style={{fontFamily:DISP,fontSize:20,color:ORG}}>{cvt(e.dist)}</span><span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:3}}>{unitLbl}</span></td>
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:12,color:MUT}}>{e.club}</td>

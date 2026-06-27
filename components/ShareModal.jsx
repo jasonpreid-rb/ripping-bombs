@@ -9,6 +9,39 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
   const [copied, setCopied] = useState(false);
   const driveUrl = `https://www.rippingbombs.com/drive/${entry.id}`;
 
+  const getInitials = (fullName) => {
+    if (!fullName) return '?';
+    const parts = fullName.trim().split(' ').filter(Boolean);
+    const first = parts[0]?.[0] || '';
+    const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
+    return (first + last).toUpperCase();
+  };
+
+  const drawAvatarCircle = (ctx, img, cx, cy, r, fullName) => {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.closePath();
+    if (img) {
+      ctx.clip();
+      // cover-fit the image into the circle
+      const size = Math.min(img.naturalWidth, img.naturalHeight);
+      const sx = (img.naturalWidth - size) / 2;
+      const sy = (img.naturalHeight - size) / 2;
+      ctx.drawImage(img, sx, sy, size, size, cx - r, cy - r, r * 2, r * 2);
+    } else {
+      ctx.fillStyle = '#FF0090';
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `bold ${Math.round(r * 0.85)}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(getInitials(fullName), cx, cy + 2);
+      ctx.textBaseline = 'alphabetic';
+    }
+    ctx.restore();
+  };
+
   const drawRBLogo = (ctx, x, y, w) => {
     const h = w * (595.28 / 841.89);
     const scaleX = w / 841.89;
@@ -44,7 +77,7 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
     for (let x=0; x<W; x+=60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
     for (let y=0; y<H; y+=60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
 
-    const drawContent = (flagImg, courseLogoImg) => {
+    const drawContent = (flagImg, courseLogoImg, avatarImg) => {
       drawRBLogo(ctx, 80, 58, 80);
       if (flagImg) ctx.drawImage(flagImg, W-160, 58, 80, 60);
       ctx.strokeStyle = 'rgba(255,0,144,0.3)'; ctx.lineWidth = 1;
@@ -63,6 +96,7 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
       ctx.fillStyle='rgba(255,0,144,0.08)'; ctx.fillRect(badgeX,badgeY,badgeW,badgeH);
       ctx.fillStyle='#ffffff'; ctx.font='bold 18px Arial'; ctx.letterSpacing='3px';
       ctx.fillText('✓  VERIFIED DISTANCE', W/2, badgeY+29);
+      drawAvatarCircle(ctx, avatarImg, W/2, 725, 50, org?.fullName || entry.player);
       ctx.fillStyle='#ffffff'; ctx.font='bold 72px Arial Black, Arial'; ctx.letterSpacing='0px';
       ctx.fillText(entry.player.toUpperCase(), W/2, 790);
       ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='34px Arial';
@@ -80,13 +114,14 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
 
     const flagSrc = org?.country ? `https://flagcdn.com/80x60/${org.country.toLowerCase()}.png` : null;
     const courseSrc = org?.logo || null;
+    const avatarSrc = org?.avatarUrl || null;
     const loadImage = src => new Promise(resolve => {
       if (!src) return resolve(null);
       const img = new Image(); img.crossOrigin = 'anonymous';
       img.onload = () => resolve(img); img.onerror = () => resolve(null); img.src = src;
     });
-    Promise.all([loadImage(flagSrc), loadImage(courseSrc)])
-      .then(([flagImg, courseLogoImg]) => drawContent(flagImg, courseLogoImg));
+    Promise.all([loadImage(flagSrc), loadImage(courseSrc), loadImage(avatarSrc)])
+      .then(([flagImg, courseLogoImg, avatarImg]) => drawContent(flagImg, courseLogoImg, avatarImg));
   }, [entry, org]);
 
   function downloadImage() {

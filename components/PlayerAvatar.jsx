@@ -1,4 +1,4 @@
-import { ORG } from '../styles/tokens';
+import { ORG } from '../lib/constants';
 
 function getInitials(fullName) {
   if (!fullName) return '?';

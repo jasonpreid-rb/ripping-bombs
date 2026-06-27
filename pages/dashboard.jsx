@@ -3,6 +3,8 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { supabase } from '../lib/supabaseClient';
 import Layout from '../components/Layout';
+import PlayerAvatar from '../components/PlayerAvatar';
+import AvatarUploader from '../components/AvatarUploader';
 
 const ORG = '#FF0090';
 const TXT = '#f0f0f0';
@@ -67,7 +69,7 @@ function FoundingBadge() {
   );
 }
 
-function ProfileModal({ club, onSave, onClose }) {
+function ProfileModal({ club, onSave, onClose, onAvatarUploaded }) {
   const [form, setForm] = useState({
     fullName: club?.fullName || '',
     location: club?.location || '',
@@ -87,6 +89,15 @@ function ProfileModal({ club, onSave, onClose }) {
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '1rem' }}>
       <div onClick={(e) => e.stopPropagation()} style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 14, padding: '2rem', width: '100%', maxWidth: 420, display: 'flex', flexDirection: 'column', gap: 8, maxHeight: '90vh', overflowY: 'auto' }}>
         <h2 style={{ margin: '0 0 8px', fontSize: '1.1rem', fontWeight: 700 }}>Edit Profile</h2>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 4 }}>
+          <PlayerAvatar fullName={club?.fullName} avatarUrl={club?.avatarUrl} size={56} />
+          <div style={{ flex: 1 }}>
+            <div style={labelStyle}>Profile Photo</div>
+            <AvatarUploader orgId={club?.id} onUploadSuccess={onAvatarUploaded} />
+          </div>
+        </div>
+
         <label style={labelStyle}>Full Name</label>
         <input style={inputStyle} value={form.fullName} onChange={(e) => set('fullName', e.target.value)} placeholder="Your name" />
         <label style={labelStyle}>Location</label>
@@ -386,6 +397,12 @@ export default function DashboardPage() {
     setLoading(false);
   };
 
+  const handleAvatarUploaded = (avatarUrl) => {
+    const updated = { ...club, avatarUrl };
+    setClub(updated);
+    localStorage.setItem('rb_club', JSON.stringify(updated));
+  };
+
   const handleProfileSave = async (form) => {
     const { error } = await supabase.from('clubs').update({
       fullName: form.fullName,
@@ -439,19 +456,22 @@ export default function DashboardPage() {
 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: 4 }}>
-              <h1 style={{ margin: 0, fontSize: 'clamp(1.4rem, 4vw, 2rem)', fontWeight: 800, letterSpacing: '-0.02em' }}>
-                {club?.courseName || club?.fullName || 'My Dashboard'}
-              </h1>
-              {club?.is_founding_member && <FoundingBadge />}
-              {club?.badge === 'simulator' && (
-                <span style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)', borderRadius: 20, padding: '2px 10px', fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Simulator</span>
-              )}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.9rem' }}>
+            <PlayerAvatar fullName={club?.fullName} avatarUrl={club?.avatarUrl} size={56} />
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: 4 }}>
+                <h1 style={{ margin: 0, fontSize: 'clamp(1.4rem, 4vw, 2rem)', fontWeight: 800, letterSpacing: '-0.02em' }}>
+                  {club?.courseName || club?.fullName || 'My Dashboard'}
+                </h1>
+                {club?.is_founding_member && <FoundingBadge />}
+                {club?.badge === 'simulator' && (
+                  <span style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)', borderRadius: 20, padding: '2px 10px', fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Simulator</span>
+                )}
+              </div>
+              <p style={{ margin: 0, color: MUT, fontSize: '0.85rem' }}>
+                {[club?.fullName, club?.position, club?.location].filter(Boolean).join(' · ')}
+              </p>
             </div>
-            <p style={{ margin: 0, color: MUT, fontSize: '0.85rem' }}>
-              {[club?.fullName, club?.position, club?.location].filter(Boolean).join(' · ')}
-            </p>
           </div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <a href="/leaderboard" style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.5rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none' }}>View Leaderboard</a>
@@ -507,7 +527,7 @@ export default function DashboardPage() {
       </div>
 
       {showModal && (
-        <ProfileModal club={club} onSave={handleProfileSave} onClose={() => setShowModal(false)} />
+        <ProfileModal club={club} onSave={handleProfileSave} onClose={() => setShowModal(false)} onAvatarUploaded={handleAvatarUploaded} />
       )}
       {showDeleteModal && (
         <DeleteModal club={club} onClose={() => setShowDeleteModal(false)} />

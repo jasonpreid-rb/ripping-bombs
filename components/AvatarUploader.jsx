@@ -44,7 +44,7 @@ function resizeImage(file) {
   });
 }
 
-export default function AvatarUploader({ entryId, onUploadSuccess }) {
+export default function AvatarUploader({ orgId, onUploadSuccess }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
 
@@ -67,7 +67,7 @@ export default function AvatarUploader({ entryId, onUploadSuccess }) {
 
       const formData = new FormData();
       formData.append('avatar', resizedFile);
-      formData.append('entryId', entryId);
+      formData.append('orgId', orgId);
 
       const res = await fetch('/api/upload-avatar', {
         method: 'POST',

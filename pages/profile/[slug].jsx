@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../../lib/constants';
 import { fmtDate, tier } from '../../lib/constants';
 import { countryFlag, BadgePill } from '../../components/UI';
+import PlayerAvatar from '../../components/PlayerAvatar';
 
 export function nameToSlug(name) {
   return name
@@ -139,12 +140,15 @@ export default function PlayerProfile({ org, playerEntries }) {
         {/* ✅ Fixed: was rgba(163,230,53,...) lime green — now neon pink */}
         <div style={{ marginTop: 24, marginBottom: 32, background: 'linear-gradient(135deg,rgba(255,0,144,0.1),rgba(255,0,144,0.03))', border: '1px solid rgba(255,0,144,0.2)', padding: '28px 28px' }}>
           <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 2, color: ORG, textTransform: 'uppercase', marginBottom: 10 }}>Player Profile</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 8 }}>
-            <div style={{ fontFamily: DISP, fontSize: 'clamp(28px,5vw,42px)', color: TXT, letterSpacing: 0.5, lineHeight: 1 }}>
-              {profileName}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 8 }}>
+            <PlayerAvatar fullName={org.fullName} avatarUrl={org.avatarUrl} size={72} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+              <div style={{ fontFamily: DISP, fontSize: 'clamp(28px,5vw,42px)', color: TXT, letterSpacing: 0.5, lineHeight: 1 }}>
+                {profileName}
+              </div>
+              {org.country && <span style={{ fontSize: 28 }}>{countryFlag(org.country)}</span>}
+              {org.badge && <BadgePill badge={org.badge} />}
             </div>
-            {org.country && <span style={{ fontSize: 28 }}>{countryFlag(org.country)}</span>}
-            {org.badge && <BadgePill badge={org.badge} />}
           </div>
           {org.location && (
             <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: hasSocials ? 16 : 0 }}>
