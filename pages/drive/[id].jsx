@@ -6,6 +6,7 @@ import { fmtDate, tier, toSlug } from '../../lib/constants';
 import { SEED_ENTRIES, SEED_ORGS } from '../../lib/data';
 import { BadgePill, countryFlag, Overlay } from '../../components/UI';
 import ShareModal from '../../components/ShareModal';
+import { supabase } from '../../lib/supabaseClient';
 
 export async function getStaticPaths() {
   const paths = SEED_ENTRIES.map(e => ({ params: { id: e.id } }));
@@ -23,9 +24,28 @@ export default function DrivePage({ staticEntry, staticOrg, entries, orgs, cvt, 
   const router = useRouter();
   const { id } = router.query;
   const [shareOpen, setShareOpen] = useState(false);
+  const [photo, setPhoto] = useState(null);
 
   const entry = entries?.find(e => e.id === id) || staticEntry;
   const org = orgs?.find(o => o.id === entry?.orgId) || staticOrg;
+
+  useEffect(() => {
+    setPhoto(null);
+    if (!entry?.id) return;
+
+    let cancelled = false;
+    supabase
+      .from('entries')
+      .select('photo')
+      .eq('id', entry.id)
+      .single()
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (!error && data?.photo) setPhoto(data.photo);
+      });
+
+    return () => { cancelled = true; };
+  }, [entry?.id]);
 
   if (!entry) return (
     <div style={{ padding:'80px 18px', textAlign:'center' }}>
@@ -79,7 +99,7 @@ export default function DrivePage({ staticEntry, staticOrg, entries, orgs, cvt, 
           </div>
 
           {org?.badge && <div style={{ marginBottom:16 }}><BadgePill badge={org.badge}/></div>}
-          {entry.photo && <img src={entry.photo} alt="Drive evidence" style={{ width:'100%', maxHeight:240, objectFit:'cover', marginBottom:16 }}/>}
+          {photo && <img src={photo} alt="Drive evidence" style={{ width:'100%', maxHeight:240, objectFit:'cover', marginBottom:16 }}/>}
 
           <button onClick={()=>setShareOpen(true)}
             style={{ background:`linear-gradient(135deg,#FF0090,#ff66c4)`, border:'none', color:'#fff', fontFamily:SANS, fontWeight:700, fontSize:13, padding:'14px 24px', cursor:'pointer', letterSpacing:.5, width:'100%' }}>
@@ -107,7 +127,7 @@ export default function DrivePage({ staticEntry, staticOrg, entries, orgs, cvt, 
         </div>
       </div>
 
-      {shareOpen && <ShareModal entry={entry} org={org} cvt={cvt||(d=>d)} unitLbl={unit} onClose={()=>setShareOpen(false)}/>}
+      {shareOpen && <ShareModal entry={{ ...entry, photo }} org={org} cvt={cvt||(d=>d)} unitLbl={unit} onClose={()=>setShareOpen(false)}/>}
     </>
   );
 }

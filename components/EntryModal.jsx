@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { fmtDate, tier } from '../lib/constants';
 import { Overlay, BadgePill, countryFlag } from './UI';
+import { supabase } from '../lib/supabaseClient';
 
 function nameToSlug(name) {
   return name
@@ -13,6 +15,26 @@ function nameToSlug(name) {
 
 export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl }) {
   const router = useRouter();
+  const [photo, setPhoto] = useState(null);
+
+  useEffect(() => {
+    setPhoto(null);
+    if (!entry?.id) return;
+
+    let cancelled = false;
+    supabase
+      .from('entries')
+      .select('photo')
+      .eq('id', entry.id)
+      .single()
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (!error && data?.photo) setPhoto(data.photo);
+      });
+
+    return () => { cancelled = true; };
+  }, [entry?.id]);
+
   if (!entry) return null;
 
   const isSimulator = entry.is_simulator === true;
@@ -54,8 +76,8 @@ export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl 
         ))}
       </div>
 
-      {entry.photo && (
-        <img src={entry.photo} alt="Drive evidence" style={{ width:'100%', maxHeight:180, objectFit:'cover', marginBottom:14 }}/>
+      {photo && (
+        <img src={photo} alt="Drive evidence" style={{ width:'100%', maxHeight:180, objectFit:'cover', marginBottom:14 }}/>
       )}
 
       <div style={{ marginTop:18, display:'flex', flexDirection:'column', gap:8 }}>
