@@ -21,8 +21,7 @@ export async function getServerSideProps({ params }) {
   const { data: clubs } = await supabase
     .from('clubs')
     .select('*')
-    .eq('status', 'approved')
-    .eq('accountType', 'club');
+    .eq('status', 'approved');
 
   if (!clubs) return { notFound: true };
 
