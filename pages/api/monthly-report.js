@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     const { count: totalIndividuals } = await supabase
       .from('clubs')
       .select('*', { count: 'exact', head: true })
-      .eq('accountType', 'individual');
+      .eq('accountType', 'simulator');
 
     const { count: newClubsThisMonth } = await supabase
       .from('clubs')
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
     const { count: newIndividualsThisMonth } = await supabase
       .from('clubs')
       .select('*', { count: 'exact', head: true })
-      .eq('accountType', 'individual')
+      .eq('accountType', 'simulator')
       .gte('created_at', startOfThisMonth.toISOString());
 
     // ----- ENTRIES (filter by text date field, 'YYYY-MM' prefix) -----
