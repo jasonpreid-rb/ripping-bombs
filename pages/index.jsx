@@ -224,21 +224,22 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             return (
               <div key={e.id}
                 onClick={()=>setDetEnt && setDetEnt(e)}
-                style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',cursor:'pointer',transition:'opacity .15s'}}
+                style={{display:'flex',alignItems:'center',gap:8,padding:'8px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',cursor:'pointer',transition:'opacity .15s'}}
                 onMouseEnter={ev=>ev.currentTarget.style.opacity='.7'}
                 onMouseLeave={ev=>ev.currentTarget.style.opacity='1'}>
-                <span style={{fontSize:16,width:22,flexShrink:0,textAlign:'center'}}>{MEDALS[i]}</span>
-                <PlayerAvatar fullName={org?.fullName || e.player} avatarUrl={org?.avatarUrl} size={28} />
-                <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,display:'flex',alignItems:'center',gap:4,flexWrap:'wrap'}}>
-                    {e.player}{org?.country && countryFlag(org.country)}
+                <span style={{fontSize:14,width:20,flexShrink:0,textAlign:'center'}}>{MEDALS[i]}</span>
+                <PlayerAvatar fullName={org?.fullName || e.player} avatarUrl={org?.avatarUrl} size={32} />
+                <div style={{flex:1,minWidth:0,overflow:'hidden'}}>
+                  <div style={{fontFamily:SANS,fontWeight:700,fontSize:12,color:TXT,display:'flex',alignItems:'center',gap:4,overflow:'hidden'}}>
+                    <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{e.player}</span>
+                    {org?.country && <span style={{flexShrink:0}}>{countryFlag(org.country)}</span>}
                   </div>
-                  <div style={{fontFamily:SANS,fontSize:10,color:DIM,marginTop:1}}>
+                  <div style={{fontFamily:SANS,fontSize:10,color:DIM,marginTop:1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
                     {e.is_simulator ? <span style={{color:'rgba(255,0,144,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
                   </div>
                 </div>
-                <div style={{textAlign:'right',flexShrink:0}}>
-                  <span style={{fontFamily:DISP,fontSize:22,color:i===0?ORG:MUT,letterSpacing:.5}}>{Number(e.dist)}</span>
+                <div style={{textAlign:'right',flexShrink:0,paddingLeft:6}}>
+                  <span style={{fontFamily:DISP,fontSize:20,color:i===0?ORG:MUT,letterSpacing:.5}}>{Number(e.dist)}</span>
                   <span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:3}}>yds</span>
                 </div>
               </div>
@@ -263,21 +264,22 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             return (
               <div key={e.id}
                 onClick={()=>setDetEnt && setDetEnt(e)}
-                style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',cursor:'pointer',transition:'opacity .15s'}}
+                style={{display:'flex',alignItems:'center',gap:8,padding:'8px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',cursor:'pointer',transition:'opacity .15s'}}
                 onMouseEnter={ev=>ev.currentTarget.style.opacity='.7'}
                 onMouseLeave={ev=>ev.currentTarget.style.opacity='1'}>
-                <span style={{fontSize:16,width:22,flexShrink:0,textAlign:'center'}}>{MEDALS[i]}</span>
-                <PlayerAvatar fullName={org?.fullName || e.player} avatarUrl={org?.avatarUrl} size={28} />
-                <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,display:'flex',alignItems:'center',gap:4,flexWrap:'wrap'}}>
-                    {e.player}{org?.country && countryFlag(org.country)}
+                <span style={{fontSize:14,width:20,flexShrink:0,textAlign:'center'}}>{MEDALS[i]}</span>
+                <PlayerAvatar fullName={org?.fullName || e.player} avatarUrl={org?.avatarUrl} size={32} />
+                <div style={{flex:1,minWidth:0,overflow:'hidden'}}>
+                  <div style={{fontFamily:SANS,fontWeight:700,fontSize:12,color:TXT,display:'flex',alignItems:'center',gap:4,overflow:'hidden'}}>
+                    <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{e.player}</span>
+                    {org?.country && <span style={{flexShrink:0}}>{countryFlag(org.country)}</span>}
                   </div>
-                  <div style={{fontFamily:SANS,fontSize:10,color:DIM,marginTop:1}}>
+                  <div style={{fontFamily:SANS,fontSize:10,color:DIM,marginTop:1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
                     {e.is_simulator ? <span style={{color:'rgba(255,0,144,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
                   </div>
                 </div>
-                <div style={{textAlign:'right',flexShrink:0}}>
-                  <span style={{fontFamily:DISP,fontSize:22,color:i===0?ORG:MUT,letterSpacing:.5}}>{Number(e.dist)}</span>
+                <div style={{textAlign:'right',flexShrink:0,paddingLeft:6}}>
+                  <span style={{fontFamily:DISP,fontSize:20,color:i===0?ORG:MUT,letterSpacing:.5}}>{Number(e.dist)}</span>
                   <span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:3}}>yds</span>
                 </div>
               </div>
