@@ -20,8 +20,6 @@ function quickChart(config, width = 560, height = 260, bg = 'white') {
 }
 
 export default async function handler(req, res) {
-  console.log('SECRET ENV:', process.env.CRON_SECRET);
-  console.log('SECRET QUERY:', req.query.secret);
 
   // Allow either: (a) Vercel Cron's automatic auth header, or
   // (b) you manually triggering it with ?secret=YOUR_CRON_SECRET in the URL.
