@@ -81,12 +81,35 @@ export default async function handler(req, res) {
       </td>
     `;
 
+    const lastMonthLabel = lastMonthDate.toLocaleString('en-US', { month: 'short' });
+    const thisMonthLabelShort = now.toLocaleString('en-US', { month: 'short' });
+    const chartConfig = {
+      type: 'bar',
+      data: {
+        labels: [lastMonthLabel, thisMonthLabelShort],
+        datasets: [{
+          label: 'Submissions',
+          data: [submissionsLastMonth, submissionsThisMonth],
+          backgroundColor: ['#444444', '#FF0090'],
+          borderRadius: 6,
+        }],
+      },
+      options: {
+        plugins: { legend: { display: false }, title: { display: false } },
+        scales: {
+          x: { ticks: { color: '#aaaaaa', font: { size: 13 } }, grid: { display: false } },
+          y: { ticks: { color: '#aaaaaa' }, grid: { color: '#2a2a2a' } },
+        },
+        backgroundColor: '#1a1a1a',
+      },
+    };
+    const chartUrl = `https://quickchart.io/chart?width=560&height=280&backgroundColor=%231a1a1a&c=${encodeURIComponent(JSON.stringify(chartConfig))}`;
+
     const html = `
-      <body style="margin: 0; padding: 0; background-color: #0a0a0a;">
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #0a0a0a; padding: 32px 16px;">
 
         <div style="text-align: center; margin-bottom: 28px;">
-          <div style="color: #FF0090; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px;">Ripping Bombs</div>
+          <img src="https://rippingbombs.com/logo.png" alt="Ripping Bombs" style="height: 40px; margin-bottom: 12px;" />
           <h1 style="color: #ffffff; font-size: 24px; margin: 0;">Monthly Snapshot (TEST SEND)</h1>
           <div style="color: #888; font-size: 14px; margin-top: 4px;">${monthLabel}</div>
         </div>
@@ -105,6 +128,11 @@ export default async function handler(req, res) {
           </tr>
         </table>
 
+        <div style="background-color: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 24px;">
+          <div style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">Submissions: Last Month vs This Month</div>
+          <img src="${chartUrl}" alt="Submissions chart" style="width: 100%; max-width: 560px; border-radius: 8px; display: block; margin: 0 auto;" />
+        </div>
+
         <div style="background-color: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
           <div style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Month-over-Month Growth</div>
           <div style="color: ${growthColor}; font-size: 28px; font-weight: 700;">
@@ -117,7 +145,6 @@ export default async function handler(req, res) {
         </p>
 
       </div>
-      </body>
     `;
 
     await resend.emails.send({
