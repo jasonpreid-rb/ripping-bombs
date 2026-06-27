@@ -89,22 +89,22 @@ function generateClubShareImage(org, best, ul) {
     const ctx = canvas.getContext('2d');
 
     ctx.fillStyle = '#0e0e0e'; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = '#a3e635'; ctx.fillRect(0, 0, W, 8); ctx.fillRect(0, H - 8, W, 8);
-    ctx.strokeStyle = 'rgba(163,230,53,0.04)'; ctx.lineWidth = 1;
+    ctx.fillStyle = '#FF0090'; ctx.fillRect(0, 0, W, 8); ctx.fillRect(0, H - 8, W, 8);
+    ctx.strokeStyle = 'rgba(255,0,144,0.04)'; ctx.lineWidth = 1;
     for (let x = 0; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
     for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
 
     const draw = (flagImg, logoImg) => {
       drawRBLogo(ctx, 80, 58, 80);
       if (flagImg) ctx.drawImage(flagImg, W - 160, 58, 80, 60);
-      ctx.strokeStyle = 'rgba(163,230,53,0.3)'; ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(255,0,144,0.3)'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(80, 150); ctx.lineTo(W - 80, 150); ctx.stroke();
       if (logoImg) {
         const aspect = logoImg.naturalWidth / logoImg.naturalHeight;
         const lh = 90, lw = lh * aspect;
         ctx.drawImage(logoImg, (W - lw) / 2, 168, lw, lh);
       }
-      ctx.fillStyle = '#a3e635'; ctx.font = 'bold 20px Arial'; ctx.textAlign = 'center';
+      ctx.fillStyle = '#FF0090'; ctx.font = 'bold 20px Arial'; ctx.textAlign = 'center';
       ctx.fillText('CLUB LEADERBOARD', W / 2, logoImg ? 290 : 210);
       ctx.fillStyle = '#ffffff'; ctx.font = 'bold 58px Arial Black, Arial';
       const name = org.courseName.toUpperCase();
@@ -113,23 +113,23 @@ function generateClubShareImage(org, best, ul) {
       ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.font = '30px Arial';
       ctx.fillText(org.location || '', W / 2, logoImg ? 420 : 340);
       if (best) {
-        ctx.fillStyle = 'rgba(163,230,53,0.7)'; ctx.font = 'bold 22px Arial';
+        ctx.fillStyle = 'rgba(255,0,144,0.7)'; ctx.font = 'bold 22px Arial';
         ctx.fillText('CLUB RECORD', W / 2, 490);
-        ctx.fillStyle = '#a3e635'; ctx.font = 'bold 280px Arial Black, Arial';
+        ctx.fillStyle = '#ffffff'; ctx.font = 'bold 280px Arial Black, Arial';
         ctx.fillText(String(best.dist), W / 2, 760);
         ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.font = 'bold 48px Arial';
         ctx.fillText((ul || 'yds').toUpperCase(), W / 2, 820);
         const badgeW = 320, badgeH = 44, badgeX = (W - badgeW) / 2, badgeY = 845;
-        ctx.strokeStyle = 'rgba(163,230,53,0.5)'; ctx.lineWidth = 1; ctx.strokeRect(badgeX, badgeY, badgeW, badgeH);
-        ctx.fillStyle = 'rgba(163,230,53,0.08)'; ctx.fillRect(badgeX, badgeY, badgeW, badgeH);
-        ctx.fillStyle = '#a3e635'; ctx.font = 'bold 18px Arial';
+        ctx.strokeStyle = 'rgba(255,0,144,0.5)'; ctx.lineWidth = 1; ctx.strokeRect(badgeX, badgeY, badgeW, badgeH);
+        ctx.fillStyle = 'rgba(255,0,144,0.08)'; ctx.fillRect(badgeX, badgeY, badgeW, badgeH);
+        ctx.fillStyle = '#ffffff'; ctx.font = 'bold 18px Arial';
         ctx.fillText('RECORD HOLDER', W / 2, badgeY + 29);
         ctx.fillStyle = '#ffffff'; ctx.font = 'bold 52px Arial Black, Arial';
         ctx.fillText(best.player.toUpperCase(), W / 2, 960);
         ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = '26px Arial';
         ctx.fillText(`${best.club}  |  HCP ${best.hcp}  |  ${fmtDate(best.date)}`, W / 2, 1000);
       }
-      ctx.strokeStyle = 'rgba(163,230,53,0.3)'; ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(255,0,144,0.3)'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(80, 1030); ctx.lineTo(W - 80, 1030); ctx.stroke();
       ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = '24px Arial';
       ctx.fillText('rippingbombs.com', W / 2, 1058);
@@ -399,7 +399,10 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
             </thead>
             <tbody>
               {sorted.map((e, i) => {
-                const simOrg = e.is_simulator ? simOrgMap[e.orgId] : null;
+                // Only link to a profile if the entry came from a registered sim user
+                // tagged to this venue (orgId !== venue id). Venue-submitted players
+                // are not registered accounts and have no profile page.
+                const simOrg = (e.is_simulator && e.orgId !== org.id) ? simOrgMap[e.orgId] : null;
                 const profileSlug = simOrg?.fullName ? nameToSlug(simOrg.fullName) : null;
                 return (
                   <tr key={e.id} style={{ borderBottom: `1px solid ${BDR}` }}>
