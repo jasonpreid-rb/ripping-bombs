@@ -49,6 +49,11 @@ export default function App({ Component, pageProps }) {
       setLoading(false);
     });
     if (typeof window !== 'undefined') {
+      // Rehydrate logged-in user from localStorage
+      const raw = localStorage.getItem('rb_club');
+      if (raw) {
+        try { setLoggedOrg(JSON.parse(raw)); } catch {}
+      }
       if (localStorage.getItem('rb_admin_auth') === '1') setShowAdmin(true);
       if (!sessionStorage.getItem('rb_launch_seen')) {
         setTimeout(() => setShowLaunch(true), 10000);
@@ -128,10 +133,9 @@ export default function App({ Component, pageProps }) {
     if (org.status !== 'approved') { toast('Account not active'); return; }
 
     setLoggedOrg(org);
-    localStorage.setItem('rb_club', JSON.stringify(org));
     setLgn({ email:'', pw:'' });
     toast(`Welcome, ${org.fullName}!`);
-    router.push('/dashboard');
+    router.push('/submit');
   }
 
   async function doSubmit() {
@@ -206,7 +210,7 @@ export default function App({ Component, pageProps }) {
 
   return (
     <>
-      <Layout loggedOrg={loggedOrg} onLogout={()=>setLoggedOrg(null)} unit={unit} setUnit={setUnit}
+      <Layout loggedOrg={loggedOrg} onLogout={()=>{ setLoggedOrg(null); localStorage.removeItem('rb_club'); }} unit={unit} setUnit={setUnit}
         onAdminClick={()=>setAdminPw({show:true,val:''})} pendingCount={pendingCount} onShowDemo={()=>setShowDemo(true)}>
         <Component {...pageProps} {...sharedProps}/>
       </Layout>
