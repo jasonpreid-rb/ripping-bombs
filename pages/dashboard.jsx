@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { supabase } from '../lib/supabaseClient';
+import Layout from '../components/Layout';
 import PlayerAvatar from '../components/PlayerAvatar';
 import AvatarUploader from '../components/AvatarUploader';
 
@@ -232,7 +233,7 @@ function SubmitCTA({ isSimulator, lastDriveDate }) {
     ? `It's been ${daysSince} days since your last submission. Time to rip another one?`
     : "Keep the momentum going — submit your next drive.";
   return (
-    <div style={{ background: 'rgba(163,230,53,0.06)', border: '1px solid rgba(163,230,53,0.2)', borderRadius: 10, padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+    <div style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
       <div>
         <p style={{ margin: '0 0 4px', fontWeight: 700, fontSize: '0.95rem', color: TXT }}>🏌️ Ready to rip?</p>
         <p style={{ margin: 0, fontSize: '0.82rem', color: MUT }}>{msg}</p>
@@ -432,19 +433,21 @@ export default function DashboardPage() {
   const globalCatAvg = bestCategory ? GLOBAL_AVGS[bestCategory] : null;
 
   // Rank percentile label
-  const percentile = rank && totalClubs ? Math.round((1 - (rank - 1) / totalClubs) * 100) : null;
+  const percentile = rank && totalClubs ? Math.round((rank / totalClubs) * 100) : null;
   const rankSub = percentile != null ? `Top ${percentile}% globally` : null;
 
   if (loading) {
     return (
-      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: MUT }}>
-        Loading your dashboard…
-      </div>
+      <Layout>
+        <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: MUT }}>
+          Loading your dashboard…
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <>
+    <Layout>
       <Head>
         <title>{club?.courseName || 'Dashboard'} — Ripping Bombs</title>
       </Head>
@@ -529,6 +532,6 @@ export default function DashboardPage() {
       {showDeleteModal && (
         <DeleteModal club={club} onClose={() => setShowDeleteModal(false)} />
       )}
-    </>
+    </Layout>
   );
 }
