@@ -3,20 +3,29 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../../lib/constants';
 import { fmtDate, tier, toSlug } from '../../lib/constants';
-import { SEED_ENTRIES, SEED_ORGS } from '../../lib/data';
+import { supabase } from '../../lib/supabaseClient';
 import { BadgePill, countryFlag, Overlay } from '../../components/UI';
 import ShareModal from '../../components/ShareModal';
-import { supabase } from '../../lib/supabaseClient';
 
 export async function getStaticPaths() {
-  const paths = SEED_ENTRIES.map(e => ({ params: { id: e.id } }));
-  return { paths, fallback: 'blocking' };
+  return { paths: [], fallback: 'blocking' };
 }
 
 export async function getStaticProps({ params }) {
-  const entry = SEED_ENTRIES.find(e => e.id === params.id);
-  if (!entry) return { notFound: true };
-  const org = SEED_ORGS.find(o => o.id === entry.orgId);
+  const { data: entry, error: entryErr } = await supabase
+    .from('entries')
+    .select('id, orgId, player, dist, club, hcp, age, date, tournament, gender, is_simulator')
+    .eq('id', params.id)
+    .single();
+
+  if (entryErr || !entry) return { notFound: true };
+
+  const { data: org } = await supabase
+    .from('clubs')
+    .select('id, courseName, location, country, badge, accountType')
+    .eq('id', entry.orgId)
+    .single();
+
   return { props: { staticEntry: entry, staticOrg: org || null }, revalidate: 3600 };
 }
 
