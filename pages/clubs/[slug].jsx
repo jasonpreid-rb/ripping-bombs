@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../../lib/constants';
 import { fmtDate, tier, nowWeek, weekLabel, prevWeek, nextWeek, sameWeek } from '../../lib/constants';
 import { BadgePill, countryFlag } from '../../components/UI';
+import PlayerAvatar from '../../components/PlayerAvatar';
 
 function toSlug(name) {
   return name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
@@ -51,7 +52,7 @@ export async function getServerSideProps({ params }) {
   if (simOrgIds.length) {
     const { data } = await supabase
       .from('clubs')
-      .select('id, fullName')
+      .select('id, fullName, avatarUrl')
       .in('id', simOrgIds);
     simOrgs = data || [];
   }
@@ -408,14 +409,19 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
                   <tr key={e.id} style={{ borderBottom: `1px solid ${BDR}` }}>
                     <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: i < 3 ? ORG : DIM, fontWeight: i < 3 ? 700 : 400 }}>{rankLabel(i)}</td>
                     <td style={{ padding: '11px 14px' }}>
-                      {profileSlug ? (
-                        <Link href={`/profile/${profileSlug}`} style={{ fontFamily: SANS, fontWeight: 700, fontSize: 14, color: ORG, textDecoration: 'none', borderBottom: '1px solid rgba(255,0,144,0.3)' }}>
-                          {e.player}
-                        </Link>
-                      ) : (
-                        <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 14, color: TXT }}>{e.player}</div>
-                      )}
-                      {e.is_simulator && <div style={{ fontFamily: SANS, fontSize: 10, color: DIM }}>simulator</div>}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <PlayerAvatar fullName={simOrg?.fullName || e.player} avatarUrl={simOrg?.avatarUrl} size={28} />
+                        <div>
+                          {profileSlug ? (
+                            <Link href={`/profile/${profileSlug}`} style={{ fontFamily: SANS, fontWeight: 700, fontSize: 14, color: ORG, textDecoration: 'none', borderBottom: '1px solid rgba(255,0,144,0.3)' }}>
+                              {e.player}
+                            </Link>
+                          ) : (
+                            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 14, color: TXT }}>{e.player}</div>
+                          )}
+                          {e.is_simulator && <div style={{ fontFamily: SANS, fontSize: 10, color: DIM }}>simulator</div>}
+                        </div>
+                      </div>
                     </td>
                     <td style={{ padding: '11px 14px', fontFamily: DISP, fontSize: 20, color: ORG, whiteSpace: 'nowrap' }}>
                       {e.dist} <span style={{ fontFamily: SANS, fontSize: 10, color: DIM }}>{ul}</span>

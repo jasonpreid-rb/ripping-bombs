@@ -5,6 +5,7 @@ import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { fmtDate } from '../lib/constants';
 import EmailSignup from '../components/EmailSignup';
 import { countryFlag } from '../components/UI';
+import PlayerAvatar from '../components/PlayerAvatar';
 
 // ── Inline percentile calculator (embedded on homepage) ──────────────────────
 
@@ -227,6 +228,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                 onMouseEnter={ev=>ev.currentTarget.style.opacity='.7'}
                 onMouseLeave={ev=>ev.currentTarget.style.opacity='1'}>
                 <span style={{fontSize:16,width:22,flexShrink:0,textAlign:'center'}}>{MEDALS[i]}</span>
+                <PlayerAvatar fullName={org?.fullName || e.player} avatarUrl={org?.avatarUrl} size={28} />
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,display:'flex',alignItems:'center',gap:4,flexWrap:'wrap'}}>
                     {e.player}{org?.country && countryFlag(org.country)}
@@ -265,6 +267,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                 onMouseEnter={ev=>ev.currentTarget.style.opacity='.7'}
                 onMouseLeave={ev=>ev.currentTarget.style.opacity='1'}>
                 <span style={{fontSize:16,width:22,flexShrink:0,textAlign:'center'}}>{MEDALS[i]}</span>
+                <PlayerAvatar fullName={org?.fullName || e.player} avatarUrl={org?.avatarUrl} size={28} />
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,display:'flex',alignItems:'center',gap:4,flexWrap:'wrap'}}>
                     {e.player}{org?.country && countryFlag(org.country)}
@@ -475,7 +478,7 @@ export async function getStaticProps() {
 
     const { data: orgs } = await supabase
       .from('clubs')
-      .select('id, courseName, country, status, badge, accountType')
+      .select('id, courseName, fullName, avatarUrl, country, status, badge, accountType')
       .eq('status', 'approved');
 
     return {
