@@ -58,6 +58,35 @@ function getCategoryLabel(cat) {
   }[cat] || 'All';
 }
 
+// ——— Weekly leaderboard helpers (Monday-start week) ———
+
+function getWeekStart(date = new Date()) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay(); // 0=Sun, 1=Mon, ...
+  const diff = (day === 0 ? -6 : 1) - day; // shift back to Monday
+  d.setDate(d.getDate() + diff);
+  return d;
+}
+
+function getWeekEnd(weekStart) {
+  const d = new Date(weekStart);
+  d.setDate(d.getDate() + 7);
+  return d;
+}
+
+function fmtWeekRange(weekStart, weekEnd) {
+  const end = new Date(weekEnd);
+  end.setDate(end.getDate() - 1); // display inclusive last day (Sunday)
+  const opts = { day: 'numeric', month: 'short' };
+  return `${weekStart.toLocaleDateString('en-GB', opts)} – ${end.toLocaleDateString('en-GB', opts)}`;
+}
+
+function daysUntilWeekReset(weekEnd) {
+  const ms = weekEnd.getTime() - Date.now();
+  return Math.max(0, Math.ceil(ms / 86400000));
+}
+
 // ——— Components ———
 
 function StatCard({ label, value, accent, sub }) {
@@ -371,6 +400,68 @@ function DriveHistory({ entries, lastDriveDate }) {
   );
 }
 
+// Weekly leaderboard — split by category, resets every Monday
+function WeeklyLeaderboard({ weeklyData }) {
+  const { weekStart, weekEnd, hasSubmitted, category, myBest, rank, total, top5, clubId } = weeklyData;
+  const rangeLabel = fmtWeekRange(weekStart, weekEnd);
+  const daysLeft = daysUntilWeekReset(weekEnd);
+
+  return (
+    <div style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, overflow: 'hidden' }}>
+      <div style={{ padding: '1rem 1.25rem', borderBottom: `1px solid ${BDR}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div>
+          <h2 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>This Week's Leaderboard</h2>
+          <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: MUT }}>
+            {rangeLabel} · resets in {daysLeft} day{daysLeft === 1 ? '' : 's'}
+          </p>
+        </div>
+        <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.78rem', padding: '0.38rem 0.85rem', borderRadius: 6, textDecoration: 'none' }}>+ Submit Drive</a>
+      </div>
+
+      {!hasSubmitted ? (
+        <div style={{ padding: '2rem 1.25rem', textAlign: 'center', color: MUT }}>
+          <p style={{ marginBottom: '1rem', fontSize: '0.88rem' }}>No drives submitted this week yet — every category resets Monday, so this is your chance to lead it.</p>
+          <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, padding: '0.55rem 1.25rem', borderRadius: 7, textDecoration: 'none', fontSize: '0.9rem' }}>Submit this week's drive →</a>
+        </div>
+      ) : (
+        <>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', padding: '1.1rem 1.25rem', borderBottom: `1px solid ${BDR}` }}>
+            <StatCard label={`Weekly Rank · ${getCategoryLabel(category)}`} value={rank ? `#${rank}` : '—'} accent sub={total ? `of ${total} this week` : null} />
+            <StatCard label="This Week's Best" value={fmt(myBest)} />
+          </div>
+
+          {top5.length > 0 && (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 480 }}>
+                <thead>
+                  <tr style={{ background: BG3, borderBottom: `1px solid ${BDR}` }}>
+                    {['#', 'Player', 'Distance', 'Club Used'].map((h) => (
+                      <th key={h} style={{ padding: '0.55rem 1rem', textAlign: 'left', fontSize: '0.68rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {top5.map((e, i) => {
+                    const isMe = e.orgId === clubId;
+                    return (
+                      <tr key={`${e.orgId}-${i}`} style={{ borderBottom: i < top5.length - 1 ? `1px solid ${BDR}` : 'none', background: isMe ? 'rgba(255,0,144,0.06)' : 'transparent' }}>
+                        <td style={{ padding: '0.75rem 1rem', color: DIM, fontSize: '0.78rem' }}>#{i + 1}</td>
+                        <td style={{ padding: '0.75rem 1rem', fontWeight: isMe ? 700 : 600, color: isMe ? ORG : TXT, fontSize: '0.85rem' }}>{e.player}{isMe ? ' (you)' : ''}</td>
+                        <td style={{ padding: '0.75rem 1rem', fontWeight: 700, color: i === 0 ? ORG : TXT, fontSize: '0.88rem' }}>{Number(e.dist)} yds</td>
+                        <td style={{ padding: '0.75rem 1rem', color: MUT, fontSize: '0.82rem' }}>{e.club || '—'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 // ——— Main Page ———
 
 export default function DashboardPage() {
@@ -380,6 +471,7 @@ export default function DashboardPage() {
   const [rank, setRank] = useState(null);
   const [totalClubs, setTotalClubs] = useState(null);
   const [globalAvgBest, setGlobalAvgBest] = useState(null);
+  const [weeklyData, setWeeklyData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -416,6 +508,55 @@ export default function DashboardPage() {
       setRank(beatenBy + 1);
       setTotalClubs(allBests.length);
       setGlobalAvgBest(avg(allBests));
+    }
+
+    // ——— Weekly leaderboard, split by category, Monday-start week ———
+    const weekStart = getWeekStart();
+    const weekEnd = getWeekEnd(weekStart);
+
+    const myWeeklyEntries = (clubEntries || [])
+      .filter((e) => {
+        const t = new Date(e.date).getTime();
+        return t >= weekStart.getTime() && t < weekEnd.getTime();
+      })
+      .sort((a, b) => Number(b.dist) - Number(a.dist));
+
+    if (myWeeklyEntries.length === 0) {
+      setWeeklyData({ weekStart, weekEnd, hasSubmitted: false, category: null, myBest: null, rank: null, total: null, top5: [], clubId: clubData.id });
+    } else {
+      const { data: weeklyAllEntries } = await supabase
+        .from('entries')
+        .select('orgId, dist, age, hcp, gender, date, player, club')
+        .gte('date', weekStart.toISOString())
+        .lt('date', weekEnd.toISOString());
+
+      const myBestEntry = myWeeklyEntries[0];
+      const category = getCategory(myBestEntry);
+
+      // Best entry per club, within this category, for the week
+      const bestEntryPerClub = {};
+      (weeklyAllEntries || []).forEach((e) => {
+        if (getCategory(e) !== category) return;
+        const d = Number(e.dist);
+        if (!bestEntryPerClub[e.orgId] || d > Number(bestEntryPerClub[e.orgId].dist)) {
+          bestEntryPerClub[e.orgId] = e;
+        }
+      });
+
+      const ranked = Object.values(bestEntryPerClub).sort((a, b) => Number(b.dist) - Number(a.dist));
+      const myIndex = ranked.findIndex((e) => e.orgId === clubData.id);
+
+      setWeeklyData({
+        weekStart,
+        weekEnd,
+        hasSubmitted: true,
+        category,
+        myBest: Number(myBestEntry.dist),
+        rank: myIndex >= 0 ? myIndex + 1 : ranked.length + 1,
+        total: ranked.length,
+        top5: ranked.slice(0, 5),
+        clubId: clubData.id,
+      });
     }
 
     setLoading(false);
@@ -535,6 +676,9 @@ export default function DashboardPage() {
         {longest && globalAvgBest && globalAvgBest !== globalCatAvg && (
           <VsAverageBar myBest={longest} globalAvg={globalAvgBest} label="All Clubs on Platform" />
         )}
+
+        {/* Weekly leaderboard — split by category, resets every Monday */}
+        {weeklyData && <WeeklyLeaderboard weeklyData={weeklyData} />}
 
         {/* Player breakdown (club accounts with multiple players) */}
         {club?.accountType === 'club' && entries.length > 0 && (
