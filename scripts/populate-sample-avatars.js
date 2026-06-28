@@ -3,6 +3,10 @@
  * using randomuser.me — deterministic per-account via the `seed` param,
  * so re-running this script always assigns the same photo to the same account.
  *
+ * Gender-matched: uses the account's `gender` column (simulator accounts
+ * only) to request a male or female photo from randomuser.me, so the
+ * avatar always matches the account's stated gender.
+ *
  * Usage:
  *   node scripts/populate-sample-avatars.js
  *
@@ -54,7 +58,7 @@ async function main() {
   //   .is('avatarUrl', null)                -- only fill in accounts with no photo yet (safe default)
   const { data: clubs, error } = await supabase
     .from('clubs')
-    .select('id, fullName, accountType')
+    .select('id, fullName, accountType, gender')
     .is('avatarUrl', null)
     .eq('accountType', 'simulator'); // individual player accounts only — clubs use org.logo instead
 
@@ -67,13 +71,20 @@ async function main() {
 
   let success = 0;
   let failed = 0;
+  let skippedNoGender = 0;
 
   for (const club of clubs) {
     try {
-      // No gender field on the clubs table currently — omit to let
-      // randomuser.me pick. Add a gender lookup here if you have one
-      // (e.g. from that player's most recent entries.gender).
-      const avatarUrl = await fetchRandomUserPhoto(club.id);
+      // Use the account's own gender field so the avatar matches.
+      // Falls back to letting randomuser.me pick at random only if
+      // gender is missing/unset on this row (logged below so you can
+      // spot data-quality gaps in your seed data).
+      if (club.gender !== 'male' && club.gender !== 'female') {
+        skippedNoGender++;
+        console.warn(`⚠ ${club.fullName} (${club.id}) has no valid gender set — photo will be randomly picked`);
+      }
+
+      const avatarUrl = await fetchRandomUserPhoto(club.id, club.gender);
 
       const { error: updateError } = await supabase
         .from('clubs')
@@ -84,7 +95,7 @@ async function main() {
         console.error(`Failed to update ${club.fullName}:`, updateError.message);
         failed++;
       } else {
-        console.log(`✓ ${club.fullName} → ${avatarUrl}`);
+        console.log(`✓ ${club.fullName} (${club.gender || 'unknown'}) → ${avatarUrl}`);
         success++;
       }
     } catch (err) {
@@ -95,7 +106,7 @@ async function main() {
     await sleep(DELAY_MS);
   }
 
-  console.log(`\nDone. ${success} updated, ${failed} failed.`);
+  console.log(`\nDone. ${success} updated, ${failed} failed, ${skippedNoGender} had no gender set.`);
 }
 
 main();
