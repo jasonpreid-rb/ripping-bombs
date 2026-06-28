@@ -129,7 +129,7 @@ function PointsMockup() {
             <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%' }}>
               <div style={{
                 height: `${Math.round((h / max) * 100)}%`,
-                background: i === bars.length - 1 ? ORG : 'rgba(163,230,53,0.25)',
+                background: i === bars.length - 1 ? ORG : 'rgba(255,0,144,0.25)',
                 borderRadius: '2px 2px 0 0',
               }} />
             </div>

@@ -94,7 +94,7 @@ export default function Championship2027Page() {
               ))}
             </div>
             {POINTS.map((row,i)=>(
-              <div key={i} style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',borderBottom:i<POINTS.length-1?`1px solid ${BDR}`:'none',background:i===0?'rgba(163,230,53,0.05)':'transparent'}}>
+              <div key={i} style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',borderBottom:i<POINTS.length-1?`1px solid ${BDR}`:'none',background:i===0?'rgba(255,0,144,0.05)':'transparent'}}>
                 <div style={{padding:'14px 20px',fontFamily:SANS,fontWeight:700,fontSize:15,color:TXT,display:'flex',alignItems:'center',gap:8}}>
                   {row.medal&&<span>{row.medal}</span>}{row.pos}
                 </div>
@@ -121,7 +121,7 @@ export default function Championship2027Page() {
           ].map((step,i)=>(
             <div key={step.num} style={{display:'grid',gridTemplateColumns:'48px 1fr',gap:'0 20px'}}>
               <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
-                <div style={{width:48,height:48,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:DISP,fontSize:20,color:ORG,background:'rgba(163,230,53,0.08)',border:`2px solid ${ORG}`,flexShrink:0}}>{step.num}</div>
+                <div style={{width:48,height:48,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:DISP,fontSize:20,color:ORG,background:'rgba(255,0,144,0.08)',border:`2px solid ${ORG}`,flexShrink:0}}>{step.num}</div>
                 {i<2&&<div style={{width:2,flex:1,background:BDR,minHeight:24}}/>}
               </div>
               <div style={{paddingBottom:36,paddingTop:10}}>
@@ -151,7 +151,7 @@ export default function Championship2027Page() {
         </div>
 
         {/* CTA STRIP */}
-        <div style={{background:'rgba(163,230,53,0.05)',border:'1px solid rgba(163,230,53,0.2)',padding:'40px 32px',textAlign:'center',marginBottom:56}}>
+        <div style={{background:'rgba(255,0,144,0.05)',border:'1px solid rgba(255,0,144,0.2)',padding:'40px 32px',textAlign:'center',marginBottom:56}}>
           <div style={{fontFamily:DISP,fontSize:'clamp(24px,4vw,36px)',color:TXT,letterSpacing:1,lineHeight:1.1,marginBottom:12}}>
             START BUILDING YOUR<br/><span style={{color:ORG}}>RECORD NOW</span>
           </div>
