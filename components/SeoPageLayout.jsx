@@ -1,8 +1,15 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
+import RelatedPages from '../components/RelatedPages';
 
 export function SeoPage({ title, description, children }) {
+  const router = useRouter();
+  // Derive the registry slug from the current path, e.g. "/sim-distance-real-or-fake" -> "sim-distance-real-or-fake".
+  // Pages not in lib/seoPages.js (core app pages, dynamic routes) simply
+  // render no related-links block — getRelatedPages() returns [] for them.
+  const currentSlug = (router.pathname || '').replace(/^\/+/, '');
+
   return (
     <>
       <Head>
@@ -13,6 +20,7 @@ export function SeoPage({ title, description, children }) {
       </Head>
       <div style={{ padding:'0 18px 80px', maxWidth:1000, margin:'0 auto' }}>
         {children}
+        <RelatedPages currentSlug={currentSlug} />
       </div>
     </>
   );
