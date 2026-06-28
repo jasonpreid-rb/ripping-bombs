@@ -28,12 +28,12 @@ function DashboardMockup() {
     <BrowserFrame url="jake-henderson">
       {/* Profile header */}
       <div style={{ padding: '24px 24px 18px', borderBottom: `1px solid ${BDR}`, display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div style={{ width: 48, height: 48, borderRadius: '50%', background: `rgba(163,230,53,0.1)`, border: `2px solid rgba(163,230,53,0.3)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>🏌️</div>
+        <div style={{ width: 48, height: 48, borderRadius: '50%', background: `rgba(255,0,144,0.1)`, border: `2px solid rgba(255,0,144,0.3)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>🏌️</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontFamily: DISP, fontSize: 20, color: TXT, letterSpacing: 0.5 }}>JAKE HENDERSON</div>
           <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 2 }}>Member since Jan 2025 · Sydney, AU</div>
         </div>
-        <div style={{ background: 'rgba(163,230,53,0.08)', border: `1px solid rgba(163,230,53,0.3)`, padding: '8px 14px', textAlign: 'center' }}>
+        <div style={{ background: 'rgba(255,0,144,0.08)', border: `1px solid rgba(255,0,144,0.3)`, padding: '8px 14px', textAlign: 'center' }}>
           <div style={{ fontFamily: DISP, fontSize: 24, color: ORG, lineHeight: 1 }}>#847</div>
           <div style={{ fontFamily: SANS, fontSize: 9, color: DIM, letterSpacing: 2, marginTop: 2 }}>WORLD RANK</div>
         </div>
@@ -65,7 +65,7 @@ function DashboardMockup() {
               <div style={{ fontFamily: SANS, fontSize: 12, color: TXT }}>{d.venue}</div>
               <div style={{ fontFamily: SANS, fontSize: 10, color: DIM }}>{d.date}</div>
             </div>
-            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, color: ORG, background: 'rgba(163,230,53,0.08)', padding: '2px 8px' }}>{d.tag}</div>
+            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, color: ORG, background: 'rgba(255,0,144,0.08)', padding: '2px 8px' }}>{d.tag}</div>
           </div>
         ))}
       </div>
@@ -92,7 +92,7 @@ function RankingMockup() {
           display: 'grid', gridTemplateColumns: '56px 1fr 80px',
           padding: '12px 20px',
           borderBottom: i < 4 ? `1px solid ${BDR}` : 'none',
-          background: p.isYou ? 'rgba(163,230,53,0.07)' : 'transparent',
+          background: p.isYou ? 'rgba(255,0,144,0.07)' : 'transparent',
           borderLeft: p.isYou ? `2px solid ${ORG}` : '2px solid transparent',
         }}>
           <div style={{ fontFamily: DISP, fontSize: 16, color: p.isYou ? ORG : MUT }}>#{p.rank}</div>
@@ -116,7 +116,7 @@ function PointsMockup() {
       <div style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, letterSpacing: 2, color: ORG, marginBottom: 6 }}>2027 CHAMPIONSHIP POINTS</div>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 4 }}>
         <div style={{ fontFamily: DISP, fontSize: 36, color: TXT, lineHeight: 1 }}>2,450 <span style={{ color: ORG }}>pts</span></div>
-        <div style={{ background: 'rgba(163,230,53,0.08)', border: `1px solid rgba(163,230,53,0.3)`, padding: '6px 12px', textAlign: 'center' }}>
+        <div style={{ background: 'rgba(255,0,144,0.08)', border: `1px solid rgba(255,0,144,0.3)`, padding: '6px 12px', textAlign: 'center' }}>
           <div style={{ fontFamily: DISP, fontSize: 15, color: ORG }}>Top 18%</div>
           <div style={{ fontFamily: SANS, fontSize: 9, color: DIM }}>GLOBAL</div>
         </div>
@@ -163,7 +163,7 @@ function PointsMockup() {
 
 const FAQS = [
   { q: 'Is my golfer profile free?', a: 'Yes, completely free. Register with your email and your profile, unique URL, and world ranking go live instantly.' },
-  { q: 'Can I choose my own profile URL?', a: 'You pick your username when you register and it becomes your permanent URL at rippingbombs.com/your-username. Make it your name, your nickname — whatever you want to be known as on the leaderboard.' },
+  { q: 'Can I choose my own profile URL?', a: 'Your URL is automatically generated from your registered name when you sign up — so it ends up as something like rippingbombs.com/your-name. It goes live instantly and stays yours permanently.' },
   { q: 'How is my world ranking calculated?', a: 'Your ranking is based on your best recorded drive distance across all participating venues. It updates automatically every time a new drive is logged.' },
   { q: 'What is my drive history?', a: 'Every drive you log at a compatible simulator venue is recorded on your profile — distance, date, venue, and how it ranked at that venue on the day. You can track your progression over time and identify your peak.' },
   { q: 'What are the 2027 Championship points?', a: 'From January 2027, every weekly drive submission earns Championship points based on where you finish in your category that week. Points accumulate all season and determine your Championship standing. Registering now builds your record ahead of the season.' },
@@ -215,11 +215,11 @@ export default function GolferProfilePage() {
           <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 12 }}>Your unique URL</div>
           <div style={{ fontFamily: DISP, fontSize: 28, color: TXT, letterSpacing: 0.5, marginBottom: 16 }}>ONE LINK. YOUR WHOLE GAME.</div>
           <div style={{ fontFamily: SANS, fontSize: 14, color: MUT, lineHeight: 1.85, marginBottom: 16 }}>
-            The moment you register, you get a permanent page at rippingbombs.com that's yours alone. Your name, your ranking, your drives — all in one place. Put the link in your Instagram bio, drop it in the group chat, or print it on your bag tag. It updates automatically whenever you log a new drive.
+            The moment you register, you get a permanent page at rippingbombs.com that's yours alone. Your name, your ranking, your drives — all in one place. Put the link in your Instagram bio, drop it in the group chat, or share it after your next session. It updates automatically every time you log a new drive.
           </div>
           {/* URL examples */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginBottom: 16 }}>
-            {['jake-henderson', 'big-drive-sarah', 'tee-shot-king'].map(u => (
+            {['jake-henderson', 'sarah-davies', 'tom-brannigan'].map(u => (
               <div key={u} style={{ background: BG2, border: `1px solid ${BDR}`, padding: '12px 18px', display: 'flex', alignItems: 'center', gap: 8, fontFamily: SANS }}>
                 <span style={{ color: MUT, fontSize: 13 }}>rippingbombs.com/</span>
                 <span style={{ color: ORG, fontWeight: 700, fontSize: 14 }}>{u}</span>
@@ -227,7 +227,7 @@ export default function GolferProfilePage() {
             ))}
           </div>
           <div style={{ fontFamily: SANS, fontSize: 13, color: DIM, lineHeight: 1.7 }}>
-            You choose your username at registration. It becomes your permanent URL immediately — no approval needed.
+            Your URL is generated from your registered name when you sign up — no extra steps needed.
           </div>
         </div>
 
@@ -296,12 +296,12 @@ export default function GolferProfilePage() {
         </div>
 
         {/* CTA STRIP */}
-        <div style={{ background: 'rgba(163,230,53,0.05)', border: '1px solid rgba(163,230,53,0.2)', padding: '40px 32px', textAlign: 'center', marginBottom: 56 }}>
+        <div style={{ background: 'rgba(255,0,144,0.05)', border: '1px solid rgba(255,0,144,0.2)', padding: '40px 32px', textAlign: 'center', marginBottom: 56 }}>
           <div style={{ fontFamily: DISP, fontSize: 'clamp(24px,4vw,36px)', color: TXT, letterSpacing: 1, lineHeight: 1.1, marginBottom: 12 }}>
             CLAIM YOUR PROFILE.<br /><span style={{ color: ORG }}>IT'S FREE.</span>
           </div>
           <div style={{ fontFamily: SANS, fontSize: 14, color: MUT, maxWidth: 420, margin: '0 auto 24px', lineHeight: 1.7 }}>
-            Register today and lock in your username. Your world ranking, drive history, and 2027 points tracker are waiting.
+            Register today and your profile goes live instantly. Your world ranking, drive history, and 2027 points tracker are waiting.
           </div>
           <button onClick={() => router.push('/register')} style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 14, padding: '14px 36px', cursor: 'pointer', letterSpacing: 0.5 }}>
             REGISTER FREE →

@@ -26,6 +26,7 @@ export async function getServerSideProps({ params }) {
   if (!clubs) return { notFound: true };
 
   const org = clubs.find(c => {
+    if (c.customSlug && c.customSlug === slug) return true;
     const base = nameToSlug(c.fullName);
     const withId = `${base}-${c.id}`;
     return base === slug || withId === slug;
@@ -84,7 +85,7 @@ export default function PlayerProfile({ org, playerEntries }) {
   const profileName = org.fullName;
   const metaDesc = `${profileName}'s golf drive stats on Ripping Bombs. Personal best: ${best ? best.dist + ' yds' : 'N/A'}. ${playerEntries.length} recorded drives.`;
   const hasSocials = org.instagram || org.tiktok || org.twitter || org.youtube;
-  const canonicalUrl = `https://www.rippingbombs.com/profile/${nameToSlug(org.fullName)}`;
+  const canonicalUrl = `https://www.rippingbombs.com/profile/${org.customSlug || nameToSlug(org.fullName)}`;
 
   const sameAs = [
     org.instagram ? `https://instagram.com/${org.instagram.replace(/^@/,'')}` : null,

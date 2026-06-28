@@ -23,6 +23,16 @@ const GLOBAL_AVGS = {
   youth:          200,
 };
 
+function nameToSlug(name) {
+  return (name || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
 const avg = (arr) => arr.length ? Math.round(arr.reduce((s, v) => s + v, 0) / arr.length) : null;
 const fmt = (n) => n == null ? '—' : `${n} yds`;
 const fmtDate = (str) => str ? new Date(str).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
@@ -77,10 +87,18 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded }) {
     tiktok: club?.tiktok || '',
     twitter: club?.twitter || '',
     youtube: club?.youtube || '',
+    customSlug: club?.customSlug || '',
   });
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-  const handleSave = async () => { setSaving(true); await onSave(form); setSaving(false); };
+  const handleSave = async () => {
+    setSaving(true);
+    setError('');
+    const err = await onSave(form);
+    setSaving(false);
+    if (err) setError(err);
+  };
   const inputStyle = { width: '100%', boxSizing: 'border-box', background: BG3, border: `1px solid ${BDR}`, borderRadius: 6, padding: '0.6rem 0.8rem', color: TXT, fontSize: '0.9rem', outline: 'none' };
   const labelStyle = { fontSize: '0.72rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 8, display: 'block' };
   const isSimulator = club?.accountType === 'simulator';
@@ -106,6 +124,24 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded }) {
         {isSimulator && (
           <>
             <div style={{ borderTop: `1px solid ${BDR}`, marginTop: 8, paddingTop: 12 }}>
+              <div style={{ fontSize: '0.7rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Public Profile URL</div>
+            </div>
+            <label style={labelStyle}>Custom URL</label>
+            <div style={{ display: 'flex', alignItems: 'center', background: BG3, border: `1px solid ${BDR}`, borderRadius: 6, paddingLeft: '0.8rem', overflow: 'hidden' }}>
+              <span style={{ fontSize: '0.78rem', color: DIM, whiteSpace: 'nowrap' }}>rippingbombs.com/profile/</span>
+              <input
+                style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', padding: '0.6rem 0.6rem 0.6rem 0', color: TXT, fontSize: '0.85rem', outline: 'none' }}
+                value={form.customSlug}
+                onChange={(e) => set('customSlug', e.target.value.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-'))}
+                placeholder={nameToSlug(form.fullName) || 'your-name'}
+              />
+            </div>
+            <div style={{ fontSize: '0.72rem', color: DIM, marginTop: 4 }}>Leave blank to use the URL based on your name. Letters, numbers and hyphens only.</div>
+          </>
+        )}
+        {isSimulator && (
+          <>
+            <div style={{ borderTop: `1px solid ${BDR}`, marginTop: 8, paddingTop: 12 }}>
               <div style={{ fontSize: '0.7rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Social Media <span style={{ color: DIM, fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional — shown on your public profile)</span></div>
             </div>
             <label style={labelStyle}>📸 Instagram handle</label>
@@ -118,6 +154,7 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded }) {
             <input style={inputStyle} value={form.youtube} onChange={(e) => set('youtube', e.target.value)} placeholder="@yourchannel" />
           </>
         )}
+        {error && <div style={{ fontSize: '0.8rem', color: '#f87171', marginTop: 4 }}>{error}</div>}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 }}>
           <button onClick={onClose} style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.45rem 0.9rem', borderRadius: 6, cursor: 'pointer', fontSize: '0.82rem' }}>Cancel</button>
           <button onClick={handleSave} disabled={saving} style={{ background: ORG, color: '#000', fontWeight: 700, padding: '0.5rem 1.1rem', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: '0.85rem', opacity: saving ? 0.6 : 1 }}>{saving ? 'Saving…' : 'Save Changes'}</button>
@@ -391,6 +428,20 @@ export default function DashboardPage() {
   };
 
   const handleProfileSave = async (form) => {
+    let customSlug = null;
+    if (club?.accountType === 'simulator' && form.customSlug && form.customSlug.trim()) {
+      customSlug = nameToSlug(form.customSlug);
+      if (!customSlug) return 'Please enter a valid URL — letters, numbers and hyphens only.';
+
+      const { data: clash } = await supabase
+        .from('clubs')
+        .select('id')
+        .eq('customSlug', customSlug)
+        .neq('id', club.id)
+        .maybeSingle();
+      if (clash) return 'That URL is already taken — please choose another.';
+    }
+
     const { error } = await supabase.from('clubs').update({
       fullName: form.fullName,
       location: form.location,
@@ -399,13 +450,15 @@ export default function DashboardPage() {
       tiktok: form.tiktok || null,
       twitter: form.twitter || null,
       youtube: form.youtube || null,
+      ...(club?.accountType === 'simulator' && { customSlug }),
     }).eq('id', club.id);
-    if (!error) {
-      const updated = { ...club, ...form };
-      setClub(updated);
-      localStorage.setItem('rb_club', JSON.stringify(updated));
-      setShowModal(false);
-    }
+
+    if (error) return 'Something went wrong saving your profile. Please try again.';
+
+    const updated = { ...club, ...form, customSlug };
+    setClub(updated);
+    localStorage.setItem('rb_club', JSON.stringify(updated));
+    setShowModal(false);
   };
 
   const distances = entries.map((e) => Number(e.dist));
