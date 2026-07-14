@@ -233,8 +233,8 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                     <span style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{e.player}</span>
                   </div>
                   <div style={{flexShrink:0}}>
-                    <span style={{fontFamily:DISP,fontSize:20,color:i===0?ORG:MUT,letterSpacing:.5}}>{Number(e.dist)}</span>
-                    <span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:2}}>yds</span>
+                    <span style={{fontFamily:DISP,fontSize:20,color:i===0?ORG:MUT,letterSpacing:.5}}>{cvt(e.dist)}</span>
+                    <span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:2}}>{unitLbl}</span>
                   </div>
                 </div>
                 <div style={{display:'flex',alignItems:'center',gap:5,paddingLeft:19}}>
@@ -275,8 +275,8 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                     <span style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{e.player}</span>
                   </div>
                   <div style={{flexShrink:0}}>
-                    <span style={{fontFamily:DISP,fontSize:20,color:i===0?ORG:MUT,letterSpacing:.5}}>{Number(e.dist)}</span>
-                    <span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:2}}>yds</span>
+                    <span style={{fontFamily:DISP,fontSize:20,color:i===0?ORG:MUT,letterSpacing:.5}}>{cvt(e.dist)}</span>
+                    <span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:2}}>{unitLbl}</span>
                   </div>
                 </div>
                 <div style={{display:'flex',alignItems:'center',gap:5,paddingLeft:19}}>
