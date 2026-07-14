@@ -36,8 +36,8 @@ export default function Page({ entries=[], orgs=[], cvt=d=>d, unitLbl='yds' }) {
         </table>
       </div>
       <SeoH2>How Are These Drives Verified?</SeoH2>
-      <SeoP>Every drive on Ripping Bombs is submitted by a registered club or tournament organiser. Entries must be the official longest drive winner of an event, supported by photo evidence, and submitted by the organiser — not self-reported by individual players.</SeoP>
-      <SeoCTA/>
+      <SeoP>Ripping Bombs features verified longest drives from golf events and golf simulators worldwide. Tournament results are submitted by registered clubs and organisers, while simulator drives are submitted by registered players and clearly marked as simulator entries.</SeoP>
+      <SeoCTA/>y photo ev
     </SeoPage>
   );
 }
