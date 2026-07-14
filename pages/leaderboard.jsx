@@ -118,9 +118,24 @@ export default function LeaderboardPage(props) {
   const hcpIn=(hcp,b)=>{if(!b)return true;if(b==='scratch')return hcp<=0;if(b==='low')return hcp>0&&hcp<=5;if(b==='mid')return hcp>5&&hcp<=14;if(b==='high')return hcp>14&&hcp<=28;if(b==='beginner')return hcp>28;return true;};
   const ageIn=(age,b)=>{if(!b)return true;if(b==='u25')return age<25;if(b==='25-40')return age>=25&&age<40;if(b==='40-55')return age>=40&&age<55;if(b==='55+')return age>=55;return true;};
 
-  const tableRows = entries
+  // Restrict to approved orgs + the active view (weekly/all-time) before deduping,
+  // so a player's weekly-best and all-time-best can differ.
+  const baseRows = entries
     .filter(e=>approvedOrgs.find(o=>o.id===e.orgId))
-    .filter(e=>allTime||sameWeek(e.date,currentWeek))
+    .filter(e=>allTime||sameWeek(e.date,currentWeek));
+
+  // One rank per player: keep only each player's longest drive.
+  // Keyed by orgId+name since there's no dedicated player ID — this collapses
+  // repeat submissions from the same account/player without merging two
+  // different real people who happen to share a name at different clubs.
+  const bestByPlayer = new Map();
+  baseRows.forEach(e => {
+    const key = `${e.orgId}::${(e.player||'').trim().toLowerCase()}`;
+    const existing = bestByPlayer.get(key);
+    if (!existing || Number(e.dist) > Number(existing.dist)) bestByPlayer.set(key, e);
+  });
+
+  const tableRows = Array.from(bestByPlayer.values())
     .filter(e=>!fCountry||(orgFor(e.orgId)?.location||'').toLowerCase().includes(fCountry.toLowerCase()))
     .filter(e=>!fPlayer||e.player.toLowerCase().includes(fPlayer.toLowerCase()))
     .filter(e=>!fGender||e.gender===fGender)
