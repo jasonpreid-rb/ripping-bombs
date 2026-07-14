@@ -1,4 +1,5 @@
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
+import Link from 'next/link';
 import { ORG } from '../lib/constants';
 const linkStyle = { color: ORG, textDecoration: 'underline' };
 
