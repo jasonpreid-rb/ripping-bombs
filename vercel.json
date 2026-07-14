@@ -4,6 +4,10 @@
     {
       "path": "/api/investor-report",
       "schedule": "0 8 1 * *"
+    },
+    {
+      "path": "/api/period-report",
+      "schedule": "0 6 * * *"
     }
   ]
 }
