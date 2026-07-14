@@ -24,11 +24,15 @@ export default function HallOfFame({ entries: propEntries=[], orgs: propOrgs=[],
   const allTimeRecord = approved[0] || null;
 
   // Country records — best drive per country
+  // Country codes are normalized to uppercase for the dedup key, since
+  // inconsistent casing (e.g. "DE" vs "de") would otherwise be treated
+  // as two different countries even though they render the same flag.
   const countryRecords = {};
   approved.forEach(e => {
     const org = orgFor(e.orgId);
-    const country = org?.country;
-    if (!country) return;
+    const rawCountry = org?.country;
+    if (!rawCountry) return;
+    const country = rawCountry.trim().toUpperCase();
     if (!countryRecords[country] || e.dist > countryRecords[country].dist) {
       countryRecords[country] = e;
     }
