@@ -65,14 +65,12 @@ async function getDynamicData() {
   }
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // Pull every column that could plausibly hold a slug, plus courseName/
-  // fullName as a fallback so we can compute one on the fly. This way a
-  // missing `slug` column (or a `slug` column that's just never been
-  // populated) can't silently zero out every club URL the way the
-  // previous version of this script did.
+  // Confirmed: clubs has no `slug` column. Use customSlug where set,
+  // otherwise compute one from courseName on the fly (same approach used
+  // elsewhere in the app for club/profile links).
   const { data: clubRows, error: clubErr } = await supabase
     .from('clubs')
-    .select('id, slug, customSlug, courseName, fullName, accountType, status, profileConsent')
+    .select('id, customSlug, courseName, fullName, accountType, status, profileConsent')
     .eq('accountType', 'club')
     .eq('status', 'approved');
 
@@ -102,7 +100,7 @@ async function getDynamicData() {
 
   const clubUrls = (clubRows || [])
     .map((c) => {
-      const slug = c.slug || c.customSlug || (c.courseName ? toSlug(c.courseName) : null);
+      const slug = c.customSlug || (c.courseName ? toSlug(c.courseName) : null);
       if (!slug) return null;
       return urlEntry(`/clubs/${slug}`, 'weekly', 0.8, lastEntryByOrg[c.id] || null);
     })
