@@ -7,8 +7,8 @@
 //      public player profile pages (/profile/[slug], only where
 //      profileConsent = true)
 //
-// Run automatically after every build:
-//   package.json -> "scripts": { "postbuild": "node scripts/generate-sitemap.cjs" }
+// Runs automatically after every build via package.json:
+//   "scripts": { "postbuild": "node scripts/generate-sitemap.cjs" }
 //
 // Uses .cjs extension on purpose so it runs as CommonJS regardless of
 // whatever "type" is set in package.json.
@@ -42,42 +42,79 @@ const corePages = [
   { slug: 'resources', priority: 0.7, changefreq: 'monthly' },
 ];
 
-function urlEntry(loc, changefreq, priority) {
-  return `  <url><loc>${SITE_URL}${loc}</loc><changefreq>${changefreq}</changefreq><priority>${priority}</priority></url>`;
+// Same slugify logic used elsewhere in the app (e.g. nameToSlug() in
+// leaderboard.jsx / dashboard.jsx), duplicated here since this script
+// runs standalone via node, outside the Next.js module graph.
+function toSlug(str) {
+  return String(str)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-');
 }
 
-async function getClubUrls() {
+function urlEntry(loc, changefreq, priority, lastmod) {
+  const lastmodTag = lastmod ? `<lastmod>${lastmod}</lastmod>` : '';
+  return `  <url><loc>${SITE_URL}${loc}</loc>${lastmodTag}<changefreq>${changefreq}</changefreq><priority>${priority}</priority></url>`;
+}
+
+async function getDynamicData() {
   if (!supabaseUrl || !supabaseKey) {
-    console.warn('[sitemap] Missing Supabase env vars — skipping dynamic club/profile URLs.');
-    return [];
+    console.warn('[sitemap] Missing Supabase env vars — skipping dynamic club/profile URLs and lastmod data.');
+    return { clubUrls: [], profileUrls: [], siteWideLatest: null };
   }
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // TODO confirm column name: this assumes a `slug` column on `clubs`
-  // for venue-type accounts. If your club venue slugs are instead
-  // computed on the fly from `courseName`, swap this query/mapping
-  // accordingly (see nameToSlug() in pages/dashboard.jsx for the same
-  // slugify logic used elsewhere in the app).
+  // Pull every column that could plausibly hold a slug, plus courseName/
+  // fullName as a fallback so we can compute one on the fly. This way a
+  // missing `slug` column (or a `slug` column that's just never been
+  // populated) can't silently zero out every club URL the way the
+  // previous version of this script did.
   const { data: clubRows, error: clubErr } = await supabase
     .from('clubs')
-    .select('slug, customSlug, fullName, accountType, profileConsent')
-    .eq('accountType', 'club');
+    .select('id, slug, customSlug, courseName, fullName, accountType, status, profileConsent')
+    .eq('accountType', 'club')
+    .eq('status', 'approved');
 
   if (clubErr) {
     console.warn('[sitemap] Could not fetch club rows:', clubErr.message);
   }
 
+  // Most recent entry date per orgId — used as a real lastmod instead of
+  // no timestamp at all.
+  const { data: entryRows, error: entryErr } = await supabase
+    .from('entries')
+    .select('orgId, date');
+
+  if (entryErr) {
+    console.warn('[sitemap] Could not fetch entries for lastmod:', entryErr.message);
+  }
+
+  const lastEntryByOrg = {};
+  let siteWideLatest = null;
+  (entryRows || []).forEach((e) => {
+    if (!e.date) return;
+    if (!lastEntryByOrg[e.orgId] || e.date > lastEntryByOrg[e.orgId]) {
+      lastEntryByOrg[e.orgId] = e.date;
+    }
+    if (!siteWideLatest || e.date > siteWideLatest) siteWideLatest = e.date;
+  });
+
   const clubUrls = (clubRows || [])
-    .map((c) => c.slug || c.customSlug)
-    .filter(Boolean)
-    .map((slug) => urlEntry(`/clubs/${slug}`, 'weekly', 0.8));
+    .map((c) => {
+      const slug = c.slug || c.customSlug || (c.courseName ? toSlug(c.courseName) : null);
+      if (!slug) return null;
+      return urlEntry(`/clubs/${slug}`, 'weekly', 0.8, lastEntryByOrg[c.id] || null);
+    })
+    .filter(Boolean);
 
   // Public player profile pages — simulator accounts that opted in via
   // the post-submission "Want a shareable profile page?" consent modal.
   const { data: profileRows, error: profileErr } = await supabase
     .from('clubs')
-    .select('customSlug, fullName, accountType, profileConsent')
+    .select('id, customSlug, fullName, accountType, status, profileConsent')
     .eq('accountType', 'simulator')
+    .eq('status', 'approved')
     .eq('profileConsent', true);
 
   if (profileErr) {
@@ -85,19 +122,36 @@ async function getClubUrls() {
   }
 
   const profileUrls = (profileRows || [])
-    .map((p) => p.customSlug)
-    .filter(Boolean)
-    .map((slug) => urlEntry(`/profile/${slug}`, 'weekly', 0.7));
+    .map((p) => {
+      const slug = p.customSlug || (p.fullName ? toSlug(p.fullName) : null);
+      if (!slug) return null;
+      return urlEntry(`/profile/${slug}`, 'weekly', 0.7, lastEntryByOrg[p.id] || null);
+    })
+    .filter(Boolean);
 
-  return [...clubUrls, ...profileUrls];
+  return { clubUrls, profileUrls, siteWideLatest };
 }
 
 async function generate() {
-  const core = corePages.map((p) => urlEntry(`/${p.slug}`.replace(/\/$/, '') || '/', p.changefreq, p.priority));
-  const seo = seoPages.map((p) => urlEntry(`/${p.slug}`, p.changefreq, p.priority));
-  const dynamic = await getClubUrls();
+  const { clubUrls, profileUrls, siteWideLatest } = await getDynamicData();
 
-  const all = [...core, ...seo, ...dynamic];
+  // Core app pages and live/weekly SEO pages get the site-wide most
+  // recent entry date as lastmod, since their content is driven by
+  // whatever's newest in `entries`. Purely evergreen guide pages are
+  // left without a computed lastmod here — add a `lastmod: 'YYYY-MM-DD'`
+  // field directly on those entries in lib/seoPages.js when you actually
+  // edit their copy, and this script will pick it up automatically.
+  const dynamicChangefreqs = new Set(['weekly']);
+
+  const core = corePages.map((p) =>
+    urlEntry(`/${p.slug}`.replace(/\/$/, '') || '/', p.changefreq, p.priority, dynamicChangefreqs.has(p.changefreq) ? siteWideLatest : null)
+  );
+
+  const seo = seoPages.map((p) =>
+    urlEntry(`/${p.slug}`, p.changefreq, p.priority, p.lastmod || (dynamicChangefreqs.has(p.changefreq) ? siteWideLatest : null))
+  );
+
+  const all = [...core, ...seo, ...clubUrls, ...profileUrls];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
