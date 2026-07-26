@@ -195,7 +195,7 @@ export default async function handler(req) {
           <div style={{ display: 'flex', color: ORG, fontSize: 15, fontWeight: 700, letterSpacing: 2, marginBottom: 4 }}>
             THIS WEEK'S LEADERS
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-evenly' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-around' }}>
             {leaders.map(({ label, entry }, i) => (
               <div
                 key={i}

@@ -181,7 +181,7 @@ export default async function handler(req) {
               display: 'flex',
               flexDirection: 'column',
               flex: 1,
-              justifyContent: entries.length ? 'space-evenly' : 'center',
+              justifyContent: entries.length ? 'space-around' : 'center',
             }}
           >
             {entries.length === 0 && (
