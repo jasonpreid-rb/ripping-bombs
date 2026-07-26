@@ -1,17 +1,30 @@
 // pages/api/weekly-images-notify.js
 //
 // Fires every Monday via Vercel Cron. Computes the week that just closed
-// and emails Jason a link + preview of all 7 social images (1 cover +
-// 6 division cards) so they can be viewed and saved manually.
+// and emails you a preview of all 7 social images (1 cover + 6 division
+// cards) so they can be viewed and saved manually.
+//
+// Week numbering is imported directly from lib/constants (nowWeek/
+// prevWeek/weekLabel) — the exact same functions the OG image endpoints
+// use — so this can never link to a different week than what those
+// endpoints actually render.
 //
 // This does NOT go to the recipient list — it's a personal notification,
 // sent only to the address in NOTIFY_EMAIL (or ?to= override for testing).
+//
+// Query overrides (all optional):
+//   ?current=1       — use THIS week (in progress), not last closed week.
+//                       Useful for an on-demand "results as they stand"
+//                       send instead of waiting for Monday.
+//   ?week=&year=     — target an explicit week/year directly.
+//   ?to=             — override the recipient (testing).
 //
 // vercel.json cron entry (Monday 06:15 UTC — offset from period-report's
 // 06:00 run so they don't hit Supabase at the exact same second):
 // { "path": "/api/weekly-images-notify", "schedule": "15 6 * * 1" }
 
 import { Resend } from 'resend';
+import { nowWeek, prevWeek, weekLabel } from '../../lib/constants';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -26,58 +39,21 @@ const DIVISIONS = [
 
 const SITE_URL = 'https://rippingbombs.com';
 
-// --- Period math (mirrors period-report.js) -----------------------------
-
-function getWeek1Start(year) {
-  const jan1 = new Date(Date.UTC(year, 0, 1));
-  const dayOfWeek = jan1.getUTCDay();
-  const daysToMonday = dayOfWeek === 1 ? 0 : (8 - dayOfWeek) % 7;
-  const week1Start = new Date(jan1);
-  week1Start.setUTCDate(week1Start.getUTCDate() + daysToMonday);
-  return week1Start;
-}
-
-function getMondayOnOrBefore(date) {
-  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-  const dow = d.getUTCDay();
-  const diff = dow === 0 ? 6 : dow - 1;
-  d.setUTCDate(d.getUTCDate() - diff);
-  return d;
-}
-
-function computeWeekNumber(date) {
-  let year = date.getUTCFullYear();
-  let week1Start = getWeek1Start(year);
-  if (date < week1Start) {
-    year -= 1;
-    week1Start = getWeek1Start(year);
-  }
-  const daysSinceAnchor = Math.floor((date - week1Start) / 86400000);
-  return { year, weekNumber: Math.floor(daysSinceAnchor / 7) + 1 };
-}
-
-function getLastClosedWeek(now = new Date()) {
-  const thisMonday = getMondayOnOrBefore(now);
-  const weekStart = new Date(thisMonday);
-  weekStart.setUTCDate(weekStart.getUTCDate() - 7);
-  const { year, weekNumber } = computeWeekNumber(weekStart);
-  return { weekStart, weekNumber, year };
-}
-
 // --- Email ---------------------------------------------------------------
 
-function buildImageUrls(year, weekNumber) {
+function buildImageUrls(target) {
   const base = `${SITE_URL}/api/og`;
-  const cover = `${base}/week-cover?week=${weekNumber}&year=${year}`;
+  const qs = `week=${target.w}&year=${target.y}`;
+  const cover = `${base}/week-cover?${qs}`;
   const divisions = DIVISIONS.map((d) => ({
     name: d,
-    url: `${base}/week-division?week=${weekNumber}&year=${year}&division=${encodeURIComponent(d)}`,
+    url: `${base}/week-division?${qs}&division=${encodeURIComponent(d)}`,
   }));
   return { cover, divisions };
 }
 
-function renderEmail(year, weekNumber, weekStart, urls) {
-  const dateLabel = weekStart.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+function renderEmail(target, isCurrent, urls) {
+  const label = weekLabel(target);
 
   const cards = urls.divisions
     .map(
@@ -92,8 +68,12 @@ function renderEmail(year, weekNumber, weekStart, urls) {
 
   return `
     <div style="max-width:600px;margin:0 auto;font-family:sans-serif;">
-      <h1 style="color:#FF0090;">Week ${weekNumber} social images ready</h1>
-      <p style="color:#444;">w/c ${dateLabel} — right-click / long-press each image to save, or open full size.</p>
+      <h1 style="color:#FF0090;">${label} social images ready</h1>
+      <p style="color:#444;">
+        ${isCurrent
+          ? 'These reflect the week in progress — results as they currently stand, not a finalized week.'
+          : 'Right-click / long-press each image to save, or open full size.'}
+      </p>
 
       <p style="font-size:13px;color:#888;margin:24px 0 6px;">Cover</p>
       <img src="${urls.cover}" width="360" style="display:block;border-radius:12px;" />
@@ -115,8 +95,20 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { weekStart, weekNumber, year } = getLastClosedWeek(new Date());
-    const urls = buildImageUrls(year, weekNumber);
+    const qWeek = req.query.week;
+    const qYear = req.query.year;
+    const isCurrent = req.query.current === '1';
+
+    let target;
+    if (qWeek && qYear) {
+      target = { y: Number(qYear), w: Number(qWeek) };
+    } else if (isCurrent) {
+      target = nowWeek();
+    } else {
+      target = prevWeek(nowWeek());
+    }
+
+    const urls = buildImageUrls(target);
 
     const to = req.query.to || process.env.NOTIFY_EMAIL;
     if (!to) {
@@ -126,14 +118,15 @@ export default async function handler(req, res) {
     await resend.emails.send({
       from: 'team@rippingbombs.com',
       to,
-      subject: `Ripping Bombs — Week ${weekNumber} social images ready`,
-      html: renderEmail(year, weekNumber, weekStart, urls),
+      subject: `Ripping Bombs — ${weekLabel(target)} social images ready`,
+      html: renderEmail(target, isCurrent, urls),
     });
 
     return res.status(200).json({
       success: true,
-      week: weekNumber,
-      year,
+      week: target.w,
+      year: target.y,
+      current: isCurrent,
       coverUrl: urls.cover,
       divisionUrls: urls.divisions,
     });
