@@ -1,17 +1,16 @@
 // pages/api/og/week-cover.js
 //
 // Generates the "WEEK XX" cover image for social posting — a preview of
-// all 6 divisions' leaders, with a scroll prompt into the category cards.
+// all 6 divisions' leaders, with a swipe prompt into the category cards.
 //
 // Week numbering comes straight from lib/constants (nowWeek/prevWeek/
 // weekLabel), so it can't drift out of sync with the live site.
 //
-// Flags are pre-fetched and converted to base64 data URIs BEFORE the image
-// is built. This matters: if a remote <img src> is left for Satori to fetch
-// during the render/stream itself and that fetch fails, the whole response
-// silently truncates to an empty 200 with no error surfaced anywhere. By
-// resolving every image ourselves first, any failure happens somewhere we
-// can actually catch and report.
+// Flags and the brand icon are pre-fetched and converted to base64 data
+// URIs BEFORE the image is built — if a remote fetch fails during Satori's
+// own render/stream step, the whole response silently truncates to an
+// empty 200 with no error. Resolving images ourselves first means any
+// failure happens somewhere we can actually catch and report.
 //
 // ?week=&year= — override the target week (year is the ISO week-year).
 // ?includeDemo=1 — TEST ONLY. Bypasses the demo/sample data exclusion so
@@ -22,13 +21,20 @@
 
 import { ImageResponse } from '@vercel/og';
 import { createClient } from '@supabase/supabase-js';
-import { BG, BDR, TXT, MUT, DIM, ORG, nowWeek, prevWeek, weekLabel } from '../../../lib/constants';
+import { BDR, TXT, MUT, DIM, ORG, nowWeek, prevWeek, weekLabel } from '../../../lib/constants';
 
 export const config = { runtime: 'edge' };
 
 const DISP_FAMILY = 'Bebas Neue';
 const SANS_FAMILY = 'Inter';
 const UNIT = 'yds';
+
+// True black for social — the site's actual BG (#1a1a1a) reads washed out
+// at 1080px on a phone feed, so this deliberately diverges from that token.
+const IMG_BG = '#000000';
+
+// Assumes public/favicon.png — update if the icon lives at a different path.
+const ICON_URL = 'https://rippingbombs.com/favicon.png';
 
 const DIVISIONS = [
   { key: 'Men', label: 'Men' },
@@ -40,7 +46,7 @@ const DIVISIONS = [
 ];
 
 const LATIN_SAMPLE =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿ0123456789 .,'-–·";
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿ0123456789 .,'-–·→";
 
 // --- Font loading ---------------------------------------------------------
 
@@ -53,18 +59,19 @@ async function loadFont(family, weight, text) {
   return res.arrayBuffer();
 }
 
-// --- Flag pre-fetching ------------------------------------------------
-// Resolves a country code to a base64 data URI, or null if the fetch fails
-// (rather than letting a bad flag take down the whole image).
+// --- Remote image pre-fetching --------------------------------------------
+// Returns a base64 data URI, or null if the fetch fails (so a bad image
+// never takes down the whole render).
 
-async function flagDataUri(code) {
-  if (!code) return null;
+async function imageDataUri(url) {
+  if (!url) return null;
   try {
-    const res = await fetch(`https://flagcdn.com/w80/${code.toLowerCase()}.png`);
+    const res = await fetch(url);
     if (!res.ok) return null;
     const buf = await res.arrayBuffer();
     const base64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
-    return `data:image/png;base64,${base64}`;
+    const contentType = res.headers.get('content-type') || 'image/png';
+    return `data:${contentType};base64,${base64}`;
   } catch {
     return null;
   }
@@ -144,12 +151,12 @@ export default async function handler(req) {
       return { label, entry: top };
     });
 
-    // Pre-fetch everything (fonts + flags) BEFORE building the image tree.
-    const [displayFont, sansRegular, sansBold, flagUris] = await Promise.all([
+    const [displayFont, sansRegular, sansBold, iconUri, flagUris] = await Promise.all([
       loadFont('Bebas+Neue', 400, 'RIPPING BOMBS WEEKLY CHAMPIONSHIP 0123456789'),
       loadFont('Inter', 400, LATIN_SAMPLE),
       loadFont('Inter', 700, LATIN_SAMPLE),
-      Promise.all(leaders.map(({ entry }) => flagDataUri(entry?.country))),
+      imageDataUri(ICON_URL),
+      Promise.all(leaders.map(({ entry }) => imageDataUri(entry?.country ? `https://flagcdn.com/w80/${entry.country.toLowerCase()}.png` : null))),
     ]);
 
     return new ImageResponse(
@@ -160,20 +167,24 @@ export default async function handler(req) {
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            backgroundColor: BG,
+            backgroundColor: IMG_BG,
             padding: '60px 64px',
             fontFamily: SANS_FAMILY,
+            position: 'relative',
           }}
         >
+          {iconUri && (
+            <img
+              src={iconUri}
+              width={56}
+              height={56}
+              style={{ position: 'absolute', top: 56, right: 56, objectFit: 'contain' }}
+            />
+          )}
+
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ display: 'flex', color: MUT, fontSize: 14, fontWeight: 700, letterSpacing: 3 }}>
-                RIPPING BOMBS
-              </div>
-              <div style={{ display: 'flex', color: BDR, fontSize: 14, margin: '0 10px' }}>·</div>
-              <div style={{ display: 'flex', color: ORG, fontSize: 14, fontWeight: 700, letterSpacing: 2 }}>
-                🏆 WEEKLY CHAMPIONSHIP
-              </div>
+            <div style={{ display: 'flex', color: ORG, fontSize: 14, fontWeight: 700, letterSpacing: 2 }}>
+              🏆 WEEKLY CHAMPIONSHIP
             </div>
             <div
               style={{
@@ -240,7 +251,7 @@ export default async function handler(req) {
 
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
             <div style={{ display: 'flex', color: ORG, fontSize: 22, fontWeight: 700, letterSpacing: 1 }}>
-              FULL RESULTS IN EACH CATEGORY BELOW ↓
+              SWIPE FOR FULL RESULTS →
             </div>
           </div>
         </div>

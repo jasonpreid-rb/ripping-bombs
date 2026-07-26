@@ -3,9 +3,9 @@
 // Generates one division's leaderboard card (top 5) for social posting.
 // Edge function using @vercel/og (Satori).
 //
-// Flags are pre-fetched and converted to base64 data URIs BEFORE the image
-// is built, so a failed remote fetch surfaces as a catchable error instead
-// of silently truncating the render to an empty 200 response.
+// Flags and the brand icon are pre-fetched and converted to base64 data
+// URIs BEFORE the image is built, so a failed remote fetch surfaces as a
+// catchable error instead of silently truncating the render.
 //
 // ?week=&year= — override the target week (year is the ISO week-year).
 // ?includeDemo=1 — TEST ONLY. Bypasses the demo/sample data exclusion so
@@ -18,13 +18,20 @@
 
 import { ImageResponse } from '@vercel/og';
 import { createClient } from '@supabase/supabase-js';
-import { BG, BDR, TXT, MUT, DIM, ORG, nowWeek, prevWeek, weekLabel } from '../../../lib/constants';
+import { BDR, TXT, MUT, DIM, ORG, nowWeek, prevWeek, weekLabel } from '../../../lib/constants';
 
 export const config = { runtime: 'edge' };
 
 const DISP_FAMILY = 'Bebas Neue';
 const SANS_FAMILY = 'Inter';
 const UNIT = 'yds';
+
+// True black for social — matches the cover image; the site's actual BG
+// (#1a1a1a) reads washed out at 1080px on a phone feed.
+const IMG_BG = '#000000';
+
+// Assumes public/favicon.png — update if the icon lives at a different path.
+const ICON_URL = 'https://rippingbombs.com/favicon.png';
 
 const DIVISIONS = [
   'Men',
@@ -49,16 +56,17 @@ async function loadFont(family, weight, text) {
   return res.arrayBuffer();
 }
 
-// --- Flag pre-fetching ------------------------------------------------
+// --- Remote image pre-fetching --------------------------------------------
 
-async function flagDataUri(code) {
-  if (!code) return null;
+async function imageDataUri(url) {
+  if (!url) return null;
   try {
-    const res = await fetch(`https://flagcdn.com/w80/${code.toLowerCase()}.png`);
+    const res = await fetch(url);
     if (!res.ok) return null;
     const buf = await res.arrayBuffer();
     const base64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
-    return `data:image/png;base64,${base64}`;
+    const contentType = res.headers.get('content-type') || 'image/png';
+    return `data:${contentType};base64,${base64}`;
   } catch {
     return null;
   }
@@ -147,11 +155,12 @@ export default async function handler(req) {
       .sort((a, b) => b.dist - a.dist)
       .slice(0, 5);
 
-    const [displayFont, sansRegular, sansBold, flagUris] = await Promise.all([
+    const [displayFont, sansRegular, sansBold, iconUri, flagUris] = await Promise.all([
       loadFont('Bebas+Neue', 400, 'RIPPING BOMBS WEEKLY CHAMPIONSHIP MEN WOMEN HIGH HANDICAP YOUTH SENIORS 0123456789'),
       loadFont('Inter', 400, LATIN_SAMPLE),
       loadFont('Inter', 700, LATIN_SAMPLE),
-      Promise.all(entries.map((e) => flagDataUri(e.country))),
+      imageDataUri(ICON_URL),
+      Promise.all(entries.map((e) => imageDataUri(e.country ? `https://flagcdn.com/w80/${e.country.toLowerCase()}.png` : null))),
     ]);
 
     return new ImageResponse(
@@ -162,11 +171,21 @@ export default async function handler(req) {
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            backgroundColor: BG,
+            backgroundColor: IMG_BG,
             padding: '56px 60px',
             fontFamily: SANS_FAMILY,
+            position: 'relative',
           }}
         >
+          {iconUri && (
+            <img
+              src={iconUri}
+              width={48}
+              height={48}
+              style={{ position: 'absolute', top: 48, right: 48, objectFit: 'contain' }}
+            />
+          )}
+
           <div style={{ display: 'flex', color: ORG, fontSize: 14, fontWeight: 700, letterSpacing: 2 }}>
             🏆 WEEKLY CHAMPIONSHIP · {weekLabel(target).toUpperCase()}
           </div>
