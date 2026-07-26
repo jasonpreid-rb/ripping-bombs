@@ -3,6 +3,10 @@
 // Generates one division's leaderboard card (top 5) for social posting.
 // Edge function using @vercel/og (Satori).
 //
+// ?includeDemo=1 — TEST ONLY. Bypasses the demo/sample data exclusion so
+// you can preview the design against seeded data. Never pass this from
+// the real weekly-images-notify cron.
+//
 // Usage: https://rippingbombs.com/api/og/week-division?week=32&year=2026&division=Men
 // division must be one of DIVISIONS below (URL-encode spaces, e.g.
 // "Men%20High%20Handicap").
@@ -13,11 +17,14 @@ import { createClient } from '@supabase/supabase-js';
 export const config = { runtime: 'edge' };
 
 const ORG = '#FF0090';
+const GOLD = '#FFB627';
 const BG = '#0A0A0F';
 const BG2 = '#15151D';
-const TXT = '#FFFFFF';
-const DIM = '#8A8A97';
-const BDR = '#2A2A35';
+const TXT = '#F5F5F7';
+const DIM = '#6E6E7A';
+const BDR = '#232330';
+
+const DISPLAY_FONT = 'Bebas Neue';
 
 const DIVISIONS = [
   'Men',
@@ -27,6 +34,19 @@ const DIVISIONS = [
   'Youth',
   'Seniors',
 ];
+
+// --- Font loading ---------------------------------------------------------
+
+async function loadDisplayFont() {
+  const cssUrl = `https://fonts.googleapis.com/css2?family=Bebas+Neue&text=${encodeURIComponent(
+    'RIPPINGBOMS WEEKMNHIGDCPOAY0123456789· m'
+  )}`;
+  const css = await (await fetch(cssUrl)).text();
+  const match = css.match(/src: url\(([^)]+)\) format\('(opentype|truetype)'\)/);
+  if (!match) throw new Error('Could not resolve Bebas Neue font URL');
+  const fontRes = await fetch(match[1]);
+  return fontRes.arrayBuffer();
+}
 
 // --- Period math (mirrors period-report.js / week-cover.js) -----------
 
@@ -103,6 +123,7 @@ export default async function handler(req) {
   const qWeek = searchParams.get('week');
   const qYear = searchParams.get('year');
   const division = searchParams.get('division');
+  const includeDemo = searchParams.get('includeDemo') === '1';
 
   if (!division || !DIVISIONS.includes(division)) {
     return new Response(
@@ -120,14 +141,18 @@ export default async function handler(req) {
     process.env.SUPABASE_SERVICE_ROLE_KEY
   );
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('entries')
     .select('player, dist, date, gender, hcp, age, facility, orgId, clubs(country)')
     .gte('date', target.weekStart.toISOString().slice(0, 10))
     .lt('date', target.weekEnd.toISOString().slice(0, 10))
-    .not('id', 'ilike', '%demo%')
-    .not('orgId', 'ilike', '%demo%')
     .order('dist', { ascending: false });
+
+  if (!includeDemo) {
+    query = query.not('id', 'ilike', '%demo%').not('orgId', 'ilike', '%demo%');
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     return new Response(`Error: ${error.message}`, { status: 500 });
@@ -152,6 +177,8 @@ export default async function handler(req) {
     month: 'short',
   })}`;
 
+  const displayFontData = await loadDisplayFont();
+
   return new ImageResponse(
     (
       <div
@@ -161,64 +188,124 @@ export default async function handler(req) {
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: BG,
-          padding: '64px',
+          backgroundImage: `linear-gradient(135deg, ${BG2} 0%, ${BG} 45%)`,
+          padding: '60px',
           fontFamily: 'sans-serif',
+          position: 'relative',
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 40 }}>
-          <div style={{ display: 'flex', color: DIM, fontSize: 24, letterSpacing: 3 }}>
-            RIPPING BOMBS · WEEK {target.weekNumber} · {dateLabel}
+        <div
+          style={{
+            display: 'flex',
+            position: 'absolute',
+            top: -110,
+            right: -110,
+            width: 300,
+            height: 300,
+            borderRadius: 999,
+            backgroundImage: `linear-gradient(135deg, ${ORG}22 0%, ${ORG}00 70%)`,
+          }}
+        />
+
+        <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 36 }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: 'flex', width: 8, height: 8, borderRadius: 999, backgroundColor: GOLD, marginRight: 10 }} />
+            <div style={{ display: 'flex', color: DIM, fontSize: 22, fontWeight: 600, letterSpacing: 4 }}>
+              RIPPING BOMBS · WEEK {target.weekNumber} · {dateLabel.toUpperCase()}
+            </div>
           </div>
-          <div style={{ display: 'flex', color: ORG, fontSize: 64, fontWeight: 800, marginTop: 12 }}>
+          <div style={{ display: 'flex', color: ORG, fontSize: 88, fontFamily: DISPLAY_FONT, marginTop: 8, letterSpacing: 1 }}>
             {division.toUpperCase()}
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {entries.length === 0 && (
-            <div style={{ display: 'flex', color: DIM, fontSize: 32 }}>No entries this week</div>
-          )}
-          {entries.map((e, i) => (
             <div
-              key={i}
               style={{
                 display: 'flex',
-                alignItems: 'center',
+                flexDirection: 'column',
                 backgroundColor: BG2,
-                border: `2px solid ${i === 0 ? ORG : BDR}`,
-                borderRadius: 20,
-                padding: '24px 36px',
+                border: `1px dashed ${BDR}`,
+                borderRadius: 24,
+                padding: '40px 36px',
               }}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  color: i === 0 ? ORG : DIM,
-                  fontSize: 44,
-                  fontWeight: 800,
-                  width: 80,
-                }}
-              >
-                {i + 1}
+              <div style={{ display: 'flex', color: DIM, fontSize: 30, fontWeight: 600 }}>
+                No drives logged this week
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                <div style={{ display: 'flex', color: TXT, fontSize: 36, fontWeight: 600 }}>
-                  {e.player}
-                </div>
-                {e.facility && (
-                  <div style={{ display: 'flex', color: DIM, fontSize: 22, marginTop: 4 }}>
-                    {e.facility}
-                  </div>
-                )}
-              </div>
-              <div style={{ display: 'flex', color: ORG, fontSize: 48, fontWeight: 800 }}>
-                {e.dist}m
+              <div style={{ display: 'flex', color: DIM, fontSize: 22, marginTop: 8, opacity: 0.8 }}>
+                Check back once entries come in
               </div>
             </div>
-          ))}
+          )}
+          {entries.map((e, i) => {
+            const isLeader = i === 0;
+            const accent = isLeader ? GOLD : ORG;
+            return (
+              <div
+                key={i}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  backgroundColor: BG2,
+                  border: `1px solid ${isLeader ? GOLD : BDR}`,
+                  borderRadius: 20,
+                  padding: '22px 32px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 56,
+                    height: 56,
+                    borderRadius: 999,
+                    backgroundColor: isLeader ? GOLD : 'transparent',
+                    border: isLeader ? 'none' : `2px solid ${BDR}`,
+                    marginRight: 28,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      color: isLeader ? BG : DIM,
+                      fontSize: 30,
+                      fontFamily: DISPLAY_FONT,
+                    }}
+                  >
+                    {i + 1}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                  <div style={{ display: 'flex', color: TXT, fontSize: 34, fontWeight: 600 }}>
+                    {e.player}
+                  </div>
+                  {e.facility && (
+                    <div style={{ display: 'flex', color: DIM, fontSize: 20, marginTop: 4 }}>
+                      {e.facility}
+                    </div>
+                  )}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline' }}>
+                  <div style={{ display: 'flex', color: accent, fontSize: 52, fontFamily: DISPLAY_FONT }}>
+                    {e.dist}
+                  </div>
+                  <div style={{ display: 'flex', color: accent, fontSize: 26, fontFamily: DISPLAY_FONT, marginLeft: 4 }}>
+                    m
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     ),
-    { width: 1080, height: 1080 }
+    {
+      width: 1080,
+      height: 1080,
+      fonts: [{ name: DISPLAY_FONT, data: displayFontData, weight: 400, style: 'normal' }],
+    }
   );
 }

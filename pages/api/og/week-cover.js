@@ -4,6 +4,10 @@
 // Edge function using @vercel/og (Satori). Called with ?week=&year= or,
 // if omitted, defaults to the most recently CLOSED week (last Mon–Sun).
 //
+// ?includeDemo=1 — TEST ONLY. Bypasses the demo/sample data exclusion so
+// you can preview the design against seeded data. Never pass this from
+// the real weekly-images-notify cron.
+//
 // Usage: https://rippingbombs.com/api/og/week-cover?week=32&year=2026
 
 import { ImageResponse } from '@vercel/og';
@@ -11,15 +15,33 @@ import { createClient } from '@supabase/supabase-js';
 
 export const config = { runtime: 'edge' };
 
-// --- Design tokens ---------------------------------------------------
-// Mirrors lib/constants — swap these for the exact hex values from that
-// file if they differ (ORG confirmed as #FF0090 per project brand).
+// --- Design tokens ------------------------------------------------------
+// ORG (#FF0090) is the confirmed brand pink — kept as-is. GOLD is new: it
+// marks the #1 / leader position throughout, so color itself carries rank
+// meaning rather than just decorating. Swap BG/BG2/TXT/DIM/BDR for your
+// exact lib/constants values if they differ.
 const ORG = '#FF0090';
+const GOLD = '#FFB627';
 const BG = '#0A0A0F';
 const BG2 = '#15151D';
-const TXT = '#FFFFFF';
-const DIM = '#8A8A97';
-const BDR = '#2A2A35';
+const TXT = '#F5F5F7';
+const DIM = '#6E6E7A';
+const BDR = '#232330';
+
+const DISPLAY_FONT = 'Bebas Neue';
+
+// --- Font loading ---------------------------------------------------------
+
+async function loadDisplayFont() {
+  const cssUrl = `https://fonts.googleapis.com/css2?family=Bebas+Neue&text=${encodeURIComponent(
+    'RIPPINGBOMS WEEK0123456789· LONGESTDRIVEOFTH m'
+  )}`;
+  const css = await (await fetch(cssUrl)).text();
+  const match = css.match(/src: url\(([^)]+)\) format\('(opentype|truetype)'\)/);
+  if (!match) throw new Error('Could not resolve Bebas Neue font URL');
+  const fontRes = await fetch(match[1]);
+  return fontRes.arrayBuffer();
+}
 
 // --- Period math (mirrors period-report.js) ---------------------------
 
@@ -40,10 +62,6 @@ function getMondayOnOrBefore(date) {
   return d;
 }
 
-// Given a date, find its week number using the same anchor logic as
-// period-report.js (weekNumber = periodIndex*4 + w + 1, generalized).
-// Handles the Jan 1 boundary by rolling back to the prior year's anchor
-// if the date falls before this year's Week 1 start.
 function computeWeekNumber(date) {
   let year = date.getUTCFullYear();
   let week1Start = getWeek1Start(year);
@@ -55,19 +73,15 @@ function computeWeekNumber(date) {
   return { year, weekNumber: Math.floor(daysSinceAnchor / 7) + 1 };
 }
 
-// Returns { weekStart, weekEnd, weekNumber, year } for the most recently
-// CLOSED week (i.e. last Monday–Sunday, not the week currently in progress).
 function getLastClosedWeek(now = new Date()) {
   const thisMonday = getMondayOnOrBefore(now);
   const weekStart = new Date(thisMonday);
   weekStart.setUTCDate(weekStart.getUTCDate() - 7);
-  const weekEnd = new Date(thisMonday); // exclusive
+  const weekEnd = new Date(thisMonday);
   const { year, weekNumber } = computeWeekNumber(weekStart);
   return { weekStart, weekEnd, weekNumber, year };
 }
 
-// Rebuilds a specific week's start/end from an explicit weekNumber/year
-// (used when the query string overrides the default).
 function getWeekByNumber(year, weekNumber) {
   const week1Start = getWeek1Start(year);
   const weekStart = new Date(week1Start);
@@ -77,12 +91,51 @@ function getWeekByNumber(year, weekNumber) {
   return { weekStart, weekEnd, weekNumber, year };
 }
 
+// --- Signature motif: ball flight arc -----------------------------------
+// A row of dots tracing a parabola, fading in as they approach the landing
+// point — a visual shorthand for "trajectory" that ties directly to what a
+// longest-drive leaderboard measures.
+
+function TrajectoryArc() {
+  const dots = 9;
+  const items = Array.from({ length: dots }).map((_, i) => {
+    const t = i / (dots - 1); // 0..1
+    const arcHeight = 70;
+    const y = -Math.sin(t * Math.PI) * arcHeight; // parabola, peak at t=0.5
+    const size = 6 + t * 10; // grows toward landing
+    const opacity = 0.25 + t * 0.75;
+    return { y, size, opacity };
+  });
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-end', height: 90, position: 'relative', width: '100%' }}>
+      {items.map((d, i) => (
+        <div
+          key={i}
+          style={{
+            display: 'flex',
+            position: 'absolute',
+            left: `${(i / (dots - 1)) * 92}%`,
+            bottom: 90 + d.y,
+            width: d.size,
+            height: d.size,
+            borderRadius: 999,
+            backgroundColor: i === dots - 1 ? GOLD : ORG,
+            opacity: d.opacity,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 // --- Handler -----------------------------------------------------------
 
 export default async function handler(req) {
   const { searchParams } = new URL(req.url);
   const qWeek = searchParams.get('week');
   const qYear = searchParams.get('year');
+  const includeDemo = searchParams.get('includeDemo') === '1';
 
   const target = qWeek && qYear
     ? getWeekByNumber(Number(qYear), Number(qWeek))
@@ -93,15 +146,19 @@ export default async function handler(req) {
     process.env.SUPABASE_SERVICE_ROLE_KEY
   );
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('entries')
     .select('player, dist, date, facility, orgId, clubs(country)')
     .gte('date', target.weekStart.toISOString().slice(0, 10))
     .lt('date', target.weekEnd.toISOString().slice(0, 10))
-    .not('id', 'ilike', '%demo%')
-    .not('orgId', 'ilike', '%demo%')
     .order('dist', { ascending: false })
     .limit(1);
+
+  if (!includeDemo) {
+    query = query.not('id', 'ilike', '%demo%').not('orgId', 'ilike', '%demo%');
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     return new Response(`Error: ${error.message}`, { status: 500 });
@@ -119,6 +176,8 @@ export default async function handler(req) {
     month: 'short',
   })}`;
 
+  const displayFontData = await loadDisplayFont();
+
   return new ImageResponse(
     (
       <div
@@ -129,53 +188,109 @@ export default async function handler(req) {
           flexDirection: 'column',
           justifyContent: 'space-between',
           backgroundColor: BG,
-          padding: '80px',
+          backgroundImage: `linear-gradient(135deg, ${BG2} 0%, ${BG} 45%)`,
+          padding: '76px 80px',
           fontFamily: 'sans-serif',
+          position: 'relative',
         }}
       >
+        {/* corner accent */}
+        <div
+          style={{
+            display: 'flex',
+            position: 'absolute',
+            top: -120,
+            right: -120,
+            width: 340,
+            height: 340,
+            borderRadius: 999,
+            backgroundImage: `linear-gradient(135deg, ${ORG}22 0%, ${ORG}00 70%)`,
+          }}
+        />
+
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', color: ORG, fontSize: 32, fontWeight: 700, letterSpacing: 4 }}>
-            RIPPING BOMBS
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: 'flex', width: 10, height: 10, borderRadius: 999, backgroundColor: GOLD, marginRight: 14 }} />
+            <div style={{ display: 'flex', color: DIM, fontSize: 26, fontWeight: 600, letterSpacing: 6 }}>
+              RIPPING BOMBS
+            </div>
           </div>
-          <div style={{ display: 'flex', color: TXT, fontSize: 110, fontWeight: 800, marginTop: 20 }}>
+          <div
+            style={{
+              display: 'flex',
+              color: TXT,
+              fontSize: 168,
+              lineHeight: 0.95,
+              marginTop: 18,
+              fontFamily: DISPLAY_FONT,
+              letterSpacing: 2,
+            }}
+          >
             WEEK {target.weekNumber}
           </div>
-          <div style={{ display: 'flex', color: DIM, fontSize: 36, marginTop: 10 }}>
-            RESULTS · {dateLabel}
+          <div style={{ display: 'flex', color: ORG, fontSize: 32, fontFamily: DISPLAY_FONT, letterSpacing: 4, marginTop: 6 }}>
+            RESULTS · {dateLabel.toUpperCase()}
           </div>
+          <TrajectoryArc />
         </div>
 
-        {top && (
+        {top ? (
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               backgroundColor: BG2,
-              border: `2px solid ${BDR}`,
-              borderRadius: 24,
-              padding: '40px 48px',
+              border: `1px solid ${BDR}`,
+              borderRadius: 28,
+              padding: '44px 52px',
             }}
           >
-            <div style={{ display: 'flex', color: DIM, fontSize: 26, letterSpacing: 2 }}>
-              LONGEST DRIVE OF THE WEEK
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', marginTop: 16 }}>
-              <div style={{ display: 'flex', color: ORG, fontSize: 90, fontWeight: 800 }}>
-                {top.dist}m
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ display: 'flex', width: 8, height: 8, borderRadius: 999, backgroundColor: GOLD, marginRight: 10 }} />
+              <div style={{ display: 'flex', color: GOLD, fontSize: 24, fontWeight: 700, letterSpacing: 3 }}>
+                LONGEST DRIVE OF THE WEEK
               </div>
-              <div style={{ display: 'flex', color: TXT, fontSize: 40, marginLeft: 28 }}>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', marginTop: 20 }}>
+              <div style={{ display: 'flex', color: ORG, fontSize: 130, fontFamily: DISPLAY_FONT }}>
+                {top.dist}
+              </div>
+              <div style={{ display: 'flex', color: ORG, fontSize: 56, fontFamily: DISPLAY_FONT, marginLeft: 6 }}>
+                m
+              </div>
+              <div style={{ display: 'flex', color: TXT, fontSize: 40, marginLeft: 32, fontWeight: 600 }}>
                 {top.player}
               </div>
             </div>
             {top.facility && (
-              <div style={{ display: 'flex', color: DIM, fontSize: 24, marginTop: 8 }}>
-                {top.facility}
-              </div>
+              <div style={{ display: 'flex', color: DIM, fontSize: 24, marginTop: 6 }}>{top.facility}</div>
             )}
+          </div>
+        ) : (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              backgroundColor: BG2,
+              border: `1px dashed ${BDR}`,
+              borderRadius: 28,
+              padding: '44px 52px',
+            }}
+          >
+            <div style={{ display: 'flex', color: DIM, fontSize: 30, fontWeight: 600 }}>
+              No drives logged this week
+            </div>
+            <div style={{ display: 'flex', color: DIM, fontSize: 22, marginTop: 8, opacity: 0.8 }}>
+              Check back once entries come in
+            </div>
           </div>
         )}
       </div>
     ),
-    { width: 1080, height: 1080 }
+    {
+      width: 1080,
+      height: 1080,
+      fonts: [{ name: DISPLAY_FONT, data: displayFontData, weight: 400, style: 'normal' }],
+    }
   );
 }
