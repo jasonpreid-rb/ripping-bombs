@@ -3,9 +3,10 @@
 // Generates one division's leaderboard card (top 5) for social posting.
 // Edge function using @vercel/og (Satori).
 //
+// ?week=&year= — override the target week (year is the ISO week-year).
 // ?includeDemo=1 — TEST ONLY. Bypasses the demo/sample data exclusion so
-// you can preview the design against seeded data. Never pass this from
-// the real weekly-images-notify cron.
+// you can preview against seeded data. Never pass this from the real
+// weekly-images-notify cron.
 //
 // Usage: https://rippingbombs.com/api/og/week-division?week=32&year=2026&division=Men
 // division must be one of DIVISIONS below (URL-encode spaces, e.g.
@@ -13,18 +14,13 @@
 
 import { ImageResponse } from '@vercel/og';
 import { createClient } from '@supabase/supabase-js';
+import { BG, BG2, BDR, TXT, MUT, DIM, ORG, nowWeek, prevWeek, weekLabel } from '../../../lib/constants';
 
 export const config = { runtime: 'edge' };
 
-const ORG = '#FF0090';
-const GOLD = '#FFB627';
-const BG = '#0A0A0F';
-const BG2 = '#15151D';
-const TXT = '#F5F5F7';
-const DIM = '#6E6E7A';
-const BDR = '#232330';
-
-const DISPLAY_FONT = 'Bebas Neue';
+const DISP_FAMILY = 'Bebas Neue';
+const SANS_FAMILY = 'Inter';
+const UNIT = 'yds';
 
 const DIVISIONS = [
   'Men',
@@ -35,68 +31,32 @@ const DIVISIONS = [
   'Seniors',
 ];
 
+const LATIN_SAMPLE =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿ0123456789 .,'-–·";
+
 // --- Font loading ---------------------------------------------------------
 
-async function loadDisplayFont() {
-  const cssUrl = `https://fonts.googleapis.com/css2?family=Bebas+Neue&text=${encodeURIComponent(
-    'RIPPINGBOMS WEEKMNHIGDCPOAY0123456789· m'
-  )}`;
+async function loadFont(family, weight, text) {
+  const cssUrl = `https://fonts.googleapis.com/css2?family=${family}:wght@${weight}&text=${encodeURIComponent(text)}`;
   const css = await (await fetch(cssUrl)).text();
   const match = css.match(/src: url\(([^)]+)\) format\('(opentype|truetype)'\)/);
-  if (!match) throw new Error('Could not resolve Bebas Neue font URL');
-  const fontRes = await fetch(match[1]);
-  return fontRes.arrayBuffer();
+  if (!match) throw new Error(`Could not resolve font: ${family} ${weight}`);
+  const res = await fetch(match[1]);
+  return res.arrayBuffer();
 }
 
-// --- Period math (mirrors period-report.js / week-cover.js) -----------
+// --- Week bounds (mirrors lib/constants' isoWeek/weekLabel math) --------
 
-function getWeek1Start(year) {
-  const jan1 = new Date(Date.UTC(year, 0, 1));
-  const dayOfWeek = jan1.getUTCDay();
-  const daysToMonday = dayOfWeek === 1 ? 0 : (8 - dayOfWeek) % 7;
-  const week1Start = new Date(jan1);
-  week1Start.setUTCDate(week1Start.getUTCDate() + daysToMonday);
-  return week1Start;
+function computeWeekBounds({ y, w }) {
+  const j4 = new Date(y, 0, 4);
+  const mon = new Date(j4);
+  mon.setDate(j4.getDate() - ((j4.getDay() + 6) % 7) + (w - 1) * 7);
+  const end = new Date(mon);
+  end.setDate(mon.getDate() + 7);
+  return { weekStart: mon, weekEnd: end };
 }
 
-function getMondayOnOrBefore(date) {
-  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-  const dow = d.getUTCDay();
-  const diff = dow === 0 ? 6 : dow - 1;
-  d.setUTCDate(d.getUTCDate() - diff);
-  return d;
-}
-
-function computeWeekNumber(date) {
-  let year = date.getUTCFullYear();
-  let week1Start = getWeek1Start(year);
-  if (date < week1Start) {
-    year -= 1;
-    week1Start = getWeek1Start(year);
-  }
-  const daysSinceAnchor = Math.floor((date - week1Start) / 86400000);
-  return { year, weekNumber: Math.floor(daysSinceAnchor / 7) + 1 };
-}
-
-function getLastClosedWeek(now = new Date()) {
-  const thisMonday = getMondayOnOrBefore(now);
-  const weekStart = new Date(thisMonday);
-  weekStart.setUTCDate(weekStart.getUTCDate() - 7);
-  const weekEnd = new Date(thisMonday);
-  const { year, weekNumber } = computeWeekNumber(weekStart);
-  return { weekStart, weekEnd, weekNumber, year };
-}
-
-function getWeekByNumber(year, weekNumber) {
-  const week1Start = getWeek1Start(year);
-  const weekStart = new Date(week1Start);
-  weekStart.setUTCDate(weekStart.getUTCDate() + (weekNumber - 1) * 7);
-  const weekEnd = new Date(weekStart);
-  weekEnd.setUTCDate(weekEnd.getUTCDate() + 7);
-  return { weekStart, weekEnd, weekNumber, year };
-}
-
-// --- Division logic (mirrors period-report.js) -------------------------
+// --- Division logic (mirrors period-report.js) ---------------------------
 
 function computeDivision({ gender, hcp, age }) {
   const numAge = Number(age);
@@ -116,6 +76,8 @@ function computeDivision({ gender, hcp, age }) {
   return isLowHandicap ? 'Women' : 'Women High Handicap';
 }
 
+const MEDAL = ['🥇', '🥈', '🥉'];
+
 // --- Handler -----------------------------------------------------------
 
 export default async function handler(req) {
@@ -132,9 +94,8 @@ export default async function handler(req) {
     );
   }
 
-  const target = qWeek && qYear
-    ? getWeekByNumber(Number(qYear), Number(qWeek))
-    : getLastClosedWeek();
+  const target = qWeek && qYear ? { y: Number(qYear), w: Number(qWeek) } : prevWeek(nowWeek());
+  const { weekStart, weekEnd } = computeWeekBounds(target);
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -144,8 +105,8 @@ export default async function handler(req) {
   let query = supabase
     .from('entries')
     .select('player, dist, date, gender, hcp, age, facility, orgId, clubs(country)')
-    .gte('date', target.weekStart.toISOString().slice(0, 10))
-    .lt('date', target.weekEnd.toISOString().slice(0, 10))
+    .gte('date', weekStart.toISOString().slice(0, 10))
+    .lt('date', weekEnd.toISOString().slice(0, 10))
     .order('dist', { ascending: false });
 
   if (!includeDemo) {
@@ -153,10 +114,7 @@ export default async function handler(req) {
   }
 
   const { data, error } = await query;
-
-  if (error) {
-    return new Response(`Error: ${error.message}`, { status: 500 });
-  }
+  if (error) return new Response(`Error: ${error.message}`, { status: 500 });
 
   const entries = data
     .map((e) => ({
@@ -169,15 +127,11 @@ export default async function handler(req) {
     .sort((a, b) => b.dist - a.dist)
     .slice(0, 5);
 
-  const dateLabel = `${target.weekStart.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-  })} – ${new Date(target.weekEnd.getTime() - 86400000).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-  })}`;
-
-  const displayFontData = await loadDisplayFont();
+  const [displayFont, sansRegular, sansBold] = await Promise.all([
+    loadFont('Bebas+Neue', 400, 'RIPPING BOMBS WEEKLY CHAMPIONSHIP MEN WOMEN HIGH HANDICAP YOUTH SENIORS 0123456789'),
+    loadFont('Inter', 400, LATIN_SAMPLE),
+    loadFont('Inter', 700, LATIN_SAMPLE),
+  ]);
 
   return new ImageResponse(
     (
@@ -188,124 +142,71 @@ export default async function handler(req) {
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: BG,
-          backgroundImage: `linear-gradient(135deg, ${BG2} 0%, ${BG} 45%)`,
-          padding: '60px',
-          fontFamily: 'sans-serif',
-          position: 'relative',
+          padding: '56px',
+          fontFamily: SANS_FAMILY,
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            position: 'absolute',
-            top: -110,
-            right: -110,
-            width: 300,
-            height: 300,
-            borderRadius: 999,
-            backgroundImage: `linear-gradient(135deg, ${ORG}22 0%, ${ORG}00 70%)`,
-          }}
-        />
-
-        <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 36 }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{ display: 'flex', width: 8, height: 8, borderRadius: 999, backgroundColor: GOLD, marginRight: 10 }} />
-            <div style={{ display: 'flex', color: DIM, fontSize: 22, fontWeight: 600, letterSpacing: 4 }}>
-              RIPPING BOMBS · WEEK {target.weekNumber} · {dateLabel.toUpperCase()}
-            </div>
-          </div>
-          <div style={{ display: 'flex', color: ORG, fontSize: 88, fontFamily: DISPLAY_FONT, marginTop: 8, letterSpacing: 1 }}>
-            {division.toUpperCase()}
-          </div>
+        <div style={{ display: 'flex', color: ORG, fontSize: 14, fontWeight: 700, letterSpacing: 2 }}>
+          🏆 WEEKLY CHAMPIONSHIP · {weekLabel(target).toUpperCase()}
+        </div>
+        <div style={{ display: 'flex', color: ORG, fontSize: 76, fontFamily: DISP_FAMILY, marginTop: 8 }}>
+          {division.toUpperCase()}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ display: 'flex', height: 1, backgroundColor: BDR, margin: '24px 0 4px' }} />
+
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
           {entries.length === 0 && (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                backgroundColor: BG2,
-                border: `1px dashed ${BDR}`,
-                borderRadius: 24,
-                padding: '40px 36px',
-              }}
-            >
-              <div style={{ display: 'flex', color: DIM, fontSize: 30, fontWeight: 600 }}>
-                No drives logged this week
-              </div>
-              <div style={{ display: 'flex', color: DIM, fontSize: 22, marginTop: 8, opacity: 0.8 }}>
-                Check back once entries come in
-              </div>
+            <div style={{ display: 'flex', padding: '48px 0' }}>
+              <div style={{ display: 'flex', color: MUT, fontSize: 26 }}>No drives recorded this week</div>
             </div>
           )}
-          {entries.map((e, i) => {
-            const isLeader = i === 0;
-            const accent = isLeader ? GOLD : ORG;
-            return (
-              <div
-                key={i}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  backgroundColor: BG2,
-                  border: `1px solid ${isLeader ? GOLD : BDR}`,
-                  borderRadius: 20,
-                  padding: '22px 32px',
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 56,
-                    height: 56,
-                    borderRadius: 999,
-                    backgroundColor: isLeader ? GOLD : 'transparent',
-                    border: isLeader ? 'none' : `2px solid ${BDR}`,
-                    marginRight: 28,
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      color: isLeader ? BG : DIM,
-                      fontSize: 30,
-                      fontFamily: DISPLAY_FONT,
-                    }}
-                  >
-                    {i + 1}
-                  </div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                  <div style={{ display: 'flex', color: TXT, fontSize: 34, fontWeight: 600 }}>
-                    {e.player}
-                  </div>
-                  {e.facility && (
-                    <div style={{ display: 'flex', color: DIM, fontSize: 20, marginTop: 4 }}>
-                      {e.facility}
-                    </div>
+          {entries.map((e, i) => (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '20px 0',
+                borderBottom: i < entries.length - 1 ? `1px solid ${BDR}` : 'none',
+              }}
+            >
+              <div style={{ display: 'flex', width: 64, fontSize: i < 3 ? 34 : 24, color: DIM, fontWeight: 700 }}>
+                {MEDAL[i] || `#${i + 1}`}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', color: TXT, fontSize: 30, fontWeight: 700 }}>{e.player}</div>
+                  {e.country && (
+                    <img
+                      src={`https://flagcdn.com/40x30/${e.country.toLowerCase()}.png`}
+                      width={20}
+                      height={15}
+                      style={{ marginLeft: 8 }}
+                    />
                   )}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'baseline' }}>
-                  <div style={{ display: 'flex', color: accent, fontSize: 52, fontFamily: DISPLAY_FONT }}>
-                    {e.dist}
-                  </div>
-                  <div style={{ display: 'flex', color: accent, fontSize: 26, fontFamily: DISPLAY_FONT, marginLeft: 4 }}>
-                    m
-                  </div>
-                </div>
+                {e.facility && (
+                  <div style={{ display: 'flex', color: MUT, fontSize: 18, marginTop: 4 }}>{e.facility}</div>
+                )}
               </div>
-            );
-          })}
+              <div style={{ display: 'flex', alignItems: 'baseline' }}>
+                <div style={{ display: 'flex', color: ORG, fontSize: 46, fontFamily: DISP_FAMILY }}>{e.dist}</div>
+                <div style={{ display: 'flex', color: DIM, fontSize: 18, marginLeft: 6 }}>{UNIT}</div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     ),
     {
       width: 1080,
       height: 1080,
-      fonts: [{ name: DISPLAY_FONT, data: displayFontData, weight: 400, style: 'normal' }],
+      fonts: [
+        { name: DISP_FAMILY, data: displayFont, weight: 400, style: 'normal' },
+        { name: SANS_FAMILY, data: sansRegular, weight: 400, style: 'normal' },
+        { name: SANS_FAMILY, data: sansBold, weight: 700, style: 'normal' },
+      ],
     }
   );
 }
