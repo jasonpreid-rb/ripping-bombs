@@ -8,6 +8,10 @@
     {
       "path": "/api/period-report",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/weekly-images-notify",
+      "schedule": "15 6 * * 1"
     }
   ]
 }
