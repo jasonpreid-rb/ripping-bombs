@@ -142,23 +142,23 @@ export default async function handler(req) {
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: BG,
-          padding: '56px',
+          padding: '56px 60px',
           fontFamily: SANS_FAMILY,
         }}
       >
         <div style={{ display: 'flex', color: ORG, fontSize: 14, fontWeight: 700, letterSpacing: 2 }}>
           🏆 WEEKLY CHAMPIONSHIP · {weekLabel(target).toUpperCase()}
         </div>
-        <div style={{ display: 'flex', color: ORG, fontSize: 76, fontFamily: DISP_FAMILY, marginTop: 8 }}>
+        <div style={{ display: 'flex', color: ORG, fontSize: 84, fontFamily: DISP_FAMILY, marginTop: 6 }}>
           {division.toUpperCase()}
         </div>
 
-        <div style={{ display: 'flex', height: 1, backgroundColor: BDR, margin: '24px 0 4px' }} />
+        <div style={{ display: 'flex', height: 1, backgroundColor: BDR, margin: '20px 0 0' }} />
 
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: entries.length ? 'space-evenly' : 'center' }}>
           {entries.length === 0 && (
-            <div style={{ display: 'flex', padding: '48px 0' }}>
-              <div style={{ display: 'flex', color: MUT, fontSize: 26 }}>No drives recorded this week</div>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', color: MUT, fontSize: 30 }}>No drives recorded this week</div>
             </div>
           )}
           {entries.map((e, i) => (
@@ -167,35 +167,42 @@ export default async function handler(req) {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                padding: '20px 0',
+                paddingBottom: i < entries.length - 1 ? 20 : 0,
                 borderBottom: i < entries.length - 1 ? `1px solid ${BDR}` : 'none',
               }}
             >
-              <div style={{ display: 'flex', width: 64, fontSize: i < 3 ? 34 : 24, color: DIM, fontWeight: 700 }}>
+              <div style={{ display: 'flex', width: 76, fontSize: i < 3 ? 42 : 30, color: DIM, fontWeight: 700 }}>
                 {MEDAL[i] || `#${i + 1}`}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', color: TXT, fontSize: 30, fontWeight: 700 }}>{e.player}</div>
+                  <div style={{ display: 'flex', color: TXT, fontSize: 38, fontWeight: 700 }}>{e.player}</div>
                   {e.country && (
                     <img
-                      src={`https://flagcdn.com/40x30/${e.country.toLowerCase()}.png`}
-                      width={20}
-                      height={15}
-                      style={{ marginLeft: 8 }}
+                      src={`https://flagcdn.com/w80/${e.country.toLowerCase()}.png`}
+                      width={36}
+                      height={27}
+                      style={{ marginLeft: 12, objectFit: 'cover' }}
                     />
                   )}
                 </div>
                 {e.facility && (
-                  <div style={{ display: 'flex', color: MUT, fontSize: 18, marginTop: 4 }}>{e.facility}</div>
+                  <div style={{ display: 'flex', color: MUT, fontSize: 20, marginTop: 4 }}>{e.facility}</div>
                 )}
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline' }}>
-                <div style={{ display: 'flex', color: ORG, fontSize: 46, fontFamily: DISP_FAMILY }}>{e.dist}</div>
-                <div style={{ display: 'flex', color: DIM, fontSize: 18, marginLeft: 6 }}>{UNIT}</div>
+                <div style={{ display: 'flex', color: ORG, fontSize: 60, fontFamily: DISP_FAMILY }}>{e.dist}</div>
+                <div style={{ display: 'flex', color: DIM, fontSize: 20, marginLeft: 8 }}>{UNIT}</div>
               </div>
             </div>
           ))}
+        </div>
+
+        <div style={{ display: 'flex', height: 1, backgroundColor: BDR, margin: '0 0 20px' }} />
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', color: DIM, fontSize: 16, fontWeight: 700, letterSpacing: 2 }}>
+            RIPPINGBOMBS.COM
+          </div>
         </div>
       </div>
     ),
