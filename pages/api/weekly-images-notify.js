@@ -17,6 +17,10 @@
 //                       Useful for an on-demand "results as they stand"
 //                       send instead of waiting for Monday.
 //   ?week=&year=     — target an explicit week/year directly.
+//   ?includeDemo=1   — TEST ONLY. Includes demo/sample entries so images
+//                       render even with sparse real data. The email is
+//                       flagged with a warning when this is on — never
+//                       enable this for the real Monday cron send.
 //   ?to=             — override the recipient (testing).
 //
 // vercel.json cron entry (Monday 06:15 UTC — offset from period-report's
@@ -41,9 +45,9 @@ const SITE_URL = 'https://rippingbombs.com';
 
 // --- Email ---------------------------------------------------------------
 
-function buildImageUrls(target) {
+function buildImageUrls(target, includeDemo) {
   const base = `${SITE_URL}/api/og`;
-  const qs = `week=${target.w}&year=${target.y}`;
+  const qs = `week=${target.w}&year=${target.y}${includeDemo ? '&includeDemo=1' : ''}`;
   const cover = `${base}/week-cover?${qs}`;
   const divisions = DIVISIONS.map((d) => ({
     name: d,
@@ -52,7 +56,7 @@ function buildImageUrls(target) {
   return { cover, divisions };
 }
 
-function renderEmail(target, isCurrent, urls) {
+function renderEmail(target, isCurrent, includeDemo, urls) {
   const label = weekLabel(target);
 
   const cards = urls.divisions
@@ -74,6 +78,9 @@ function renderEmail(target, isCurrent, urls) {
           ? 'These reflect the week in progress — results as they currently stand, not a finalized week.'
           : 'Right-click / long-press each image to save, or open full size.'}
       </p>
+      ${includeDemo
+        ? '<p style="color:#c92a2a;font-weight:600;">⚠️ Includes demo/sample data — not real results. Do not post these publicly.</p>'
+        : ''}
 
       <p style="font-size:13px;color:#888;margin:24px 0 6px;">Cover</p>
       <img src="${urls.cover}" width="360" style="display:block;border-radius:12px;" />
@@ -98,6 +105,7 @@ export default async function handler(req, res) {
     const qWeek = req.query.week;
     const qYear = req.query.year;
     const isCurrent = req.query.current === '1';
+    const includeDemo = req.query.includeDemo === '1';
 
     let target;
     if (qWeek && qYear) {
@@ -108,7 +116,7 @@ export default async function handler(req, res) {
       target = prevWeek(nowWeek());
     }
 
-    const urls = buildImageUrls(target);
+    const urls = buildImageUrls(target, includeDemo);
 
     const to = req.query.to || process.env.NOTIFY_EMAIL;
     if (!to) {
@@ -119,7 +127,7 @@ export default async function handler(req, res) {
       from: 'team@rippingbombs.com',
       to,
       subject: `Ripping Bombs — ${weekLabel(target)} social images ready`,
-      html: renderEmail(target, isCurrent, urls),
+      html: renderEmail(target, isCurrent, includeDemo, urls),
     });
 
     return res.status(200).json({
