@@ -289,6 +289,45 @@ function VsAverageBar({ myBest, globalAvg, label }) {
   );
 }
 
+// Standalone hero strip for global rank — sits between header and stat cards
+function RankStrip({ rank, totalClubs, percentile }) {
+  if (!rank) return null;
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, rgba(255,0,144,0.14), rgba(255,0,144,0.03))',
+      border: '1px solid rgba(255,0,144,0.35)',
+      borderRadius: 12,
+      padding: '1.25rem 1.5rem',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      flexWrap: 'wrap',
+      gap: '0.75rem',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem' }}>
+        <span style={{ fontSize: '2.6rem', fontWeight: 900, color: ORG, letterSpacing: '-0.03em', lineHeight: 1 }}>
+          #{rank}
+        </span>
+        <span style={{ fontSize: '0.95rem', fontWeight: 700, color: TXT, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Global Rank
+        </span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+        {percentile != null && (
+          <span style={{ background: 'rgba(255,0,144,0.16)', color: ORG, border: '1px solid rgba(255,0,144,0.3)', borderRadius: 20, padding: '4px 12px', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.03em' }}>
+            Top {percentile}% globally
+          </span>
+        )}
+        {totalClubs && (
+          <span style={{ fontSize: '0.78rem', color: MUT }}>
+            of {totalClubs.toLocaleString()} players worldwide
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Per-player breakdown table (for club accounts)
 function PlayerBreakdown({ entries }) {
   const players = {};
@@ -658,12 +697,14 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Global rank — standalone hero strip */}
+        <RankStrip rank={rank} totalClubs={totalClubs} percentile={percentile} />
+
         {/* Stat cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.85rem' }}>
           <StatCard label="Longest Drive" value={fmt(longest)} accent />
           <StatCard label="Average Drive" value={fmt(average)} />
           <StatCard label="Total Drives" value={totalDrives || '—'} />
-          <StatCard label="Global Rank" value={rank ? `#${rank}` : '—'} sub={rankSub} />
           {globalAvgBest && <StatCard label="Global Avg Best" value={fmt(globalAvgBest)} />}
         </div>
 
