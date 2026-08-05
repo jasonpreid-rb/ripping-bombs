@@ -18,7 +18,7 @@ export function SeoPage({ title, description, children }) {
         <meta property="og:title" content={title}/>
         <meta property="og:description" content={description}/>
       </Head>
-      <div style={{ padding:'0 18px 80px', maxWidth:1000, margin:'0 auto' }}>
+      <div style={{ padding:'48px 18px 80px', maxWidth:1000, margin:'0 auto' }}>
         {children}
         <RelatedPages currentSlug={currentSlug} />
       </div>
