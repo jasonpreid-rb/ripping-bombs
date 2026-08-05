@@ -269,6 +269,14 @@ export default function PercentileCalculator() {
         Driving distance is influenced by swing speed, launch angle, ball speed, spin rate, equipment, physical fitness, and technique. Club head speed is the single biggest factor — faster swings produce longer drives. Optimising your launch conditions (higher launch, lower spin for most amateurs) can add significant distance without changing your swing. Equipment upgrades, fitness improvements, and lessons focused on impact efficiency are the most reliable ways to add yards.
       </SeoP>
 
+      <SeoH2>Want a Live Global Rank Instead of an Estimate?</SeoH2>
+      <SeoP>
+        This calculator uses benchmark averages to give you a quick, general estimate. If you'd rather see how you
+        compare against real, verified drives submitted by golfers worldwide, check your{' '}
+        <Link href="/where-do-i-rank-globally" style={linkStyle}>live global rank</Link> - it's calculated from
+        actual Ripping Bombs leaderboard data, not statistical benchmarks.
+      </SeoP>
+
       <SeoH2>What Is the Longest Drive Ever Hit?</SeoH2>
       <SeoP>
         The world record for the longest drive in competition is 515 yards, set by Mike Austin in 1974 during a US Senior National Open qualifier. In professional long drive competition, elite competitors regularly hit 400+ yards. Among amateur golfers, drives over 300 yards put you in a very small percentile of the golfing population — which is exactly what Ripping Bombs is built to celebrate.
@@ -276,6 +284,7 @@ export default function PercentileCalculator() {
     
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
+        <Link href="/where-do-i-rank-globally" style={linkStyle}>Where Do I Rank Globally?</Link>{' | '}
         <Link href="/average-driver-distance-by-handicap" style={linkStyle}>Average Driver Distance By Handicap</Link>{' | '}
         <Link href="/average-golf-drive-distance" style={linkStyle}>Average Golf Drive Distance</Link>{' | '}
         <Link href="/golf-handicap-driving-distance" style={linkStyle}>Golf Handicap And Driving Distance</Link>{' | '}
