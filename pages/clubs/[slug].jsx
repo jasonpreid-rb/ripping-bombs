@@ -242,6 +242,12 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
   const metaDesc = `Longest drive leaderboard for ${org.courseName}, ${org.location}. ${clubEntries.length} drives recorded on Ripping Bombs.`;
   const simOrgMap = Object.fromEntries((simOrgs || []).map(o => [o.id, o]));
 
+  // Pages with no recorded drives yet are thin/near-duplicate content in
+  // Google's eyes — noindex them until the venue has at least one real
+  // submission, then they naturally become indexable and re-enter the
+  // sitemap (see scripts/generate-sitemap.cjs).
+  const isEmpty = clubEntries.length === 0;
+
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'SportsOrganization',
@@ -259,6 +265,7 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
       <Head>
         <title>{org.courseName} Longest Drive Leaderboard | Ripping Bombs</title>
         <meta name="description" content={metaDesc} />
+        {isEmpty && <meta name="robots" content="noindex, follow" />}
         <link rel="canonical" href={canonicalUrl} />
         <meta property="og:title" content={`${org.courseName} | Ripping Bombs`} />
         <meta property="og:description" content={metaDesc} />

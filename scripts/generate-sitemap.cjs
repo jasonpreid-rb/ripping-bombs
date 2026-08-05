@@ -80,25 +80,40 @@ async function getDynamicData() {
 
   // Most recent entry date per orgId — used as a real lastmod instead of
   // no timestamp at all.
+  // orgId = the venue's own submissions, venueId = drives tagged to this
+  // venue by simulator players elsewhere. pages/clubs/[slug].jsx counts
+  // both when deciding whether a venue page has any content — mirror
+  // that here so a venue isn't excluded from the sitemap while its page
+  // actually shows drives (or vice versa).
   const { data: entryRows, error: entryErr } = await supabase
     .from('entries')
-    .select('orgId, date');
+    .select('orgId, venueId, date');
 
   if (entryErr) {
     console.warn('[sitemap] Could not fetch entries for lastmod:', entryErr.message);
   }
 
   const lastEntryByOrg = {};
+  const entryCountByOrg = {};
   let siteWideLatest = null;
   (entryRows || []).forEach((e) => {
-    if (!e.date) return;
-    if (!lastEntryByOrg[e.orgId] || e.date > lastEntryByOrg[e.orgId]) {
-      lastEntryByOrg[e.orgId] = e.date;
-    }
-    if (!siteWideLatest || e.date > siteWideLatest) siteWideLatest = e.date;
+    [e.orgId, e.venueId].filter(Boolean).forEach((id) => {
+      entryCountByOrg[id] = (entryCountByOrg[id] || 0) + 1;
+      if (e.date && (!lastEntryByOrg[id] || e.date > lastEntryByOrg[id])) {
+        lastEntryByOrg[id] = e.date;
+      }
+    });
+    if (e.date && (!siteWideLatest || e.date > siteWideLatest)) siteWideLatest = e.date;
   });
 
+  // Venues with zero recorded drives are thin/near-duplicate pages —
+  // Google was leaving 50+ URLs as "Discovered - currently not indexed"
+  // with these mixed in. Excluding empty venues from the sitemap (and
+  // noindexing the page itself, see pages/clubs/[slug].jsx) keeps the
+  // sitemap smaller and raises trust in the URLs that remain. A venue
+  // reappears here automatically the moment it gets its first drive.
   const clubUrls = (clubRows || [])
+    .filter((c) => (entryCountByOrg[c.id] || 0) > 0)
     .map((c) => {
       const slug = c.customSlug || (c.courseName ? toSlug(c.courseName) : null);
       if (!slug) return null;
@@ -126,6 +141,11 @@ async function getDynamicData() {
       return urlEntry(`/profile/${slug}`, 'weekly', 0.7, lastEntryByOrg[p.id] || null);
     })
     .filter(Boolean);
+
+  const excludedCount = (clubRows || []).length - clubUrls.length;
+  if (excludedCount > 0) {
+    console.log(`[sitemap] Excluded ${excludedCount} venue page(s) with zero recorded drives.`);
+  }
 
   return { clubUrls, profileUrls, siteWideLatest };
 }
