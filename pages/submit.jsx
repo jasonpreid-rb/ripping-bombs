@@ -35,13 +35,25 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
     }
   }, [router.isReady, router.query.venue, approvedOrgs]);
 
-  if (!loggedOrg) return (
-    <div style={{ padding:'80px 18px', textAlign:'center' }}>
-      <div style={{ fontFamily:DISP, fontSize:28, color:TXT, marginBottom:12 }}>Not Logged In</div>
-      <div style={{ fontFamily:SANS, fontSize:14, color:MUT, marginBottom:24 }}>Please log in to submit a drive.</div>
-      <Btn onClick={()=>router.push('/login')}>Log In →</Btn>
-    </div>
-  );
+  if (!loggedOrg) {
+    const venueParam = router.query.venue;
+    const currentPath = venueParam ? `/submit?venue=${venueParam}` : '/submit';
+    const redirectQS = `?redirect=${encodeURIComponent(currentPath)}`;
+    return (
+      <div style={{ padding:'80px 18px', textAlign:'center' }}>
+        <div style={{ fontFamily:DISP, fontSize:28, color:TXT, marginBottom:12 }}>Not Logged In</div>
+        <div style={{ fontFamily:SANS, fontSize:14, color:MUT, marginBottom:24 }}>
+          {venueParam
+            ? "Log in or create a free account to submit your drive — you'll come right back here."
+            : 'Please log in to submit a drive.'}
+        </div>
+        <div style={{ display:'flex', gap:10, justifyContent:'center', flexWrap:'wrap' }}>
+          <Btn onClick={()=>router.push(`/login${redirectQS}`)}>Log In →</Btn>
+          <Btn variant="subtle" onClick={()=>router.push(`/register${redirectQS}`)}>Create Free Account →</Btn>
+        </div>
+      </div>
+    );
+  }
 
   const isSimulator = loggedOrg.accountType === 'simulator';
 

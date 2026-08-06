@@ -6,6 +6,10 @@ import { Card, Field, Btn } from '../components/UI';
 
 export default function LoginPage({ lgn, setLgn, doLogin, doForgotPassword }) {
   const router = useRouter();
+  // Preserves ?redirect= through login — e.g. someone scanning a venue's QR
+  // poster who isn't logged in yet gets sent back to /submit?venue=X instead
+  // of the generic dashboard after they log in.
+  const redirectTo = typeof router.query.redirect === 'string' ? router.query.redirect : null;
   const [forgotMode, setForgotMode] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotSent, setForgotSent] = useState(false);
@@ -123,11 +127,11 @@ export default function LoginPage({ lgn, setLgn, doLogin, doForgotPassword }) {
                 </span>
               </div>
 
-              <Btn full onClick={doLogin}>Log In →</Btn>
+              <Btn full onClick={() => doLogin(redirectTo)}>Log In →</Btn>
 
               <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 12, textAlign: 'center' }}>
                 Don't have an account?{' '}
-                <span onClick={() => router.push('/register')} style={{ color: ORG, cursor: 'pointer', fontWeight: 600 }}>
+                <span onClick={() => router.push(redirectTo ? `/register?redirect=${encodeURIComponent(redirectTo)}` : '/register')} style={{ color: ORG, cursor: 'pointer', fontWeight: 600 }}>
                   Register here
                 </span>
               </div>

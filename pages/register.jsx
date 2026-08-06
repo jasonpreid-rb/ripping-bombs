@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { COUNTRIES, ORG, MUT, TXT, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { Card, Field, Btn } from '../components/UI';
 import { toB64 } from '../lib/constants';
@@ -9,6 +10,8 @@ const SIMULATORS = [
 ];
 
 export default function RegisterPage({ reg, setReg, doRegister }) {
+  const router = useRouter();
+  const redirectTo = typeof router.query.redirect === 'string' ? router.query.redirect : null;
   const isSimulator = reg.type !== 'club';
 
   const CountrySelect = () => (
@@ -40,7 +43,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
       <div style={{ maxWidth: 540, margin: '0 auto', padding: '28px 18px 80px' }}>
         <div style={{ fontFamily: DISP, fontSize: 30, color: TXT, letterSpacing: 1, marginBottom: 6 }}>Register</div>
         <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: 18 }}>
-          Free to join. Select your account type below.
+          {redirectTo ? "Free to join. You'll be taken straight back to finish submitting your drive." : 'Free to join. Select your account type below.'}
         </div>
 
         {/* Benefit strip — gives a cold visitor a reason to keep going, reacts to account type */}
@@ -221,7 +224,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
 
           {/* Profile consent moved to post-submission flow — see submit.jsx note */}
 
-          <Btn full onClick={doRegister}>
+          <Btn full onClick={() => doRegister(redirectTo)}>
             {isSimulator ? 'Create Account →' : 'Submit Registration →'}
           </Btn>
 

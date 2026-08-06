@@ -65,7 +65,7 @@ export default function App({ Component, pageProps }) {
   const orgFor = id => orgs.find(o => o.id === id);
   const pendingCount = orgs.filter(o => o.status === 'pending').length;
 
-  async function doRegister() {
+  async function doRegister(redirectTo) {
     const isSimulator = reg.type === 'simulator';
 
     // Validation
@@ -100,14 +100,14 @@ export default function App({ Component, pageProps }) {
     if (isSimulator) {
       setLoggedOrg(newOrg);
       toast('Account created! You can now submit simulator drives.');
-      router.push('/submit?welcome=1');
+      router.push(redirectTo || '/submit?welcome=1');
     } else {
       toast('Registration submitted — awaiting admin approval');
       router.push('/');
     }
   }
 
-  async function doLogin() {
+  async function doLogin(redirectTo) {
     // Search loaded orgs state first (already fetched from Supabase)
     let org = orgs.find(o => o.email === lgn.email && o.pw === lgn.pw);
 
@@ -133,7 +133,7 @@ export default function App({ Component, pageProps }) {
     localStorage.setItem('rb_club', JSON.stringify(org));
     setLgn({ email:'', pw:'' });
     toast(`Welcome, ${org.fullName}!`);
-    router.push('/dashboard');
+    router.push(redirectTo || '/dashboard');
   }
 
   async function doSubmit() {
