@@ -68,7 +68,7 @@ const DRIVERS = [
 function SpinForgivenessChart() {
   const chartW = 640;
   const chartH = 380;
-  const pad = 40;
+  const pad = 46;
   const plotW = chartW - pad * 2;
   const plotH = chartH - pad * 2;
   const scale = 5; // spin/forgiveness values run 1-5
@@ -86,7 +86,7 @@ function SpinForgivenessChart() {
         <text x={pad} y={chartH - 14} fill={DIM} fontFamily={SANS} fontSize="11">← Lower Spin</text>
         <text x={chartW - pad} y={chartH - 14} fill={DIM} fontFamily={SANS} fontSize="11" textAnchor="end">Higher Spin →</text>
         <text x={14} y={chartH - pad} fill={DIM} fontFamily={SANS} fontSize="11" transform={`rotate(-90 14 ${chartH - pad})`}>Less Forgiving</text>
-        <text x={14} y={pad + 10} fill={DIM} fontFamily={SANS} fontSize="11" transform={`rotate(-90 14 ${pad + 10})`}>More Forgiving →</text>
+        <text x={14} y={pad + 10} fill={DIM} fontFamily={SANS} fontSize="11" textAnchor="end" transform={`rotate(-90 14 ${pad + 10})`}>More Forgiving →</text>
 
         {DRIVERS.map((d, i) => {
           const x = pad + (d.spin / scale) * plotW;
