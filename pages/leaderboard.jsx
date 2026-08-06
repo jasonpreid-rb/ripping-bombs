@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 
 function nameToSlug(name) {
@@ -115,8 +116,29 @@ export default function LeaderboardPage(props) {
   // Reset to page 1 whenever any filter or view changes
   useEffect(() => { setPage(1); }, [fCountry, fHcp, fAge, fClub, fPlayer, fGender, fSimulator, sortBy, allTime, week]);
 
-  const hcpIn=(hcp,b)=>{if(!b)return true;if(b==='scratch')return hcp<=0;if(b==='low')return hcp>0&&hcp<=5;if(b==='mid')return hcp>5&&hcp<=14;if(b==='high')return hcp>14&&hcp<=28;if(b==='beginner')return hcp>28;return true;};
-  const ageIn=(age,b)=>{if(!b)return true;if(b==='u25')return age<25;if(b==='25-40')return age>=25&&age<40;if(b==='40-55')return age>=40&&age<55;if(b==='55+')return age>=55;return true;};
+  // 'u20'/'o20' and 'u16' aren't exposed in the filter dropdowns — they exist so
+  // homepage category cards (e.g. "Men High Handicap", "Youth") can deep-link
+  // into an exact pre-filtered view via the URL query, below.
+  const hcpIn=(hcp,b)=>{if(!b)return true;if(b==='scratch')return hcp<=0;if(b==='low')return hcp>0&&hcp<=5;if(b==='mid')return hcp>5&&hcp<=14;if(b==='high')return hcp>14&&hcp<=28;if(b==='beginner')return hcp>28;if(b==='u20')return hcp<20;if(b==='o20')return hcp>=20;return true;};
+  const ageIn=(age,b)=>{if(!b)return true;if(b==='u25')return age<25;if(b==='25-40')return age>=25&&age<40;if(b==='40-55')return age>=40&&age<55;if(b==='55+')return age>=55;if(b==='u16')return age<16;return true;};
+
+  // Apply filters from the URL query on load (e.g. arriving from a homepage
+  // category card: /leaderboard?gender=male&hcp=o20). Only runs once the
+  // router has hydrated, and only sets a filter if a value was actually passed.
+  const router = useRouter();
+  useEffect(() => {
+    if (!router.isReady) return;
+    const { gender, hcp, age, country, player, club, simulator, allTime: allTimeQ } = router.query;
+    if (gender && setFGender) setFGender(String(gender));
+    if (hcp && setFHcp) setFHcp(String(hcp));
+    if (age && setFAge) setFAge(String(age));
+    if (country && setFCountry) setFCountry(String(country));
+    if (player && setFPlayer) setFPlayer(String(player));
+    if (club && setFClub) setFClub(String(club));
+    if (simulator && setFSimulator) setFSimulator(String(simulator));
+    if (allTimeQ && setAllTime) setAllTime(allTimeQ === '1' || allTimeQ === 'true');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady]);
 
   // Restrict to approved orgs + the active view (weekly/all-time) before deduping,
   // so a player's weekly-best and all-time-best can differ.

@@ -210,12 +210,31 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
 
   const MEDALS = ['🥇','🥈','🥉'];
 
+  // Maps a homepage category to the exact filter query the /leaderboard page
+  // understands (see the matching useEffect there that reads router.query).
+  const categoryHref = (key, allTime) => {
+    const params = new URLSearchParams();
+    if (allTime) params.set('allTime', '1');
+    if (key === 'mens')       { params.set('gender','male');   params.set('hcp','u20'); }
+    else if (key === 'mens_hcp')   { params.set('gender','male');   params.set('hcp','o20'); }
+    else if (key === 'womens')     { params.set('gender','female'); params.set('hcp','u20'); }
+    else if (key === 'womens_hcp') { params.set('gender','female'); params.set('hcp','o20'); }
+    else if (key === 'youth')      { params.set('age','u16'); }
+    else if (key === 'senior')     { params.set('age','55+'); }
+    const qs = params.toString();
+    return qs ? `/leaderboard?${qs}` : '/leaderboard';
+  };
+
   // Weekly card — single best entry
   const WeeklyCard = ({ cat }) => {
     const { top3 } = cat;
     return (
-      <div style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0}}>
-        <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.icon} {cat.label}</span>
+      <div
+        onClick={()=>router.push(categoryHref(cat.key, false))}
+        style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0,cursor:'pointer',transition:'border-color .15s'}}
+        onMouseEnter={ev=>{ev.currentTarget.style.borderColor='rgba(255,0,144,0.5)';}}
+        onMouseLeave={ev=>{ev.currentTarget.style.borderColor=top3.length?'rgba(255,0,144,0.2)':BDR;}}>
+        <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.label}</span>
         {top3.length === 0 ? (
           <div style={{fontFamily:SANS,fontSize:12,color:DIM,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
         ) : (
@@ -223,10 +242,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             const org = orgFor(e.orgId);
             return (
               <div key={e.id}
-                onClick={()=>setDetEnt && setDetEnt(e)}
+                onClick={ev=>{ev.stopPropagation();setDetEnt && setDetEnt(e);}}
                 style={{display:'flex',flexDirection:'column',gap:3,padding:'10px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',cursor:'pointer',transition:'opacity .15s'}}
-                onMouseEnter={ev=>ev.currentTarget.style.opacity='.7'}
-                onMouseLeave={ev=>ev.currentTarget.style.opacity='1'}>
+                onMouseEnter={ev=>{ev.currentTarget.style.opacity='.7';}}
+                onMouseLeave={ev=>{ev.currentTarget.style.opacity='1';}}>
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
                   <div style={{display:'flex',alignItems:'center',gap:5,minWidth:0,flex:1,overflow:'hidden'}}>
                     <span style={{fontSize:13,flexShrink:0}}>{MEDALS[i]}</span>
@@ -256,8 +275,12 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
   const AllTimeCard = ({ cat }) => {
     const { top3 } = cat;
     return (
-      <div style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.15)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0}}>
-        <span style={{fontFamily:SANS,fontSize:10,color:MUT,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.icon} {cat.label}</span>
+      <div
+        onClick={()=>router.push(categoryHref(cat.key, true))}
+        style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.15)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0,cursor:'pointer',transition:'border-color .15s'}}
+        onMouseEnter={ev=>{ev.currentTarget.style.borderColor='rgba(255,0,144,0.4)';}}
+        onMouseLeave={ev=>{ev.currentTarget.style.borderColor=top3.length?'rgba(255,0,144,0.15)':BDR;}}>
+        <span style={{fontFamily:SANS,fontSize:10,color:MUT,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.label}</span>
         {top3.length === 0 ? (
           <div style={{fontFamily:SANS,fontSize:12,color:DIM,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
         ) : (
@@ -265,10 +288,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             const org = orgFor(e.orgId);
             return (
               <div key={e.id}
-                onClick={()=>setDetEnt && setDetEnt(e)}
+                onClick={ev=>{ev.stopPropagation();setDetEnt && setDetEnt(e);}}
                 style={{display:'flex',flexDirection:'column',gap:3,padding:'10px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',cursor:'pointer',transition:'opacity .15s'}}
-                onMouseEnter={ev=>ev.currentTarget.style.opacity='.7'}
-                onMouseLeave={ev=>ev.currentTarget.style.opacity='1'}>
+                onMouseEnter={ev=>{ev.currentTarget.style.opacity='.7';}}
+                onMouseLeave={ev=>{ev.currentTarget.style.opacity='1';}}>
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
                   <div style={{display:'flex',alignItems:'center',gap:5,minWidth:0,flex:1,overflow:'hidden'}}>
                     <span style={{fontSize:13,flexShrink:0}}>{MEDALS[i]}</span>
