@@ -242,10 +242,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             const org = orgFor(e.orgId);
             return (
               <div key={e.id}
-                onClick={ev=>{ev.stopPropagation();setDetEnt && setDetEnt(e);}}
-                style={{display:'flex',flexDirection:'column',gap:3,padding:'10px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',cursor:'pointer',transition:'opacity .15s'}}
-                onMouseEnter={ev=>{ev.currentTarget.style.opacity='.7';}}
-                onMouseLeave={ev=>{ev.currentTarget.style.opacity='1';}}>
+                style={{display:'flex',flexDirection:'column',gap:3,padding:'10px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',transition:'opacity .15s'}}>
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
                   <div style={{display:'flex',alignItems:'center',gap:5,minWidth:0,flex:1,overflow:'hidden'}}>
                     <span style={{fontSize:13,flexShrink:0}}>{MEDALS[i]}</span>
@@ -288,10 +285,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             const org = orgFor(e.orgId);
             return (
               <div key={e.id}
-                onClick={ev=>{ev.stopPropagation();setDetEnt && setDetEnt(e);}}
-                style={{display:'flex',flexDirection:'column',gap:3,padding:'10px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',cursor:'pointer',transition:'opacity .15s'}}
-                onMouseEnter={ev=>{ev.currentTarget.style.opacity='.7';}}
-                onMouseLeave={ev=>{ev.currentTarget.style.opacity='1';}}>
+                style={{display:'flex',flexDirection:'column',gap:3,padding:'10px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',transition:'opacity .15s'}}>
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
                   <div style={{display:'flex',alignItems:'center',gap:5,minWidth:0,flex:1,overflow:'hidden'}}>
                     <span style={{fontSize:13,flexShrink:0}}>{MEDALS[i]}</span>
