@@ -6,6 +6,8 @@ import { ORG, TXT, MUT, DIM, BDR, SANS, DISP } from '../lib/constants';
 
 const linkStyle = { color: ORG };
 
+// spin / forgiveness are 1-5 relative positioning for the chart below, derived from each driver's
+// tested characteristics (lower spin = more forward CG / low-spin construction; forgiveness = MOI)
 const DRIVERS = [
   {
     name: 'TaylorMade Qi4D LS',
@@ -13,6 +15,8 @@ const DRIVERS = [
     blurb:
       "Independent test panels rate this the most complete driver of the year — it doesn't just win on raw carry, it does it while staying competitive on accuracy and forgiveness. The low-spin build moves fast through the air and suits players who already generate solid clubhead speed.",
     bestFor: 'Low handicappers wanting distance without giving up consistency',
+    spin: 2,
+    forgiveness: 3.5,
   },
   {
     name: 'TaylorMade Qi35 LS',
@@ -20,6 +24,8 @@ const DRIVERS = [
     blurb:
       'A forward CG and a stronger front weight push spin down and ball speed up. In head-to-head robot and player testing it produced the fastest ball speeds and longest carry of any driver in its category — a true low-spin bomber for players who can control it.',
     bestFor: 'Fast, repeatable swingers chasing maximum carry',
+    spin: 1,
+    forgiveness: 2,
   },
   {
     name: 'Callaway Quantum Max',
@@ -27,6 +33,8 @@ const DRIVERS = [
     blurb:
       "Callaway's Tri-Force face technology posted the fastest ball speeds and longest carry distances of any driver in a recent 42-model field test, with carry numbers pushing toward 286 yards on testing rigs. This is the pick when distance is the only stat that matters.",
     bestFor: 'Golfers who want the longest number on the sheet, full stop',
+    spin: 1.5,
+    forgiveness: 2.5,
   },
   {
     name: 'Callaway Quantum Triple Diamond Max',
@@ -34,6 +42,8 @@ const DRIVERS = [
     blurb:
       'This model won multiple outlets\' overall "best driver" award for balancing tour-level ball speed with a tighter dispersion pattern than most low-spin heads manage. If you want distance without sacrificing fairways, this is the safer bet of the Quantum lineup.',
     bestFor: 'Players who want distance and dispersion control together',
+    spin: 3,
+    forgiveness: 4,
   },
   {
     name: 'Titleist GTS4',
@@ -41,6 +51,8 @@ const DRIVERS = [
     blurb:
       "The tightest head in Titleist's new GTS lineup, with the most forward center of gravity of any model in the range for maximum spin reduction. Built for faster swingers who want a penetrating, boring flight rather than a high, ballooning one.",
     bestFor: 'Hard swingers who spin the ball too much with a standard driver',
+    spin: 1,
+    forgiveness: 2,
   },
   {
     name: 'PING G440 LST',
@@ -48,8 +60,48 @@ const DRIVERS = [
     blurb:
       "PING's low-spin model pairs a forward CG with the brand's usual high-MOI stability, so mishits still carry respectable distance. It rewards players with average-to-above-average swing speed and a fairly repeatable strike location.",
     bestFor: 'Mid-to-low handicappers who want distance without a tiny margin for error',
+    spin: 2.5,
+    forgiveness: 4.5,
   },
 ];
+
+function SpinForgivenessChart() {
+  const chartW = 640;
+  const chartH = 420;
+  const pad = 40;
+  const plotW = chartW - pad * 2;
+  const plotH = chartH - pad * 2;
+  const scale = 5; // spin/forgiveness values run 1-5
+
+  return (
+    <svg viewBox={`0 0 ${chartW} ${chartH}`} width="100%" style={{ display: 'block', overflow: 'visible' }}>
+      {/* quadrant gridlines */}
+      <line x1={pad} y1={pad} x2={pad} y2={chartH - pad} stroke={BDR} strokeWidth="1" />
+      <line x1={pad} y1={chartH - pad} x2={chartW - pad} y2={chartH - pad} stroke={BDR} strokeWidth="1" />
+      <line x1={chartW / 2} y1={pad} x2={chartW / 2} y2={chartH - pad} stroke={BDR} strokeWidth="1" strokeDasharray="4 4" />
+      <line x1={pad} y1={chartH / 2} x2={chartW - pad} y2={chartH / 2} stroke={BDR} strokeWidth="1" strokeDasharray="4 4" />
+
+      {/* axis labels */}
+      <text x={pad} y={chartH - 12} fill={DIM} fontFamily={SANS} fontSize="11">← Lower Spin</text>
+      <text x={chartW - pad} y={chartH - 12} fill={DIM} fontFamily={SANS} fontSize="11" textAnchor="end">Higher Spin →</text>
+      <text x={16} y={chartH - pad} fill={DIM} fontFamily={SANS} fontSize="11" transform={`rotate(-90 16 ${chartH - pad})`}>Less Forgiving</text>
+      <text x={16} y={pad + 10} fill={DIM} fontFamily={SANS} fontSize="11" transform={`rotate(-90 16 ${pad + 10})`}>More Forgiving →</text>
+
+      {DRIVERS.map((d) => {
+        const x = pad + (d.spin / scale) * plotW;
+        const y = chartH - pad - (d.forgiveness / scale) * plotH;
+        return (
+          <g key={d.name}>
+            <circle cx={x} cy={y} r={6} fill={ORG} />
+            <text x={x + 10} y={y + 4} fill={TXT} fontFamily={SANS} fontSize="11">
+              {d.name}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
 
 export default function BestDriversForDistance2026() {
   const router = useRouter();
@@ -102,6 +154,19 @@ export default function BestDriversForDistance2026() {
           </Card>
         ))}
       </div>
+
+      <Card style={{ marginBottom: 28 }}>
+        <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, color: MUT, textTransform: 'uppercase', marginBottom: 4 }}>
+          Where Each Driver Sits: Spin vs. Forgiveness
+        </div>
+        <div style={{ fontFamily: SANS, fontSize: 12, color: DIM, marginBottom: 18 }}>
+          Low-spin, low-forgiveness drivers reward fast, consistent swings. High-forgiveness models protect mishits at a small cost to peak distance.
+        </div>
+        <SpinForgivenessChart />
+        <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 12 }}>
+          Approximate positioning based on published test data and manufacturer specs — for an exact fit, get measured on a launch monitor.
+        </div>
+      </Card>
 
       {/* Hybrid CTA strip */}
       <div style={{ background: 'rgba(255,0,144,0.05)', border: '1px solid rgba(255,0,144,0.2)', padding: '28px 24px', margin: '32px 0', textAlign: 'center' }}>
