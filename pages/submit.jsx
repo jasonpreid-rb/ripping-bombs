@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { TXT, MUT, ORG, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { tier, todayStr, toB64 } from '../lib/constants';
@@ -18,7 +18,22 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
   const [consent, setConsent] = useState(false);
   const [showProfilePrompt, setShowProfilePrompt] = useState(false);
   const [rankResult, setRankResult] = useState(null);
+  const [venueLocked, setVenueLocked] = useState(false);
   const router = useRouter();
+
+  // Auto-connect flow: a venue's QR poster links to /submit?venue=<id>.
+  // If that matches a real, approved club, pre-select and lock it so the
+  // scanner doesn't have to find their venue in the dropdown manually.
+  useEffect(() => {
+    if (!router.isReady) return;
+    const venueParam = router.query.venue;
+    if (!venueParam) return;
+    const match = approvedOrgs.find(o => o.accountType === 'club' && String(o.id) === String(venueParam));
+    if (match) {
+      setForm(f => ({ ...f, venueId: match.id }));
+      setVenueLocked(true);
+    }
+  }, [router.isReady, router.query.venue, approvedOrgs]);
 
   if (!loggedOrg) return (
     <div style={{ padding:'80px 18px', textAlign:'center' }}>
@@ -118,26 +133,51 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
                 <label style={{ display: 'block', fontFamily: SANS, fontSize: 11, fontWeight: 600, color: MUT, marginBottom: 5, textTransform: 'uppercase', letterSpacing: .8 }}>
                   Simulator Venue <span style={{ color: DIM, fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional)</span>
                 </label>
-                <div style={{ position: 'relative' }}>
-                  <select
-                    value={form.venueId || ''}
-                    onChange={e => setForm({ ...form, venueId: e.target.value || null })}
-                    style={{ width: '100%', background: BG3, border: `1px solid ${BDR}`, padding: '10px 36px 10px 14px', color: form.venueId ? TXT : DIM, fontFamily: SANS, fontSize: 14, outline: 'none', appearance: 'none', boxSizing: 'border-box' }}
-                  >
-                    <option value="">No venue / playing at home</option>
-                    {approvedOrgs
-                      .filter(o => o.accountType === 'club')
-                      .sort((a, b) => a.courseName.localeCompare(b.courseName))
-                      .map(o => (
-                        <option key={o.id} value={o.id}>{o.courseName}{o.location ? ` — ${o.location}` : ''}</option>
-                      ))
-                    }
-                  </select>
-                  <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: DIM, fontSize: 10 }}>&#9662;</span>
-                </div>
-                <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 5 }}>
-                  Tagging a venue adds your drive to that venue's leaderboard.
-                </div>
+
+                {venueLocked && form.venueId ? (
+                  <>
+                    <div style={{ background: 'rgba(255,0,144,0.06)', border: `1px solid rgba(255,0,144,0.3)`, padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
+                      <span style={{ fontFamily: SANS, fontSize: 14, color: TXT }}>
+                        {'\u2713 '}
+                        {approvedOrgs.find(o => o.id === form.venueId)?.courseName || 'Venue'}
+                        <span style={{ color: ORG, fontWeight: 600, marginLeft: 6, fontSize: 11 }}>(from QR code)</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setVenueLocked(false)}
+                        style={{ background: 'none', border: 'none', color: DIM, fontFamily: SANS, fontSize: 11, textDecoration: 'underline', cursor: 'pointer', padding: 0 }}
+                      >
+                        Change
+                      </button>
+                    </div>
+                    <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 5 }}>
+                      This venue was selected automatically from the QR code you scanned.
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ position: 'relative' }}>
+                      <select
+                        value={form.venueId || ''}
+                        onChange={e => setForm({ ...form, venueId: e.target.value || null })}
+                        style={{ width: '100%', background: BG3, border: `1px solid ${BDR}`, padding: '10px 36px 10px 14px', color: form.venueId ? TXT : DIM, fontFamily: SANS, fontSize: 14, outline: 'none', appearance: 'none', boxSizing: 'border-box' }}
+                      >
+                        <option value="">No venue / playing at home</option>
+                        {approvedOrgs
+                          .filter(o => o.accountType === 'club')
+                          .sort((a, b) => a.courseName.localeCompare(b.courseName))
+                          .map(o => (
+                            <option key={o.id} value={o.id}>{o.courseName}{o.location ? ` — ${o.location}` : ''}</option>
+                          ))
+                        }
+                      </select>
+                      <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: DIM, fontSize: 10 }}>&#9662;</span>
+                    </div>
+                    <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 5 }}>
+                      Tagging a venue adds your drive to that venue's leaderboard.
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
