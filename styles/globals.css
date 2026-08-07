@@ -52,3 +52,28 @@ select {
 a {
   color: inherit;
 }
+
+/* Prevent the "everything looks like an editable document" feel: text is
+   not selectable by default (no I-beam cursor, no accidental highlight
+   when clicking near labels/buttons). Opt specific content back in below. */
+body {
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+/* Re-enable selection for actual reading content — paragraphs, list/table
+   text, and anything explicitly marked selectable (e.g. player names,
+   distances, course names you want people to be able to copy). */
+p, li, td, th, blockquote,
+[data-selectable="true"] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+  cursor: text;
+}
+
+button, a, [role="button"], summary {
+  cursor: pointer;
+}

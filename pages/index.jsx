@@ -242,25 +242,30 @@ function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 })
         className="rb-scroll-row"
         style={{overflowX:'auto',WebkitOverflowScrolling:'touch',marginLeft:-18,marginRight:-18,paddingLeft:18,paddingRight:18,cursor:'grab',touchAction:'pan-x'}}
       >
-        <div style={{display:'flex',gap}}>
+        <div style={{display:'flex',alignItems:'stretch',gap}}>
           {loopItems.map((item,i)=>(
-            <div key={`${item.key}-${i}`} style={{flex:`0 0 ${cardWidth}px`,minWidth:0}}>
+            <div key={`${item.key}-${i}`} style={{flex:`0 0 ${cardWidth}px`,minWidth:0,display:'flex'}}>
               {renderItem(item)}
             </div>
           ))}
         </div>
       </div>
       {showHint && (
-        <div style={{position:'absolute',top:0,bottom:0,right:0,width:64,pointerEvents:'none',background:`linear-gradient(to right, transparent, ${bg} 75%)`,display:'flex',alignItems:'center',justifyContent:'flex-end',paddingRight:6}}>
-          <span style={{fontSize:22,color:'rgba(255,255,255,0.8)',display:'inline-block',animation:'rbArrowPulse 1.5s ease-in-out infinite',textShadow:'0 0 8px rgba(0,0,0,0.6)'}}>→</span>
-        </div>
+        <>
+          {/* soft vignette — plain black fade works over any card color underneath, no seam */}
+          <div style={{position:'absolute',top:0,bottom:0,right:0,width:46,pointerEvents:'none',background:'linear-gradient(to right, transparent, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.5))'}}/>
+          {/* floating chevron pill */}
+          <div style={{position:'absolute',top:'50%',right:10,pointerEvents:'none',width:32,height:32,borderRadius:'50%',background:'rgba(255,255,255,0.1)',border:'1px solid rgba(255,255,255,0.22)',backdropFilter:'blur(4px)',WebkitBackdropFilter:'blur(4px)',display:'flex',alignItems:'center',justifyContent:'center',animation:'rbArrowPulse 1.6s ease-in-out infinite'}}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </div>
+        </>
       )}
       <style jsx>{`
         .rb-scroll-row::-webkit-scrollbar { display: none; }
         .rb-scroll-row { scrollbar-width: none; -ms-overflow-style: none; }
         @keyframes rbArrowPulse {
-          0%, 100% { opacity: 0.4; transform: translateX(0); }
-          50% { opacity: 1; transform: translateX(6px); }
+          0%, 100% { opacity: 0.55; transform: translate(0,-50%); }
+          50% { opacity: 1; transform: translate(4px,-50%); }
         }
       `}</style>
     </div>
