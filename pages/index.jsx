@@ -255,9 +255,8 @@ function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 })
             // positioned sibling (measured against a differently-sized
             // outer wrapper) could.
             <div aria-hidden style={{position:'sticky',right:0,alignSelf:'stretch',width:0,flexShrink:0,zIndex:2,pointerEvents:'none'}}>
-              <div style={{position:'absolute',top:0,bottom:0,right:0,width:46,background:'linear-gradient(to right, transparent, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.5))'}}/>
-              <div style={{position:'absolute',top:'50%',right:10,transform:'translateY(-50%)',width:32,height:32,borderRadius:'50%',background:'rgba(255,255,255,0.1)',border:'1px solid rgba(255,255,255,0.22)',backdropFilter:'blur(4px)',WebkitBackdropFilter:'blur(4px)',display:'flex',alignItems:'center',justifyContent:'center',animation:'rbArrowPulse 1.6s ease-in-out infinite'}}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+              <div style={{position:'absolute',top:'50%',right:14,transform:'translateY(-50%)',width:44,height:44,borderRadius:'50%',background:'rgba(20,20,20,0.55)',border:'1px solid rgba(255,255,255,0.25)',backdropFilter:'blur(4px)',WebkitBackdropFilter:'blur(4px)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 14px rgba(0,0,0,0.45)',animation:'rbArrowPulse 1.6s ease-in-out infinite'}}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.95)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
               </div>
             </div>
           )}
