@@ -154,6 +154,69 @@ function InlineCalculator({ router }) {
   );
 }
 
+// ── Infinite-loop horizontal scroll row (category cards) ─────────────────────
+// Renders `items` 3x back-to-back, starts scrolled into the middle copy, and
+// silently snaps scrollLeft back by one set-width whenever it nears either
+// end — so continuous scrolling in either direction loops forever. Native
+// scrollbar is hidden; a fading arrow hint on the right edge prompts the
+// user to scroll and disappears after their first interaction.
+function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 }) {
+  const scrollRef = useRef(null);
+  const [showHint, setShowHint] = useState(true);
+  const loopItems = [...items, ...items, ...items];
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const setWidth = el.scrollWidth / 3;
+    el.scrollLeft = setWidth; // start in the middle copy
+  }, [items]);
+
+  function handleScroll() {
+    const el = scrollRef.current;
+    if (!el) return;
+    const setWidth = el.scrollWidth / 3;
+    if (el.scrollLeft < setWidth * 0.5) {
+      el.scrollLeft += setWidth;
+    } else if (el.scrollLeft > setWidth * 1.5) {
+      el.scrollLeft -= setWidth;
+    }
+    if (showHint) setShowHint(false);
+  }
+
+  return (
+    <div style={{position:'relative'}}>
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="rb-scroll-row"
+        style={{overflowX:'auto',WebkitOverflowScrolling:'touch',marginLeft:-18,marginRight:-18,paddingLeft:18,paddingRight:18}}
+      >
+        <div style={{display:'flex',gap}}>
+          {loopItems.map((item,i)=>(
+            <div key={`${item.key}-${i}`} style={{flex:`0 0 ${cardWidth}px`,minWidth:0}}>
+              {renderItem(item)}
+            </div>
+          ))}
+        </div>
+      </div>
+      {showHint && (
+        <div style={{position:'absolute',top:0,bottom:0,right:0,width:64,pointerEvents:'none',background:`linear-gradient(to right, transparent, ${bg} 75%)`,display:'flex',alignItems:'center',justifyContent:'flex-end',paddingRight:6}}>
+          <span style={{fontSize:20,color:'rgba(255,255,255,0.55)',display:'inline-block',animation:'rbArrowPulse 1.5s ease-in-out infinite'}}>→</span>
+        </div>
+      )}
+      <style jsx>{`
+        .rb-scroll-row::-webkit-scrollbar { display: none; }
+        .rb-scroll-row { scrollbar-width: none; -ms-overflow-style: none; }
+        @keyframes rbArrowPulse {
+          0%, 100% { opacity: 0.35; transform: translateX(0); }
+          50% { opacity: 1; transform: translateX(6px); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], setDetEnt, cvt, unitLbl, staticEntries=[], staticOrgs=[] }) {
   const entries = staticEntries.length ? staticEntries : propEntries;
   const orgs = staticOrgs.length ? staticOrgs : propOrgs;
@@ -358,11 +421,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
               </div>
               <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
             </div>
-            <div style={{overflowX:"auto",WebkitOverflowScrolling:"touch",marginLeft:-18,marginRight:-18,paddingLeft:18,paddingRight:18}}>
-              <div style={{display:"grid",gridTemplateColumns:"repeat(6,minmax(200px,1fr))",gap:10,minWidth:1240}}>
-                {weeklyLeaders.map(cat => <WeeklyCard key={cat.key} cat={cat}/>)}
-              </div>
-            </div>
+            <InfiniteScrollRow items={weeklyLeaders} bg="#0e0e0e" renderItem={cat => <WeeklyCard cat={cat}/>}/>
           </div>
         </div>
 
@@ -376,11 +435,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
               </div>
               <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
             </div>
-            <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch',marginLeft:-18,marginRight:-18,paddingLeft:18,paddingRight:18}}>
-              <div style={{display:'grid',gridTemplateColumns:'repeat(6,minmax(200px,1fr))',gap:10,minWidth:1240}}>
-                {allTimeLeaders.map(cat => <AllTimeCard key={cat.key} cat={cat}/>)}
-              </div>
-            </div>
+            <InfiniteScrollRow items={allTimeLeaders} bg="#111" renderItem={cat => <AllTimeCard cat={cat}/>}/>
           </div>
         </div>
 
