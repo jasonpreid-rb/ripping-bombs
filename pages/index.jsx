@@ -441,7 +441,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
         <div style={{padding:'0 18px'}}>
 
           {/* FEATURE CARDS */}
-          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',gap:16,marginBottom:60,marginTop:60}}>
+          <div style={{maxWidth:1000,margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',gap:16,marginBottom:60,marginTop:60}}>
             {[
               {img:'https://images.pexels.com/photos/10463463/pexels-photo-10463463.jpeg?auto=compress&cs=tinysrgb&w=600',title:'Global Long Drive Standings',body:'Compare verified drives from clubs, tournaments, and simulator sessions worldwide on one unified leaderboard.'},
               {img:'https://images.pexels.com/photos/12642295/pexels-photo-12642295.jpeg?auto=compress&cs=tinysrgb&w=600',title:'Free for Clubs, Events & Individuals',body:'Golf clubs, tournament organisers, driving ranges, and individual simulator golfers can all register and submit for free.'},
@@ -460,14 +460,14 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           </div>
 
           {/* CTA STRIP */}
-          <div style={{background:'rgba(255,0,144,0.05)',border:'1px solid rgba(255,0,144,0.2)',padding:'40px 32px',textAlign:'center',marginBottom:60}}>
+          <div style={{maxWidth:1000,margin:'0 auto',background:'rgba(255,0,144,0.05)',border:'1px solid rgba(255,0,144,0.2)',padding:'40px 32px',textAlign:'center',marginBottom:60}}>
             <div style={{fontFamily:DISP,fontSize:'clamp(24px,5vw,40px)',color:TXT,letterSpacing:1,marginBottom:10}}>FREE TO JOIN. FREE TO SUBMIT.</div>
             <div style={{fontFamily:SANS,fontSize:14,color:MUT,marginBottom:28}}>Built for golfers who love sending it.</div>
             <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 36px',borderRadius:0,cursor:'pointer'}}>REGISTER NOW FREE →</button>
           </div>
 
           {/* FAQ */}
-          <div style={{marginBottom:60}}>
+          <div style={{maxWidth:1000,margin:'0 auto',marginBottom:60}}>
             <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:20}}>FAQ</div>
             <div style={{display:'flex',flexDirection:'column',gap:8}}>
               {faqs.map(({q,a},i)=>(
