@@ -159,11 +159,14 @@ function InlineCalculator({ router }) {
 // silently snaps scrollLeft back by one set-width whenever it nears either
 // end — so continuous scrolling in either direction loops forever. Native
 // scrollbar is hidden; a fading arrow hint on the right edge prompts the
-// user to scroll and disappears after their first interaction.
+// user to scroll and disappears on their first interaction. Touch/trackpad
+// keeps native momentum scrolling; mouse users get click-and-drag panning,
+// since hiding the scrollbar removes their only other way to scroll.
 function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 }) {
   const scrollRef = useRef(null);
   const [showHint, setShowHint] = useState(true);
   const loopItems = [...items, ...items, ...items];
+  const drag = useRef({ isDown:false, startX:0, startScrollLeft:0, moved:false });
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -172,6 +175,9 @@ function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 })
     el.scrollLeft = setWidth; // start in the middle copy
   }, [items]);
 
+  // Loop-reset only — hint visibility is handled separately by real user
+  // interaction, since this programmatic scrollLeft assignment above also
+  // fires 'scroll' events and would otherwise hide the hint before it's seen.
   function handleScroll() {
     const el = scrollRef.current;
     if (!el) return;
@@ -181,7 +187,44 @@ function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 })
     } else if (el.scrollLeft > setWidth * 1.5) {
       el.scrollLeft -= setWidth;
     }
-    if (showHint) setShowHint(false);
+  }
+
+  function dismissHint() {
+    setShowHint(false);
+  }
+
+  function handlePointerDown(e) {
+    if (e.pointerType !== 'mouse') { dismissHint(); return; } // touch: native scroll handles it
+    const el = scrollRef.current;
+    drag.current = { isDown:true, startX:e.clientX, startScrollLeft: el.scrollLeft, moved:false };
+    el.setPointerCapture?.(e.pointerId);
+    el.style.cursor = 'grabbing';
+  }
+
+  function handlePointerMove(e) {
+    if (e.pointerType !== 'mouse' || !drag.current.isDown) return;
+    const el = scrollRef.current;
+    const dx = e.clientX - drag.current.startX;
+    if (Math.abs(dx) > 3) drag.current.moved = true;
+    el.scrollLeft = drag.current.startScrollLeft - dx;
+    dismissHint();
+  }
+
+  function endDrag(e) {
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    drag.current.isDown = false;
+    const el = scrollRef.current;
+    if (el) el.style.cursor = 'grab';
+  }
+
+  function handleClickCapture(e) {
+    // Suppress the click that follows a drag so cards don't get navigated to
+    // when the user was just panning the row.
+    if (drag.current.moved) {
+      e.preventDefault();
+      e.stopPropagation();
+      drag.current.moved = false;
+    }
   }
 
   return (
@@ -189,8 +232,15 @@ function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 })
       <div
         ref={scrollRef}
         onScroll={handleScroll}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={endDrag}
+        onPointerLeave={endDrag}
+        onPointerCancel={endDrag}
+        onClickCapture={handleClickCapture}
+        onTouchStart={dismissHint}
         className="rb-scroll-row"
-        style={{overflowX:'auto',WebkitOverflowScrolling:'touch',marginLeft:-18,marginRight:-18,paddingLeft:18,paddingRight:18}}
+        style={{overflowX:'auto',WebkitOverflowScrolling:'touch',marginLeft:-18,marginRight:-18,paddingLeft:18,paddingRight:18,cursor:'grab',touchAction:'pan-x'}}
       >
         <div style={{display:'flex',gap}}>
           {loopItems.map((item,i)=>(
@@ -202,14 +252,14 @@ function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 })
       </div>
       {showHint && (
         <div style={{position:'absolute',top:0,bottom:0,right:0,width:64,pointerEvents:'none',background:`linear-gradient(to right, transparent, ${bg} 75%)`,display:'flex',alignItems:'center',justifyContent:'flex-end',paddingRight:6}}>
-          <span style={{fontSize:20,color:'rgba(255,255,255,0.55)',display:'inline-block',animation:'rbArrowPulse 1.5s ease-in-out infinite'}}>→</span>
+          <span style={{fontSize:22,color:'rgba(255,255,255,0.8)',display:'inline-block',animation:'rbArrowPulse 1.5s ease-in-out infinite',textShadow:'0 0 8px rgba(0,0,0,0.6)'}}>→</span>
         </div>
       )}
       <style jsx>{`
         .rb-scroll-row::-webkit-scrollbar { display: none; }
         .rb-scroll-row { scrollbar-width: none; -ms-overflow-style: none; }
         @keyframes rbArrowPulse {
-          0%, 100% { opacity: 0.35; transform: translateX(0); }
+          0%, 100% { opacity: 0.4; transform: translateX(0); }
           50% { opacity: 1; transform: translateX(6px); }
         }
       `}</style>
@@ -294,10 +344,11 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
     return (
       <div
         onClick={()=>router.push(categoryHref(cat.key, false))}
-        style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0,cursor:'pointer',transition:'border-color .15s'}}
+        style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0,minHeight:220,cursor:'pointer',transition:'border-color .15s'}}
         onMouseEnter={ev=>{ev.currentTarget.style.borderColor='rgba(255,0,144,0.5)';}}
         onMouseLeave={ev=>{ev.currentTarget.style.borderColor=top3.length?'rgba(255,0,144,0.2)':BDR;}}>
         <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.label}</span>
+        <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:top3.length===0?'center':'flex-start'}}>
         {top3.length === 0 ? (
           <div style={{fontFamily:SANS,fontSize:12,color:DIM,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
         ) : (
@@ -327,6 +378,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             );
           })
         )}
+        </div>
       </div>
     );
   };
@@ -337,10 +389,11 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
     return (
       <div
         onClick={()=>router.push(categoryHref(cat.key, true))}
-        style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.15)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0,cursor:'pointer',transition:'border-color .15s'}}
+        style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.15)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0,minHeight:220,cursor:'pointer',transition:'border-color .15s'}}
         onMouseEnter={ev=>{ev.currentTarget.style.borderColor='rgba(255,0,144,0.4)';}}
         onMouseLeave={ev=>{ev.currentTarget.style.borderColor=top3.length?'rgba(255,0,144,0.15)':BDR;}}>
         <span style={{fontFamily:SANS,fontSize:10,color:MUT,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.label}</span>
+        <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:top3.length===0?'center':'flex-start'}}>
         {top3.length === 0 ? (
           <div style={{fontFamily:SANS,fontSize:12,color:DIM,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
         ) : (
@@ -370,6 +423,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             );
           })
         )}
+        </div>
       </div>
     );
   };
