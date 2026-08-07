@@ -248,18 +248,21 @@ function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 })
               {renderItem(item)}
             </div>
           ))}
+          {showHint && (
+            // position:sticky *inside* the scrolling row anchors this to the
+            // true visible right edge of the scroll viewport itself, so it
+            // can't drift out of alignment the way a plain absolutely-
+            // positioned sibling (measured against a differently-sized
+            // outer wrapper) could.
+            <div aria-hidden style={{position:'sticky',right:0,alignSelf:'stretch',width:0,flexShrink:0,zIndex:2,pointerEvents:'none'}}>
+              <div style={{position:'absolute',top:0,bottom:0,right:0,width:46,background:'linear-gradient(to right, transparent, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.5))'}}/>
+              <div style={{position:'absolute',top:'50%',right:10,transform:'translateY(-50%)',width:32,height:32,borderRadius:'50%',background:'rgba(255,255,255,0.1)',border:'1px solid rgba(255,255,255,0.22)',backdropFilter:'blur(4px)',WebkitBackdropFilter:'blur(4px)',display:'flex',alignItems:'center',justifyContent:'center',animation:'rbArrowPulse 1.6s ease-in-out infinite'}}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-      {showHint && (
-        <>
-          {/* soft vignette — plain black fade works over any card color underneath, no seam */}
-          <div style={{position:'absolute',top:0,bottom:0,right:0,width:46,pointerEvents:'none',background:'linear-gradient(to right, transparent, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.5))'}}/>
-          {/* floating chevron pill */}
-          <div style={{position:'absolute',top:'50%',right:10,pointerEvents:'none',width:32,height:32,borderRadius:'50%',background:'rgba(255,255,255,0.1)',border:'1px solid rgba(255,255,255,0.22)',backdropFilter:'blur(4px)',WebkitBackdropFilter:'blur(4px)',display:'flex',alignItems:'center',justifyContent:'center',animation:'rbArrowPulse 1.6s ease-in-out infinite'}}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
-          </div>
-        </>
-      )}
       <style jsx>{`
         .rb-scroll-row::-webkit-scrollbar { display: none; }
         .rb-scroll-row { scrollbar-width: none; -ms-overflow-style: none; }
@@ -349,7 +352,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
     return (
       <div
         onClick={()=>router.push(categoryHref(cat.key, false))}
-        style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0,minHeight:220,cursor:'pointer',transition:'border-color .15s'}}
+        style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,width:'100%',minWidth:0,minHeight:220,cursor:'pointer',transition:'border-color .15s'}}
         onMouseEnter={ev=>{ev.currentTarget.style.borderColor='rgba(255,0,144,0.5)';}}
         onMouseLeave={ev=>{ev.currentTarget.style.borderColor=top3.length?'rgba(255,0,144,0.2)':BDR;}}>
         <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.label}</span>
@@ -394,7 +397,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
     return (
       <div
         onClick={()=>router.push(categoryHref(cat.key, true))}
-        style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.15)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0,minHeight:220,cursor:'pointer',transition:'border-color .15s'}}
+        style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.15)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,width:'100%',minWidth:0,minHeight:220,cursor:'pointer',transition:'border-color .15s'}}
         onMouseEnter={ev=>{ev.currentTarget.style.borderColor='rgba(255,0,144,0.4)';}}
         onMouseLeave={ev=>{ev.currentTarget.style.borderColor=top3.length?'rgba(255,0,144,0.15)':BDR;}}>
         <span style={{fontFamily:SANS,fontSize:10,color:MUT,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.label}</span>
