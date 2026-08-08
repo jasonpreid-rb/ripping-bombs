@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 function nameToSlug(name) {
   return name
@@ -23,8 +23,22 @@ const PLAYER_W = 180;
 
 function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
   const COLS = ['Rank','Player','Distance','Club','HCP','Age','Gender','Course','Event','Date','Tier','Share'];
+  const scrollRef = useRef(null);
+
+  const handleWheel = (e) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // Only hijack the wheel when there's actually horizontal overflow,
+    // and the scroll is primarily vertical (a plain mouse wheel).
+    const canScrollH = el.scrollWidth > el.clientWidth;
+    if (!canScrollH) return;
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return; // let native horizontal gestures pass through
+    e.preventDefault();
+    el.scrollLeft += e.deltaY;
+  };
+
   return (
-    <div style={{overflowX:'auto',border:`1px solid ${BDR}`,background:BG2}}>
+    <div ref={scrollRef} onWheel={handleWheel} style={{overflowX:'auto',border:`1px solid ${BDR}`,background:BG2}}>
       <table style={{width:'100%',borderCollapse:'collapse',minWidth:750}}>
         <thead>
           <tr>
