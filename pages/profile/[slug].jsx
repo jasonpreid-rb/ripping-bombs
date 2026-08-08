@@ -14,6 +14,20 @@ export function nameToSlug(name) {
     .replace(/\s+/g, '-');
 }
 
+// Category thresholds: Youth <16, Senior 55+, High Handicap 15+.
+// Age/Senior checks take priority so a 15-year-old is always Youth,
+// never "Women High Handicap" etc.
+function getCategory(entry) {
+  const age = Number(entry?.age);
+  const hcp = Number(entry?.hcp);
+  const isFemale = entry?.gender === 'female';
+
+  if (!Number.isNaN(age) && age < 16) return 'Youth';
+  if (!Number.isNaN(age) && age >= 55) return 'Senior';
+  if (isFemale) return !Number.isNaN(hcp) && hcp >= 15 ? 'Women High Handicap' : 'Women';
+  return !Number.isNaN(hcp) && hcp >= 15 ? 'Men High Handicap' : 'Men';
+}
+
 export async function getServerSideProps({ params }) {
   const { slug } = params;
 
@@ -41,11 +55,53 @@ export async function getServerSideProps({ params }) {
     .eq('is_simulator', true)
     .order('date', { ascending: false });
 
+  const playerEntries = entries || [];
+  const personalBest = playerEntries.length
+    ? [...playerEntries].sort((a, b) => Number(b.dist) - Number(a.dist))[0]
+    : null;
+
+  // Rank against the whole platform (every entry, official + simulator),
+  // one personal best per account (orgId), so a player isn't out-ranked
+  // by their own multiple submissions.
+  let globalRank = null, globalTotal = 0, category = null, categoryRank = null, categoryTotal = 0;
+
+  if (personalBest) {
+    const { data: allEntries } = await supabase
+      .from('entries')
+      .select('orgId, dist, gender, age, hcp');
+
+    if (allEntries && allEntries.length) {
+      const bestByOrg = new Map();
+      for (const e of allEntries) {
+        const cur = bestByOrg.get(e.orgId);
+        if (!cur || Number(e.dist) > Number(cur.dist)) bestByOrg.set(e.orgId, e);
+      }
+      const bests = [...bestByOrg.values()];
+
+      const sortedGlobal = [...bests].sort((a, b) => Number(b.dist) - Number(a.dist));
+      globalTotal = sortedGlobal.length;
+      globalRank = sortedGlobal.findIndex(e => e.orgId === org.id) + 1;
+      if (globalRank === 0) globalRank = null; // this org's best wasn't in allEntries (edge case)
+
+      category = getCategory(personalBest);
+      const categoryPeers = bests.filter(e => getCategory(e) === category);
+      const sortedCategory = [...categoryPeers].sort((a, b) => Number(b.dist) - Number(a.dist));
+      categoryTotal = sortedCategory.length;
+      categoryRank = sortedCategory.findIndex(e => e.orgId === org.id) + 1;
+      if (categoryRank === 0) categoryRank = null;
+    }
+  }
+
   return {
     props: {
       org,
-      playerEntries: entries || [],
+      playerEntries,
       slug,
+      globalRank,
+      globalTotal,
+      category,
+      categoryRank,
+      categoryTotal,
     },
   };
 }
@@ -55,6 +111,24 @@ function StatCard({ label, value, accent }) {
     <div style={{ background: BG3, border: `1px solid ${BDR}`, padding: '18px 20px' }}>
       <div style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, color: DIM, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
       <div style={{ fontFamily: DISP, fontSize: 28, color: accent ? ORG : TXT, letterSpacing: 0.5 }}>{value}</div>
+    </div>
+  );
+}
+
+function RankPill({ label, rank, total, primary }) {
+  if (!rank) return null;
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 10,
+      background: primary ? 'linear-gradient(135deg,#FF0090,#ff66c4)' : BG3,
+      border: `1px solid ${primary ? 'transparent' : BDR}`,
+      padding: '10px 16px',
+    }}>
+      <div style={{ fontFamily: DISP, fontSize: 24, color: primary ? '#111' : ORG, lineHeight: 1 }}>#{rank}</div>
+      <div>
+        <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: primary ? 'rgba(0,0,0,0.65)' : DIM }}>{label}</div>
+        <div style={{ fontFamily: SANS, fontSize: 11, color: primary ? 'rgba(0,0,0,0.55)' : MUT }}>of {total} ranked</div>
+      </div>
     </div>
   );
 }
@@ -75,7 +149,7 @@ function SocialHandle({ handle, href, icon }) {
   );
 }
 
-export default function PlayerProfile({ org, playerEntries }) {
+export default function PlayerProfile({ org, playerEntries, globalRank, globalTotal, category, categoryRank, categoryTotal }) {
   const sorted = [...playerEntries].sort((a, b) => Number(b.dist) - Number(a.dist));
   const best = sorted[0];
   const avgDist = playerEntries.length
@@ -108,6 +182,8 @@ export default function PlayerProfile({ org, playerEntries }) {
         { '@type': 'PropertyValue', name: 'Personal Best Drive', value: `${best.dist} yards` },
         { '@type': 'PropertyValue', name: 'Total Drives', value: playerEntries.length },
         ...(avgDist ? [{ '@type': 'PropertyValue', name: 'Average Drive', value: `${avgDist} yards` }] : []),
+        ...(globalRank ? [{ '@type': 'PropertyValue', name: 'Global Rank', value: `#${globalRank} of ${globalTotal}` }] : []),
+        ...(categoryRank ? [{ '@type': 'PropertyValue', name: `${category} Rank`, value: `#${categoryRank} of ${categoryTotal}` }] : []),
       ],
     }),
   };
@@ -152,10 +228,18 @@ export default function PlayerProfile({ org, playerEntries }) {
             </div>
           </div>
           {org.location && (
-            <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: hasSocials ? 16 : 0 }}>
+            <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: (hasSocials || globalRank || categoryRank) ? 16 : 0 }}>
               {org.location}{org.simulator ? ` · ${org.simulator}` : ''}
             </div>
           )}
+
+          {(globalRank || categoryRank) && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: hasSocials ? 16 : 0 }}>
+              <RankPill label="Global Rank" rank={globalRank} total={globalTotal} primary />
+              <RankPill label={`${category} Rank`} rank={categoryRank} total={categoryTotal} />
+            </div>
+          )}
+
           {hasSocials && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14 }}>
               <SocialHandle handle={org.instagram} href="https://instagram.com/" icon="Instagram" />
