@@ -196,17 +196,24 @@ function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 })
   function handlePointerDown(e) {
     if (e.pointerType !== 'mouse') { dismissHint(); return; } // touch: native scroll handles it
     const el = scrollRef.current;
-    drag.current = { isDown:true, startX:e.clientX, startScrollLeft: el.scrollLeft, moved:false };
-    el.setPointerCapture?.(e.pointerId);
+    drag.current = { isDown:true, startX:e.clientX, startScrollLeft: el.scrollLeft, moved:false, pointerId:e.pointerId };
     el.style.cursor = 'grabbing';
+    // Deliberately NOT calling setPointerCapture here. Capturing on every
+    // mousedown — even a plain click — makes the browser retarget the click
+    // event to this container instead of the card underneath, so the card's
+    // own onClick never fires. Capture is applied lazily in handlePointerMove
+    // only once real dragging is detected.
   }
 
   function handlePointerMove(e) {
     if (e.pointerType !== 'mouse' || !drag.current.isDown) return;
     const el = scrollRef.current;
     const dx = e.clientX - drag.current.startX;
-    if (Math.abs(dx) > 3) drag.current.moved = true;
-    el.scrollLeft = drag.current.startScrollLeft - dx;
+    if (Math.abs(dx) > 3 && !drag.current.moved) {
+      drag.current.moved = true;
+      el.setPointerCapture?.(e.pointerId); // now it's a real drag — capture so it tracks outside the row too
+    }
+    if (drag.current.moved) el.scrollLeft = drag.current.startScrollLeft - dx;
     dismissHint();
   }
 
@@ -214,7 +221,10 @@ function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 })
     if (e.pointerType && e.pointerType !== 'mouse') return;
     drag.current.isDown = false;
     const el = scrollRef.current;
-    if (el) el.style.cursor = 'grab';
+    if (el) {
+      el.style.cursor = 'grab';
+      if (e.pointerId != null && el.hasPointerCapture?.(e.pointerId)) el.releasePointerCapture(e.pointerId);
+    }
   }
 
   function handleClickCapture(e) {
