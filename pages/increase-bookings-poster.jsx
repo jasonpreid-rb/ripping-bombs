@@ -27,18 +27,34 @@ export default function IncreaseBookingsPoster() {
           background: #4a4a4a;
         }
         @media print {
-          /* Hide everything on the page except the poster itself — this
-             works regardless of Layout's markup, since it hides by
-             default and only un-hides the poster sheet and its children. */
+          /* Force the CSS background-image to actually print — browsers
+             skip backgrounds by default unless told otherwise. */
+          #poster-sheet {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          /* Collapse everything else to zero height so its hidden layout
+             space doesn't push the poster onto a second page. visibility:
+             hidden alone still reserves space; this removes it. */
+          html, body {
+            height: 0 !important;
+            margin: 0 !important;
+            overflow: hidden !important;
+            background: none !important;
+          }
+
           body * { visibility: hidden; }
           #poster-sheet, #poster-sheet * { visibility: visible; }
+
           #poster-sheet {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
+            width: 210mm;
+            height: 297mm;
             box-shadow: none !important;
           }
-          html, body { background: none; }
         }
       `}</style>
 
