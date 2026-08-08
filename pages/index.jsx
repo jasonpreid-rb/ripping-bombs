@@ -437,12 +437,31 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
   return (
     <>
       <Head>
-        <title>Ripping Bombs | Global Longest Golf Drive Database</title>
-        <meta name="description" content="Track and compare the longest golf drives from tournaments worldwide. Ripping Bombs is the global leaderboard for longest drive competitions."/>
-        <meta property="og:title" content="Ripping Bombs | Global Longest Golf Drive Database"/>
-        <meta property="og:description" content="The global home of competition longest drives. Free to join, free to submit."/>
+        <title>Ripping Bombs | Longest Drive Leaderboard for Simulator Golf</title>
+        <meta name="description" content="Compare your longest golf drives on the free global leaderboard for simulator golf venues and clubs. Submit your drive, track rankings by category, and compete toward the 2027 Championship."/>
+        <link rel="canonical" href="https://www.rippingbombs.com"/>
+
+        <meta property="og:title" content="Ripping Bombs | Longest Drive Leaderboard for Simulator Golf"/>
+        <meta property="og:description" content="The global home of longest drive competition. Free to join, free to submit — compete across simulator venues and clubs worldwide."/>
+        <meta property="og:image" content="https://www.rippingbombs.com/og-image.jpg"/>
+        <meta property="og:image:width" content="1200"/>
+        <meta property="og:image:height" content="630"/>
         <meta property="og:url" content="https://www.rippingbombs.com"/>
         <meta property="og:type" content="website"/>
+        <meta property="og:site_name" content="Ripping Bombs"/>
+
+        <meta name="twitter:card" content="summary_large_image"/>
+        <meta name="twitter:title" content="Ripping Bombs | Longest Drive Leaderboard for Simulator Golf"/>
+        <meta name="twitter:description" content="The global home of longest drive competition. Free to join, free to submit — compete across simulator venues and clubs worldwide."/>
+        <meta name="twitter:image" content="https://www.rippingbombs.com/og-image.jpg"/>
+
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: 'Ripping Bombs',
+          url: 'https://www.rippingbombs.com',
+          description: 'The free global leaderboard for longest golf drives — simulator venues and clubs submitting verified drives, ranked by category.',
+        }) }}/>
       </Head>
       <div style={{animation:'fi .4s ease'}}>
 
