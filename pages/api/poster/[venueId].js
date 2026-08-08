@@ -19,13 +19,13 @@ const POSTER_HEIGHT = 1754;
 const POSTER_BG_URL = 'https://www.rippingbombs.com/posters/venue-poster-bg.png';
 
 // ─── QR code placement ───
-// Verified against the actual design: x:0-470, y:1250-1620 is genuinely
-// blank (checked pixel-by-pixel), and the design's consistent left margin
-// elsewhere in the poster is 37px. Footer content starts at y:1700, so this
-// leaves clean space above it.
+// Matches the text block's own right margin (102px) on the QR's left side
+// for a balanced two-column layout, and vertically centers the QR against
+// the "Scan to Register" text block (heading at y:1289 through the URL
+// line) rather than just aligning to the top.
 const QR_SIZE = 340;
-const QR_X = 37;
-const QR_Y = 1290;
+const QR_X = 102;
+const QR_Y = 1254;
 
 export default async function handler(req) {
   const url = new URL(req.url);

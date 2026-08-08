@@ -27,8 +27,18 @@ export default function IncreaseBookingsPoster() {
           background: #4a4a4a;
         }
         @media print {
+          /* Hide everything on the page except the poster itself — this
+             works regardless of Layout's markup, since it hides by
+             default and only un-hides the poster sheet and its children. */
+          body * { visibility: hidden; }
+          #poster-sheet, #poster-sheet * { visibility: visible; }
+          #poster-sheet {
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-shadow: none !important;
+          }
           html, body { background: none; }
-          #poster-sheet { box-shadow: none !important; }
         }
       `}</style>
 
@@ -48,14 +58,15 @@ export default function IncreaseBookingsPoster() {
           {/* Generic marketing QR — always points to /register, not venue-specific.
               For a real venue's personalized poster with their own auto-connect
               QR code, use /api/poster/[venueId] instead (see pages/venue-qr.jsx).
-              Placement verified against the actual design: blank region
-              x:0-470px, y:1250-1620px on the 1240x1754px source, converted to mm
-              at 150dpi so it lines up regardless of print scaling. */}
+              Placement: left margin matches the text block's own right margin
+              (102px / 17.27mm) for a balanced two-column layout, vertically
+              centered against the "Scan to Register" text block. Converted to
+              mm at 150dpi so it lines up regardless of print scaling. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://www.rippingbombs.com/register&margin=0"
             alt="Scan to register on Ripping Bombs"
-            style={{ position: 'absolute', left: '6.26mm', top: '218.4mm', width: '57.6mm', height: '57.6mm' }}
+            style={{ position: 'absolute', left: '17.27mm', top: '212.35mm', width: '57.6mm', height: '57.6mm' }}
           />
         </div>
       </div>
