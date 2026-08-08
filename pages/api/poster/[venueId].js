@@ -19,11 +19,13 @@ const POSTER_HEIGHT = 1754;
 const POSTER_BG_URL = 'https://www.rippingbombs.com/posters/venue-poster-bg.png';
 
 // ─── QR code placement ───
-// Adjust these to match wherever you left space in your design. All values
-// are in pixels on the POSTER_WIDTH x POSTER_HEIGHT canvas above.
-const QR_SIZE = 380;
-const QR_X = (POSTER_WIDTH - QR_SIZE) / 2; // centered horizontally by default
-const QR_Y = POSTER_HEIGHT - QR_SIZE - 160; // 160px up from the bottom edge
+// Verified against the actual design: x:0-470, y:1250-1620 is genuinely
+// blank (checked pixel-by-pixel), and the design's consistent left margin
+// elsewhere in the poster is 37px. Footer content starts at y:1700, so this
+// leaves clean space above it.
+const QR_SIZE = 340;
+const QR_X = 37;
+const QR_Y = 1290;
 
 export default async function handler(req) {
   const url = new URL(req.url);
