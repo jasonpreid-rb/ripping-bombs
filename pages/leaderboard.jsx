@@ -25,20 +25,28 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
   const COLS = ['Rank','Player','Distance','Club','HCP','Age','Gender','Course','Event','Date','Tier','Share'];
   const scrollRef = useRef(null);
 
-  const handleWheel = (e) => {
+  useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    // Only hijack the wheel when there's actually horizontal overflow,
-    // and the scroll is primarily vertical (a plain mouse wheel).
-    const canScrollH = el.scrollWidth > el.clientWidth;
-    if (!canScrollH) return;
-    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return; // let native horizontal gestures pass through
-    e.preventDefault();
-    el.scrollLeft += e.deltaY;
-  };
+
+    // React's onWheel is passive by default, so preventDefault() inside a
+    // JSX handler is silently ignored (page scrolls AND div scrolls at once).
+    // Attaching manually with { passive:false } lets us actually stop the
+    // vertical page scroll when we redirect it into horizontal table scroll.
+    const handleWheel = (e) => {
+      const canScrollH = el.scrollWidth > el.clientWidth;
+      if (!canScrollH) return;
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return; // let native horizontal gestures pass through
+      e.preventDefault();
+      el.scrollLeft += e.deltaY;
+    };
+
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
+  }, []);
 
   return (
-    <div ref={scrollRef} onWheel={handleWheel} style={{overflowX:'auto',border:`1px solid ${BDR}`,background:BG2}}>
+    <div ref={scrollRef} style={{overflowX:'auto',border:`1px solid ${BDR}`,background:BG2}}>
       <table style={{width:'100%',borderCollapse:'collapse',minWidth:750}}>
         <thead>
           <tr>
