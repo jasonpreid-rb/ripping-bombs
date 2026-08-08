@@ -75,7 +75,7 @@ export default function Page() {
               <div style={{ fontSize: 13, color: MUT }}>A4 &middot; print-ready &middot; PNG/HTML &middot; free</div>
             </div>
             <a
-              href="/posters/increase-bookings-poster.html"
+              href="/api/poster/generic"
               download
               style={{
                 background: ORG, color: '#0e0e0e', fontWeight: 700, fontSize: 14,
