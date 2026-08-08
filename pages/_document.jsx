@@ -4,8 +4,6 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        <meta name="robots" content="noai, noimageai" />
-<meta name="googlebot" content="noai" />
         <link rel="icon" type="image/png" href="/favicon.png"/>
         <link rel="apple-touch-icon" href="/favicon.png"/>
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
