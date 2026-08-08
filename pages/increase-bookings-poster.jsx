@@ -27,38 +27,17 @@ export default function IncreaseBookingsPoster() {
           background: #4a4a4a;
         }
         @media print {
-          /* Force the CSS background-image to actually print — browsers
-             skip backgrounds by default unless told otherwise. */
+          html, body { background: none; }
+          .poster-page-wrap { min-height: 0 !important; }
           #poster-sheet {
+            box-shadow: none !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
-          }
-
-          /* Collapse everything else to zero height so its hidden layout
-             space doesn't push the poster onto a second page. visibility:
-             hidden alone still reserves space; this removes it. */
-          html, body {
-            height: 0 !important;
-            margin: 0 !important;
-            overflow: hidden !important;
-            background: none !important;
-          }
-
-          body * { visibility: hidden; }
-          #poster-sheet, #poster-sheet * { visibility: visible; }
-
-          #poster-sheet {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 210mm;
-            height: 297mm;
-            box-shadow: none !important;
           }
         }
       `}</style>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+      <div className="poster-page-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
         <div
           id="poster-sheet"
           style={{

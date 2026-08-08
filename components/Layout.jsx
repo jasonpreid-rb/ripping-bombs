@@ -69,7 +69,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: '#1a1a1a', color: '#f0f0f0', fontFamily: SANS }}>
+    <div className="site-shell" style={{ minHeight: '100vh', background: '#1a1a1a', color: '#f0f0f0', fontFamily: SANS }}>
 
       {/* Announcement Banner — hidden on mobile via .promo-banner CSS rule */}
       {!bannerDismissed && (
@@ -108,6 +108,20 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
         @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
         .brand-row:hover .brand-logo{opacity:1;filter:grayscale(1) brightness(0) invert(1);}
         .brand-row:hover .brand-chip{border-color:rgba(255,0,144,0.25);background:rgba(255,0,144,0.04);}
+
+        /* Print mode — used by pages that render a print-only asset (e.g.
+           /increase-bookings-poster) inside <main>. These use display:none
+           rather than visibility:hidden so the hidden elements don't
+           reserve layout space, which was previously causing a phantom
+           blank page. The page itself only needs to render its own
+           content in <main> — no fixed/absolute positioning required. */
+        @media print {
+          .site-shell { min-height: 0 !important; }
+          .promo-banner, .site-header, .more-panel, .brand-marquee, .bottom-tabbar, footer {
+            display: none !important;
+          }
+          main { margin: 0 !important; padding: 0 !important; }
+        }
       `}</style>
 
       {/* HEADER */}
@@ -178,7 +192,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
         </button>
       </div>
 
-      <div style={{ background:'#0e0e0e', borderTop:'1px solid rgba(255,255,255,0.06)', borderBottom:'1px solid rgba(255,255,255,0.06)', padding:'18px 16px' }}>
+      <div className="brand-marquee" style={{ background:'#0e0e0e', borderTop:'1px solid rgba(255,255,255,0.06)', borderBottom:'1px solid rgba(255,255,255,0.06)', padding:'18px 16px' }}>
         <div onClick={() => navTo('/supported-simulators')} style={{ fontFamily:SANS, fontSize:9, fontWeight:700, letterSpacing:2, color:'rgba(255,255,255,0.18)', textTransform:'uppercase', textAlign:'center', marginBottom:12, cursor:'pointer' }}>Compatible with →</div>
         <div className="brand-row" style={{ display:'flex', flexWrap:'wrap', justifyContent:'center', gap:10 }}>
           {SIM_BRANDS.map((brand, i) => (
