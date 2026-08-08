@@ -28,6 +28,22 @@ const SITE_URL = 'https://www.rippingbombs.com';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+// Today's date (UTC, YYYY-MM-DD) at build time — used as a ceiling so a
+// bad/typo'd future date in `entries.date` (e.g. a demo row entered as
+// 2026-09-30) can never leak into a page's <lastmod> and post-date the
+// actual build. Search-engine crawlers can penalize trust in a sitemap
+// where lastmod is in the future.
+const TODAY = new Date().toISOString().slice(0, 10);
+
+// Returns `date` only if it's a well-formed YYYY-MM-DD string that is not
+// later than today; otherwise returns null so callers fall back to "no
+// lastmod" rather than propagating a bogus value.
+function safeDate(date) {
+  if (!date || typeof date !== 'string') return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  return date <= TODAY ? date : null;
+}
+
 // Core, hand-maintained app pages. Update this list if you add/remove
 // a top-level app page (not an SEO content page — those go in seoPages.js).
 const corePages = [
@@ -96,15 +112,21 @@ async function getDynamicData() {
   const lastEntryByOrg = {};
   const entryCountByOrg = {};
   let siteWideLatest = null;
+  let skippedFutureDates = 0;
   (entryRows || []).forEach((e) => {
+    const date = safeDate(e.date);
+    if (e.date && !date) skippedFutureDates++;
     [e.orgId, e.venueId].filter(Boolean).forEach((id) => {
       entryCountByOrg[id] = (entryCountByOrg[id] || 0) + 1;
-      if (e.date && (!lastEntryByOrg[id] || e.date > lastEntryByOrg[id])) {
-        lastEntryByOrg[id] = e.date;
+      if (date && (!lastEntryByOrg[id] || date > lastEntryByOrg[id])) {
+        lastEntryByOrg[id] = date;
       }
     });
-    if (e.date && (!siteWideLatest || e.date > siteWideLatest)) siteWideLatest = e.date;
+    if (date && (!siteWideLatest || date > siteWideLatest)) siteWideLatest = date;
   });
+  if (skippedFutureDates > 0) {
+    console.warn(`[sitemap] Ignored ${skippedFutureDates} entries.date value(s) that were invalid or in the future (after ${TODAY}) — check for typo'd data.`);
+  }
 
   // Venues with zero recorded drives are thin/near-duplicate pages —
   // Google was leaving 50+ URLs as "Discovered - currently not indexed"
@@ -166,7 +188,7 @@ async function generate() {
   );
 
   const seo = seoPages.map((p) =>
-    urlEntry(`/${p.slug}`, p.changefreq, p.priority, p.lastmod || (dynamicChangefreqs.has(p.changefreq) ? siteWideLatest : null))
+    urlEntry(`/${p.slug}`, p.changefreq, p.priority, safeDate(p.lastmod) || (dynamicChangefreqs.has(p.changefreq) ? siteWideLatest : null))
   );
 
   const all = [...core, ...seo, ...clubUrls, ...profileUrls];
