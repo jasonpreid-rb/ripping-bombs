@@ -40,6 +40,12 @@ export function middleware(request) {
 }
 
 export const config = {
-  // Run on all routes except Next.js internals and static files
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  // Run on all routes except Next.js internals and any static asset —
+  // anything with a file extension (.html, .png, .css, .js, .ico, etc.)
+  // is excluded, since real pages never have a dot in their path but
+  // files in public/ do. Previously only _next/static, _next/image, and
+  // favicon.ico were excluded, which left every other public/ file
+  // (including this poster's .html and .png) running through middleware
+  // unnecessarily.
+  matcher: ['/((?!_next/static|_next/image|.*\\..*).*)'],
 };
