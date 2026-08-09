@@ -54,6 +54,7 @@ const corePages = [
   { slug: 'login', priority: 0.6, changefreq: 'monthly' },
   { slug: 'contact', priority: 0.8, changefreq: 'monthly' },
   { slug: 'clubs', priority: 0.9, changefreq: 'weekly' },
+  { slug: 'for-venues', priority: 0.8, changefreq: 'monthly' },
   { slug: 'submit-your-longest-drive', priority: 0.75, changefreq: 'monthly' },
   { slug: 'resources', priority: 0.7, changefreq: 'monthly' },
 ];
