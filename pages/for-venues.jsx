@@ -46,8 +46,15 @@ export default function ForVenues() {
             <div className="tv-cam" />
             <div className="tv-screen">
               <iframe
+                className="live-embed"
                 src="/venue-display-demo"
                 title="Live leaderboard demo"
+                loading="lazy"
+              />
+              <img
+                className="mobile-shot"
+                src="/images/tv-demo-preview.svg"
+                alt="Sample longest-drive leaderboard shown on a venue TV"
                 loading="lazy"
               />
             </div>
@@ -169,6 +176,16 @@ export default function ForVenues() {
           height: 100%;
           border: none;
           display: block;
+        }
+        .tv-screen .mobile-shot {
+          display: none;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        @media (max-width: 640px) {
+          .tv-screen .live-embed { display: none; }
+          .tv-screen .mobile-shot { display: block; }
         }
         .tv-stand {
           width: 8px;
