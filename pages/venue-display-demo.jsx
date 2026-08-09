@@ -17,8 +17,6 @@ import Head from 'next/head';
 
 const ROTATE_MS = 16000;
 
-const FLAGS = { US: '🇺🇸', GB: '🇬🇧', CA: '🇨🇦', AU: '🇦🇺', DE: '🇩🇪' };
-
 const VENUE = {
   name: 'Highland Ridge Golf Club',
   location: 'Austin, TX',
@@ -34,25 +32,25 @@ const DIVISIONS = [
     sub: 'This week · Overall division',
     unit: 'YDS',
     venue: [
-      { name: 'Marcus Reid', countryCode: 'US', meta: 'HCP 4', distance: 341, photo: null },
-      { name: 'Devon Clarke', countryCode: 'CA', meta: 'HCP 8', distance: 336, photo: null },
-      { name: 'Tyler Osei', countryCode: 'US', meta: 'HCP 2', distance: 329, photo: null },
-      { name: 'Sam Whitfield', countryCode: 'GB', meta: 'HCP 11', distance: 324, photo: null },
-      { name: 'Jake Bonnano', countryCode: 'US', meta: 'HCP 6', distance: 318, photo: null },
+      { name: 'Marcus Reid', countryCode: 'US', meta: 'HCP 4', distance: 341, photo: 'https://i.pravatar.cc/150?img=12' },
+      { name: 'Devon Clarke', countryCode: 'CA', meta: 'HCP 8', distance: 336, photo: 'https://i.pravatar.cc/150?img=33' },
+      { name: 'Tyler Osei', countryCode: 'US', meta: 'HCP 2', distance: 329, photo: 'https://i.pravatar.cc/150?img=14' },
+      { name: 'Sam Whitfield', countryCode: 'GB', meta: 'HCP 11', distance: 324, photo: 'https://i.pravatar.cc/150?img=15' },
+      { name: 'Jake Bonnano', countryCode: 'US', meta: 'HCP 6', distance: 318, photo: 'https://i.pravatar.cc/150?img=22' },
     ],
     global: [
-      { name: 'Elias Vogt', countryCode: 'DE', meta: 'Ironwood GC, Munich', distance: 352, photo: null },
-      { name: 'Marcus Reid', countryCode: 'US', meta: 'Highland Ridge GC', distance: 341, photo: null },
-      { name: 'Ryan Cassidy', countryCode: 'AU', meta: 'Coastal Pines, Perth', distance: 339, photo: null },
-      { name: 'Devon Clarke', countryCode: 'CA', meta: 'Highland Ridge GC', distance: 336, photo: null },
-      { name: 'Ollie Pratt', countryCode: 'GB', meta: 'The Fairways, Leeds', distance: 333, photo: null },
+      { name: 'Elias Vogt', countryCode: 'DE', meta: 'Ironwood GC, Munich', distance: 352, photo: 'https://i.pravatar.cc/150?img=5' },
+      { name: 'Marcus Reid', countryCode: 'US', meta: 'Highland Ridge GC', distance: 341, photo: 'https://i.pravatar.cc/150?img=12' },
+      { name: 'Ryan Cassidy', countryCode: 'AU', meta: 'Coastal Pines, Perth', distance: 339, photo: 'https://i.pravatar.cc/150?img=8' },
+      { name: 'Devon Clarke', countryCode: 'CA', meta: 'Highland Ridge GC', distance: 336, photo: 'https://i.pravatar.cc/150?img=33' },
+      { name: 'Ollie Pratt', countryCode: 'GB', meta: 'The Fairways, Leeds', distance: 333, photo: 'https://i.pravatar.cc/150?img=17' },
     ],
     allTime: [
-      { name: 'Marcus Reid', countryCode: 'US', meta: 'Set Mar 2026', distance: 351, photo: null },
-      { name: 'Anthony Cruz', countryCode: 'US', meta: 'Set Nov 2025', distance: 347, photo: null },
-      { name: 'Devon Clarke', countryCode: 'CA', meta: 'Set Jan 2026', distance: 344, photo: null },
-      { name: 'Tyler Osei', countryCode: 'US', meta: 'Set Jun 2026', distance: 340, photo: null },
-      { name: 'Sam Whitfield', countryCode: 'GB', meta: 'Set Feb 2026', distance: 337, photo: null },
+      { name: 'Marcus Reid', countryCode: 'US', meta: 'Set Mar 2026', distance: 351, photo: 'https://i.pravatar.cc/150?img=12' },
+      { name: 'Anthony Cruz', countryCode: 'US', meta: 'Set Nov 2025', distance: 347, photo: 'https://i.pravatar.cc/150?img=19' },
+      { name: 'Devon Clarke', countryCode: 'CA', meta: 'Set Jan 2026', distance: 344, photo: 'https://i.pravatar.cc/150?img=33' },
+      { name: 'Tyler Osei', countryCode: 'US', meta: 'Set Jun 2026', distance: 340, photo: 'https://i.pravatar.cc/150?img=14' },
+      { name: 'Sam Whitfield', countryCode: 'GB', meta: 'Set Feb 2026', distance: 337, photo: 'https://i.pravatar.cc/150?img=15' },
     ],
   },
   {
@@ -62,25 +60,25 @@ const DIVISIONS = [
     sub: 'HCP 0–16',
     unit: 'YDS',
     venue: [
-      { name: 'Tyler Osei', countryCode: 'US', meta: 'HCP 2', distance: 329, photo: null },
-      { name: 'Marcus Reid', countryCode: 'US', meta: 'HCP 4', distance: 341, photo: null },
-      { name: 'Jake Bonnano', countryCode: 'US', meta: 'HCP 6', distance: 318, photo: null },
-      { name: 'Devon Clarke', countryCode: 'CA', meta: 'HCP 8', distance: 336, photo: null },
-      { name: 'Priya Nair', countryCode: 'US', meta: 'HCP 12', distance: 301, photo: null },
+      { name: 'Tyler Osei', countryCode: 'US', meta: 'HCP 2', distance: 329, photo: 'https://i.pravatar.cc/150?img=14' },
+      { name: 'Marcus Reid', countryCode: 'US', meta: 'HCP 4', distance: 341, photo: 'https://i.pravatar.cc/150?img=12' },
+      { name: 'Jake Bonnano', countryCode: 'US', meta: 'HCP 6', distance: 318, photo: 'https://i.pravatar.cc/150?img=22' },
+      { name: 'Devon Clarke', countryCode: 'CA', meta: 'HCP 8', distance: 336, photo: 'https://i.pravatar.cc/150?img=33' },
+      { name: 'Priya Nair', countryCode: 'US', meta: 'HCP 12', distance: 301, photo: 'https://i.pravatar.cc/150?img=47' },
     ],
     global: [
-      { name: 'Elias Vogt', countryCode: 'DE', meta: 'Ironwood GC, Munich', distance: 352, photo: null },
-      { name: 'Ryan Cassidy', countryCode: 'AU', meta: 'Coastal Pines, Perth', distance: 339, photo: null },
-      { name: 'Marcus Reid', countryCode: 'US', meta: 'Highland Ridge GC', distance: 341, photo: null },
-      { name: 'Tyler Osei', countryCode: 'US', meta: 'Highland Ridge GC', distance: 329, photo: null },
-      { name: 'Devon Clarke', countryCode: 'CA', meta: 'Highland Ridge GC', distance: 336, photo: null },
+      { name: 'Elias Vogt', countryCode: 'DE', meta: 'Ironwood GC, Munich', distance: 352, photo: 'https://i.pravatar.cc/150?img=5' },
+      { name: 'Ryan Cassidy', countryCode: 'AU', meta: 'Coastal Pines, Perth', distance: 339, photo: 'https://i.pravatar.cc/150?img=8' },
+      { name: 'Marcus Reid', countryCode: 'US', meta: 'Highland Ridge GC', distance: 341, photo: 'https://i.pravatar.cc/150?img=12' },
+      { name: 'Tyler Osei', countryCode: 'US', meta: 'Highland Ridge GC', distance: 329, photo: 'https://i.pravatar.cc/150?img=14' },
+      { name: 'Devon Clarke', countryCode: 'CA', meta: 'Highland Ridge GC', distance: 336, photo: 'https://i.pravatar.cc/150?img=33' },
     ],
     allTime: [
-      { name: 'Marcus Reid', countryCode: 'US', meta: 'Set Mar 2026', distance: 351, photo: null },
-      { name: 'Tyler Osei', countryCode: 'US', meta: 'Set Jun 2026', distance: 340, photo: null },
-      { name: 'Devon Clarke', countryCode: 'CA', meta: 'Set Jan 2026', distance: 344, photo: null },
-      { name: 'Jake Bonnano', countryCode: 'US', meta: 'Set May 2026', distance: 322, photo: null },
-      { name: 'Priya Nair', countryCode: 'US', meta: 'Set Apr 2026', distance: 309, photo: null },
+      { name: 'Marcus Reid', countryCode: 'US', meta: 'Set Mar 2026', distance: 351, photo: 'https://i.pravatar.cc/150?img=12' },
+      { name: 'Tyler Osei', countryCode: 'US', meta: 'Set Jun 2026', distance: 340, photo: 'https://i.pravatar.cc/150?img=14' },
+      { name: 'Devon Clarke', countryCode: 'CA', meta: 'Set Jan 2026', distance: 344, photo: 'https://i.pravatar.cc/150?img=33' },
+      { name: 'Jake Bonnano', countryCode: 'US', meta: 'Set May 2026', distance: 322, photo: 'https://i.pravatar.cc/150?img=22' },
+      { name: 'Priya Nair', countryCode: 'US', meta: 'Set Apr 2026', distance: 309, photo: 'https://i.pravatar.cc/150?img=47' },
     ],
   },
   {
@@ -90,25 +88,25 @@ const DIVISIONS = [
     sub: 'This week · All handicaps',
     unit: 'YDS',
     venue: [
-      { name: 'Priya Nair', countryCode: 'US', meta: 'HCP 12', distance: 301, photo: null },
-      { name: 'Casey Lindgren', countryCode: 'US', meta: 'HCP 9', distance: 294, photo: null },
-      { name: 'Freya Holt', countryCode: 'GB', meta: 'HCP 15', distance: 287, photo: null },
-      { name: 'Maddie Okafor', countryCode: 'CA', meta: 'HCP 18', distance: 279, photo: null },
-      { name: 'Renee Duval', countryCode: 'US', meta: 'HCP 21', distance: 271, photo: null },
+      { name: 'Priya Nair', countryCode: 'US', meta: 'HCP 12', distance: 301, photo: 'https://i.pravatar.cc/150?img=47' },
+      { name: 'Casey Lindgren', countryCode: 'US', meta: 'HCP 9', distance: 294, photo: 'https://i.pravatar.cc/150?img=49' },
+      { name: 'Freya Holt', countryCode: 'GB', meta: 'HCP 15', distance: 287, photo: 'https://i.pravatar.cc/150?img=44' },
+      { name: 'Maddie Okafor', countryCode: 'CA', meta: 'HCP 18', distance: 279, photo: 'https://i.pravatar.cc/150?img=29' },
+      { name: 'Renee Duval', countryCode: 'US', meta: 'HCP 21', distance: 271, photo: 'https://i.pravatar.cc/150?img=26' },
     ],
     global: [
-      { name: 'Lena Brandt', countryCode: 'DE', meta: 'Ironwood GC, Munich', distance: 312, photo: null },
-      { name: 'Priya Nair', countryCode: 'US', meta: 'Highland Ridge GC', distance: 301, photo: null },
-      { name: 'Casey Lindgren', countryCode: 'US', meta: 'Highland Ridge GC', distance: 294, photo: null },
-      { name: 'Zara Bishop', countryCode: 'AU', meta: 'Coastal Pines, Perth', distance: 290, photo: null },
-      { name: 'Freya Holt', countryCode: 'GB', meta: 'Highland Ridge GC', distance: 287, photo: null },
+      { name: 'Lena Brandt', countryCode: 'DE', meta: 'Ironwood GC, Munich', distance: 312, photo: 'https://i.pravatar.cc/150?img=31' },
+      { name: 'Priya Nair', countryCode: 'US', meta: 'Highland Ridge GC', distance: 301, photo: 'https://i.pravatar.cc/150?img=47' },
+      { name: 'Casey Lindgren', countryCode: 'US', meta: 'Highland Ridge GC', distance: 294, photo: 'https://i.pravatar.cc/150?img=49' },
+      { name: 'Zara Bishop', countryCode: 'AU', meta: 'Coastal Pines, Perth', distance: 290, photo: 'https://i.pravatar.cc/150?img=38' },
+      { name: 'Freya Holt', countryCode: 'GB', meta: 'Highland Ridge GC', distance: 287, photo: 'https://i.pravatar.cc/150?img=44' },
     ],
     allTime: [
-      { name: 'Priya Nair', countryCode: 'US', meta: 'Set Apr 2026', distance: 309, photo: null },
-      { name: 'Casey Lindgren', countryCode: 'US', meta: 'Set Feb 2026', distance: 298, photo: null },
-      { name: 'Freya Holt', countryCode: 'GB', meta: 'Set Dec 2025', distance: 291, photo: null },
-      { name: 'Maddie Okafor', countryCode: 'CA', meta: 'Set Jun 2026', distance: 283, photo: null },
-      { name: 'Renee Duval', countryCode: 'US', meta: 'Set Mar 2026', distance: 275, photo: null },
+      { name: 'Priya Nair', countryCode: 'US', meta: 'Set Apr 2026', distance: 309, photo: 'https://i.pravatar.cc/150?img=47' },
+      { name: 'Casey Lindgren', countryCode: 'US', meta: 'Set Feb 2026', distance: 298, photo: 'https://i.pravatar.cc/150?img=49' },
+      { name: 'Freya Holt', countryCode: 'GB', meta: 'Set Dec 2025', distance: 291, photo: 'https://i.pravatar.cc/150?img=44' },
+      { name: 'Maddie Okafor', countryCode: 'CA', meta: 'Set Jun 2026', distance: 283, photo: 'https://i.pravatar.cc/150?img=29' },
+      { name: 'Renee Duval', countryCode: 'US', meta: 'Set Mar 2026', distance: 275, photo: 'https://i.pravatar.cc/150?img=26' },
     ],
   },
   {
@@ -118,25 +116,25 @@ const DIVISIONS = [
     sub: 'This week · Age 55+',
     unit: 'YDS',
     venue: [
-      { name: 'Gary Fenwick', countryCode: 'US', meta: 'HCP 10', distance: 279, photo: null },
-      { name: 'Robert Chan', countryCode: 'CA', meta: 'HCP 14', distance: 271, photo: null },
-      { name: 'Ian Sutcliffe', countryCode: 'GB', meta: 'HCP 7', distance: 268, photo: null },
-      { name: 'Dale Morrison', countryCode: 'US', meta: 'HCP 16', distance: 259, photo: null },
-      { name: 'Frank Delvecchio', countryCode: 'US', meta: 'HCP 19', distance: 251, photo: null },
+      { name: 'Gary Fenwick', countryCode: 'US', meta: 'HCP 10', distance: 279, photo: 'https://i.pravatar.cc/150?img=51' },
+      { name: 'Robert Chan', countryCode: 'CA', meta: 'HCP 14', distance: 271, photo: 'https://i.pravatar.cc/150?img=52' },
+      { name: 'Ian Sutcliffe', countryCode: 'GB', meta: 'HCP 7', distance: 268, photo: 'https://i.pravatar.cc/150?img=53' },
+      { name: 'Dale Morrison', countryCode: 'US', meta: 'HCP 16', distance: 259, photo: 'https://i.pravatar.cc/150?img=54' },
+      { name: 'Frank Delvecchio', countryCode: 'US', meta: 'HCP 19', distance: 251, photo: 'https://i.pravatar.cc/150?img=55' },
     ],
     global: [
-      { name: 'Klaus Richter', countryCode: 'DE', meta: 'Ironwood GC, Munich', distance: 288, photo: null },
-      { name: 'Gary Fenwick', countryCode: 'US', meta: 'Highland Ridge GC', distance: 279, photo: null },
-      { name: 'Neil Ashworth', countryCode: 'AU', meta: 'Coastal Pines, Perth', distance: 274, photo: null },
-      { name: 'Robert Chan', countryCode: 'CA', meta: 'Highland Ridge GC', distance: 271, photo: null },
-      { name: 'Ian Sutcliffe', countryCode: 'GB', meta: 'Highland Ridge GC', distance: 268, photo: null },
+      { name: 'Klaus Richter', countryCode: 'DE', meta: 'Ironwood GC, Munich', distance: 288, photo: 'https://i.pravatar.cc/150?img=56' },
+      { name: 'Gary Fenwick', countryCode: 'US', meta: 'Highland Ridge GC', distance: 279, photo: 'https://i.pravatar.cc/150?img=51' },
+      { name: 'Neil Ashworth', countryCode: 'AU', meta: 'Coastal Pines, Perth', distance: 274, photo: 'https://i.pravatar.cc/150?img=57' },
+      { name: 'Robert Chan', countryCode: 'CA', meta: 'Highland Ridge GC', distance: 271, photo: 'https://i.pravatar.cc/150?img=52' },
+      { name: 'Ian Sutcliffe', countryCode: 'GB', meta: 'Highland Ridge GC', distance: 268, photo: 'https://i.pravatar.cc/150?img=53' },
     ],
     allTime: [
-      { name: 'Gary Fenwick', countryCode: 'US', meta: 'Set Jan 2026', distance: 284, photo: null },
-      { name: 'Robert Chan', countryCode: 'CA', meta: 'Set May 2026', distance: 277, photo: null },
-      { name: 'Ian Sutcliffe', countryCode: 'GB', meta: 'Set Mar 2026', distance: 270, photo: null },
-      { name: 'Dale Morrison', countryCode: 'US', meta: 'Set Nov 2025', distance: 263, photo: null },
-      { name: 'Frank Delvecchio', countryCode: 'US', meta: 'Set Jun 2026', distance: 255, photo: null },
+      { name: 'Gary Fenwick', countryCode: 'US', meta: 'Set Jan 2026', distance: 284, photo: 'https://i.pravatar.cc/150?img=51' },
+      { name: 'Robert Chan', countryCode: 'CA', meta: 'Set May 2026', distance: 277, photo: 'https://i.pravatar.cc/150?img=52' },
+      { name: 'Ian Sutcliffe', countryCode: 'GB', meta: 'Set Mar 2026', distance: 270, photo: 'https://i.pravatar.cc/150?img=53' },
+      { name: 'Dale Morrison', countryCode: 'US', meta: 'Set Nov 2025', distance: 263, photo: 'https://i.pravatar.cc/150?img=54' },
+      { name: 'Frank Delvecchio', countryCode: 'US', meta: 'Set Jun 2026', distance: 255, photo: 'https://i.pravatar.cc/150?img=55' },
     ],
   },
 ];
@@ -396,7 +394,15 @@ function Row({ rank, row, unit }) {
         />
         <div className="pname-block">
           <div className="pname">
-            {row.countryCode && FLAGS[row.countryCode] ? `${FLAGS[row.countryCode]} ` : ''}
+            {row.countryCode && (
+              <img
+                src={`https://flagcdn.com/20x15/${row.countryCode.toLowerCase()}.png`}
+                alt={row.countryCode}
+                width={16}
+                height={12}
+                className="flag"
+              />
+            )}
             {row.name}
           </div>
           <div className="pmeta">{row.meta}</div>
@@ -408,6 +414,13 @@ function Row({ rank, row, unit }) {
       </div>
 
       <style jsx>{`
+        .flag {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: 5px;
+          border-radius: 2px;
+          margin-top: -2px;
+        }
         .row {
           display: flex; align-items: center; background: var(--panel);
           border: 1px solid var(--bdr); border-radius: 10px; padding: 0 14px;
