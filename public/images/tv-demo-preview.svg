@@ -1,0 +1,223 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
+<defs><radialGradient id="glow" cx="50%" cy="-5%" r="60%"><stop offset="0%" stop-color="#ff0090" stop-opacity="0.12"/><stop offset="100%" stop-color="#08080c" stop-opacity="0"/></radialGradient></defs>
+<rect width="1600" height="900" fill="#08080c"/>
+<rect width="1600" height="900" fill="url(#glow)"/>
+<line x1="0" y1="96" x2="1600" y2="96" stroke="#25252f" stroke-width="1"/>
+<rect x="40" y="26" width="44" height="44" rx="8" fill="#ff0090"/>
+<text x="62" y="54" font-family="Arial, sans-serif" font-weight="700" font-size="20" fill="#08080c" text-anchor="middle">HR</text>
+<text x="98" y="46" font-family="Arial, sans-serif" font-weight="700" font-size="24" letter-spacing="1" fill="#f5f5f7">HIGHLAND RIDGE GOLF CLUB</text>
+<text x="98" y="66" font-family="Arial, sans-serif" font-size="12" letter-spacing="1.5" fill="#8a8a96">AUSTIN, TX</text>
+<circle cx="1340" cy="42" r="5" fill="#ff0090"/>
+<text x="1354" y="47" font-family="Arial, sans-serif" font-size="12" letter-spacing="2" fill="#8a8a96">WEEK 32</text>
+<text x="1560" y="47" font-family="Courier New, monospace" font-size="16" letter-spacing="1" fill="#f5f5f7" text-anchor="end">07:42:15</text>
+<text x="40" y="136" font-family="Arial, sans-serif" font-weight="700" font-size="12" letter-spacing="3" fill="#ff0090">OVERALL</text>
+<text x="40" y="176" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="44" letter-spacing="1" fill="#f5f5f7">LONGEST DRIVES</text>
+<text x="1560" y="154" font-family="Arial, sans-serif" font-size="14" fill="#8a8a96" text-anchor="end">This week · Overall division</text>
+<rect x="40" y="212" width="120" height="24" rx="5" fill="rgba(255,0,144,0.12)" stroke="rgba(255,0,144,0.3)" stroke-width="1"/>
+<text x="100" y="228" font-family="Arial, sans-serif" font-weight="700" font-size="11" letter-spacing="1.5" fill="#ff0090" text-anchor="middle">VENUE</text>
+<text x="170" y="229" font-family="Arial, sans-serif" font-size="12" fill="#8a8a96">Highland Ridge, this week</text>
+<rect x="40" y="250" width="480" height="100.4" rx="10" fill="#121218" stroke="rgba(232,193,112,0.35)" stroke-width="1.5"/>
+<rect x="40" y="250" width="4" height="100.4" rx="2" fill="#e8c170"/>
+<text x="66" y="311.24399999999997" font-family="Arial, sans-serif" font-weight="700" font-size="34" fill="#e8c170">1</text>
+<defs><linearGradient id="av40_250" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff0090"/><stop offset="100%" stop-color="#7a0048"/></linearGradient></defs>
+<circle cx="130" cy="300.2" r="24.096" fill="url(#av40_250)"/>
+<circle cx="130" cy="293.45312" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 115.06048 318.99487999999997 A 14.93952 12.048 0 0 1 144.93952 318.99487999999997 L 144.93952 326.7056 L 115.06048 326.7056 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av40_250)"/>
+<clipPath id="clip-av40_250"><circle cx="130" cy="300.2" r="24.096"/></clipPath>
+<circle cx="130" cy="300.2" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-US-174.096-270.08"><rect x="174.096" y="270.08" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-US-174.096-270.08)"><rect x="174.096" y="270.08" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="174.096" y="273.23542857142854" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="174.096" y="276.3908571428571" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="174.096" y="279.5462857142857" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="174.096" y="282.7017142857143" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="174.096" y="285.85714285714283" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="174.096" y="289.0125714285714" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="174.096" y="270.08" width="12.048000000000002" height="12.148400000000002" fill="#3C3B6E"/></g><rect x="174.096" y="270.08" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="214.216" y="294.176" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Marcus Reid</text>
+<text x="174.096" y="330.32" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">HCP 4</text>
+<text x="500" y="310.24" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#e8c170" text-anchor="end">341<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<rect x="40" y="364.4" width="480" height="100.4" rx="10" fill="#121218" stroke="#25252f" stroke-width="1.5"/>
+<rect x="40" y="364.4" width="4" height="100.4" rx="2" fill="#c7ccd6"/>
+<text x="66" y="425.64399999999995" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#c7ccd6">2</text>
+<defs><linearGradient id="av40_364.4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7fc8ff"/><stop offset="100%" stop-color="#1a5c8a"/></linearGradient></defs>
+<circle cx="130" cy="414.59999999999997" r="24.096" fill="url(#av40_364.4)"/>
+<circle cx="130" cy="407.85312" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 115.06048 433.39487999999994 A 14.93952 12.048 0 0 1 144.93952 433.39487999999994 L 144.93952 441.1056 L 115.06048 441.1056 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av40_364.4)"/>
+<clipPath id="clip-av40_364.4"><circle cx="130" cy="414.59999999999997" r="24.096"/></clipPath>
+<circle cx="130" cy="414.59999999999997" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-CA-174.096-384.47999999999996"><rect x="174.096" y="384.47999999999996" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-CA-174.096-384.47999999999996)"><rect x="174.096" y="384.47999999999996" width="10.040000000000001" height="22.088" fill="#D80621"/><rect x="184.136" y="384.47999999999996" width="10.040000000000001" height="22.088" fill="#FFFFFF"/><rect x="194.17600000000002" y="384.47999999999996" width="10.040000000000001" height="22.088" fill="#D80621"/><path d="M 189.156 388.45583999999997 L 190.662 394.41959999999995 L 193.3728 393.31519999999995 L 191.8668 396.62839999999994 L 195.18 397.29103999999995 L 190.9632 399.49983999999995 L 191.56560000000002 402.5921599999999 L 189.156 399.94159999999994 L 186.7464 402.5921599999999 L 187.3488 399.49983999999995 L 183.132 397.29103999999995 L 186.4452 396.62839999999994 L 184.9392 393.31519999999995 L 187.65 394.41959999999995 Z" fill="#D80621"/></g><rect x="174.096" y="384.47999999999996" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="214.216" y="408.57599999999996" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Devon Clarke</text>
+<text x="174.096" y="444.71999999999997" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">HCP 8</text>
+<text x="500" y="424.64" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#c7ccd6" text-anchor="end">336<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<rect x="40" y="478.79999999999995" width="480" height="100.4" rx="10" fill="#121218" stroke="#25252f" stroke-width="1.5"/>
+<rect x="40" y="478.79999999999995" width="4" height="100.4" rx="2" fill="#d99567"/>
+<text x="66" y="540.044" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#d99567">3</text>
+<defs><linearGradient id="av40_478.79999999999995" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8c170"/><stop offset="100%" stop-color="#8a6a26"/></linearGradient></defs>
+<circle cx="130" cy="529.0" r="24.096" fill="url(#av40_478.79999999999995)"/>
+<circle cx="130" cy="522.25312" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 115.06048 547.79488 A 14.93952 12.048 0 0 1 144.93952 547.79488 L 144.93952 555.5056 L 115.06048 555.5056 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av40_478.79999999999995)"/>
+<clipPath id="clip-av40_478.79999999999995"><circle cx="130" cy="529.0" r="24.096"/></clipPath>
+<circle cx="130" cy="529.0" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-US-174.096-498.88"><rect x="174.096" y="498.88" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-US-174.096-498.88)"><rect x="174.096" y="498.88" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="174.096" y="502.03542857142855" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="174.096" y="505.1908571428571" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="174.096" y="508.3462857142857" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="174.096" y="511.5017142857143" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="174.096" y="514.6571428571428" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="174.096" y="517.8125714285715" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="174.096" y="498.88" width="12.048000000000002" height="12.148400000000002" fill="#3C3B6E"/></g><rect x="174.096" y="498.88" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="214.216" y="522.976" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Tyler Osei</text>
+<text x="174.096" y="559.12" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">HCP 2</text>
+<text x="500" y="539.04" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#d99567" text-anchor="end">329<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<rect x="40" y="593.1999999999999" width="480" height="100.4" rx="10" fill="#121218" stroke="#25252f" stroke-width="1.5"/>
+<text x="66" y="654.444" font-family="Arial, sans-serif" font-weight="700" font-size="26" fill="#8a8a96">4</text>
+<defs><linearGradient id="av40_593.1999999999999" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#8a8afe"/><stop offset="100%" stop-color="#3a3a9a"/></linearGradient></defs>
+<circle cx="130" cy="643.4" r="24.096" fill="url(#av40_593.1999999999999)"/>
+<circle cx="130" cy="636.65312" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 115.06048 662.19488 A 14.93952 12.048 0 0 1 144.93952 662.19488 L 144.93952 669.9055999999999 L 115.06048 669.9055999999999 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av40_593.1999999999999)"/>
+<clipPath id="clip-av40_593.1999999999999"><circle cx="130" cy="643.4" r="24.096"/></clipPath>
+<circle cx="130" cy="643.4" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-GB-174.096-613.28"><rect x="174.096" y="613.28" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-GB-174.096-613.28)"><rect x="174.096" y="613.28" width="30.12" height="22.088" fill="#012169"/><line x1="174.096" y1="613.28" x2="204.216" y2="635.3679999999999" stroke="#FFFFFF" stroke-width="6.184640000000001"/><line x1="204.216" y1="613.28" x2="174.096" y2="635.3679999999999" stroke="#FFFFFF" stroke-width="6.184640000000001"/><line x1="174.096" y1="613.28" x2="204.216" y2="635.3679999999999" stroke="#C8102E" stroke-width="2.65056"/><line x1="204.216" y1="613.28" x2="174.096" y2="635.3679999999999" stroke="#C8102E" stroke-width="2.65056"/><rect x="186.144" y="613.28" width="6.024000000000001" height="22.088" fill="#FFFFFF"/><rect x="174.096" y="620.7899199999999" width="30.12" height="7.068160000000001" fill="#FFFFFF"/><rect x="187.3488" y="613.28" width="3.6144" height="22.088" fill="#C8102E"/><rect x="174.096" y="622.1152" width="30.12" height="4.4176" fill="#C8102E"/></g><rect x="174.096" y="613.28" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="214.216" y="637.376" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Sam Whitfield</text>
+<text x="174.096" y="673.52" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">HCP 11</text>
+<text x="500" y="653.4399999999999" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#f5f5f7" text-anchor="end">324<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<rect x="40" y="707.5999999999999" width="480" height="100.4" rx="10" fill="#121218" stroke="#25252f" stroke-width="1.5"/>
+<text x="66" y="768.8439999999999" font-family="Arial, sans-serif" font-weight="700" font-size="26" fill="#8a8a96">5</text>
+<defs><linearGradient id="av40_707.5999999999999" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5fd6a8"/><stop offset="100%" stop-color="#1f7a56"/></linearGradient></defs>
+<circle cx="130" cy="757.8" r="24.096" fill="url(#av40_707.5999999999999)"/>
+<circle cx="130" cy="751.0531199999999" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 115.06048 776.59488 A 14.93952 12.048 0 0 1 144.93952 776.59488 L 144.93952 784.3055999999999 L 115.06048 784.3055999999999 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av40_707.5999999999999)"/>
+<clipPath id="clip-av40_707.5999999999999"><circle cx="130" cy="757.8" r="24.096"/></clipPath>
+<circle cx="130" cy="757.8" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-US-174.096-727.68"><rect x="174.096" y="727.68" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-US-174.096-727.68)"><rect x="174.096" y="727.68" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="174.096" y="730.8354285714286" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="174.096" y="733.9908571428571" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="174.096" y="737.1462857142857" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="174.096" y="740.3017142857142" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="174.096" y="743.4571428571428" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="174.096" y="746.6125714285714" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="174.096" y="727.68" width="12.048000000000002" height="12.148400000000002" fill="#3C3B6E"/></g><rect x="174.096" y="727.68" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="214.216" y="751.776" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Jake Bonnano</text>
+<text x="174.096" y="787.92" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">HCP 6</text>
+<text x="500" y="767.8399999999999" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#f5f5f7" text-anchor="end">318<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<rect x="544" y="212" width="120" height="24" rx="5" fill="rgba(127,200,255,0.1)" stroke="rgba(127,200,255,0.28)" stroke-width="1"/>
+<text x="604" y="228" font-family="Arial, sans-serif" font-weight="700" font-size="11" letter-spacing="1.5" fill="#7fc8ff" text-anchor="middle">GLOBAL</text>
+<text x="674" y="229" font-family="Arial, sans-serif" font-size="12" fill="#8a8a96">All venues, this week</text>
+<rect x="544" y="250" width="480" height="100.4" rx="10" fill="#121218" stroke="rgba(232,193,112,0.35)" stroke-width="1.5"/>
+<rect x="544" y="250" width="4" height="100.4" rx="2" fill="#e8c170"/>
+<text x="570" y="311.24399999999997" font-family="Arial, sans-serif" font-weight="700" font-size="34" fill="#e8c170">1</text>
+<defs><linearGradient id="av544_250" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff0090"/><stop offset="100%" stop-color="#7a0048"/></linearGradient></defs>
+<circle cx="634" cy="300.2" r="24.096" fill="url(#av544_250)"/>
+<circle cx="634" cy="293.45312" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 619.06048 318.99487999999997 A 14.93952 12.048 0 0 1 648.93952 318.99487999999997 L 648.93952 326.7056 L 619.06048 326.7056 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av544_250)"/>
+<clipPath id="clip-av544_250"><circle cx="634" cy="300.2" r="24.096"/></clipPath>
+<circle cx="634" cy="300.2" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-DE-678.096-270.08"><rect x="678.096" y="270.08" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-DE-678.096-270.08)"><rect x="678.096" y="270.08" width="30.12" height="7.862666666666667" fill="#000000"/><rect x="678.096" y="277.44266666666664" width="30.12" height="7.862666666666667" fill="#DD0000"/><rect x="678.096" y="284.8053333333333" width="30.12" height="7.862666666666667" fill="#FFCE00"/></g><rect x="678.096" y="270.08" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="718.216" y="294.176" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Elias Vogt</text>
+<text x="678.096" y="330.32" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">Ironwood GC, Munich</text>
+<text x="1004" y="310.24" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#e8c170" text-anchor="end">352<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<rect x="544" y="364.4" width="480" height="100.4" rx="10" fill="#121218" stroke="#25252f" stroke-width="1.5"/>
+<rect x="544" y="364.4" width="4" height="100.4" rx="2" fill="#c7ccd6"/>
+<text x="570" y="425.64399999999995" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#c7ccd6">2</text>
+<defs><linearGradient id="av544_364.4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7fc8ff"/><stop offset="100%" stop-color="#1a5c8a"/></linearGradient></defs>
+<circle cx="634" cy="414.59999999999997" r="24.096" fill="url(#av544_364.4)"/>
+<circle cx="634" cy="407.85312" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 619.06048 433.39487999999994 A 14.93952 12.048 0 0 1 648.93952 433.39487999999994 L 648.93952 441.1056 L 619.06048 441.1056 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av544_364.4)"/>
+<clipPath id="clip-av544_364.4"><circle cx="634" cy="414.59999999999997" r="24.096"/></clipPath>
+<circle cx="634" cy="414.59999999999997" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-US-678.096-384.47999999999996"><rect x="678.096" y="384.47999999999996" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-US-678.096-384.47999999999996)"><rect x="678.096" y="384.47999999999996" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="678.096" y="387.6354285714285" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="678.096" y="390.7908571428571" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="678.096" y="393.9462857142857" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="678.096" y="397.10171428571425" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="678.096" y="400.2571428571428" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="678.096" y="403.41257142857137" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="678.096" y="384.47999999999996" width="12.048000000000002" height="12.148400000000002" fill="#3C3B6E"/></g><rect x="678.096" y="384.47999999999996" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="718.216" y="408.57599999999996" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Marcus Reid</text>
+<text x="678.096" y="444.71999999999997" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">Highland Ridge GC</text>
+<text x="1004" y="424.64" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#c7ccd6" text-anchor="end">341<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<rect x="544" y="478.79999999999995" width="480" height="100.4" rx="10" fill="#121218" stroke="#25252f" stroke-width="1.5"/>
+<rect x="544" y="478.79999999999995" width="4" height="100.4" rx="2" fill="#d99567"/>
+<text x="570" y="540.044" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#d99567">3</text>
+<defs><linearGradient id="av544_478.79999999999995" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8c170"/><stop offset="100%" stop-color="#8a6a26"/></linearGradient></defs>
+<circle cx="634" cy="529.0" r="24.096" fill="url(#av544_478.79999999999995)"/>
+<circle cx="634" cy="522.25312" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 619.06048 547.79488 A 14.93952 12.048 0 0 1 648.93952 547.79488 L 648.93952 555.5056 L 619.06048 555.5056 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av544_478.79999999999995)"/>
+<clipPath id="clip-av544_478.79999999999995"><circle cx="634" cy="529.0" r="24.096"/></clipPath>
+<circle cx="634" cy="529.0" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-AU-678.096-498.88"><rect x="678.096" y="498.88" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-AU-678.096-498.88)"><rect x="678.096" y="498.88" width="30.12" height="22.088" fill="#00008B"/><rect x="678.096" y="498.88" width="15.06" height="11.044" fill="#012169"/><line x1="678.096" y1="498.88" x2="693.156" y2="509.924" stroke="#FFFFFF" stroke-width="2.2088"/><line x1="693.156" y1="498.88" x2="678.096" y2="509.924" stroke="#FFFFFF" stroke-width="2.2088"/><circle cx="701.5896" cy="503.73936" r="1.32528" fill="#FFFFFF"/><circle cx="698.5776" cy="508.15695999999997" r="1.32528" fill="#FFFFFF"/><circle cx="705.204" cy="509.924" r="1.32528" fill="#FFFFFF"/><circle cx="701.5896" cy="514.3416" r="1.32528" fill="#FFFFFF"/><circle cx="696.168" cy="516.5504" r="1.32528" fill="#FFFFFF"/></g><rect x="678.096" y="498.88" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="718.216" y="522.976" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Ryan Cassidy</text>
+<text x="678.096" y="559.12" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">Coastal Pines, Perth</text>
+<text x="1004" y="539.04" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#d99567" text-anchor="end">339<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<rect x="544" y="593.1999999999999" width="480" height="100.4" rx="10" fill="#121218" stroke="#25252f" stroke-width="1.5"/>
+<text x="570" y="654.444" font-family="Arial, sans-serif" font-weight="700" font-size="26" fill="#8a8a96">4</text>
+<defs><linearGradient id="av544_593.1999999999999" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#8a8afe"/><stop offset="100%" stop-color="#3a3a9a"/></linearGradient></defs>
+<circle cx="634" cy="643.4" r="24.096" fill="url(#av544_593.1999999999999)"/>
+<circle cx="634" cy="636.65312" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 619.06048 662.19488 A 14.93952 12.048 0 0 1 648.93952 662.19488 L 648.93952 669.9055999999999 L 619.06048 669.9055999999999 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av544_593.1999999999999)"/>
+<clipPath id="clip-av544_593.1999999999999"><circle cx="634" cy="643.4" r="24.096"/></clipPath>
+<circle cx="634" cy="643.4" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-CA-678.096-613.28"><rect x="678.096" y="613.28" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-CA-678.096-613.28)"><rect x="678.096" y="613.28" width="10.040000000000001" height="22.088" fill="#D80621"/><rect x="688.136" y="613.28" width="10.040000000000001" height="22.088" fill="#FFFFFF"/><rect x="698.176" y="613.28" width="10.040000000000001" height="22.088" fill="#D80621"/><path d="M 693.156 617.2558399999999 L 694.6619999999999 623.2195999999999 L 697.3728 622.1152 L 695.8667999999999 625.4284 L 699.18 626.0910399999999 L 694.9631999999999 628.2998399999999 L 695.5655999999999 631.39216 L 693.156 628.7416 L 690.7464 631.39216 L 691.3488 628.2998399999999 L 687.132 626.0910399999999 L 690.4452 625.4284 L 688.9391999999999 622.1152 L 691.65 623.2195999999999 Z" fill="#D80621"/></g><rect x="678.096" y="613.28" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="718.216" y="637.376" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Devon Clarke</text>
+<text x="678.096" y="673.52" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">Highland Ridge GC</text>
+<text x="1004" y="653.4399999999999" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#f5f5f7" text-anchor="end">336<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<rect x="544" y="707.5999999999999" width="480" height="100.4" rx="10" fill="#121218" stroke="#25252f" stroke-width="1.5"/>
+<text x="570" y="768.8439999999999" font-family="Arial, sans-serif" font-weight="700" font-size="26" fill="#8a8a96">5</text>
+<defs><linearGradient id="av544_707.5999999999999" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5fd6a8"/><stop offset="100%" stop-color="#1f7a56"/></linearGradient></defs>
+<circle cx="634" cy="757.8" r="24.096" fill="url(#av544_707.5999999999999)"/>
+<circle cx="634" cy="751.0531199999999" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 619.06048 776.59488 A 14.93952 12.048 0 0 1 648.93952 776.59488 L 648.93952 784.3055999999999 L 619.06048 784.3055999999999 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av544_707.5999999999999)"/>
+<clipPath id="clip-av544_707.5999999999999"><circle cx="634" cy="757.8" r="24.096"/></clipPath>
+<circle cx="634" cy="757.8" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-GB-678.096-727.68"><rect x="678.096" y="727.68" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-GB-678.096-727.68)"><rect x="678.096" y="727.68" width="30.12" height="22.088" fill="#012169"/><line x1="678.096" y1="727.68" x2="708.216" y2="749.7679999999999" stroke="#FFFFFF" stroke-width="6.184640000000001"/><line x1="708.216" y1="727.68" x2="678.096" y2="749.7679999999999" stroke="#FFFFFF" stroke-width="6.184640000000001"/><line x1="678.096" y1="727.68" x2="708.216" y2="749.7679999999999" stroke="#C8102E" stroke-width="2.65056"/><line x1="708.216" y1="727.68" x2="678.096" y2="749.7679999999999" stroke="#C8102E" stroke-width="2.65056"/><rect x="690.144" y="727.68" width="6.024000000000001" height="22.088" fill="#FFFFFF"/><rect x="678.096" y="735.1899199999999" width="30.12" height="7.068160000000001" fill="#FFFFFF"/><rect x="691.3488" y="727.68" width="3.6144" height="22.088" fill="#C8102E"/><rect x="678.096" y="736.5151999999999" width="30.12" height="4.4176" fill="#C8102E"/></g><rect x="678.096" y="727.68" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="718.216" y="751.776" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Ollie Pratt</text>
+<text x="678.096" y="787.92" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">The Fairways, Leeds</text>
+<text x="1004" y="767.8399999999999" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#f5f5f7" text-anchor="end">333<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<rect x="1048" y="212" width="120" height="24" rx="5" fill="rgba(232,193,112,0.1)" stroke="rgba(232,193,112,0.3)" stroke-width="1"/>
+<text x="1108" y="228" font-family="Arial, sans-serif" font-weight="700" font-size="11" letter-spacing="1.5" fill="#e8c170" text-anchor="middle">ALL-TIME</text>
+<text x="1178" y="229" font-family="Arial, sans-serif" font-size="12" fill="#8a8a96">Highland Ridge record book</text>
+<rect x="1048" y="250" width="480" height="100.4" rx="10" fill="#121218" stroke="rgba(232,193,112,0.35)" stroke-width="1.5"/>
+<rect x="1048" y="250" width="4" height="100.4" rx="2" fill="#e8c170"/>
+<text x="1074" y="311.24399999999997" font-family="Arial, sans-serif" font-weight="700" font-size="34" fill="#e8c170">1</text>
+<defs><linearGradient id="av1048_250" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff0090"/><stop offset="100%" stop-color="#7a0048"/></linearGradient></defs>
+<circle cx="1138" cy="300.2" r="24.096" fill="url(#av1048_250)"/>
+<circle cx="1138" cy="293.45312" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 1123.06048 318.99487999999997 A 14.93952 12.048 0 0 1 1152.93952 318.99487999999997 L 1152.93952 326.7056 L 1123.06048 326.7056 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av1048_250)"/>
+<clipPath id="clip-av1048_250"><circle cx="1138" cy="300.2" r="24.096"/></clipPath>
+<circle cx="1138" cy="300.2" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-US-1182.096-270.08"><rect x="1182.096" y="270.08" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-US-1182.096-270.08)"><rect x="1182.096" y="270.08" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="1182.096" y="273.23542857142854" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="1182.096" y="276.3908571428571" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="1182.096" y="279.5462857142857" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="1182.096" y="282.7017142857143" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="1182.096" y="285.85714285714283" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="1182.096" y="289.0125714285714" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="1182.096" y="270.08" width="12.048000000000002" height="12.148400000000002" fill="#3C3B6E"/></g><rect x="1182.096" y="270.08" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="1222.216" y="294.176" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Marcus Reid</text>
+<text x="1182.096" y="330.32" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">Set Mar 2026</text>
+<text x="1508" y="310.24" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#e8c170" text-anchor="end">351<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<rect x="1048" y="364.4" width="480" height="100.4" rx="10" fill="#121218" stroke="#25252f" stroke-width="1.5"/>
+<rect x="1048" y="364.4" width="4" height="100.4" rx="2" fill="#c7ccd6"/>
+<text x="1074" y="425.64399999999995" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#c7ccd6">2</text>
+<defs><linearGradient id="av1048_364.4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7fc8ff"/><stop offset="100%" stop-color="#1a5c8a"/></linearGradient></defs>
+<circle cx="1138" cy="414.59999999999997" r="24.096" fill="url(#av1048_364.4)"/>
+<circle cx="1138" cy="407.85312" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 1123.06048 433.39487999999994 A 14.93952 12.048 0 0 1 1152.93952 433.39487999999994 L 1152.93952 441.1056 L 1123.06048 441.1056 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av1048_364.4)"/>
+<clipPath id="clip-av1048_364.4"><circle cx="1138" cy="414.59999999999997" r="24.096"/></clipPath>
+<circle cx="1138" cy="414.59999999999997" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-US-1182.096-384.47999999999996"><rect x="1182.096" y="384.47999999999996" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-US-1182.096-384.47999999999996)"><rect x="1182.096" y="384.47999999999996" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="1182.096" y="387.6354285714285" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="1182.096" y="390.7908571428571" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="1182.096" y="393.9462857142857" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="1182.096" y="397.10171428571425" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="1182.096" y="400.2571428571428" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="1182.096" y="403.41257142857137" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="1182.096" y="384.47999999999996" width="12.048000000000002" height="12.148400000000002" fill="#3C3B6E"/></g><rect x="1182.096" y="384.47999999999996" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="1222.216" y="408.57599999999996" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Anthony Cruz</text>
+<text x="1182.096" y="444.71999999999997" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">Set Nov 2025</text>
+<text x="1508" y="424.64" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#c7ccd6" text-anchor="end">347<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<rect x="1048" y="478.79999999999995" width="480" height="100.4" rx="10" fill="#121218" stroke="#25252f" stroke-width="1.5"/>
+<rect x="1048" y="478.79999999999995" width="4" height="100.4" rx="2" fill="#d99567"/>
+<text x="1074" y="540.044" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#d99567">3</text>
+<defs><linearGradient id="av1048_478.79999999999995" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8c170"/><stop offset="100%" stop-color="#8a6a26"/></linearGradient></defs>
+<circle cx="1138" cy="529.0" r="24.096" fill="url(#av1048_478.79999999999995)"/>
+<circle cx="1138" cy="522.25312" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 1123.06048 547.79488 A 14.93952 12.048 0 0 1 1152.93952 547.79488 L 1152.93952 555.5056 L 1123.06048 555.5056 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av1048_478.79999999999995)"/>
+<clipPath id="clip-av1048_478.79999999999995"><circle cx="1138" cy="529.0" r="24.096"/></clipPath>
+<circle cx="1138" cy="529.0" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-CA-1182.096-498.88"><rect x="1182.096" y="498.88" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-CA-1182.096-498.88)"><rect x="1182.096" y="498.88" width="10.040000000000001" height="22.088" fill="#D80621"/><rect x="1192.136" y="498.88" width="10.040000000000001" height="22.088" fill="#FFFFFF"/><rect x="1202.176" y="498.88" width="10.040000000000001" height="22.088" fill="#D80621"/><path d="M 1197.156 502.85584 L 1198.662 508.8196 L 1201.3727999999999 507.7152 L 1199.8668 511.0284 L 1203.1799999999998 511.69104 L 1198.9632 513.8998399999999 L 1199.5656 516.99216 L 1197.156 514.3416 L 1194.7464 516.99216 L 1195.3488 513.8998399999999 L 1191.132 511.69104 L 1194.4451999999999 511.0284 L 1192.9392 507.7152 L 1195.6499999999999 508.8196 Z" fill="#D80621"/></g><rect x="1182.096" y="498.88" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="1222.216" y="522.976" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Devon Clarke</text>
+<text x="1182.096" y="559.12" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">Set Jan 2026</text>
+<text x="1508" y="539.04" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#d99567" text-anchor="end">344<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<rect x="1048" y="593.1999999999999" width="480" height="100.4" rx="10" fill="#121218" stroke="#25252f" stroke-width="1.5"/>
+<text x="1074" y="654.444" font-family="Arial, sans-serif" font-weight="700" font-size="26" fill="#8a8a96">4</text>
+<defs><linearGradient id="av1048_593.1999999999999" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#8a8afe"/><stop offset="100%" stop-color="#3a3a9a"/></linearGradient></defs>
+<circle cx="1138" cy="643.4" r="24.096" fill="url(#av1048_593.1999999999999)"/>
+<circle cx="1138" cy="636.65312" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 1123.06048 662.19488 A 14.93952 12.048 0 0 1 1152.93952 662.19488 L 1152.93952 669.9055999999999 L 1123.06048 669.9055999999999 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av1048_593.1999999999999)"/>
+<clipPath id="clip-av1048_593.1999999999999"><circle cx="1138" cy="643.4" r="24.096"/></clipPath>
+<circle cx="1138" cy="643.4" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-US-1182.096-613.28"><rect x="1182.096" y="613.28" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-US-1182.096-613.28)"><rect x="1182.096" y="613.28" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="1182.096" y="616.4354285714286" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="1182.096" y="619.5908571428571" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="1182.096" y="622.7462857142857" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="1182.096" y="625.9017142857142" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="1182.096" y="629.0571428571428" width="30.12" height="3.6554285714285717" fill="#FFFFFF"/><rect x="1182.096" y="632.2125714285714" width="30.12" height="3.6554285714285717" fill="#B22234"/><rect x="1182.096" y="613.28" width="12.048000000000002" height="12.148400000000002" fill="#3C3B6E"/></g><rect x="1182.096" y="613.28" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="1222.216" y="637.376" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Tyler Osei</text>
+<text x="1182.096" y="673.52" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">Set Jun 2026</text>
+<text x="1508" y="653.4399999999999" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#f5f5f7" text-anchor="end">340<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<rect x="1048" y="707.5999999999999" width="480" height="100.4" rx="10" fill="#121218" stroke="#25252f" stroke-width="1.5"/>
+<text x="1074" y="768.8439999999999" font-family="Arial, sans-serif" font-weight="700" font-size="26" fill="#8a8a96">5</text>
+<defs><linearGradient id="av1048_707.5999999999999" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5fd6a8"/><stop offset="100%" stop-color="#1f7a56"/></linearGradient></defs>
+<circle cx="1138" cy="757.8" r="24.096" fill="url(#av1048_707.5999999999999)"/>
+<circle cx="1138" cy="751.0531199999999" r="7.71072" fill="#ffffff" opacity="0.92"/>
+<path d="M 1123.06048 776.59488 A 14.93952 12.048 0 0 1 1152.93952 776.59488 L 1152.93952 784.3055999999999 L 1123.06048 784.3055999999999 Z" fill="#ffffff" opacity="0.92" clip-path="url(#clip-av1048_707.5999999999999)"/>
+<clipPath id="clip-av1048_707.5999999999999"><circle cx="1138" cy="757.8" r="24.096"/></clipPath>
+<circle cx="1138" cy="757.8" r="24.096" fill="none" stroke="#25252f" stroke-width="1"/>
+<clipPath id="flagclip-GB-1182.096-727.68"><rect x="1182.096" y="727.68" width="30.12" height="22.088" rx="2"/></clipPath><g clip-path="url(#flagclip-GB-1182.096-727.68)"><rect x="1182.096" y="727.68" width="30.12" height="22.088" fill="#012169"/><line x1="1182.096" y1="727.68" x2="1212.216" y2="749.7679999999999" stroke="#FFFFFF" stroke-width="6.184640000000001"/><line x1="1212.216" y1="727.68" x2="1182.096" y2="749.7679999999999" stroke="#FFFFFF" stroke-width="6.184640000000001"/><line x1="1182.096" y1="727.68" x2="1212.216" y2="749.7679999999999" stroke="#C8102E" stroke-width="2.65056"/><line x1="1212.216" y1="727.68" x2="1182.096" y2="749.7679999999999" stroke="#C8102E" stroke-width="2.65056"/><rect x="1194.144" y="727.68" width="6.024000000000001" height="22.088" fill="#FFFFFF"/><rect x="1182.096" y="735.1899199999999" width="30.12" height="7.068160000000001" fill="#FFFFFF"/><rect x="1195.3488" y="727.68" width="3.6144" height="22.088" fill="#C8102E"/><rect x="1182.096" y="736.5151999999999" width="30.12" height="4.4176" fill="#C8102E"/></g><rect x="1182.096" y="727.68" width="30.12" height="22.088" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+<text x="1222.216" y="751.776" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#f5f5f7">Sam Whitfield</text>
+<text x="1182.096" y="787.92" font-family="Arial, sans-serif" font-size="16" fill="#8a8a96">Set Feb 2026</text>
+<text x="1508" y="767.8399999999999" font-family="Arial, sans-serif" font-weight="700" font-size="30" fill="#f5f5f7" text-anchor="end">337<tspan font-size="15" fill="#8a8a96" font-weight="500"> YDS</tspan></text>
+<line x1="532.0" y1="216" x2="532.0" y2="804" stroke="#25252f" stroke-width="1"/>
+<line x1="1036.0" y1="216" x2="1036.0" y2="804" stroke="#25252f" stroke-width="1"/>
+<circle cx="40" cy="848.0" r="6" fill="#ff0090"/>
+<circle cx="58" cy="848.0" r="4" fill="#25252f"/>
+<circle cx="76" cy="848.0" r="4" fill="#25252f"/>
+<circle cx="94" cy="848.0" r="4" fill="#25252f"/>
+<rect x="778.0" y="826.0" width="44" height="44" rx="6" fill="#ffffff"/>
+<text x="836.0" y="846.0" font-family="Arial, sans-serif" font-size="13" fill="#8a8a96">Scan to submit your drive · <tspan font-weight="700" fill="#f5f5f7">rippingbombs.com/your-venue</tspan></text>
+<text x="1560" y="853.0" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="16" letter-spacing="1" fill="#8a8a96" text-anchor="end">RIPPING<tspan fill="#ff0090">BOMBS</tspan></text>
+</svg>
