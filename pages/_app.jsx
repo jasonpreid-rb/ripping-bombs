@@ -194,6 +194,21 @@ export default function App({ Component, pageProps }) {
     sortBy, setSortBy,
   };
 
+  // Full-screen TV/kiosk pages render on their own, with no site nav,
+  // banner, or footer. Add any future kiosk-style route here.
+  const isKioskRoute =
+    router.pathname.startsWith('/venue-display/') ||
+    router.pathname === '/venue-display-demo';
+
+  if (isKioskRoute) {
+    return (
+      <>
+        <Component {...pageProps} {...sharedProps} />
+        <Analytics />
+      </>
+    );
+  }
+
   if (loading) return (
     <div style={{ minHeight:'100vh', background:'#1a1a1a', display:'flex', alignItems:'center', justifyContent:'center' }}>
       <div style={{ fontFamily:SANS, color:MUT, fontSize:13, letterSpacing:2 }}>LOADING...</div>
