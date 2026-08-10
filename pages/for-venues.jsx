@@ -106,12 +106,21 @@ export default function ForVenues() {
             <div className="tier-card featured">
               <div className="tier-badge">3 months free</div>
               <div className="tier-name">TV Display &amp; Sponsors</div>
-              <div className="tier-price">Everything in Free, plus:</div>
+              <div className="tier-price">
+                <span className="price-num">$49</span><span className="price-unit">/mo after trial</span>
+              </div>
               <ul>
                 <li>The live leaderboard running on a TV in your venue, always up to date</li>
-                <li>A sponsor's logo on that screen — charge them to help cover the subscription</li>
+                <li>A sponsor's logo on that screen</li>
               </ul>
-              <div className="tier-foot">Free for your first 3 months, then a paid subscription.</div>
+              <div className="sponsor-math">
+                <div className="sponsor-math-label">Let a sponsor cover it</div>
+                <div className="sponsor-math-body">
+                  Local businesses typically pay <strong>$75–150/mo</strong> for a logo spot like this.
+                  Sell it once, and the subscription is covered — with margin left over for you.
+                </div>
+              </div>
+              <div className="tier-foot">Free for your first 3 months, then $49/mo.</div>
             </div>
           </div>
         </section>
@@ -321,6 +330,40 @@ export default function ForVenues() {
           font-family: ${SANS || "'Inter', sans-serif"};
           font-size: 14px;
           font-weight: 700;
+        }
+        .price-num {
+          font-family: ${DISP || "'Bebas Neue', sans-serif"};
+          font-size: 30px;
+          letter-spacing: 0.3px;
+          margin-right: 6px;
+        }
+        .price-unit {
+          font-size: 13px;
+          font-weight: 600;
+          color: ${MUT || '#8a8a96'};
+        }
+        .sponsor-math {
+          background: rgba(255,0,144,0.08);
+          border: 1px solid rgba(255,0,144,0.35);
+          border-radius: 8px;
+          padding: 12px 14px;
+          margin: 4px 0 16px;
+        }
+        .sponsor-math-label {
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.4px;
+          text-transform: uppercase;
+          color: ${ORG || '#ff0090'};
+          margin-bottom: 6px;
+        }
+        .sponsor-math-body {
+          font-size: 13px;
+          line-height: 1.55;
+          color: ${TXT || '#f5f5f7'};
+        }
+        .sponsor-math-body strong {
+          color: ${ORG || '#ff0090'};
         }
         .tier-card ul {
           list-style: none;
