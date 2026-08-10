@@ -24,6 +24,33 @@ const GLOBAL_AVGS = {
   youth:          200,
 };
 
+// ——— Country / flag helpers ———
+// No dedicated country field on `clubs` yet — we parse the trailing segment
+// of the free-text `location` field (e.g. "Austin, United States") and map
+// common country names/aliases to an ISO 3166-1 alpha-2 code for the flag.
+const COUNTRY_TO_ISO = {
+  'united states': 'US', 'usa': 'US', 'us': 'US', 'united states of america': 'US',
+  'united kingdom': 'GB', 'uk': 'GB', 'great britain': 'GB', 'england': 'GB', 'scotland': 'GB', 'wales': 'GB', 'northern ireland': 'GB',
+  'ireland': 'IE', 'canada': 'CA', 'australia': 'AU', 'new zealand': 'NZ',
+  'germany': 'DE', 'france': 'FR', 'spain': 'ES', 'portugal': 'PT', 'italy': 'IT',
+  'netherlands': 'NL', 'belgium': 'BE', 'switzerland': 'CH', 'austria': 'AT',
+  'sweden': 'SE', 'norway': 'NO', 'denmark': 'DK', 'finland': 'FI', 'iceland': 'IS',
+  'poland': 'PL', 'czech republic': 'CZ', 'czechia': 'CZ', 'greece': 'GR',
+  'south africa': 'ZA', 'japan': 'JP', 'south korea': 'KR', 'korea': 'KR',
+  'china': 'CN', 'india': 'IN', 'thailand': 'TH', 'singapore': 'SG', 'malaysia': 'MY',
+  'united arab emirates': 'AE', 'uae': 'AE', 'saudi arabia': 'SA', 'qatar': 'QA',
+  'mexico': 'MX', 'brazil': 'BR', 'argentina': 'AR', 'chile': 'CL', 'colombia': 'CO',
+};
+
+function getFlagEmoji(location) {
+  if (!location) return null;
+  const parts = location.split(',').map((p) => p.trim()).filter(Boolean);
+  const countryPart = (parts[parts.length - 1] || '').toLowerCase();
+  const iso = COUNTRY_TO_ISO[countryPart];
+  if (!iso) return null;
+  return String.fromCodePoint(...[...iso].map((c) => 127397 + c.charCodeAt(0)));
+}
+
 function nameToSlug(name) {
   return (name || '')
     .toLowerCase()
@@ -861,7 +888,7 @@ export default function DashboardPage() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: 4 }}>
                 <h1 style={{ margin: 0, fontSize: 'clamp(1.4rem, 4vw, 2rem)', fontWeight: 800, letterSpacing: '-0.02em' }}>
-                  {club?.courseName || club?.fullName || 'My Dashboard'}
+                  {club?.fullName || 'My Dashboard'}
                 </h1>
                 {club?.is_founding_member && <FoundingBadge />}
                 {club?.badge === 'simulator' && (
@@ -869,16 +896,23 @@ export default function DashboardPage() {
                 )}
               </div>
               <p style={{ margin: 0, color: MUT, fontSize: '0.85rem' }}>
-                {[club?.fullName, club?.position, club?.location].filter(Boolean).join(' · ')}
+                {[club?.courseName, club?.position, club?.location].filter(Boolean).join(' · ')}
               </p>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <a href="/leaderboard" style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.5rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none' }}>View Leaderboard</a>
-            {club?.accountType === 'club' && (
-              <a href="/venue-qr" style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, padding: '0.5rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none', fontWeight: 700 }}>Get QR Poster</a>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
+            {getFlagEmoji(club?.location) && (
+              <span title={club?.location} style={{ fontSize: '1.8rem', lineHeight: 1 }}>
+                {getFlagEmoji(club?.location)}
+              </span>
             )}
-            <button onClick={() => setShowModal(true)} style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.5rem 1rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.82rem' }}>Edit Profile</button>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+              <a href="/leaderboard" style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.5rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none' }}>View Leaderboard</a>
+              {club?.accountType === 'club' && (
+                <a href="/venue-qr" style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, padding: '0.5rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none', fontWeight: 700 }}>Get QR Poster</a>
+              )}
+              <button onClick={() => setShowModal(true)} style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.5rem 1rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.82rem' }}>Edit Profile</button>
+            </div>
           </div>
         </div>
 
