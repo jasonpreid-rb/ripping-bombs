@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { supabase } from '../lib/supabaseClient';
 import PlayerAvatar from '../components/PlayerAvatar';
 import AvatarUploader from '../components/AvatarUploader';
+import SponsorLogoUploader from '../components/SponsorLogoUploader';
 
 const ORG = '#FF0090';
 const TXT = '#f0f0f0';
@@ -107,7 +108,7 @@ function FoundingBadge() {
   );
 }
 
-function ProfileModal({ club, onSave, onClose, onAvatarUploaded }) {
+function ProfileModal({ club, onSave, onClose, onAvatarUploaded, onSponsorLogoUploaded }) {
   const [form, setForm] = useState({
     fullName: club?.fullName || '',
     location: club?.location || '',
@@ -117,6 +118,8 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded }) {
     twitter: club?.twitter || '',
     youtube: club?.youtube || '',
     customSlug: club?.customSlug || '',
+    sponsorName: club?.sponsorName || '',
+    sponsorLink: club?.sponsorLink || '',
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -184,6 +187,30 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded }) {
           </>
         )}
         {error && <div style={{ fontSize: '0.8rem', color: '#f87171', marginTop: 4 }}>{error}</div>}
+        {!isSimulator && (
+          <>
+            <div style={{ borderTop: `1px solid ${BDR}`, marginTop: 8, paddingTop: 12 }}>
+              <div style={{ fontSize: '0.7rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
+                TV Display Sponsor <span style={{ color: DIM, fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional — shown on your leaderboard TV screen)</span>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 4 }}>
+              {club?.sponsorLogoUrl ? (
+                <img src={club.sponsorLogoUrl} alt="Sponsor logo" style={{ width: 56, height: 56, objectFit: 'contain', background: BG3, border: `1px solid ${BDR}`, borderRadius: 8 }} />
+              ) : (
+                <div style={{ width: 56, height: 56, background: BG3, border: `1px dashed ${BDR}`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: DIM, fontSize: '0.65rem', textAlign: 'center' }}>No logo</div>
+              )}
+              <div style={{ flex: 1 }}>
+                <div style={labelStyle}>Sponsor Logo</div>
+                <SponsorLogoUploader orgId={club?.id} onUploadSuccess={onSponsorLogoUploaded} />
+              </div>
+            </div>
+            <label style={labelStyle}>Sponsor Name</label>
+            <input style={inputStyle} value={form.sponsorName} onChange={(e) => set('sponsorName', e.target.value)} placeholder="e.g. Titleist" />
+            <label style={labelStyle}>Sponsor Link <span style={{ color: DIM, fontWeight: 400 }}>(optional)</span></label>
+            <input style={inputStyle} value={form.sponsorLink} onChange={(e) => set('sponsorLink', e.target.value)} placeholder="https://sponsor-website.com" />
+          </>
+        )}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 }}>
           <button onClick={onClose} style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.45rem 0.9rem', borderRadius: 6, cursor: 'pointer', fontSize: '0.82rem' }}>Cancel</button>
           <button onClick={handleSave} disabled={saving} style={{ background: ORG, color: '#000', fontWeight: 700, padding: '0.5rem 1.1rem', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: '0.85rem', opacity: saving ? 0.6 : 1 }}>{saving ? 'Saving…' : 'Save Changes'}</button>
@@ -607,6 +634,12 @@ export default function DashboardPage() {
     localStorage.setItem('rb_club', JSON.stringify(updated));
   };
 
+  const handleSponsorLogoUploaded = (sponsorLogoUrl) => {
+    const updated = { ...club, sponsorLogoUrl };
+    setClub(updated);
+    localStorage.setItem('rb_club', JSON.stringify(updated));
+  };
+
   const handleProfileSave = async (form) => {
     let customSlug = null;
     if (club?.accountType === 'simulator' && form.customSlug && form.customSlug.trim()) {
@@ -631,6 +664,10 @@ export default function DashboardPage() {
       twitter: form.twitter || null,
       youtube: form.youtube || null,
       ...(club?.accountType === 'simulator' && { customSlug }),
+      ...(club?.accountType !== 'simulator' && {
+        sponsorName: form.sponsorName || null,
+        sponsorLink: form.sponsorLink || null,
+      }),
     }).eq('id', club.id);
 
     if (error) return 'Something went wrong saving your profile. Please try again.';
@@ -750,7 +787,7 @@ export default function DashboardPage() {
       </div>
 
       {showModal && (
-        <ProfileModal club={club} onSave={handleProfileSave} onClose={() => setShowModal(false)} onAvatarUploaded={handleAvatarUploaded} />
+        <ProfileModal club={club} onSave={handleProfileSave} onClose={() => setShowModal(false)} onAvatarUploaded={handleAvatarUploaded} onSponsorLogoUploaded={handleSponsorLogoUploaded} />
       )}
       {showDeleteModal && (
         <DeleteModal club={club} onClose={() => setShowDeleteModal(false)} />

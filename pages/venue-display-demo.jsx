@@ -194,6 +194,12 @@ export default function VenueDisplayDemo() {
               <div className="venue-loc">{VENUE.location}</div>
             </div>
           </div>
+
+          <div className="sponsor-banner">
+            <span className="sponsor-label">Presented by</span>
+            <div className="sponsor-logo-placeholder">TITLEIST</div>
+          </div>
+
           <div className="status-right">
             <div className="live-pill"><span className="live-dot" />Week {WEEK}</div>
             <div className="clock">{clock}</div>
@@ -285,11 +291,31 @@ export default function VenueDisplayDemo() {
           display: flex;
           align-items: center;
           justify-content: space-between;
+          gap: 20px;
           padding: 22px 40px;
           border-bottom: 1px solid var(--bdr);
           flex-shrink: 0;
         }
-        .venue-id { display: flex; align-items: center; gap: 14px; }
+        .venue-id { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+        .sponsor-banner {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          background: var(--panel);
+          border: 1px solid var(--bdr);
+          border-radius: 8px;
+          padding: 7px 16px;
+          flex-shrink: 1;
+          min-width: 0;
+        }
+        .sponsor-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mut); white-space: nowrap; }
+        .sponsor-logo-placeholder {
+          font-family: var(--disp);
+          font-size: 15px;
+          letter-spacing: 1px;
+          color: var(--txt);
+          white-space: nowrap;
+        }
         .venue-mark {
           width: 40px; height: 40px; border-radius: 8px;
           background: linear-gradient(145deg, var(--org), #7a0048);
@@ -299,7 +325,7 @@ export default function VenueDisplayDemo() {
         .venue-name-block { display: flex; flex-direction: column; line-height: 1.15; }
         .venue-name { font-family: var(--disp); font-size: 22px; letter-spacing: 1px; }
         .venue-loc { font-size: 11px; color: var(--mut); letter-spacing: 1.5px; text-transform: uppercase; }
-        .status-right { display: flex; align-items: center; gap: 28px; }
+        .status-right { display: flex; align-items: center; gap: 28px; flex-shrink: 0; }
         .live-pill { display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--mut); }
         .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--org); box-shadow: 0 0 8px 2px rgba(255, 0, 144, 0.6); animation: pulse 1.6s ease-in-out infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
