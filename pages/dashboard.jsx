@@ -190,8 +190,9 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded, onSponsorLogoUp
         {!isSimulator && (
           <>
             <div style={{ borderTop: `1px solid ${BDR}`, marginTop: 8, paddingTop: 12 }}>
-              <div style={{ fontSize: '0.7rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
-                TV Display Sponsor <span style={{ color: DIM, fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional — shown on your leaderboard TV screen)</span>
+              <div style={{ fontSize: '0.7rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <span>TV Display Sponsor <span style={{ color: DIM, fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional — shown on your leaderboard TV screen)</span></span>
+                <span style={{ background: 'rgba(255,0,144,0.12)', color: ORG, border: `1px solid ${ORG}`, borderRadius: 20, padding: '1px 8px', fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'none', whiteSpace: 'nowrap' }}>Free for your first 3 months</span>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 4 }}>
@@ -528,6 +529,37 @@ function WeeklyLeaderboard({ weeklyData }) {
   );
 }
 
+function TvDisplayPromo({ club, onManageClick }) {
+  const hasSponsor = !!(club?.sponsorName || club?.sponsorLogoUrl);
+  return (
+    <div style={{ background: `linear-gradient(135deg, ${BG2}, ${BG3})`, border: `1px solid ${ORG}`, borderRadius: 10, padding: '1.25rem 1.5rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, flex: '1 1 320px' }}>
+        <div style={{ fontSize: '1.6rem', lineHeight: 1 }}>📺</div>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 3 }}>
+            <span style={{ fontSize: '0.95rem', fontWeight: 800 }}>TV Display &amp; Sponsors</span>
+            <span style={{ background: 'rgba(255,0,144,0.15)', color: ORG, border: `1px solid ${ORG}`, borderRadius: 20, padding: '1px 9px', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+              Free for your first 3 months
+            </span>
+          </div>
+          <p style={{ margin: 0, fontSize: '0.82rem', color: MUT, lineHeight: 1.5, maxWidth: 480 }}>
+            Show a live, always-on leaderboard on any TV at your venue — and put a sponsor's logo on screen while you're at it.
+            {hasSponsor ? ' Your sponsor is set up and live.' : ' Takes about five minutes to set up.'}
+          </p>
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        <a href="/for-venues" target="_blank" rel="noreferrer" style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.55rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+          See it in action
+        </a>
+        <button onClick={onManageClick} style={{ background: ORG, color: '#000', fontWeight: 700, border: 'none', padding: '0.55rem 1.1rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.82rem', whiteSpace: 'nowrap' }}>
+          {hasSponsor ? 'Manage Sponsor' : 'Set Up Sponsor'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ——— Main Page ———
 
 export default function DashboardPage() {
@@ -736,6 +768,11 @@ export default function DashboardPage() {
             <button onClick={() => setShowModal(true)} style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.5rem 1rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.82rem' }}>Edit Profile</button>
           </div>
         </div>
+
+        {/* TV Display & Sponsors promo — club accounts only */}
+        {club?.accountType === 'club' && (
+          <TvDisplayPromo club={club} onManageClick={() => setShowModal(true)} />
+        )}
 
         {/* Global rank — standalone hero strip */}
         <RankStrip rank={rank} totalClubs={totalClubs} percentile={percentile} />
