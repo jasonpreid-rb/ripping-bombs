@@ -87,6 +87,35 @@ export default function ForVenues() {
           </div>
         </section>
 
+        <section className="tiers">
+          <div className="tiers-head">
+            <div className="eyebrow">TWO WAYS TO PLAY</div>
+            <h2>Free to join. Upgrade when you want the screen.</h2>
+          </div>
+          <div className="tiers-grid">
+            <div className="tier-card">
+              <div className="tier-name">Free Venue Account</div>
+              <div className="tier-price">$0</div>
+              <ul>
+                <li>Your venue listed on Ripping Bombs, selectable by every player</li>
+                <li>Appears on the global longest-drive leaderboard</li>
+                <li>A public leaderboard page for your venue — categories, ages, divisions</li>
+              </ul>
+              <div className="tier-foot">Free, always.</div>
+            </div>
+            <div className="tier-card featured">
+              <div className="tier-badge">3 months free</div>
+              <div className="tier-name">TV Display &amp; Sponsors</div>
+              <div className="tier-price">Everything in Free, plus:</div>
+              <ul>
+                <li>The live leaderboard running on a TV in your venue, always up to date</li>
+                <li>A sponsor's logo on that screen — charge them to help cover the subscription</li>
+              </ul>
+              <div className="tier-foot">Free for your first 3 months, then a paid subscription.</div>
+            </div>
+          </div>
+        </section>
+
         <section className="cta-block">
           <h2>Want this running at your venue?</h2>
           <p>Takes about five minutes to set up. No hardware to buy.</p>
@@ -229,6 +258,105 @@ export default function ForVenues() {
           font-size: 13.5px;
           line-height: 1.55;
           color: ${MUT || '#8a8a96'};
+        }
+
+        .tiers {
+          max-width: 900px;
+          margin: 0 auto 80px;
+        }
+        .tiers-head {
+          text-align: center;
+          margin-bottom: 36px;
+        }
+        .tiers-head h2 {
+          font-family: ${DISP || "'Bebas Neue', sans-serif"};
+          font-size: 32px;
+          letter-spacing: 0.5px;
+          margin: 0;
+        }
+        .tiers-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 24px;
+        }
+        .tier-card {
+          position: relative;
+          background: ${BG3 || '#121218'};
+          border: 1px solid ${BDR || '#25252f'};
+          border-radius: 12px;
+          padding: 28px 26px;
+          display: flex;
+          flex-direction: column;
+        }
+        .tier-card.featured {
+          border-color: ${ORG || '#ff0090'};
+          background: linear-gradient(160deg, ${BG3 || '#121218'}, rgba(255,0,144,0.06));
+        }
+        .tier-badge {
+          position: absolute;
+          top: -12px;
+          right: 22px;
+          background: ${ORG || '#ff0090'};
+          color: #08080c;
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.4px;
+          padding: 4px 12px;
+          border-radius: 20px;
+        }
+        .tier-name {
+          font-weight: 700;
+          font-size: 16px;
+          margin-bottom: 6px;
+        }
+        .tier-price {
+          font-family: ${DISP || "'Bebas Neue', sans-serif"};
+          font-size: 26px;
+          letter-spacing: 0.3px;
+          color: ${MUT || '#8a8a96'};
+          margin-bottom: 18px;
+        }
+        .tier-card.featured .tier-price {
+          color: ${ORG || '#ff0090'};
+          font-family: ${SANS || "'Inter', sans-serif"};
+          font-size: 14px;
+          font-weight: 700;
+        }
+        .tier-card ul {
+          list-style: none;
+          margin: 0 0 20px;
+          padding: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          flex: 1;
+        }
+        .tier-card li {
+          font-size: 14px;
+          line-height: 1.5;
+          color: ${TXT || '#f5f5f7'};
+          padding-left: 22px;
+          position: relative;
+        }
+        .tier-card li::before {
+          content: '✓';
+          position: absolute;
+          left: 0;
+          color: ${MUT || '#8a8a96'};
+          font-weight: 800;
+        }
+        .tier-card.featured li::before {
+          color: ${ORG || '#ff0090'};
+        }
+        .tier-foot {
+          font-size: 12.5px;
+          color: ${MUT || '#8a8a96'};
+          border-top: 1px solid ${BDR || '#25252f'};
+          padding-top: 14px;
+        }
+
+        @media (max-width: 640px) {
+          .tiers-grid { grid-template-columns: 1fr; }
         }
 
         .cta-block {

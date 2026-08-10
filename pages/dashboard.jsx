@@ -560,6 +560,52 @@ function TvDisplayPromo({ club, onManageClick }) {
   );
 }
 
+function TierComparison() {
+  const cell = { padding: '0.9rem 1rem', fontSize: '0.82rem', lineHeight: 1.5 };
+  const check = (color) => <span style={{ color, fontWeight: 800, marginRight: 8 }}>✓</span>;
+  return (
+    <div style={{ border: `1px solid ${BDR}`, borderRadius: 10, overflow: 'hidden' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: `1px solid ${BDR}` }}>
+        <div style={{ ...cell, background: BG2, borderRight: `1px solid ${BDR}` }}>
+          <div style={{ fontSize: '0.68rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Free Venue Account</div>
+        </div>
+        <div style={{ ...cell, background: 'rgba(255,0,144,0.06)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.68rem', color: ORG, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>TV Display &amp; Sponsors</span>
+            <span style={{ background: 'rgba(255,0,144,0.15)', color: ORG, border: `1px solid ${ORG}`, borderRadius: 20, padding: '1px 8px', fontSize: '0.6rem', fontWeight: 700, whiteSpace: 'nowrap' }}>3 months free</span>
+          </div>
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+        <div style={{ ...cell, borderRight: `1px solid ${BDR}` }}>
+          {check(MUT)}Venue listed on Ripping Bombs, selectable by players
+        </div>
+        <div style={cell}>
+          {check(ORG)}Everything in Free, plus:
+        </div>
+        <div style={{ ...cell, borderRight: `1px solid ${BDR}`, borderTop: `1px solid ${BDR}` }}>
+          {check(MUT)}Appears on the global leaderboard
+        </div>
+        <div style={{ ...cell, borderTop: `1px solid ${BDR}` }}>
+          {check(ORG)}Live leaderboard on your venue's TV, always up to date
+        </div>
+        <div style={{ ...cell, borderRight: `1px solid ${BDR}`, borderTop: `1px solid ${BDR}` }}>
+          {check(MUT)}Public venue leaderboard page — categories, ages, divisions
+        </div>
+        <div style={{ ...cell, borderTop: `1px solid ${BDR}` }}>
+          {check(ORG)}Add a sponsor's logo to your screen — charge them to help cover the cost
+        </div>
+        <div style={{ ...cell, borderRight: `1px solid ${BDR}`, borderTop: `1px solid ${BDR}`, color: MUT }}>
+          {check(MUT)}Free, always
+        </div>
+        <div style={{ ...cell, borderTop: `1px solid ${BDR}`, color: MUT }}>
+          {check(ORG)}Free for 3 months, then a paid subscription
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ——— Main Page ———
 
 export default function DashboardPage() {
@@ -771,7 +817,10 @@ export default function DashboardPage() {
 
         {/* TV Display & Sponsors promo — club accounts only */}
         {club?.accountType === 'club' && (
-          <TvDisplayPromo club={club} onManageClick={() => setShowModal(true)} />
+          <>
+            <TvDisplayPromo club={club} onManageClick={() => setShowModal(true)} />
+            <TierComparison />
+          </>
         )}
 
         {/* Global rank — standalone hero strip */}
