@@ -882,6 +882,9 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Global rank — standalone hero strip */}
+        <RankStrip rank={rank} totalClubs={totalClubs} percentile={percentile} />
+
         {/* TV Display & Sponsors promo — club accounts only */}
         {club?.accountType === 'club' && (
           <>
@@ -894,9 +897,6 @@ export default function DashboardPage() {
         {club?.accountType === 'simulator' && (
           <IndividualPremiumPromo isPremium={!!club?.isPremium} />
         )}
-
-        {/* Global rank — standalone hero strip */}
-        <RankStrip rank={rank} totalClubs={totalClubs} percentile={percentile} />
 
         {/* Stat cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.85rem' }}>
