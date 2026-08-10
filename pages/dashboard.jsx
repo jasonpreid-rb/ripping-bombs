@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, cloneElement } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { supabase } from '../lib/supabaseClient';
 import PlayerAvatar from '../components/PlayerAvatar';
 import AvatarUploader from '../components/AvatarUploader';
 import SponsorLogoUploader from '../components/SponsorLogoUploader';
+import { countryFlag } from '../components/UI';
 
 const ORG = '#FF0090';
 const TXT = '#f0f0f0';
@@ -23,13 +24,6 @@ const GLOBAL_AVGS = {
   senior:         215,
   youth:          200,
 };
-
-// ——— Country / flag helpers ———
-// `clubs.country` stores a plain ISO 3166-1 alpha-2 code (e.g. "US", "GB").
-function getFlagEmoji(countryCode) {
-  if (!countryCode || countryCode.length !== 2) return null;
-  return String.fromCodePoint(...[...countryCode.toUpperCase()].map((c) => 127397 + c.charCodeAt(0)));
-}
 
 function nameToSlug(name) {
   return (name || '')
@@ -856,7 +850,7 @@ export default function DashboardPage() {
   return (
     <>
       <Head>
-        <title>{club?.courseName || 'Dashboard'} — Ripping Bombs</title>
+        <title>{club?.fullName || 'Dashboard'} — Ripping Bombs</title>
       </Head>
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '2rem 1rem', color: TXT, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -881,9 +875,9 @@ export default function DashboardPage() {
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
-            {getFlagEmoji(club?.country) && (
-              <span title={club?.country} style={{ fontSize: '1.8rem', lineHeight: 1 }}>
-                {getFlagEmoji(club?.country)}
+            {club?.country && (
+              <span title={club.country} style={{ display: 'inline-block' }}>
+                {cloneElement(countryFlag(club.country), { style: { width: 40, height: 30, objectFit: 'cover', borderRadius: 3, display: 'block' } })}
               </span>
             )}
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
