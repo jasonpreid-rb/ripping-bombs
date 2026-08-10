@@ -25,30 +25,10 @@ const GLOBAL_AVGS = {
 };
 
 // ——— Country / flag helpers ———
-// No dedicated country field on `clubs` yet — we parse the trailing segment
-// of the free-text `location` field (e.g. "Austin, United States") and map
-// common country names/aliases to an ISO 3166-1 alpha-2 code for the flag.
-const COUNTRY_TO_ISO = {
-  'united states': 'US', 'usa': 'US', 'us': 'US', 'united states of america': 'US',
-  'united kingdom': 'GB', 'uk': 'GB', 'great britain': 'GB', 'england': 'GB', 'scotland': 'GB', 'wales': 'GB', 'northern ireland': 'GB',
-  'ireland': 'IE', 'canada': 'CA', 'australia': 'AU', 'new zealand': 'NZ',
-  'germany': 'DE', 'france': 'FR', 'spain': 'ES', 'portugal': 'PT', 'italy': 'IT',
-  'netherlands': 'NL', 'belgium': 'BE', 'switzerland': 'CH', 'austria': 'AT',
-  'sweden': 'SE', 'norway': 'NO', 'denmark': 'DK', 'finland': 'FI', 'iceland': 'IS',
-  'poland': 'PL', 'czech republic': 'CZ', 'czechia': 'CZ', 'greece': 'GR',
-  'south africa': 'ZA', 'japan': 'JP', 'south korea': 'KR', 'korea': 'KR',
-  'china': 'CN', 'india': 'IN', 'thailand': 'TH', 'singapore': 'SG', 'malaysia': 'MY',
-  'united arab emirates': 'AE', 'uae': 'AE', 'saudi arabia': 'SA', 'qatar': 'QA',
-  'mexico': 'MX', 'brazil': 'BR', 'argentina': 'AR', 'chile': 'CL', 'colombia': 'CO',
-};
-
-function getFlagEmoji(location) {
-  if (!location) return null;
-  const parts = location.split(',').map((p) => p.trim()).filter(Boolean);
-  const countryPart = (parts[parts.length - 1] || '').toLowerCase();
-  const iso = COUNTRY_TO_ISO[countryPart];
-  if (!iso) return null;
-  return String.fromCodePoint(...[...iso].map((c) => 127397 + c.charCodeAt(0)));
+// `clubs.country` stores a plain ISO 3166-1 alpha-2 code (e.g. "US", "GB").
+function getFlagEmoji(countryCode) {
+  if (!countryCode || countryCode.length !== 2) return null;
+  return String.fromCodePoint(...[...countryCode.toUpperCase()].map((c) => 127397 + c.charCodeAt(0)));
 }
 
 function nameToSlug(name) {
@@ -901,9 +881,9 @@ export default function DashboardPage() {
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
-            {getFlagEmoji(club?.location) && (
-              <span title={club?.location} style={{ fontSize: '1.8rem', lineHeight: 1 }}>
-                {getFlagEmoji(club?.location)}
+            {getFlagEmoji(club?.country) && (
+              <span title={club?.country} style={{ fontSize: '1.8rem', lineHeight: 1 }}>
+                {getFlagEmoji(club?.country)}
               </span>
             )}
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
