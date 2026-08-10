@@ -52,5 +52,5 @@ export function Overlay({children,onClose}){
 
 export function countryFlag(code){
   if(!code) return null;
-  return <img src={`https://flagcdn.com/40x30/${code.toLowerCase()}.png`} alt={code} style={{width:20,height:15,objectFit:"cover",display:"inline-block",verticalAlign:"middle",marginLeft:6}} loading="lazy"/>;
+  return <img src={`https://flagcdn.com/160x120/${code.toLowerCase()}.png`} alt={code} style={{width:20,height:15,objectFit:"cover",display:"inline-block",verticalAlign:"middle",marginLeft:6}} loading="lazy"/>;
 }
