@@ -543,7 +543,7 @@ function TvDisplayPromo({ club, onManageClick }) {
             </span>
           </div>
           <p style={{ margin: 0, fontSize: '0.82rem', color: MUT, lineHeight: 1.5, maxWidth: 480 }}>
-            Show a live, always-on leaderboard on any TV at your venue — and put a sponsor's logo on screen while you're at it.
+            Show a live, always-on leaderboard on any TV at your venue — then sell the sponsor spot to cover the $49/mo subscription and then some.
             {hasSponsor ? ' Your sponsor is set up and live.' : ' Takes about five minutes to set up.'}
           </p>
         </div>
@@ -599,7 +599,14 @@ function TierComparison() {
           {check(MUT)}Free, always
         </div>
         <div style={{ ...cell, borderTop: `1px solid ${BDR}`, color: MUT }}>
-          {check(ORG)}Free for 3 months, then a paid subscription
+          {check(ORG)}Free for 3 months, then <strong style={{ color: TXT }}>$49/mo</strong>
+        </div>
+      </div>
+      <div style={{ background: 'rgba(255,0,144,0.07)', borderTop: `1px solid ${BDR}`, padding: '0.85rem 1.1rem', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+        <span style={{ fontSize: '1rem', lineHeight: 1.2 }}>💡</span>
+        <div style={{ fontSize: '0.78rem', lineHeight: 1.5, color: TXT }}>
+          <strong style={{ color: ORG }}>Let a sponsor cover it —</strong> local businesses typically pay $75–150/mo for a logo spot on a venue TV.
+          Sell it once and the $49/mo subscription pays for itself, with margin left over.
         </div>
       </div>
     </div>
