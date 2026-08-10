@@ -409,13 +409,17 @@ function PlayerBreakdown({ entries }) {
 }
 
 // Recent drives table
-function DriveHistory({ entries, lastDriveDate }) {
+function DriveHistory({ entries, lastDriveDate, limitToFree }) {
   const daysSince = lastDriveDate ? Math.floor((Date.now() - new Date(lastDriveDate)) / 86400000) : null;
   const nudge = daysSince === null
     ? "You haven't submitted a drive yet — get on the board!"
     : daysSince > 14
     ? `It's been ${daysSince} days since your last submission. Time to rip another one?`
     : null;
+  const FREE_LIMIT = 3;
+  const isLimited = limitToFree && entries.length > FREE_LIMIT;
+  const visibleEntries = isLimited ? entries.slice(0, FREE_LIMIT) : entries;
+  const hiddenCount = entries.length - visibleEntries.length;
   return (
     <div style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', borderBottom: `1px solid ${BDR}`, flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -442,8 +446,8 @@ function DriveHistory({ entries, lastDriveDate }) {
               </tr>
             </thead>
             <tbody>
-              {entries.map((e, i) => (
-                <tr key={e.id} style={{ borderBottom: i < entries.length - 1 ? `1px solid ${BDR}` : 'none' }}
+              {visibleEntries.map((e, i) => (
+                <tr key={e.id} style={{ borderBottom: i < visibleEntries.length - 1 ? `1px solid ${BDR}` : 'none' }}
                   onMouseEnter={(el) => el.currentTarget.style.background = 'rgba(163,230,53,0.03)'}
                   onMouseLeave={(el) => el.currentTarget.style.background = 'transparent'}>
                   <td style={{ padding: '0.8rem 1rem', color: DIM, fontSize: '0.78rem' }}>#{i + 1}</td>
@@ -461,6 +465,14 @@ function DriveHistory({ entries, lastDriveDate }) {
               ))}
             </tbody>
           </table>
+          {isLimited && (
+            <div style={{ padding: '1rem 1.25rem', borderTop: `1px solid ${BDR}`, background: 'rgba(255,0,144,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+              <div style={{ fontSize: '0.8rem', color: TXT }}>
+                <strong style={{ color: ORG }}>{hiddenCount} more drive{hiddenCount === 1 ? '' : 's'}</strong> hidden — free accounts show your best {FREE_LIMIT}.
+              </div>
+              <span style={{ fontSize: '0.76rem', color: MUT }}>Upgrade to Premium to see your full history →</span>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -608,6 +620,54 @@ function TierComparison() {
           <strong style={{ color: ORG }}>Let a sponsor cover it —</strong> local businesses typically pay $75–150/mo for a logo spot on a venue TV.
           Sell it once and the $49/mo subscription pays for itself, with margin left over.
         </div>
+      </div>
+    </div>
+  );
+}
+
+function IndividualPremiumPromo({ isPremium }) {
+  const cell = { padding: '0.9rem 1rem', fontSize: '0.82rem', lineHeight: 1.5 };
+  const check = (color) => <span style={{ color, fontWeight: 800, marginRight: 8 }}>✓</span>;
+  if (isPremium) {
+    return (
+      <div style={{ background: `linear-gradient(135deg, ${BG2}, ${BG3})`, border: `1px solid ${ORG}`, borderRadius: 10, padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <span style={{ fontSize: '1.3rem' }}>⭐</span>
+        <div style={{ fontSize: '0.85rem' }}>
+          <strong style={{ color: ORG }}>You're a Premium member.</strong> Thanks for backing Ripping Bombs — your full drive history, certificate, and analytics are unlocked.
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div style={{ border: `1px solid ${BDR}`, borderRadius: 10, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', padding: '1.1rem 1.25rem', background: `linear-gradient(135deg, ${BG2}, ${BG3})`, borderBottom: `1px solid ${BDR}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: '1.4rem' }}>⭐</span>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>Ripping Bombs Premium</div>
+            <div style={{ fontSize: '0.78rem', color: MUT, marginTop: 2 }}>Support the platform and unlock your full stats.</div>
+          </div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontWeight: 800, fontSize: '1.05rem', color: ORG }}>$5/mo <span style={{ fontWeight: 500, color: MUT, fontSize: '0.75rem' }}>or $50/yr</span></div>
+          <button style={{ marginTop: 6, background: ORG, color: '#000', fontWeight: 700, border: 'none', padding: '0.45rem 1rem', borderRadius: 6, cursor: 'pointer', fontSize: '0.78rem' }}>
+            Upgrade — Coming Soon
+          </button>
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+        {[
+          'Official Drive Certificate — downloadable, shareable',
+          'Full drive history (free accounts see your best 3)',
+          'Personal progress analytics & percentile trend',
+          'Overtaken Alerts — know the moment someone passes you',
+          'Vanity profile card / QR for socials & business cards',
+          'Premium badge on your public profile',
+        ].map((item, i) => (
+          <div key={item} style={{ ...cell, borderTop: `1px solid ${BDR}`, borderRight: i % 2 === 0 ? `1px solid ${BDR}` : 'none' }}>
+            {check(ORG)}{item}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -830,6 +890,11 @@ export default function DashboardPage() {
           </>
         )}
 
+        {/* Ripping Bombs Premium promo — individual/simulator accounts only */}
+        {club?.accountType === 'simulator' && (
+          <IndividualPremiumPromo isPremium={!!club?.isPremium} />
+        )}
+
         {/* Global rank — standalone hero strip */}
         <RankStrip rank={rank} totalClubs={totalClubs} percentile={percentile} />
 
@@ -860,7 +925,11 @@ export default function DashboardPage() {
         )}
 
         {/* Drive history */}
-        <DriveHistory entries={entries} lastDriveDate={lastDriveDate} />
+        <DriveHistory
+          entries={entries}
+          lastDriveDate={lastDriveDate}
+          limitToFree={club?.accountType === 'simulator' && !club?.isPremium}
+        />
 
         {/* Danger Zone */}
         <div style={{ border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '1.25rem 1.5rem' }}>
