@@ -116,20 +116,6 @@ export default function VenueDisplay({ slug, venue, initialData }) {
             </div>
           </div>
 
-          {data.sponsor && (
-            <a
-              className="sponsor-banner"
-              href={data.sponsor.link || undefined}
-              target={data.sponsor.link ? '_blank' : undefined}
-              rel={data.sponsor.link ? 'noopener noreferrer' : undefined}
-              style={{ pointerEvents: data.sponsor.link ? 'auto' : 'none' }}
-            >
-              <span className="sponsor-label">Presented by</span>
-              <img className="sponsor-logo" src={data.sponsor.logoUrl} alt={data.sponsor.name || 'Sponsor'} />
-              {data.sponsor.name && <span className="sponsor-name">{data.sponsor.name}</span>}
-            </a>
-          )}
-
           <div className="status-right">
             <div className="live-pill"><span className="live-dot" />Week {data.week}</div>
             <div className="clock">{clock}</div>
@@ -137,11 +123,23 @@ export default function VenueDisplay({ slug, venue, initialData }) {
         </header>
 
         <main className="stage">
+          {data.sponsor && (
+            <a
+              className="sponsor-stage"
+              href={data.sponsor.link || undefined}
+              target={data.sponsor.link ? '_blank' : undefined}
+              rel={data.sponsor.link ? 'noopener noreferrer' : undefined}
+              style={{ pointerEvents: data.sponsor.link ? 'auto' : 'none' }}
+            >
+              <span className="sponsor-stage-label">Presented by</span>
+              <img className="sponsor-stage-logo" src={data.sponsor.logoUrl} alt={data.sponsor.name || 'Sponsor'} />
+              {data.sponsor.name && <span className="sponsor-stage-name">{data.sponsor.name}</span>}
+            </a>
+          )}
+
           <div className="view-header">
-            <div>
-              <div className="view-eyebrow">{div.eyebrow}</div>
-              <div className="view-title">{div.title}</div>
-            </div>
+            <div className="view-eyebrow">{div.eyebrow}</div>
+            <div className="view-title">{div.title}</div>
             <div className="view-sub">{div.sub}</div>
           </div>
 
@@ -210,21 +208,6 @@ export default function VenueDisplay({ slug, venue, initialData }) {
           flex-shrink: 0;
         }
         .venue-id { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
-        .sponsor-banner {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          background: var(--panel);
-          border: 1px solid var(--bdr);
-          border-radius: 8px;
-          padding: 7px 16px;
-          text-decoration: none;
-          flex-shrink: 1;
-          min-width: 0;
-        }
-        .sponsor-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mut); white-space: nowrap; }
-        .sponsor-logo { height: 22px; max-width: 120px; object-fit: contain; }
-        .sponsor-name { font-size: 12px; font-weight: 700; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .venue-mark {
           width: 40px; height: 40px; border-radius: 8px;
           background: linear-gradient(145deg, var(--org), #7a0048);
@@ -241,10 +224,28 @@ export default function VenueDisplay({ slug, venue, initialData }) {
         .clock { font-family: var(--mono); font-size: 15px; letter-spacing: 1px; }
 
         .stage { flex: 1; padding: 34px 40px 10px; display: flex; flex-direction: column; min-height: 0; }
-        .view-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; flex-shrink: 0; }
+
+        .sponsor-stage {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          background: var(--panel);
+          border: 1px solid var(--bdr);
+          border-radius: 12px;
+          padding: 16px 24px;
+          text-decoration: none;
+          margin-bottom: 22px;
+          flex-shrink: 0;
+        }
+        .sponsor-stage-label { font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--mut); white-space: nowrap; }
+        .sponsor-stage-logo { height: 38px; max-width: 240px; object-fit: contain; }
+        .sponsor-stage-name { font-size: 17px; font-weight: 700; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .view-header { margin-bottom: 18px; flex-shrink: 0; }
         .view-eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--org); font-weight: 700; }
         .view-title { font-family: var(--disp); font-size: 40px; letter-spacing: 1px; margin-top: 2px; }
-        .view-sub { font-size: 13px; color: var(--mut); }
+        .view-sub { font-size: 13px; color: var(--mut); margin-top: 4px; }
 
         .dual {
           flex: 1;
