@@ -235,17 +235,17 @@ export default function VenueDisplay({ slug, venue, initialData }) {
         .sponsor-stage {
           display: flex;
           align-items: center;
-          gap: 14px;
+          gap: 18px;
           background: var(--panel);
-          border: 1px solid var(--bdr);
-          border-radius: 12px;
-          padding: 14px 22px;
+          border: 1px solid rgba(255, 0, 144, 0.3);
+          border-radius: 14px;
+          padding: 18px 30px;
           text-decoration: none;
           flex-shrink: 0;
         }
-        .sponsor-stage-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--mut); white-space: nowrap; }
-        .sponsor-stage-logo { height: 32px; max-width: 180px; object-fit: contain; }
-        .sponsor-stage-name { font-size: 15px; font-weight: 700; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sponsor-stage-label { font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--mut); white-space: nowrap; }
+        .sponsor-stage-logo { height: 60px; max-width: 320px; object-fit: contain; }
+        .sponsor-stage-name { font-size: 20px; font-weight: 700; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .dual {
           flex: 1;

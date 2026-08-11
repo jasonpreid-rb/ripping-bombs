@@ -322,17 +322,17 @@ export default function VenueDisplayDemo() {
         .sponsor-stage {
           display: flex;
           align-items: center;
-          gap: 14px;
+          gap: 18px;
           background: var(--panel);
-          border: 1px solid var(--bdr);
-          border-radius: 12px;
-          padding: 14px 22px;
+          border: 1px solid rgba(255, 0, 144, 0.3);
+          border-radius: 14px;
+          padding: 18px 30px;
           flex-shrink: 0;
         }
-        .sponsor-stage-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--mut); white-space: nowrap; }
+        .sponsor-stage-label { font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--mut); white-space: nowrap; }
         .sponsor-stage-placeholder {
           font-family: var(--disp);
-          font-size: 20px;
+          font-size: 30px;
           letter-spacing: 1px;
           color: var(--txt);
           white-space: nowrap;
