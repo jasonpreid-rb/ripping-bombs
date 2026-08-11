@@ -25,7 +25,7 @@ export async function getServerSideProps({ params }) {
 
   if (!clubs) return { notFound: true };
 
-  const org = clubs.find(c => toSlug(c.courseName) === slug);
+  const org = clubs.find(c => (c.customSlug || toSlug(c.courseName)) === slug);
   if (!org) return { notFound: true };
 
   const { data: ownEntries } = await supabase

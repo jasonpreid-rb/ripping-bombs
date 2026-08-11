@@ -167,7 +167,7 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded, onSponsorLogoUp
                 style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', padding: '0.6rem 0.6rem 0.6rem 0', color: TXT, fontSize: '0.85rem', outline: 'none' }}
                 value={form.customSlug}
                 onChange={(e) => set('customSlug', e.target.value.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-'))}
-                placeholder={nameToSlug(form.fullName) || 'your-venue'}
+                placeholder={nameToSlug(club?.courseName || form.fullName) || 'your-venue'}
               />
             </div>
             <div style={{ fontSize: '0.72rem', color: DIM, marginTop: 4 }}>
@@ -837,9 +837,13 @@ export default function DashboardPage() {
         .maybeSingle();
       if (clash) return 'That URL is already taken — please choose another.';
     } else if (wantsSlug) {
-      // Left blank — auto-generate from the name instead of clearing it,
-      // so every account always ends up with a working link.
-      const base = nameToSlug(form.fullName);
+      // Left blank — auto-generate instead of clearing it, so every account
+      // always ends up with a working link. Club accounts base this on
+      // courseName, matching the slug their public /clubs/[slug] page has
+      // always used (and may already be indexed under) — using fullName
+      // here instead would silently move an existing venue to a new URL.
+      const nameForSlug = club?.accountType === 'club' ? (club?.courseName || form.fullName) : form.fullName;
+      const base = nameToSlug(nameForSlug);
       if (!base) return 'Please enter a name so we can generate your URL.';
 
       let candidate = base;
