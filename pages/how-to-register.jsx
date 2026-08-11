@@ -7,13 +7,13 @@ const CLUB_STEPS = [
   {
     num: 1,
     title: 'Register Your Club',
-    desc: 'Sign up free in under 2 minutes. Enter your club name, country, and a contact name. Your account will be reviewed and approved within 24 hours.',
+    desc: 'Sign up free in under 2 minutes. Enter your club name, country, and a contact name. Club accounts are approved instantly — no waiting required.',
     reqs: ['Club name and country', 'Contact name and email', 'Approximate location or city'],
   },
   {
     num: 2,
     title: 'Submit Drives on Behalf of Players',
-    desc: 'Once approved, log in and submit your longest drives from tournaments, events, or competitions. You submit on behalf of your players — enter their name, distance, club used, handicap, and age.',
+    desc: 'Log in and submit your longest drives from tournaments, events, or competitions. You submit on behalf of your players — enter their name, distance, club used, handicap, and age.',
     reqs: ['Player full name', 'Distance (yards or metres)', 'Club used', 'Handicap index', 'Player age and gender', 'Photo evidence'],
   },
   {
@@ -46,7 +46,7 @@ const SIM_STEPS = [
 ]
 
 const CLUB_FAQS = [
-  { q: 'Do I need approval before submitting?', a: 'Yes — club accounts require a quick review, usually completed within 24 hours. Once approved you can submit straight away.' },
+  { q: 'Do I need approval before submitting?', a: 'No — club accounts are approved instantly, the same as simulator/individual accounts. You can log in and start submitting drives right away.' },
   { q: 'Can I submit drives for multiple players?', a: 'Yes. As a club account you can submit drives on behalf of any of your members or tournament participants.' },
   { q: 'Is there a limit on how many drives I can submit?', a: 'No limit. You can submit as many drives as you like — from weekly club competitions, one-off events, or ongoing tournaments.' },
   { q: 'What photo evidence is required?', a: 'A photo showing the drive distance — this could be a GPS readout, laser rangefinder display, measuring wheel result, or any recognised measurement method.' },
@@ -180,7 +180,7 @@ export default function HowToRegisterPage() {
                 {mode === 'club' ? 'READY TO REGISTER YOUR CLUB?' : 'READY TO SUBMIT YOUR FIRST DRIVE?'}
               </div>
               <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: 20 }}>
-                {mode === 'club' ? 'Free to join. No subscription.' : 'Free to join. Auto-approved instantly.'}
+                {mode === 'club' ? 'Free to join. Approved instantly.' : 'Free to join. Auto-approved instantly.'}
               </div>
               <button
                 onClick={() => router.push('/register')}

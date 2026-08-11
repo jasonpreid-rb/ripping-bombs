@@ -56,7 +56,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
               ]
             : [
                 ['🏆', 'Global exposure', 'for your club or event'],
-                ['✅', 'Verified results', 'reviewed within 24h'],
+                ['⚡', 'Instant access', 'approved automatically'],
                 ['🆓', '100% free', 'no card, no catch'],
               ]
           ).map(([icon, title, sub]) => (
@@ -101,7 +101,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
             <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 8 }}>
               {isSimulator
                 ? '🖥️ Submit your own simulator longest drives with screenshot evidence. Account approved instantly — no waiting required.'
-                : '🏌️ Register a club, course or event to submit verified competition winners on behalf of players. Reviewed within 24 hours.'}
+                : '🏌️ Register a club, course or event to submit verified competition winners on behalf of players. Account approved instantly — no waiting required.'}
             </div>
           </div>
 
@@ -229,9 +229,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
           </Btn>
 
           <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 12, textAlign: 'center' }}>
-            {isSimulator
-              ? 'Simulator accounts are approved instantly.'
-              : 'Club registrations are reviewed within 24 hours.'}
+            All accounts are approved instantly.
           </div>
         </Card>
       </div>
