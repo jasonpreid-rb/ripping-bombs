@@ -901,11 +901,6 @@ export default function DashboardPage() {
           </>
         )}
 
-        {/* Ripping Bombs Premium promo — individual/simulator accounts only */}
-        {club?.accountType === 'simulator' && (
-          <IndividualPremiumPromo isPremium={!!club?.isPremium} />
-        )}
-
         {/* Stat cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.85rem' }}>
           <StatCard label="Longest Drive" value={fmt(longest)} accent />
@@ -938,6 +933,11 @@ export default function DashboardPage() {
           lastDriveDate={lastDriveDate}
           limitToFree={club?.accountType === 'simulator' && !club?.isPremium}
         />
+
+        {/* Ripping Bombs Premium promo — individual/simulator accounts only */}
+        {club?.accountType === 'simulator' && (
+          <IndividualPremiumPromo isPremium={!!club?.isPremium} />
+        )}
 
         {/* Danger Zone */}
         <div style={{ border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '1.25rem 1.5rem' }}>
