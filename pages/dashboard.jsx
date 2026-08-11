@@ -837,7 +837,25 @@ export default function DashboardPage() {
         .maybeSingle();
       if (clash) return 'That URL is already taken — please choose another.';
     } else if (wantsSlug) {
-      customSlug = null;
+      // Left blank — auto-generate from the name instead of clearing it,
+      // so every account always ends up with a working link.
+      const base = nameToSlug(form.fullName);
+      if (!base) return 'Please enter a name so we can generate your URL.';
+
+      let candidate = base;
+      let suffix = 2;
+      while (suffix <= 50) {
+        const { data: clash } = await supabase
+          .from('clubs')
+          .select('id')
+          .eq('customSlug', candidate)
+          .neq('id', club.id)
+          .maybeSingle();
+        if (!clash) break;
+        candidate = `${base}-${suffix}`;
+        suffix += 1;
+      }
+      customSlug = candidate;
     }
 
     const { error } = await supabase.from('clubs').update({
