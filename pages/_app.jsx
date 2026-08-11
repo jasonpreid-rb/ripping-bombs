@@ -1,4 +1,5 @@
 import '../styles/globals.css';
+import Head from 'next/head';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Analytics } from '@vercel/analytics/react';
@@ -13,6 +14,7 @@ import { sendRegistrationNotification } from '../lib/email';
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
+  const canonicalUrl = `https://www.rippingbombs.com${router.asPath.split('?')[0].split('#')[0]}`;
   const [orgs, setOrgs] = useState([]);
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -203,6 +205,7 @@ export default function App({ Component, pageProps }) {
   if (isKioskRoute) {
     return (
       <>
+        <Head><link rel="canonical" href={canonicalUrl} /></Head>
         <Component {...pageProps} {...sharedProps} />
         <Analytics />
       </>
@@ -210,9 +213,12 @@ export default function App({ Component, pageProps }) {
   }
 
   if (loading) return (
-    <div style={{ minHeight:'100vh', background:'#1a1a1a', display:'flex', alignItems:'center', justifyContent:'center' }}>
-      <div style={{ fontFamily:SANS, color:MUT, fontSize:13, letterSpacing:2 }}>LOADING...</div>
-    </div>
+    <>
+      <Head><link rel="canonical" href={canonicalUrl} /></Head>
+      <div style={{ minHeight:'100vh', background:'#1a1a1a', display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <div style={{ fontFamily:SANS, color:MUT, fontSize:13, letterSpacing:2 }}>LOADING...</div>
+      </div>
+    </>
   );
 
   if (showAdmin) return (
@@ -223,6 +229,7 @@ export default function App({ Component, pageProps }) {
 
   return (
     <>
+      <Head><link rel="canonical" href={canonicalUrl} /></Head>
       <Layout loggedOrg={loggedOrg} onLogout={()=>{ setLoggedOrg(null); localStorage.removeItem('rb_club'); }} unit={unit} setUnit={setUnit}
         onAdminClick={()=>setAdminPw({show:true,val:''})} pendingCount={pendingCount} onShowDemo={()=>setShowDemo(true)}>
         <Component {...pageProps} {...sharedProps}/>
