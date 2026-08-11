@@ -562,6 +562,9 @@ function TvDisplayPromo({ club, onManageClick }) {
         </div>
       </div>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        <a href="/venue-setup" style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.55rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+          Setup Guide
+        </a>
         <a href="/for-venues" target="_blank" rel="noreferrer" style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.55rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none', whiteSpace: 'nowrap' }}>
           See it in action
         </a>
