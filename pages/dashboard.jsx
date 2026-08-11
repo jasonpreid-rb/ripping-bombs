@@ -893,14 +893,6 @@ export default function DashboardPage() {
         {/* Global rank — standalone hero strip */}
         <RankStrip rank={rank} totalClubs={totalClubs} percentile={percentile} />
 
-        {/* TV Display & Sponsors promo — club accounts only */}
-        {club?.accountType === 'club' && (
-          <>
-            <TvDisplayPromo club={club} onManageClick={() => setShowModal(true)} />
-            <TierComparison />
-          </>
-        )}
-
         {/* Stat cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.85rem' }}>
           <StatCard label="Longest Drive" value={fmt(longest)} accent />
@@ -933,6 +925,14 @@ export default function DashboardPage() {
           lastDriveDate={lastDriveDate}
           limitToFree={club?.accountType === 'simulator' && !club?.isPremium}
         />
+
+        {/* TV Display & Sponsors promo — club accounts only */}
+        {club?.accountType === 'club' && (
+          <>
+            <TvDisplayPromo club={club} onManageClick={() => setShowModal(true)} />
+            <TierComparison />
+          </>
+        )}
 
         {/* Ripping Bombs Premium promo — individual/simulator accounts only */}
         {club?.accountType === 'simulator' && (
