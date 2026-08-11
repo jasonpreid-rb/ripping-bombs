@@ -119,9 +119,13 @@ export default function VenueSetupPage() {
 
           {/* Steps */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.6rem', marginBottom: '2.5rem' }}>
-            <StepCard number={1} title="Find your display link">
-              Your venue's live display link is in the <strong style={{ color: TXT }}>TV Display &amp; Sponsors</strong>{' '}
-              section of your dashboard. It updates automatically — there's nothing to turn on first.
+            <StepCard number={1} title="Set your venue's display URL">
+              Open <strong style={{ color: TXT }}>Edit Profile</strong> from your dashboard and set a{' '}
+              <strong style={{ color: TXT }}>Custom URL</strong> under TV Display URL. This becomes your live link at{' '}
+              <code style={{ background: 'rgba(255,255,255,0.06)', padding: '2px 6px', borderRadius: 4, fontSize: '0.8rem' }}>
+                rippingbombs.com/venue-display/your-venue
+              </code>
+              . Once it's set, the link and a copy button appear right on your dashboard.
             </StepCard>
 
             <StepCard number={2} title="Add a sponsor (optional, but it pays for itself)">

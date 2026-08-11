@@ -135,6 +135,7 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded, onSponsorLogoUp
   const inputStyle = { width: '100%', boxSizing: 'border-box', background: BG3, border: `1px solid ${BDR}`, borderRadius: 6, padding: '0.6rem 0.8rem', color: TXT, fontSize: '0.9rem', outline: 'none' };
   const labelStyle = { fontSize: '0.72rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 8, display: 'block' };
   const isSimulator = club?.accountType === 'simulator';
+  const isClub = club?.accountType === 'club';
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '1rem' }}>
       <div onClick={(e) => e.stopPropagation()} style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 14, padding: '2rem', width: '100%', maxWidth: 420, display: 'flex', flexDirection: 'column', gap: 8, maxHeight: '90vh', overflowY: 'auto' }}>
@@ -154,6 +155,26 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded, onSponsorLogoUp
         <input style={inputStyle} value={form.location} onChange={(e) => set('location', e.target.value)} placeholder="City, Country" />
         <label style={labelStyle}>Position / Role</label>
         <input style={inputStyle} value={form.position} onChange={(e) => set('position', e.target.value)} placeholder="e.g. Club Manager" />
+        {isClub && (
+          <>
+            <div style={{ borderTop: `1px solid ${BDR}`, marginTop: 8, paddingTop: 12 }}>
+              <div style={{ fontSize: '0.7rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>TV Display URL</div>
+            </div>
+            <label style={labelStyle}>Custom URL</label>
+            <div style={{ display: 'flex', alignItems: 'center', background: BG3, border: `1px solid ${BDR}`, borderRadius: 6, paddingLeft: '0.8rem', overflow: 'hidden' }}>
+              <span style={{ fontSize: '0.78rem', color: DIM, whiteSpace: 'nowrap' }}>rippingbombs.com/venue-display/</span>
+              <input
+                style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', padding: '0.6rem 0.6rem 0.6rem 0', color: TXT, fontSize: '0.85rem', outline: 'none' }}
+                value={form.customSlug}
+                onChange={(e) => set('customSlug', e.target.value.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-'))}
+                placeholder={nameToSlug(form.fullName) || 'your-venue'}
+              />
+            </div>
+            <div style={{ fontSize: '0.72rem', color: DIM, marginTop: 4 }}>
+              This is the link you'll open on your venue's TV. Leave blank to use one based on your venue name. Letters, numbers and hyphens only.
+            </div>
+          </>
+        )}
         {isSimulator && (
           <>
             <div style={{ borderTop: `1px solid ${BDR}`, marginTop: 8, paddingTop: 12 }}>
@@ -544,6 +565,7 @@ function WeeklyLeaderboard({ weeklyData }) {
 
 function TvDisplayPromo({ club, onManageClick }) {
   const hasSponsor = !!(club?.sponsorName || club?.sponsorLogoUrl);
+  const displayUrl = club?.customSlug ? `rippingbombs.com/venue-display/${club.customSlug}` : null;
   return (
     <div style={{ background: `linear-gradient(135deg, ${BG2}, ${BG3})`, border: `1px solid ${ORG}`, borderRadius: 10, padding: '1.25rem 1.5rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, flex: '1 1 320px' }}>
@@ -555,10 +577,21 @@ function TvDisplayPromo({ club, onManageClick }) {
               Free for your first 3 months
             </span>
           </div>
-          <p style={{ margin: 0, fontSize: '0.82rem', color: MUT, lineHeight: 1.5, maxWidth: 480 }}>
-            Show a live, always-on leaderboard on any TV at your venue — then sell the sponsor spot to cover the $49/mo subscription and then some.
-            {hasSponsor ? ' Your sponsor is set up and live.' : ' Takes about five minutes to set up.'}
-          </p>
+          {displayUrl ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
+              <code style={{ fontSize: '0.8rem', color: TXT, background: 'rgba(255,255,255,0.06)', padding: '3px 8px', borderRadius: 5 }}>{displayUrl}</code>
+              <button
+                onClick={() => navigator.clipboard?.writeText(`https://${displayUrl}`)}
+                style={{ background: 'transparent', border: `1px solid ${BDR}`, color: MUT, padding: '2px 8px', borderRadius: 5, fontSize: '0.7rem', cursor: 'pointer' }}
+              >
+                Copy
+              </button>
+            </div>
+          ) : (
+            <p style={{ margin: 0, fontSize: '0.82rem', color: MUT, lineHeight: 1.5, maxWidth: 480 }}>
+              Show a live, always-on leaderboard on any TV at your venue. Set a custom URL below to get your link.
+            </p>
+          )}
         </div>
       </div>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -790,8 +823,9 @@ export default function DashboardPage() {
   };
 
   const handleProfileSave = async (form) => {
-    let customSlug = null;
-    if (club?.accountType === 'simulator' && form.customSlug && form.customSlug.trim()) {
+    let customSlug = club?.customSlug || null;
+    const wantsSlug = club?.accountType === 'simulator' || club?.accountType === 'club';
+    if (wantsSlug && form.customSlug && form.customSlug.trim()) {
       customSlug = nameToSlug(form.customSlug);
       if (!customSlug) return 'Please enter a valid URL — letters, numbers and hyphens only.';
 
@@ -802,6 +836,8 @@ export default function DashboardPage() {
         .neq('id', club.id)
         .maybeSingle();
       if (clash) return 'That URL is already taken — please choose another.';
+    } else if (wantsSlug) {
+      customSlug = null;
     }
 
     const { error } = await supabase.from('clubs').update({
@@ -812,7 +848,7 @@ export default function DashboardPage() {
       tiktok: form.tiktok || null,
       twitter: form.twitter || null,
       youtube: form.youtube || null,
-      ...(club?.accountType === 'simulator' && { customSlug }),
+      ...(wantsSlug && { customSlug }),
       ...(club?.accountType !== 'simulator' && {
         sponsorName: form.sponsorName || null,
         sponsorLink: form.sponsorLink || null,
