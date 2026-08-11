@@ -119,15 +119,15 @@ export default function VenueSetupPage() {
 
           {/* Steps */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.6rem', marginBottom: '2.5rem' }}>
-            <StepCard number={1} title="Turn on TV Display in your dashboard">
-              From your dashboard, open <strong style={{ color: TXT }}>TV Display &amp; Sponsors</strong> and click{' '}
-              <strong style={{ color: TXT }}>Set Up Sponsor</strong>. This activates your venue's live display and
-              generates its unique link — you'll find that link there once it's on.
+            <StepCard number={1} title="Find your display link">
+              Your venue's live display link is in the <strong style={{ color: TXT }}>TV Display &amp; Sponsors</strong>{' '}
+              section of your dashboard. It updates automatically — there's nothing to turn on first.
             </StepCard>
 
-            <StepCard number={2} title="Add your sponsor (optional, but it pays for itself)">
-              If a local business is sponsoring your screen, upload their logo here too. It'll rotate onto the display
-              automatically — no separate setup needed.
+            <StepCard number={2} title="Add a sponsor (optional, but it pays for itself)">
+              If a local business is sponsoring your screen, click <strong style={{ color: TXT }}>Set Up Sponsor</strong>{' '}
+              to upload their logo. It'll rotate onto the display automatically — no separate setup needed. Skip this
+              step if you don't have a sponsor yet.
             </StepCard>
 
             <StepCard number={3} title="Open the display link on your TV">
@@ -183,10 +183,10 @@ export default function VenueSetupPage() {
           <div style={{ marginTop: '3rem', textAlign: 'center' }}>
             <p style={{ fontSize: '0.85rem', color: DIM, marginBottom: 12 }}>Still stuck, or setting up something unusual?</p>
             <a
-              href="mailto:support@rippingbombs.com"
+              href="mailto:team@rippingbombs.com"
               style={{ color: ORG, fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none' }}
             >
-              Email support@rippingbombs.com →
+              Email team@rippingbombs.com →
             </a>
           </div>
         </div>
