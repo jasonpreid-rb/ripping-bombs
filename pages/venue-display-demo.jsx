@@ -195,11 +195,6 @@ export default function VenueDisplayDemo() {
             </div>
           </div>
 
-          <div className="sponsor-banner">
-            <span className="sponsor-label">Presented by</span>
-            <div className="sponsor-logo-placeholder">TITLEIST</div>
-          </div>
-
           <div className="status-right">
             <div className="live-pill"><span className="live-dot" />Week {WEEK}</div>
             <div className="clock">{clock}</div>
@@ -207,11 +202,14 @@ export default function VenueDisplayDemo() {
         </header>
 
         <main className="stage">
+          <div className="sponsor-stage">
+            <span className="sponsor-stage-label">Presented by</span>
+            <div className="sponsor-stage-placeholder">TITLEIST</div>
+          </div>
+
           <div className="view-header">
-            <div>
-              <div className="view-eyebrow">{div.eyebrow}</div>
-              <div className="view-title">{div.title}</div>
-            </div>
+            <div className="view-eyebrow">{div.eyebrow}</div>
+            <div className="view-title">{div.title}</div>
             <div className="view-sub">{div.sub}</div>
           </div>
 
@@ -297,25 +295,6 @@ export default function VenueDisplayDemo() {
           flex-shrink: 0;
         }
         .venue-id { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
-        .sponsor-banner {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          background: var(--panel);
-          border: 1px solid var(--bdr);
-          border-radius: 8px;
-          padding: 7px 16px;
-          flex-shrink: 1;
-          min-width: 0;
-        }
-        .sponsor-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mut); white-space: nowrap; }
-        .sponsor-logo-placeholder {
-          font-family: var(--disp);
-          font-size: 15px;
-          letter-spacing: 1px;
-          color: var(--txt);
-          white-space: nowrap;
-        }
         .venue-mark {
           width: 40px; height: 40px; border-radius: 8px;
           background: linear-gradient(145deg, var(--org), #7a0048);
@@ -332,10 +311,32 @@ export default function VenueDisplayDemo() {
         .clock { font-family: var(--mono); font-size: 15px; letter-spacing: 1px; }
 
         .stage { flex: 1; padding: 34px 40px 10px; display: flex; flex-direction: column; min-height: 0; }
-        .view-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; flex-shrink: 0; }
+
+        .sponsor-stage {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          background: var(--panel);
+          border: 1px solid var(--bdr);
+          border-radius: 12px;
+          padding: 16px 24px;
+          margin-bottom: 22px;
+          flex-shrink: 0;
+        }
+        .sponsor-stage-label { font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--mut); white-space: nowrap; }
+        .sponsor-stage-placeholder {
+          font-family: var(--disp);
+          font-size: 22px;
+          letter-spacing: 1px;
+          color: var(--txt);
+          white-space: nowrap;
+        }
+
+        .view-header { margin-bottom: 18px; flex-shrink: 0; }
         .view-eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--org); font-weight: 700; }
         .view-title { font-family: var(--disp); font-size: 40px; letter-spacing: 1px; margin-top: 2px; }
-        .view-sub { font-size: 13px; color: var(--mut); }
+        .view-sub { font-size: 13px; color: var(--mut); margin-top: 4px; }
 
         .dual {
           flex: 1;
