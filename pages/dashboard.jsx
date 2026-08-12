@@ -506,6 +506,8 @@ function WeeklyLeaderboard({ weeklyData }) {
   const { weekStart, weekEnd, hasSubmitted, category, myBest, rank, total, top5, clubId } = weeklyData;
   const rangeLabel = fmtWeekRange(weekStart, weekEnd);
   const daysLeft = daysUntilWeekReset(weekEnd);
+  const hasEntries = top5.length > 0;
+  const leaderDist = hasEntries ? Number(top5[0].dist) : null;
 
   return (
     <div style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, overflow: 'hidden' }}>
@@ -519,44 +521,51 @@ function WeeklyLeaderboard({ weeklyData }) {
         <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.78rem', padding: '0.38rem 0.85rem', borderRadius: 6, textDecoration: 'none' }}>+ Submit Drive</a>
       </div>
 
-      {!hasSubmitted ? (
+      {!hasEntries ? (
         <div style={{ padding: '2rem 1.25rem', textAlign: 'center', color: MUT }}>
           <p style={{ marginBottom: '1rem', fontSize: '0.88rem' }}>No drives submitted this week yet — every category resets Monday, so this is your chance to lead it.</p>
           <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, padding: '0.55rem 1.25rem', borderRadius: 7, textDecoration: 'none', fontSize: '0.9rem' }}>Submit this week's drive →</a>
         </div>
       ) : (
         <>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', padding: '1.1rem 1.25rem', borderBottom: `1px solid ${BDR}` }}>
-            <StatCard label={`Weekly Rank · ${getCategoryLabel(category)}`} value={rank ? `#${rank}` : '—'} accent sub={total ? `of ${total} this week` : null} />
-            <StatCard label="This Week's Best" value={fmt(myBest)} />
-          </div>
-
-          {top5.length > 0 && (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 480 }}>
-                <thead>
-                  <tr style={{ background: BG3, borderBottom: `1px solid ${BDR}` }}>
-                    {['#', 'Player', 'Distance', 'Club Used'].map((h) => (
-                      <th key={h} style={{ padding: '0.55rem 1rem', textAlign: 'left', fontSize: '0.68rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {top5.map((e, i) => {
-                    const isMe = e.orgId === clubId;
-                    return (
-                      <tr key={`${e.orgId}-${i}`} style={{ borderBottom: i < top5.length - 1 ? `1px solid ${BDR}` : 'none', background: isMe ? 'rgba(255,0,144,0.06)' : 'transparent' }}>
-                        <td style={{ padding: '0.75rem 1rem', color: DIM, fontSize: '0.78rem' }}>#{i + 1}</td>
-                        <td style={{ padding: '0.75rem 1rem', fontWeight: isMe ? 700 : 600, color: isMe ? ORG : TXT, fontSize: '0.85rem' }}>{e.player}{isMe ? ' (you)' : ''}</td>
-                        <td style={{ padding: '0.75rem 1rem', fontWeight: 700, color: i === 0 ? ORG : TXT, fontSize: '0.88rem' }}>{Number(e.dist)} yds</td>
-                        <td style={{ padding: '0.75rem 1rem', color: MUT, fontSize: '0.82rem' }}>{e.club || '—'}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+          {hasSubmitted ? (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', padding: '1.1rem 1.25rem', borderBottom: `1px solid ${BDR}` }}>
+              <StatCard label={`Weekly Rank · ${getCategoryLabel(category)}`} value={rank ? `#${rank}` : '—'} accent sub={total ? `of ${total} this week` : null} />
+              <StatCard label="This Week's Best" value={fmt(myBest)} />
+            </div>
+          ) : (
+            <div style={{ padding: '0.9rem 1.25rem', borderBottom: `1px solid ${BDR}`, background: 'rgba(255,0,144,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+              <div style={{ fontSize: '0.82rem', color: TXT }}>
+                This week's leader is out at <strong style={{ color: ORG }}>{fmt(leaderDist)}</strong> — think you can beat it?
+              </div>
+              <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.78rem', padding: '0.4rem 0.9rem', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}>Submit your drive →</a>
             </div>
           )}
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 480 }}>
+              <thead>
+                <tr style={{ background: BG3, borderBottom: `1px solid ${BDR}` }}>
+                  {['#', 'Player', 'Distance', 'Club Used'].map((h) => (
+                    <th key={h} style={{ padding: '0.55rem 1rem', textAlign: 'left', fontSize: '0.68rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {top5.map((e, i) => {
+                  const isMe = e.orgId === clubId;
+                  return (
+                    <tr key={`${e.orgId}-${i}`} style={{ borderBottom: i < top5.length - 1 ? `1px solid ${BDR}` : 'none', background: isMe ? 'rgba(255,0,144,0.06)' : 'transparent' }}>
+                      <td style={{ padding: '0.75rem 1rem', color: DIM, fontSize: '0.78rem' }}>#{i + 1}</td>
+                      <td style={{ padding: '0.75rem 1rem', fontWeight: isMe ? 700 : 600, color: isMe ? ORG : TXT, fontSize: '0.85rem' }}>{e.player}{isMe ? ' (you)' : ''}</td>
+                      <td style={{ padding: '0.75rem 1rem', fontWeight: 700, color: i === 0 ? ORG : TXT, fontSize: '0.88rem' }}>{Number(e.dist)} yds</td>
+                      <td style={{ padding: '0.75rem 1rem', color: MUT, fontSize: '0.82rem' }}>{e.club || '—'}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </>
       )}
     </div>
@@ -769,15 +778,38 @@ export default function DashboardPage() {
       })
       .sort((a, b) => Number(b.dist) - Number(a.dist));
 
-    if (myWeeklyEntries.length === 0) {
-      setWeeklyData({ weekStart, weekEnd, hasSubmitted: false, category: null, myBest: null, rank: null, total: null, top5: [], clubId: clubData.id });
-    } else {
-      const { data: weeklyAllEntries } = await supabase
-        .from('entries')
-        .select('orgId, dist, age, hcp, gender, date, player, club')
-        .gte('date', weekStart.toISOString())
-        .lt('date', weekEnd.toISOString());
+    // Always fetch this week's platform-wide entries — the leaderboard needs to
+    // show live competition even when the current user hasn't submitted yet.
+    const { data: weeklyAllEntries } = await supabase
+      .from('entries')
+      .select('orgId, dist, age, hcp, gender, date, player, club')
+      .gte('date', weekStart.toISOString())
+      .lt('date', weekEnd.toISOString());
 
+    if (myWeeklyEntries.length === 0) {
+      // Not submitted yet this week — show the overall weekly top 5 across all
+      // categories so the user sees real distances to beat and is prompted to submit.
+      const bestEntryPerClub = {};
+      (weeklyAllEntries || []).forEach((e) => {
+        const d = Number(e.dist);
+        if (!bestEntryPerClub[e.orgId] || d > Number(bestEntryPerClub[e.orgId].dist)) {
+          bestEntryPerClub[e.orgId] = e;
+        }
+      });
+      const ranked = Object.values(bestEntryPerClub).sort((a, b) => Number(b.dist) - Number(a.dist));
+
+      setWeeklyData({
+        weekStart,
+        weekEnd,
+        hasSubmitted: false,
+        category: null,
+        myBest: null,
+        rank: null,
+        total: ranked.length,
+        top5: ranked.slice(0, 5),
+        clubId: clubData.id,
+      });
+    } else {
       const myBestEntry = myWeeklyEntries[0];
       const category = getCategory(myBestEntry);
 
