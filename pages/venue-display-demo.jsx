@@ -139,10 +139,31 @@ const DIVISIONS = [
   },
 ];
 
+// Design reference resolution. The whole layout is authored in fixed px
+// against this canvas, then uniformly scaled to fit whatever screen it's
+// displayed on (see `scale` below) — so it holds its proportions and
+// legibility whether it's on a 43" lounge TV or a 75" one.
+const DESIGN_W = 1920;
+const DESIGN_H = 1080;
+
 export default function VenueDisplayDemo() {
   const [current, setCurrent] = useState(0);
   const [entered, setEntered] = useState(true);
   const [clock, setClock] = useState('--:--:--');
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const computeScale = () => {
+      const s = Math.min(
+        window.innerWidth / DESIGN_W,
+        window.innerHeight / DESIGN_H
+      );
+      setScale(s);
+    };
+    computeScale();
+    window.addEventListener('resize', computeScale);
+    return () => window.removeEventListener('resize', computeScale);
+  }, []);
 
   useEffect(() => {
     const rotate = setInterval(() => {
@@ -183,7 +204,8 @@ export default function VenueDisplayDemo() {
         />
       </Head>
 
-      <div className="tv">
+      <div className="tv-viewport">
+      <div className="tv" style={{ transform: `scale(${scale})` }}>
         <div className="demo-badge">Sample data · Demo</div>
 
         <header className="statusbar">
@@ -228,8 +250,9 @@ export default function VenueDisplayDemo() {
               <span key={d.key} className={`dot ${i === current ? 'active' : ''}`} />
             ))}
           </div>
-          <a href="/" className="rb-logo" aria-label="Ripping Bombs home">RB</a>
+          <a href="/" className="rb-logo" aria-label="Ripping Bombs home" />
         </footer>
+      </div>
       </div>
 
       <style jsx global>{`
@@ -252,10 +275,20 @@ export default function VenueDisplayDemo() {
       `}</style>
 
       <style jsx>{`
-        .tv {
+        .tv-viewport {
           width: 100vw;
           height: 100vh;
-          min-height: 600px;
+          overflow: hidden;
+          background: var(--bg);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .tv {
+          width: 1920px;
+          height: 1080px;
+          flex-shrink: 0;
+          transform-origin: center center;
           display: flex;
           flex-direction: column;
           background:
@@ -356,14 +389,14 @@ export default function VenueDisplayDemo() {
         .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bdr); transition: background 0.3s ease, transform 0.3s ease; }
         .dot.active { background: var(--org); transform: scale(1.25); }
         .rb-logo {
-          width: 30px; height: 30px; border-radius: 7px;
-          background: linear-gradient(145deg, var(--org), #7a0048);
-          display: flex; align-items: center; justify-content: center;
-          font-family: var(--disp); font-size: 13px; letter-spacing: 0.5px;
-          color: var(--txt); text-decoration: none;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          width: 32px; height: 32px;
+          display: block;
+          background-color: var(--org);
+          -webkit-mask: url('/favicon.ico') center / contain no-repeat;
+          mask: url('/favicon.ico') center / contain no-repeat;
+          transition: transform 0.2s ease, filter 0.2s ease;
         }
-        .rb-logo:hover { transform: scale(1.06); box-shadow: 0 0 14px 1px rgba(255, 0, 144, 0.4); }
+        .rb-logo:hover { transform: scale(1.08); filter: drop-shadow(0 0 8px rgba(255, 0, 144, 0.65)); }
       `}</style>
     </>
   );
