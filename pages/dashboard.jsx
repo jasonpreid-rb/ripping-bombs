@@ -447,9 +447,9 @@ function DriveHistory({ entries, lastDriveDate, limitToFree }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', borderBottom: `1px solid ${BDR}`, flexWrap: 'wrap', gap: '0.5rem' }}>
         <div>
           <h2 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>All Submitted Drives</h2>
-          {nudge && <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: MUT }}>{nudge}</p>}
-        </div>
-        <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.78rem', padding: '0.38rem 0.85rem', borderRadius: 6, textDecoration: 'none' }}>+ Submit Drive</a>
+        {entries.length > 0 && (
+          <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.78rem', padding: '0.38rem 0.85rem', borderRadius: 6, textDecoration: 'none' }}>+ Submit Drive</a>
+        )}
       </div>
 
       {entries.length === 0 ? (
@@ -511,14 +511,11 @@ function WeeklyLeaderboard({ weeklyData }) {
 
   return (
     <div style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, overflow: 'hidden' }}>
-      <div style={{ padding: '1rem 1.25rem', borderBottom: `1px solid ${BDR}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
-        <div>
-          <h2 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>This Week's Leaderboard</h2>
-          <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: MUT }}>
-            {rangeLabel} · resets in {daysLeft} day{daysLeft === 1 ? '' : 's'}
-          </p>
-        </div>
-        <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.78rem', padding: '0.38rem 0.85rem', borderRadius: 6, textDecoration: 'none' }}>+ Submit Drive</a>
+      <div style={{ padding: '1rem 1.25rem', borderBottom: `1px solid ${BDR}` }}>
+        <h2 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>This Week's Leaderboard</h2>
+        <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: MUT }}>
+          {rangeLabel} · resets in {daysLeft} day{daysLeft === 1 ? '' : 's'}
+        </p>
       </div>
 
       {!hasEntries ? (
