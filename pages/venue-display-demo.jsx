@@ -428,11 +428,11 @@ function Column({ tag, label, name, rows, unit }) {
       <style jsx>{`
         .col { display: flex; flex-direction: column; min-height: 0; }
         .col-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-shrink: 0; }
-        .col-tag { font-size: 10px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; padding: 4px 9px; border-radius: 5px; white-space: nowrap; }
+        .col-tag { font-size: 12px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; padding: 5px 10px; border-radius: 5px; white-space: nowrap; }
         .col-tag.venue { color: var(--org); background: rgba(255, 0, 144, 0.12); border: 1px solid rgba(255, 0, 144, 0.3); }
         .col-tag.global { color: #7fc8ff; background: rgba(127, 200, 255, 0.1); border: 1px solid rgba(127, 200, 255, 0.28); }
         .col-tag.alltime { color: var(--gold); background: rgba(232, 193, 112, 0.1); border: 1px solid rgba(232, 193, 112, 0.3); }
-        .col-name { font-size: 12px; color: var(--mut); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .col-name { font-size: 14px; color: var(--mut); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .rows { flex: 1; display: flex; flex-direction: column; gap: 9px; min-height: 0; }
         .empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--mut); font-size: 13px; background: var(--panel); border: 1px dashed var(--bdr); border-radius: 10px; }
       `}</style>
@@ -454,10 +454,10 @@ function Row({ rank, row, unit }) {
           <div className="pname">
             {row.countryCode && (
               <img
-                src={`https://flagcdn.com/20x15/${row.countryCode.toLowerCase()}.png`}
+                src={`https://flagcdn.com/40x30/${row.countryCode.toLowerCase()}.png`}
                 alt={row.countryCode}
-                width={16}
-                height={12}
+                width={22}
+                height={16}
                 className="flag"
               />
             )}
@@ -492,20 +492,20 @@ function Row({ rank, row, unit }) {
         .row.r2 { background: linear-gradient(90deg, rgba(199, 204, 214, 0.06), var(--panel) 30%); }
         .row.r3 { background: linear-gradient(90deg, rgba(217, 149, 103, 0.06), var(--panel) 30%); }
 
-        .rank { font-family: var(--disp); font-size: 20px; width: 30px; flex-shrink: 0; color: var(--mut); }
-        .row.r1 .rank { color: var(--gold); font-size: 24px; }
-        .row.r2 .rank { color: var(--silver); font-size: 22px; }
-        .row.r3 .rank { color: var(--bronze); font-size: 22px; }
+        .rank { font-family: var(--disp); font-size: 26px; width: 38px; flex-shrink: 0; color: var(--mut); }
+        .row.r1 .rank { color: var(--gold); font-size: 30px; }
+        .row.r2 .rank { color: var(--silver); font-size: 28px; }
+        .row.r3 .rank { color: var(--bronze); font-size: 28px; }
 
-        .player { display: flex; align-items: center; gap: 9px; flex: 1; min-width: 0; }
-        .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--panel2); border: 1px solid var(--bdr); flex-shrink: 0; background-size: cover; background-position: center; }
+        .player { display: flex; align-items: center; gap: 13px; flex: 1; min-width: 0; }
+        .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--panel2); border: 1px solid var(--bdr); flex-shrink: 0; background-size: cover; background-position: center; }
         .pname-block { min-width: 0; }
-        .pname { font-weight: 700; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .pmeta { font-size: 9.5px; color: var(--mut); letter-spacing: 0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pname { font-weight: 700; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pmeta { font-size: 12px; color: var(--mut); letter-spacing: 0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
 
-        .distance { font-family: var(--mono); font-weight: 700; font-size: 17px; flex-shrink: 0; display: flex; align-items: baseline; gap: 3px; }
-        .distance .unit { font-size: 9.5px; color: var(--mut); font-weight: 500; }
-        .row.r1 .distance { color: var(--gold); font-size: 19px; }
+        .distance { font-family: var(--mono); font-weight: 700; font-size: 23px; flex-shrink: 0; display: flex; align-items: baseline; gap: 4px; }
+        .distance .unit { font-size: 11px; color: var(--mut); font-weight: 500; }
+        .row.r1 .distance { color: var(--gold); font-size: 26px; }
         .row.r2 .distance { color: var(--silver); }
         .row.r3 .distance { color: var(--bronze); }
       `}</style>
