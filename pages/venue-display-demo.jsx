@@ -228,13 +228,7 @@ export default function VenueDisplayDemo() {
               <span key={d.key} className={`dot ${i === current ? 'active' : ''}`} />
             ))}
           </div>
-          <div className="cta">
-            <div className="qr" />
-            <div className="cta-text">
-              Scan to submit your drive · <b>rippingbombs.com/your-venue</b>
-            </div>
-          </div>
-          <div className="wordmark">RIPPING<b>BOMBS</b></div>
+          <a href="/" className="rb-logo" aria-label="Ripping Bombs home">RB</a>
         </footer>
       </div>
 
@@ -361,11 +355,15 @@ export default function VenueDisplayDemo() {
         .dots { display: flex; gap: 8px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bdr); transition: background 0.3s ease, transform 0.3s ease; }
         .dot.active { background: var(--org); transform: scale(1.25); }
-        .cta { display: flex; align-items: center; gap: 12px; color: var(--mut); font-size: 12px; }
-        .qr { width: 44px; height: 44px; background: #fff; border-radius: 6px; }
-        .cta-text b { color: var(--txt); }
-        .wordmark { font-family: var(--disp); font-size: 14px; letter-spacing: 1px; color: var(--mut); }
-        .wordmark b { color: var(--org); }
+        .rb-logo {
+          width: 30px; height: 30px; border-radius: 7px;
+          background: linear-gradient(145deg, var(--org), #7a0048);
+          display: flex; align-items: center; justify-content: center;
+          font-family: var(--disp); font-size: 13px; letter-spacing: 0.5px;
+          color: var(--txt); text-decoration: none;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .rb-logo:hover { transform: scale(1.06); box-shadow: 0 0 14px 1px rgba(255, 0, 144, 0.4); }
       `}</style>
     </>
   );
