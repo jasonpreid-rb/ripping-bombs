@@ -447,6 +447,8 @@ function DriveHistory({ entries, lastDriveDate, limitToFree }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', borderBottom: `1px solid ${BDR}`, flexWrap: 'wrap', gap: '0.5rem' }}>
         <div>
           <h2 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>All Submitted Drives</h2>
+          {nudge && <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: MUT }}>{nudge}</p>}
+        </div>
         {entries.length > 0 && (
           <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.78rem', padding: '0.38rem 0.85rem', borderRadius: 6, textDecoration: 'none' }}>+ Submit Drive</a>
         )}
