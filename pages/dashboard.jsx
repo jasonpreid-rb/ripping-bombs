@@ -724,6 +724,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [club, setClub] = useState(null);
   const [entries, setEntries] = useState([]);
+  const [primaryCategory, setPrimaryCategory] = useState(null);
   const [rank, setRank] = useState(null);
   const [totalClubs, setTotalClubs] = useState(null);
   const [globalAvgBest, setGlobalAvgBest] = useState(null);
@@ -749,6 +750,11 @@ export default function DashboardPage() {
     const { data: clubEntries } = await supabase.from('entries').select('*').eq('orgId', clubData.id);
     const sorted = (clubEntries || []).sort((a, b) => Number(b.dist) - Number(a.dist));
     setEntries(sorted);
+
+    const mostRecent = (clubEntries || [])
+      .slice()
+      .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+    setPrimaryCategory(mostRecent ? getCategory(mostRecent) : null);
 
     // Global rank + avg
     const { data: allEntries } = await supabase.from('entries').select('orgId, dist');
@@ -1013,7 +1019,11 @@ export default function DashboardPage() {
 
         {/* Drive history */}
         <DriveHistory
-          entries={entries}
+          entries={
+            club?.accountType === 'simulator' && primaryCategory
+              ? entries.filter((e) => getCategory(e) === primaryCategory)
+              : entries
+          }
           lastDriveDate={lastDriveDate}
           limitToFree={club?.accountType === 'simulator' && !club?.isPremium}
         />
