@@ -293,16 +293,27 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
 
   const orgFor = id => orgs.find(o=>o.id===id);
 
-  // Week number helper
-  const getWeekNumber = (dateStr) => {
-    const d = new Date(dateStr);
-    const jan1 = new Date(d.getFullYear(), 0, 1);
-    return Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+  // Monday-start week boundary — must match the dashboard's getWeekStart/getWeekEnd
+  // exactly, or entries near the week edge will show on one page and not the other.
+  const getWeekStart = (date = new Date()) => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    const day = d.getDay(); // 0=Sun, 1=Mon, ...
+    const diff = (day === 0 ? -6 : 1) - day;
+    d.setDate(d.getDate() + diff);
+    return d;
+  };
+  const getWeekEnd = (weekStart) => {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() + 7);
+    return d;
   };
 
   const now = new Date();
-  const currentWeek = getWeekNumber(now.toISOString().slice(0,10));
-  const currentYear = now.getFullYear();
+  const weekStart = getWeekStart(now);
+  const weekEnd = getWeekEnd(weekStart);
+  // Display label, e.g. "Week of 10 Aug" — replaces the old arbitrary week-number scheme
+  const currentWeekLabel = `Week of ${weekStart.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`;
   const approved = entries.filter(e => approvedOrgs.find(o => o.id === e.orgId));
 
   const CATEGORIES = [
@@ -316,7 +327,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
 
   const weeklyLeaders = CATEGORIES.map(cat => {
     const top3 = approved
-      .filter(e => getWeekNumber(e.date) === currentWeek && new Date(e.date).getFullYear() === currentYear)
+      .filter(e => {
+        const d = new Date(e.date);
+        return d >= weekStart && d < weekEnd;
+      })
       .filter(cat.filter)
       .sort((a,b) => Number(b.dist) - Number(a.dist)).slice(0,3);
     return { ...cat, top3 };
@@ -507,7 +521,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
               <div>
                 <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:6}}>Live from the Registry</div>
-                <div style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>Week {currentWeek}, {currentYear} — Category Leaders</div>
+                <div style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>{currentWeekLabel} — Category Leaders</div>
               </div>
               <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
             </div>
