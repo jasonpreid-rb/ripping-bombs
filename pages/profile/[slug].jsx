@@ -115,19 +115,56 @@ function StatCard({ label, value, accent }) {
   );
 }
 
-function RankPill({ label, rank, total, primary }) {
+function FoundingBadge() {
+  return (
+    <span title="One of the first 50 members to join Ripping Bombs" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'linear-gradient(135deg, #78350f, #92400e)', color: '#fbbf24', border: '1px solid #b45309', borderRadius: 20, padding: '2px 10px', fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', whiteSpace: 'nowrap', cursor: 'help' }}>
+      ★ Founding Member
+    </span>
+  );
+}
+
+function SimulatorBadge() {
+  return (
+    <span style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)', borderRadius: 20, padding: '2px 10px', fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+      Simulator
+    </span>
+  );
+}
+
+// Standalone hero strip for global rank — mirrors the dashboard's RankStrip
+function RankStrip({ rank, total, category }) {
   if (!rank) return null;
+  const percentile = total ? Math.round((rank / total) * 100) : null;
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', gap: 10,
-      background: primary ? 'linear-gradient(135deg,#FF0090,#ff66c4)' : BG3,
-      border: `1px solid ${primary ? 'transparent' : BDR}`,
-      padding: '10px 16px',
+      background: 'linear-gradient(135deg, rgba(255,0,144,0.14), rgba(255,0,144,0.03))',
+      border: '1px solid rgba(255,0,144,0.35)',
+      padding: '20px 24px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      flexWrap: 'wrap',
+      gap: 12,
+      marginBottom: 24,
     }}>
-      <div style={{ fontFamily: DISP, fontSize: 24, color: primary ? '#111' : ORG, lineHeight: 1 }}>#{rank}</div>
-      <div>
-        <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: primary ? 'rgba(0,0,0,0.65)' : DIM }}>{label}</div>
-        <div style={{ fontFamily: SANS, fontSize: 11, color: primary ? 'rgba(0,0,0,0.55)' : MUT }}>of {total} ranked</div>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+        <span style={{ fontFamily: DISP, fontSize: 42, color: ORG, letterSpacing: 0.5, lineHeight: 1 }}>#{rank}</span>
+        <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: TXT, textTransform: 'uppercase', letterSpacing: 1 }}>Global Rank</span>
+        {category && (
+          <span style={{ background: 'rgba(255,255,255,0.08)', color: MUT, border: `1px solid ${BDR}`, borderRadius: 20, padding: '3px 11px', fontFamily: SANS, fontSize: 11, fontWeight: 600, letterSpacing: 0.5 }}>
+            {category}
+          </span>
+        )}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        {percentile != null && (
+          <span style={{ background: 'rgba(255,0,144,0.16)', color: ORG, border: '1px solid rgba(255,0,144,0.3)', borderRadius: 20, padding: '4px 12px', fontFamily: SANS, fontSize: 12, fontWeight: 700, letterSpacing: 0.5 }}>
+            Top {percentile}% globally
+          </span>
+        )}
+        {total > 0 && (
+          <span style={{ fontFamily: SANS, fontSize: 12, color: MUT }}>of {total.toLocaleString()} players worldwide</span>
+        )}
       </div>
     </div>
   );
@@ -210,45 +247,45 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
 
       <div style={{ padding: '28px 18px 80px', maxWidth: 900, margin: '0 auto' }}>
 
-        <Link href="/leaderboard" style={{ fontFamily: SANS, fontSize: 12, color: DIM, textDecoration: 'none', letterSpacing: 1, textTransform: 'uppercase' }}>
-          &larr; Leaderboard
-        </Link>
-
-        {/* ✅ Fixed: was rgba(163,230,53,...) lime green — now neon pink */}
-        <div style={{ marginTop: 24, marginBottom: 32, background: 'linear-gradient(135deg,rgba(255,0,144,0.1),rgba(255,0,144,0.03))', border: '1px solid rgba(255,0,144,0.2)', padding: '28px 28px' }}>
-          <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 2, color: ORG, textTransform: 'uppercase', marginBottom: 10 }}>Player Profile</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 8 }}>
+        {/* Header — mirrors the player dashboard header layout */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
             <PlayerAvatar fullName={org.fullName} avatarUrl={org.avatarUrl} size={72} />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-              <div style={{ fontFamily: DISP, fontSize: 'clamp(28px,5vw,42px)', color: TXT, letterSpacing: 0.5, lineHeight: 1 }}>
-                {profileName}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 6 }}>
+                <h1 style={{ margin: 0, fontFamily: DISP, fontSize: 'clamp(28px,5vw,42px)', color: TXT, letterSpacing: 0.5, lineHeight: 1 }}>
+                  {profileName}
+                </h1>
+                {org.is_founding_member && <FoundingBadge />}
+                {org.badge === 'simulator' && <SimulatorBadge />}
+                {org.badge && org.badge !== 'simulator' && <BadgePill badge={org.badge} />}
               </div>
-              {org.country && <span style={{ fontSize: 28 }}>{countryFlag(org.country)}</span>}
-              {org.badge && <BadgePill badge={org.badge} />}
+              {(org.location || org.simulator) && (
+                <p style={{ margin: 0, fontFamily: SANS, fontSize: 13, color: MUT }}>
+                  {[org.location, org.simulator].filter(Boolean).join(' · ')}
+                </p>
+              )}
             </div>
           </div>
-          {org.location && (
-            <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: (hasSocials || globalRank || categoryRank) ? 16 : 0 }}>
-              {org.location}{org.simulator ? ` · ${org.simulator}` : ''}
-            </div>
-          )}
-
-          {(globalRank || categoryRank) && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: hasSocials ? 16 : 0 }}>
-              <RankPill label="Global Rank" rank={globalRank} total={globalTotal} primary />
-              <RankPill label={`${category} Rank`} rank={categoryRank} total={categoryTotal} />
-            </div>
-          )}
-
-          {hasSocials && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14 }}>
-              <SocialHandle handle={org.instagram} href="https://instagram.com/" icon="Instagram" />
-              <SocialHandle handle={org.tiktok}    href="https://tiktok.com/@"   icon="TikTok" />
-              <SocialHandle handle={org.twitter}   href="https://x.com/"         icon="X" />
-              <SocialHandle handle={org.youtube}   href="https://youtube.com/@"  icon="YouTube" />
-            </div>
-          )}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
+            {org.country && <span title={org.country} style={{ fontSize: 28 }}>{countryFlag(org.country)}</span>}
+            <Link href="/leaderboard" style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '10px 16px', fontFamily: SANS, fontSize: 13, textDecoration: 'none' }}>
+              View Leaderboard
+            </Link>
+          </div>
         </div>
+
+        {/* Global rank — standalone hero strip, same as the dashboard */}
+        <RankStrip rank={globalRank} total={globalTotal} category={category} />
+
+        {hasSocials && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 32 }}>
+            <SocialHandle handle={org.instagram} href="https://instagram.com/" icon="Instagram" />
+            <SocialHandle handle={org.tiktok}    href="https://tiktok.com/@"   icon="TikTok" />
+            <SocialHandle handle={org.twitter}   href="https://x.com/"         icon="X" />
+            <SocialHandle handle={org.youtube}   href="https://youtube.com/@"  icon="YouTube" />
+          </div>
+        )}
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10, marginBottom: 32 }}>
           <StatCard label="Personal Best" value={best ? `${best.dist} yds` : '-'} accent />
