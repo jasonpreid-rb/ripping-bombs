@@ -253,6 +253,11 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
             <PlayerAvatar fullName={org.fullName} avatarUrl={org.avatarUrl} size={72} />
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 6 }}>
+                {org.country && (
+                  <span title={org.country} style={{ fontSize: 'clamp(24px,4vw,34px)', lineHeight: 1 }}>
+                    {countryFlag(org.country)}
+                  </span>
+                )}
                 <h1 style={{ margin: 0, fontFamily: DISP, fontSize: 'clamp(28px,5vw,42px)', color: TXT, letterSpacing: 0.5, lineHeight: 1 }}>
                   {profileName}
                 </h1>
@@ -268,7 +273,6 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
-            {org.country && <span title={org.country} style={{ fontSize: 28 }}>{countryFlag(org.country)}</span>}
             <Link href="/leaderboard" style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '10px 16px', fontFamily: SANS, fontSize: 13, textDecoration: 'none' }}>
               View Leaderboard
             </Link>
