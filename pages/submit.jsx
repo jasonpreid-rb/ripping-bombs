@@ -130,14 +130,22 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
               </div>
             ) : (
               <div style={{ gridColumn:'1/-1' }}>
-                <Field label="Tournament / Event Name" value={form.tournament} onChange={e=>setForm({...form,tournament:e.target.value})} placeholder="e.g. Club Championship 2026"/>
+                <Field label="Tournament / Event Name (optional)" value={form.tournament} onChange={e=>setForm({...form,tournament:e.target.value})} placeholder="e.g. Club Championship 2026 — leave blank for a casual drive"/>
               </div>
             )}
 
-            {/* Facility — optional, for all account types */}
-            <div style={{ gridColumn:'1/-1' }}>
-              <Field label="Facility Name (optional)" value={form.facility||''} onChange={e=>setForm({...form,facility:e.target.value})} placeholder="e.g. TopGolf Manchester, GolfZon World, The Range Dubai"/>
-            </div>
+            {/* Facility — free-text venue name. Club accounts ARE the registered venue
+                (their own profile already covers this), so this field would just be
+                redundant or conflicting for them. Only useful for simulator/individual
+                submitters playing somewhere not registered on RB and not tagged above. */}
+            {isSimulator && (
+              <div style={{ gridColumn:'1/-1' }}>
+                <Field label="Facility Name (optional)" value={form.facility||''} onChange={e=>setForm({...form,facility:e.target.value})} placeholder="e.g. TopGolf Manchester, GolfZon World, The Range Dubai"/>
+                <div style={{ fontFamily:SANS, fontSize:11, color:DIM, marginTop:5 }}>
+                  Only needed if you played somewhere not covered by the venue dropdown above.
+                </div>
+              </div>
+            )}
 
             {/* Venue tag — simulator accounts can tag a club venue */}
             {isSimulator && (
@@ -268,6 +276,8 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
               // For simulator accounts, pre-fill player name and tournament from account
               if (isSimulator) {
                 setForm(f => ({ ...f, player: loggedOrg.fullName, tournament: 'Simulator', gender: loggedOrg.gender || 'male' }));
+              } else if (!form.tournament || !form.tournament.trim()) {
+                setForm(f => ({ ...f, tournament: 'Casual / Practice' }));
               }
               const result = await doSubmit();
               if (result && result.ok) {
