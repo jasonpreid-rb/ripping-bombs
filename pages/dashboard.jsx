@@ -6,6 +6,7 @@ import PlayerAvatar from '../components/PlayerAvatar';
 import AvatarUploader from '../components/AvatarUploader';
 import SponsorLogoUploader from '../components/SponsorLogoUploader';
 import { countryFlag } from '../components/UI';
+import { DISP } from '../lib/constants';
 
 const ORG = '#FF0090';
 const TXT = '#f0f0f0';
@@ -504,6 +505,7 @@ function DriveHistory({ entries, lastDriveDate, limitToFree }) {
 }
 
 // Weekly leaderboard — split by category, resets every Monday
+const WEEKLY_MEDALS = ['🥇', '🥈', '🥉'];
 function WeeklyLeaderboard({ weeklyData }) {
   const { weekStart, weekEnd, hasSubmitted, category, myBest, rank, total, top5, clubId } = weeklyData;
   const rangeLabel = fmtWeekRange(weekStart, weekEnd);
@@ -541,29 +543,30 @@ function WeeklyLeaderboard({ weeklyData }) {
             </div>
           )}
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 480 }}>
-              <thead>
-                <tr style={{ background: BG3, borderBottom: `1px solid ${BDR}` }}>
-                  {['#', 'Player', 'Distance', 'Club Used'].map((h) => (
-                    <th key={h} style={{ padding: '0.55rem 1rem', textAlign: 'left', fontSize: '0.68rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {top5.map((e, i) => {
-                  const isMe = e.orgId === clubId;
-                  return (
-                    <tr key={`${e.orgId}-${i}`} style={{ borderBottom: i < top5.length - 1 ? `1px solid ${BDR}` : 'none', background: isMe ? 'rgba(255,0,144,0.06)' : 'transparent' }}>
-                      <td style={{ padding: '0.75rem 1rem', color: DIM, fontSize: '0.78rem' }}>#{i + 1}</td>
-                      <td style={{ padding: '0.75rem 1rem', fontWeight: isMe ? 700 : 600, color: isMe ? ORG : TXT, fontSize: '0.85rem' }}>{e.player}{isMe ? ' (you)' : ''}</td>
-                      <td style={{ padding: '0.75rem 1rem', fontWeight: 700, color: i === 0 ? ORG : TXT, fontSize: '0.88rem' }}>{Number(e.dist)} yds</td>
-                      <td style={{ padding: '0.75rem 1rem', color: MUT, fontSize: '0.82rem' }}>{e.club || '—'}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div>
+            {top5.map((e, i) => {
+              const isMe = e.orgId === clubId;
+              return (
+                <div key={`${e.orgId}-${i}`}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '0.8rem 1.25rem', borderBottom: i < top5.length - 1 ? `1px solid ${BDR}` : 'none', background: isMe ? 'rgba(255,0,144,0.06)' : 'transparent' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
+                    <span style={{ fontSize: '0.95rem', width: 22, flexShrink: 0, textAlign: 'center', color: DIM }}>{WEEKLY_MEDALS[i] || `#${i + 1}`}</span>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.85rem', color: isMe ? ORG : TXT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {e.player}{isMe ? ' (you)' : ''}
+                      </div>
+                      <div style={{ fontSize: '0.72rem', color: DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {e.club || '—'}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                    <span style={{ fontFamily: DISP, fontSize: '1.25rem', letterSpacing: '.5px', color: i === 0 ? ORG : TXT }}>{Number(e.dist)}</span>
+                    <span style={{ fontSize: '0.68rem', color: DIM, marginLeft: 3 }}>yds</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </>
       )}

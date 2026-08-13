@@ -6,7 +6,6 @@ import { Analytics } from '@vercel/analytics/react';
 import Layout from '../components/Layout';
 import AdminPanel from '../components/AdminPanel';
 import LaunchModal from '../components/LaunchModal';
-import DemoSubmit from '../components/DemoSubmit';
 import { initData, db } from '../lib/data';
 import { ORGS_KEY, ENT_KEY, ADMIN_PW, SANS, ORG, MUT, BG2, BDR, TXT, DIM, DISP } from '../lib/constants';
 import { todayStr } from '../lib/constants';
@@ -23,7 +22,6 @@ export default function App({ Component, pageProps }) {
   const [toastMsg, setToastMsg] = useState(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [adminPw, setAdminPw] = useState({ show:false, val:'' });
-  const [showDemo, setShowDemo] = useState(false);
   const [showLaunch, setShowLaunch] = useState(false);
   const [shareEnt, setShareEnt] = useState(null);
   const [detEnt, setDetEnt] = useState(null);
@@ -231,7 +229,7 @@ export default function App({ Component, pageProps }) {
     <>
       <Head><link rel="canonical" href={canonicalUrl} /></Head>
       <Layout loggedOrg={loggedOrg} onLogout={()=>{ setLoggedOrg(null); localStorage.removeItem('rb_club'); }} unit={unit} setUnit={setUnit}
-        onAdminClick={()=>setAdminPw({show:true,val:''})} pendingCount={pendingCount} onShowDemo={()=>setShowDemo(true)}>
+        onAdminClick={()=>setAdminPw({show:true,val:''})} pendingCount={pendingCount}>
         <Component {...pageProps} {...sharedProps}/>
       </Layout>
 
@@ -251,9 +249,6 @@ export default function App({ Component, pageProps }) {
           </div>
         </div>
       )}
-
-      {/* Demo */}
-      {showDemo && <DemoSubmit onClose={()=>setShowDemo(false)} cvt={cvt} unitLbl={unitLbl} toast={toast}/>}
 
       {/* Launch modal — hidden */}
       {/* {showLaunch && <LaunchModal onClose={()=>{setShowLaunch(false);sessionStorage.setItem('rb_launch_seen','1');}}/>} */}

@@ -46,7 +46,7 @@ function nameToSlug(name) {
     .replace(/\s+/g, '-');
 }
 
-export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, onAdminClick, pendingCount, onShowDemo }) {
+export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, onAdminClick, pendingCount }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
@@ -132,7 +132,6 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           <NavBtn href="/leaderboard" label="Leaderboard"/>
           <NavBtn href="/hall-of-fame" label="Hall of Fame"/>
           <NavBtn href="/contact" label="Contact"/>
-          <button onClick={onShowDemo} style={{ background: 'transparent', border: '1px solid rgba(255,0,144,0.4)', color: ORG, fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', borderRadius: 0, cursor: 'pointer' }}>Try Demo</button>
           {loggedOrg
             ? <><NavBtn href="/dashboard" label="Dashboard"/><NavBtn href="/submit" label="Submit Drive"/><button onClick={onLogout} style={{ background: 'none', border: '1px solid rgba(220,80,80,0.3)', color: '#f87171', fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', cursor: 'pointer', borderRadius: 0 }}>Log Out</button></>
             : <><NavBtn href="/login" label="Login"/><button onClick={() => navTo('/register')} style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 12, padding: '7px 16px', borderRadius: 0, cursor: 'pointer' }}>Register</button></>
@@ -153,7 +152,6 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           {[['Leaderboard','/leaderboard'],['Hall of Fame','/hall-of-fame'],['Contact','/contact'],['Login','/login'],['Register','/register']].map(([label,href]) => (
             <button key={href} onClick={() => navTo(href)} style={{ background: isActive(href) ? ORG : 'transparent', border: isActive(href) ? 'none' : '1px solid rgba(255,255,255,0.12)', color: isActive(href) ? '#111' : 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>{label}</button>
           ))}
-          <button onClick={() => { onShowDemo(); setMenuOpen(false); }} style={{ background: 'transparent', border: '1px solid rgba(255,0,144,0.4)', color: ORG, fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Try Demo</button>
           {loggedOrg && <>
             <button onClick={() => navTo('/dashboard')} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Dashboard</button>
             <button onClick={() => navTo('/submit')} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Submit Drive</button>
