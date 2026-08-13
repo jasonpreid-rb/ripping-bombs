@@ -84,7 +84,7 @@ export default function App({ Component, pageProps }) {
       email: reg.email,
       pw: reg.pw,
       logo: reg.logo || '',
-      status: isSimulator ? 'approved' : 'pending',
+      status: 'approved',
       badge: isSimulator ? 'simulator' : null,
       accountType: reg.type,
       simulator: reg.simulator || '',
@@ -97,14 +97,11 @@ export default function App({ Component, pageProps }) {
     await sendRegistrationNotification(newOrg);
     setReg({ type:'simulator', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
 
-    if (isSimulator) {
-      setLoggedOrg(newOrg);
-      toast('Account created! You can now submit simulator drives.');
-      router.push(redirectTo || '/submit?welcome=1');
-    } else {
-      toast('Registration submitted — awaiting admin approval');
-      router.push('/');
-    }
+    // Every account is auto-approved now — log them straight in and send to the dashboard
+    setLoggedOrg(newOrg);
+    localStorage.setItem('rb_club', JSON.stringify(newOrg));
+    toast(isSimulator ? 'Account created! Welcome to Ripping Bombs.' : `Welcome, ${newOrg.courseName}!`);
+    router.push(redirectTo || '/dashboard');
   }
 
   async function doLogin(redirectTo) {

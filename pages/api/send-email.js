@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         from: 'Ripping Bombs <team@rippingbombs.com>',
         to: 'team@rippingbombs.com',
         subject: `New Registration: ${org.courseName}`,
-        text: `New registration request on Ripping Bombs:\n\nCourse: ${org.courseName}\nFull Name: ${org.fullName || '—'}\nPosition: ${org.position || '—'}\nLocation: ${org.location}\nCountry: ${org.country || '—'}\nEmail: ${org.email}\nPassword: ${org.pw}\n\nLogin to approve:\nhttps://www.rippingbombs.com`,
+        text: `New registration on Ripping Bombs (auto-approved, no action needed):\n\nCourse: ${org.courseName}\nFull Name: ${org.fullName || '—'}\nPosition: ${org.position || '—'}\nLocation: ${org.location}\nCountry: ${org.country || '—'}\nEmail: ${org.email}\n\nView in admin:\nhttps://www.rippingbombs.com`,
       });
 
       // Welcome email to the registrant
@@ -22,10 +22,10 @@ export default async function handler(req, res) {
       await resend.emails.send({
         from: 'Ripping Bombs <team@rippingbombs.com>',
         to: org.email,
-        subject: isSimulator ? 'Welcome to Ripping Bombs!' : 'Registration received — Ripping Bombs',
+        subject: 'Welcome to Ripping Bombs!',
         text: isSimulator
-          ? `Hi ${org.fullName},\n\nYour simulator account is live! You can now log in and start submitting your longest drives to the World Registry.\n\nLogin at: https://www.rippingbombs.com\nEmail: ${org.email}\n\nWelcome!\nThe Ripping Bombs Team`
-          : `Hi ${org.fullName},\n\nThanks for registering ${org.courseName} on Ripping Bombs!\n\nYour application is under review and we'll be in touch shortly once approved.\n\nLogin at: https://www.rippingbombs.com\nEmail: ${org.email}\n\nThe Ripping Bombs Team`,
+          ? `Hi ${org.fullName},\n\nYour account is live! You can now log in and start submitting your longest drives to the World Registry.\n\nLogin at: https://www.rippingbombs.com\nEmail: ${org.email}\n\nWelcome!\nThe Ripping Bombs Team`
+          : `Hi ${org.fullName},\n\n${org.courseName} is live on Ripping Bombs! You can now log in and start submitting your longest drive competition results.\n\nLogin at: https://www.rippingbombs.com\nEmail: ${org.email}\n\nWelcome!\nThe Ripping Bombs Team`,
       });
     }
 
