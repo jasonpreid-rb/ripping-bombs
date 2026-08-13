@@ -9,6 +9,92 @@ const SIMULATORS = [
   "SkyTrak","Uneekor","Bushnell Launch Pro","Garmin Approach","Other"
 ];
 
+// Tier copy — kept in sync with the Free/Premium and Free/TV Display comparisons on the dashboard
+const TIERS = {
+  simulator: {
+    freeLabel: 'Free Account',
+    freeBadge: null,
+    freeItems: [
+      'Submit your own drives, instant approval',
+      'Public profile page & global rank',
+      'Weekly division leaderboard placement',
+    ],
+    paidLabel: 'Premium',
+    paidBadge: 'Coming soon',
+    paidPrice: '$5/mo or $50/yr',
+    paidItems: [
+      'Auto-generated drive cards to share',
+      'Rival tracking & overtaken alerts',
+      'Full drive history & progress chart',
+      'Weekly recap email',
+    ],
+    note: 'Every account starts free — Premium will be an optional upgrade from your dashboard once it launches.',
+  },
+  club: {
+    freeLabel: 'Free Venue Account',
+    freeBadge: null,
+    freeItems: [
+      'Venue listed on Ripping Bombs, selectable by players',
+      'Appears on the global leaderboard',
+      'Public venue leaderboard page — categories, ages, divisions',
+    ],
+    paidLabel: 'TV Display & Sponsors',
+    paidBadge: 'Free for 3 months',
+    paidPrice: '$49/mo after',
+    paidItems: [
+      'Live leaderboard on your venue\u2019s TV, always up to date',
+      'Add a sponsor\u2019s logo to your screen',
+      'Sell the sponsor slot to a local business — it typically covers the subscription with margin left over',
+    ],
+    note: 'Every venue starts on the free tier — upgrade to TV Display & Sponsors anytime from your dashboard, no card required to register.',
+  },
+};
+
+function TierPreview({ isSimulator }) {
+  const t = isSimulator ? TIERS.simulator : TIERS.club;
+  const colStyle = { flex: '1 1 220px', minWidth: 0 };
+  const headStyle = { display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 8 };
+  const labelStyle = { fontFamily: SANS, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: .6 };
+  const itemStyle = { display: 'flex', gap: 7, fontFamily: SANS, fontSize: 11.5, color: MUT, lineHeight: 1.5, marginBottom: 5 };
+  const badgeStyle = { background: 'rgba(255,0,144,0.15)', color: ORG, border: `1px solid ${ORG}`, borderRadius: 20, padding: '1px 7px', fontSize: 9, fontWeight: 700, letterSpacing: .3, whiteSpace: 'nowrap' };
+
+  return (
+    <div style={{ border: `1px solid ${BDR}`, background: BG3, padding: '16px 16px 14px', marginBottom: 14 }}>
+      <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+        <div style={colStyle}>
+          <div style={headStyle}>
+            <span style={{ ...labelStyle, color: MUT }}>{t.freeLabel}</span>
+          </div>
+          {t.freeItems.map(item => (
+            <div key={item} style={itemStyle}>
+              <span style={{ color: DIM }}>✓</span>
+              <span>{item}</span>
+            </div>
+          ))}
+        </div>
+        <div style={colStyle}>
+          <div style={headStyle}>
+            <span style={{ ...labelStyle, color: ORG }}>{t.paidLabel}</span>
+            <span style={badgeStyle}>{t.paidBadge}</span>
+          </div>
+          {t.paidItems.map(item => (
+            <div key={item} style={itemStyle}>
+              <span style={{ color: ORG }}>✓</span>
+              <span>{item}</span>
+            </div>
+          ))}
+          <div style={{ fontFamily: SANS, fontSize: 11, color: TXT, marginTop: 4 }}>
+            <strong style={{ color: ORG }}>{t.paidPrice}</strong>
+          </div>
+        </div>
+      </div>
+      <div style={{ fontFamily: SANS, fontSize: 10.5, color: DIM, marginTop: 12, paddingTop: 10, borderTop: `1px solid ${BDR}`, lineHeight: 1.5 }}>
+        {t.note}
+      </div>
+    </div>
+  );
+}
+
 export default function RegisterPage({ reg, setReg, doRegister }) {
   const router = useRouter();
   const redirectTo = typeof router.query.redirect === 'string' ? router.query.redirect : null;
@@ -77,7 +163,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
 
         <Card>
           {/* Account type toggle */}
-          <div style={{ marginBottom: 22 }}>
+          <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', fontFamily: SANS, fontSize: 11, fontWeight: 600, color: MUT, marginBottom: 8, textTransform: 'uppercase', letterSpacing: .8 }}>
               Account Type
             </label>
@@ -104,6 +190,9 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
                 : '🏌️ Register a club, course or event to submit verified competition winners on behalf of players. Account approved instantly — no waiting required.'}
             </div>
           </div>
+
+          {/* Free vs paid tier explainer — updates with account type */}
+          <TierPreview isSimulator={isSimulator} />
 
           {/* Shared name field */}
           <Field
