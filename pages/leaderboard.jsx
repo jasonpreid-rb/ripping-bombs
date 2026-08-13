@@ -180,7 +180,12 @@ export default function LeaderboardPage(props) {
   });
 
   const tableRows = Array.from(bestByPlayer.values())
-    .filter(e=>!fCountry||(orgFor(e.orgId)?.location||'').toLowerCase().includes(fCountry.toLowerCase()))
+    .filter(e=>{
+      if(!fCountry) return true;
+      const org=orgFor(e.orgId);
+      const q=fCountry.toLowerCase();
+      return (org?.country||'').toLowerCase().includes(q) || (org?.location||'').toLowerCase().includes(q);
+    })
     .filter(e=>!fPlayer||e.player.toLowerCase().includes(fPlayer.toLowerCase()))
     .filter(e=>!fGender||e.gender===fGender)
     .filter(e=>!fSimulator||(fSimulator==='simulator'?e.is_simulator===true:e.is_simulator!==true))
