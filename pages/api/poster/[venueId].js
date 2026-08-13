@@ -2,12 +2,19 @@ import { ImageResponse } from '@vercel/og';
 import QRCode from 'qrcode';
 import { supabase } from '../../../lib/supabaseClient';
 
-// NOTE: intentionally NOT using the Edge runtime here. The `qrcode` package's
-// server-side PNG renderer (used by QRCode.toDataURL) depends on `pngjs`,
-// which extends Node's `stream.Duplex` internally — and `stream` is a Node
-// core module the Edge Runtime does not support. That was silently throwing
-// on every request and surfacing as a bare 500 with no stack trace. @vercel/og
-// fully supports the Node.js runtime too, so we just don't opt into edge.
+export const config = { runtime: 'edge' };
+
+// NOTE ON THE QR CODE: we deliberately do NOT use QRCode.toDataURL() here.
+// Its server-side PNG renderer depends on `pngjs`, which extends Node's
+// `stream.Duplex` internally — and `stream` is a Node core module the Edge
+// Runtime does not support. That was throwing on every request (silently,
+// with no stack trace) and is what caused the earlier 500s.
+//
+// Instead we use QRCode.create() — pure matrix/math, no streams, no image
+// encoding — and render the QR ourselves as a grid of small <div> squares.
+// Satori (the engine behind @vercel/og) renders that natively, same as any
+// other flex/absolute layout, so there's no image format or edge-compat
+// question at all.
 
 // ─── Poster canvas — A4 portrait @ 150dpi (print-safe, keeps Satori fast) ───
 // If you want true 300dpi later, double these and test render time/timeout
@@ -31,16 +38,39 @@ const POSTER_BG_URL = 'https://www.rippingbombs.com/posters/venue-poster-bg.png'
 const QR_SIZE = 340;
 const QR_X = 102;
 const QR_Y = 1254;
+const QR_QUIET_ZONE_MODULES = 1; // matches the old margin:1 option
+
+function buildQrSquares(text) {
+  const qr = QRCode.create(text, { errorCorrectionLevel: 'M' });
+  const modCount = qr.modules.size;
+  const totalModules = modCount + QR_QUIET_ZONE_MODULES * 2;
+  const cell = QR_SIZE / totalModules;
+
+  const squares = [];
+  for (let row = 0; row < modCount; row++) {
+    for (let col = 0; col < modCount; col++) {
+      if (qr.modules.get(row, col)) {
+        squares.push({
+          key: `${row}-${col}`,
+          left: (col + QR_QUIET_ZONE_MODULES) * cell,
+          top: (row + QR_QUIET_ZONE_MODULES) * cell,
+        });
+      }
+    }
+  }
+  return { squares, cell };
+}
 
 export default async function handler(req) {
-  const url = new URL(req.url);
-  const venueId = url.pathname.split('/').pop();
-
-  if (!venueId) {
-    return new Response('Missing venueId', { status: 400 });
-  }
-
+  let venueId;
   try {
+    const url = new URL(req.url);
+    venueId = url.pathname.split('/').pop();
+
+    if (!venueId) {
+      return new Response('Missing venueId', { status: 400 });
+    }
+
     const { data: club, error } = await supabase
       .from('clubs')
       .select('id, courseName, accountType, status')
@@ -52,11 +82,7 @@ export default async function handler(req) {
     }
 
     const submissionUrl = `https://www.rippingbombs.com/submit?venue=${club.id}`;
-    const qrDataUrl = await QRCode.toDataURL(submissionUrl, {
-      width: QR_SIZE,
-      margin: 1,
-      color: { dark: '#000000ff', light: '#ffffffff' },
-    });
+    const { squares, cell } = buildQrSquares(submissionUrl);
 
     const filenameSafe = (club.courseName || 'venue').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
@@ -71,14 +97,32 @@ export default async function handler(req) {
             height={POSTER_HEIGHT}
             style={{ position: 'absolute', top: 0, left: 0, objectFit: 'cover' }}
           />
-          {/* QR code, stamped on top at the configured position */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={qrDataUrl}
-            width={QR_SIZE}
-            height={QR_SIZE}
-            style={{ position: 'absolute', left: QR_X, top: QR_Y }}
-          />
+          {/* QR code — white quiet-zone backing, then dark modules stamped on top */}
+          <div
+            style={{
+              display: 'flex',
+              position: 'absolute',
+              left: QR_X,
+              top: QR_Y,
+              width: QR_SIZE,
+              height: QR_SIZE,
+              background: '#ffffff',
+            }}
+          >
+            {squares.map((sq) => (
+              <div
+                key={sq.key}
+                style={{
+                  position: 'absolute',
+                  left: sq.left,
+                  top: sq.top,
+                  width: Math.ceil(cell),
+                  height: Math.ceil(cell),
+                  background: '#000000',
+                }}
+              />
+            ))}
+          </div>
         </div>
       ),
       {
