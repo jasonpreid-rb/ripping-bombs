@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 const ORG = '#FF0090';
 const TXT = '#f0f0f0';
@@ -55,6 +56,106 @@ function TipBox({ children }) {
     >
       <span style={{ fontSize: '1rem', lineHeight: 1.3 }}>💡</span>
       <div>{children}</div>
+    </div>
+  );
+}
+
+function WidgetSnippetGenerator() {
+  const [slug, setSlug] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  const cleanSlug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+  const snippet = `<iframe
+  src="https://rippingbombs.com/widget/${cleanSlug || 'your-venue'}"
+  width="100%"
+  height="480"
+  style="border: none; max-width: 400px;"
+  title="Longest Drive Leaderboard"
+></iframe>`;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(snippet);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <div>
+      <label
+        style={{
+          display: 'block',
+          fontSize: '0.7rem',
+          color: MUT,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          fontWeight: 700,
+          marginBottom: 6,
+        }}
+      >
+        Your venue's custom URL slug
+      </label>
+      <input
+        value={slug}
+        onChange={(e) => setSlug(e.target.value)}
+        placeholder="your-venue"
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          background: '#0d0d0d',
+          border: `1px solid ${BDR}`,
+          borderRadius: 6,
+          padding: '0.6rem 0.8rem',
+          color: TXT,
+          fontSize: '0.85rem',
+          marginBottom: 12,
+        }}
+      />
+      <div style={{ position: 'relative' }}>
+        <pre
+          style={{
+            background: '#0d0d0d',
+            border: `1px solid ${BDR}`,
+            borderRadius: 6,
+            padding: '0.9rem 1rem',
+            fontSize: '0.78rem',
+            lineHeight: 1.6,
+            color: TXT,
+            overflowX: 'auto',
+            margin: 0,
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+          }}
+        >
+          {snippet}
+        </pre>
+        <button
+          onClick={handleCopy}
+          style={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            background: copied ? ORG : 'rgba(255,255,255,0.08)',
+            color: copied ? '#0d0d0d' : TXT,
+            border: 'none',
+            borderRadius: 5,
+            padding: '5px 10px',
+            fontSize: '0.72rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
+        >
+          {copied ? 'Copied ✓' : 'Copy'}
+        </button>
+      </div>
+      <div style={{ fontSize: '0.78rem', color: MUT, marginTop: 10, lineHeight: 1.6 }}>
+        Paste this into your website's HTML, or into a "Custom HTML" / "Embed" block if you're on
+        Wix, Squarespace, WordPress, or similar. Not sure of your slug? It's the last part of your
+        display URL from Step 1 — <code style={{ background: 'rgba(255,255,255,0.06)', padding: '2px 6px', borderRadius: 4 }}>rippingbombs.com/venue-display/<strong style={{ color: TXT }}>your-slug</strong></code>.
+      </div>
     </div>
   );
 }
@@ -150,6 +251,14 @@ export default function VenueSetupPage() {
             <StepCard number={5} title="Leave it running">
               The leaderboard updates on its own — no refreshing needed. If the TV ever gets fully powered off,
               reopening the same link brings it right back.
+            </StepCard>
+
+            <StepCard number={6} title="Optional: embed it on your own website too">
+              Want the leaderboard on your website as well as your TV? Paste your slug below and grab the embed
+              code — it works on Wix, Squarespace, WordPress, or any site that accepts custom HTML.
+              <div style={{ marginTop: 14 }}>
+                <WidgetSnippetGenerator />
+              </div>
             </StepCard>
           </div>
 

@@ -100,6 +100,7 @@ export default function ForVenues() {
                 <li>Your venue listed on Ripping Bombs, selectable by every player</li>
                 <li>Appears on the global longest-drive leaderboard</li>
                 <li>A public leaderboard page for your venue — categories, ages, divisions</li>
+                <li>An embeddable leaderboard widget you can drop straight onto your own website</li>
               </ul>
               <div className="tier-foot">Free, always.</div>
             </div>
