@@ -133,19 +133,19 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
         </div>
 
         {/* Benefit strip — gives a cold visitor a reason to keep going, reacts to account type */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 10 }}>
           {(isSimulator
             ? [
-                ['📊', 'See your rank', 'vs players worldwide'],
-                ['⚡', 'Instant access', 'submit in minutes'],
-                ['🆓', '100% free', 'no card, no catch'],
+                ['See your rank', 'vs players worldwide'],
+                ['Instant access', 'submit in minutes'],
+                ['Free, always', 'no card required'],
               ]
             : [
-                ['🏆', 'Global exposure', 'for your club or event'],
-                ['⚡', 'Instant access', 'approved automatically'],
-                ['🆓', '100% free', 'no card, no catch'],
+                ['Global exposure', 'for your club or event'],
+                ['Instant access', 'approved automatically'],
+                ['Free, always', 'no card required'],
               ]
-          ).map(([icon, title, sub]) => (
+          ).map(([title, sub]) => (
             <div key={title} style={{
               border: `1px solid ${BDR}`,
               borderTop: `2px solid ${ORG}`,
@@ -154,11 +154,14 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
               textAlign: 'center',
               transition: 'transform .15s',
             }}>
-              <div style={{ fontSize: 22, marginBottom: 6 }}>{icon}</div>
               <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: TXT, lineHeight: 1.3 }}>{title}</div>
               <div style={{ fontFamily: SANS, fontSize: 10, color: MUT, lineHeight: 1.3, marginTop: 3 }}>{sub}</div>
             </div>
           ))}
+        </div>
+
+        <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, textAlign: 'center', marginBottom: 24 }}>
+          No credit card or payment details required to register.
         </div>
 
         <Card>
@@ -168,7 +171,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
               Account Type
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              {[['simulator', '🖥️ Individual / Simulator'], ['club', '🏌️ Golf Club / Event']].map(([val, label]) => (
+              {[['simulator', 'Individual / Simulator'], ['club', 'Golf Club / Event']].map(([val, label]) => (
                 <button
                   key={val}
                   type="button"
@@ -186,8 +189,8 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
             </div>
             <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 8 }}>
               {isSimulator
-                ? '🖥️ Submit your own simulator longest drives with screenshot evidence. Account approved instantly — no waiting required.'
-                : '🏌️ Register a club, course or event to submit verified competition winners on behalf of players. Account approved instantly — no waiting required.'}
+                ? 'Submit your own simulator longest drives with screenshot evidence. Account approved instantly — no waiting required.'
+                : 'Register a club, course or event to submit verified competition winners on behalf of players. Account approved instantly — no waiting required.'}
             </div>
           </div>
 
