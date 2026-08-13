@@ -254,7 +254,7 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 6 }}>
                 {org.country && (
-                  <span title={org.country} style={{ fontSize: 'clamp(24px,4vw,34px)', lineHeight: 1 }}>
+                  <span title={org.country} style={{ fontSize: 'clamp(28px,5vw,42px)', lineHeight: 1 }}>
                     {countryFlag(org.country)}
                   </span>
                 )}
