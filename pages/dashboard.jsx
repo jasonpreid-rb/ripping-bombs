@@ -341,7 +341,7 @@ function VsAverageBar({ myBest, globalAvg, label }) {
 }
 
 // Standalone hero strip for global rank — sits between header and stat cards
-function RankStrip({ rank, totalClubs, percentile }) {
+function RankStrip({ rank, totalClubs, percentile, category }) {
   if (!rank) return null;
   return (
     <div style={{
@@ -355,13 +355,18 @@ function RankStrip({ rank, totalClubs, percentile }) {
       flexWrap: 'wrap',
       gap: '0.75rem',
     }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem' }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', flexWrap: 'wrap' }}>
         <span style={{ fontSize: '2.6rem', fontWeight: 900, color: ORG, letterSpacing: '-0.03em', lineHeight: 1 }}>
           #{rank}
         </span>
         <span style={{ fontSize: '0.95rem', fontWeight: 700, color: TXT, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Global Rank
         </span>
+        {category && (
+          <span style={{ background: 'rgba(255,255,255,0.08)', color: MUT, border: `1px solid ${BDR}`, borderRadius: 20, padding: '3px 11px', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.03em' }}>
+            {getCategoryLabel(category)}
+          </span>
+        )}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
         {percentile != null && (
@@ -681,7 +686,7 @@ function IndividualPremiumPromo({ isPremium }) {
       <div style={{ background: `linear-gradient(135deg, ${BG2}, ${BG3})`, border: `1px solid ${ORG}`, borderRadius: 10, padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: 12 }}>
         <span style={{ fontSize: '1.3rem' }}>⭐</span>
         <div style={{ fontSize: '0.85rem' }}>
-          <strong style={{ color: ORG }}>You're a Premium member.</strong> Thanks for backing Ripping Bombs — your full drive history, certificate, and analytics are unlocked.
+          <strong style={{ color: ORG }}>You're a Premium member.</strong> Thanks for backing Ripping Bombs — your drive cards, full history, and rival alerts are unlocked.
         </div>
       </div>
     );
@@ -693,7 +698,7 @@ function IndividualPremiumPromo({ isPremium }) {
           <span style={{ fontSize: '1.4rem' }}>⭐</span>
           <div>
             <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>Ripping Bombs Premium</div>
-            <div style={{ fontSize: '0.78rem', color: MUT, marginTop: 2 }}>Support the platform and unlock your full stats.</div>
+            <div style={{ fontSize: '0.78rem', color: MUT, marginTop: 2 }}>Turn every big drive into bragging rights.</div>
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
@@ -705,11 +710,11 @@ function IndividualPremiumPromo({ isPremium }) {
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
         {[
+          'Auto-Generated Drive Cards — a shareable image every time you set a new PR',
+          'Rival Tracking & Overtaken Alerts — follow players, know the moment they pass you',
+          'Weekly Recap Email — your trend, rank movement, and who\'s chasing you',
+          'Full Drive History & Progress Chart — every drive you\'ve submitted, over time',
           'Official Drive Certificate — downloadable, shareable',
-          'Full drive history (free accounts see your best 3)',
-          'Personal progress analytics & percentile trend',
-          'Overtaken Alerts — know the moment someone passes you',
-          'Vanity profile card / QR for socials & business cards',
           'Premium badge on your public profile',
         ].map((item, i) => (
           <div key={item} style={{ ...cell, borderTop: `1px solid ${BDR}`, borderRight: i % 2 === 0 ? `1px solid ${BDR}` : 'none' }}>
@@ -992,7 +997,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Global rank — standalone hero strip */}
-        <RankStrip rank={rank} totalClubs={totalClubs} percentile={percentile} />
+        <RankStrip rank={rank} totalClubs={totalClubs} percentile={percentile} category={bestCategory} />
 
         {/* Stat cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.85rem' }}>
