@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         subject: 'Welcome to Ripping Bombs!',
         text: isSimulator
           ? `Hi ${org.fullName},\n\nYour account is live! You can now log in and start submitting your longest drives to the World Registry.\n\nLogin at: https://www.rippingbombs.com\nEmail: ${org.email}\n\nWelcome!\nThe Ripping Bombs Team`
-          : `Hi ${org.fullName},\n\n${org.courseName} is live on Ripping Bombs! You can now log in and start submitting your longest drive competition results.\n\nLogin at: https://www.rippingbombs.com\nEmail: ${org.email}\n\nWelcome!\nThe Ripping Bombs Team`,
+          : `Hi ${org.fullName},\n\n${org.courseName} is live on Ripping Bombs! Players can now find your venue and assign their submitted drives to you — building your own local leaderboard, giving you exposure, and contributing to the global rankings. You can also submit results directly from your dashboard.\n\nLogin at: https://www.rippingbombs.com\nEmail: ${org.email}\n\nWelcome!\nThe Ripping Bombs Team`,
       });
     }
 

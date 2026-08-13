@@ -956,7 +956,7 @@ export default function DashboardPage() {
   return (
     <>
       <Head>
-        <title>{club?.fullName || 'Dashboard'} — Ripping Bombs</title>
+        <title>{(club?.accountType === 'club' ? club?.courseName : club?.fullName) || 'Dashboard'} — Ripping Bombs</title>
       </Head>
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '2rem 1rem', color: TXT, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -968,7 +968,7 @@ export default function DashboardPage() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: 4 }}>
                 <h1 style={{ margin: 0, fontSize: 'clamp(1.4rem, 4vw, 2rem)', fontWeight: 800, letterSpacing: '-0.02em' }}>
-                  {club?.fullName || 'My Dashboard'}
+                  {club?.accountType === 'club' ? (club?.courseName || 'My Dashboard') : (club?.fullName || 'My Dashboard')}
                 </h1>
                 {club?.is_founding_member && <FoundingBadge />}
                 {club?.badge === 'simulator' && (
@@ -976,7 +976,10 @@ export default function DashboardPage() {
                 )}
               </div>
               <p style={{ margin: 0, color: MUT, fontSize: '0.85rem' }}>
-                {[club?.courseName, club?.position, club?.location].filter(Boolean).join(' · ')}
+                {(club?.accountType === 'club'
+                  ? [club?.fullName, club?.position, club?.location]
+                  : [club?.courseName, club?.position, club?.location]
+                ).filter(Boolean).join(' · ')}
               </p>
             </div>
           </div>

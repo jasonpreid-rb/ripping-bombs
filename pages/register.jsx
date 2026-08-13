@@ -123,7 +123,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
     <>
       <Head>
         <title>Register | Ripping Bombs</title>
-        <meta name="description" content="Register your golf club, tournament, or simulator account on Ripping Bombs. Free to join. Submit verified longest drives to the global leaderboard." />
+        <meta name="description" content="Register your venue or simulator account on Ripping Bombs. Free to join. Submit verified longest drives to the global leaderboard." />
       </Head>
 
       <div style={{ maxWidth: 540, margin: '0 auto', padding: '28px 18px 80px' }}>
@@ -141,7 +141,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
                 ['Free, always', 'no card required'],
               ]
             : [
-                ['Global exposure', 'for your club or event'],
+                ['Global exposure', 'for your venue'],
                 ['Instant access', 'approved automatically'],
                 ['Free, always', 'no card required'],
               ]
@@ -171,7 +171,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
               Account Type
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              {[['simulator', 'Individual / Simulator'], ['club', 'Golf Club / Event']].map(([val, label]) => (
+              {[['simulator', 'Individual / Simulator'], ['club', 'Venue']].map(([val, label]) => (
                 <button
                   key={val}
                   type="button"
@@ -190,7 +190,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
             <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 8 }}>
               {isSimulator
                 ? 'Submit your own simulator longest drives with screenshot evidence. Account approved instantly — no waiting required.'
-                : 'Register a club, course or event to submit verified competition winners on behalf of players. Account approved instantly — no waiting required.'}
+                : 'Register your venue so players can find you and assign their drives to you — building your local leaderboard and giving you exposure. You can also submit results directly. Account approved instantly — no waiting required.'}
             </div>
           </div>
 
@@ -261,7 +261,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
                 required
               />
               <Field
-                label="Course / Club / Event Name"
+                label="Venue Name"
                 value={reg.courseName}
                 onChange={e => setReg({ ...reg, courseName: e.target.value })}
                 placeholder="Augusta National Golf Club"
@@ -277,7 +277,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
               <CountrySelect />
               <div style={{ marginBottom: 14 }}>
                 <label style={{ display: 'block', fontFamily: SANS, fontSize: 11, fontWeight: 600, color: MUT, marginBottom: 5, textTransform: 'uppercase', letterSpacing: .8 }}>
-                  Course Logo (optional)
+                  Venue Logo (optional)
                 </label>
                 {/* ✅ Fixed: was rgba(163,230,53,...) lime green — now neon pink */}
                 <div style={{ border: '1px dashed rgba(255,0,144,0.3)', padding: 16, background: 'rgba(255,0,144,0.03)', textAlign: 'center' }}>
