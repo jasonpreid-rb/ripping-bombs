@@ -1,3 +1,4 @@
+import { cloneElement } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
@@ -254,8 +255,8 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 6 }}>
                 {org.country && (
-                  <span title={org.country} style={{ fontSize: 'clamp(28px,5vw,42px)', lineHeight: 1 }}>
-                    {countryFlag(org.country)}
+                  <span title={org.country} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                    {cloneElement(countryFlag(org.country), { style: { width: 'clamp(38px,6.5vw,58px)', height: 'clamp(28px,5vw,42px)', objectFit: 'cover', borderRadius: 4, display: 'block' } })}
                   </span>
                 )}
                 <h1 style={{ margin: 0, fontFamily: DISP, fontSize: 'clamp(28px,5vw,42px)', color: TXT, letterSpacing: 0.5, lineHeight: 1 }}>
