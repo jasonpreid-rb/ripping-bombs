@@ -29,7 +29,7 @@ export default function App({ Component, pageProps }) {
   // Form state
   const [reg, setReg] = useState({ type:'simulator', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
   const [lgn, setLgn] = useState({ email:'', pw:'' });
-  const [form, setForm] = useState({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male' });
+  const [form, setForm] = useState({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male', venueId:'', facility:'' });
 
   // Leaderboard filter state
   const [week, setWeek] = useState(null);
@@ -138,6 +138,8 @@ export default function App({ Component, pageProps }) {
     if (!form.player || !form.dist || !form.club || !form.hcp || !form.age) { toast('Fill all required fields'); return false; }
     if (!form.photo) { toast('Photo evidence required'); return false; }
 
+    const isSimulator = loggedOrg.accountType === 'simulator';
+
     const e = {
       id: Date.now().toString(),
       orgId: loggedOrg.id,
@@ -150,6 +152,9 @@ export default function App({ Component, pageProps }) {
       date: form.date,
       tournament: form.tournament,
       gender: form.gender,
+      is_simulator: isSimulator,
+      venue_id: form.venueId || null,
+      facility_name: form.facility || null,
     };
 
     const ok = await db.insertEntry(e);
@@ -165,7 +170,7 @@ export default function App({ Component, pageProps }) {
     const rank = sameGender.findIndex(x => x.id === e.id) + 1;
     const total = sameGender.length;
 
-    setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male' });
+    setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male', venueId:'', facility:'' });
     toast('Drive submitted to the World Registry!');
     return { ok: true, rank, total, gender: e.gender };
   }
