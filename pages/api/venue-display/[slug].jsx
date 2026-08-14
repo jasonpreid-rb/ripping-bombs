@@ -23,6 +23,17 @@ function nameToSlug(name) {
     .replace(/^-|-$/g, '');
 }
 
+// A venue can view its TV display once it's either started its 3-month free
+// trial (and that trial hasn't lapsed) or is on a paid subscription.
+// Kept in sync with the same check in pages/venue-display/[slug].jsx.
+const TRIAL_DAYS = 90;
+function isDisplayActive(club) {
+  if (club?.display_subscribed) return true;
+  if (!club?.display_trial_started_at) return false;
+  const daysElapsed = (Date.now() - new Date(club.display_trial_started_at).getTime()) / 86400000;
+  return daysElapsed < TRIAL_DAYS;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
 
@@ -37,7 +48,7 @@ export default async function handler(req, res) {
     // Try an exact match on the saved custom slug first
     let { data: club } = await supabase
       .from('clubs')
-      .select('id, fullName, courseName, location, country, customSlug')
+      .select('id, fullName, courseName, location, country, customSlug, display_trial_started_at, display_subscribed')
       .eq('customSlug', slug)
       .maybeSingle();
 
@@ -45,7 +56,7 @@ export default async function handler(req, res) {
     if (!club) {
       const { data: candidates } = await supabase
         .from('clubs')
-        .select('id, fullName, courseName, location, country, customSlug');
+        .select('id, fullName, courseName, location, country, customSlug, display_trial_started_at, display_subscribed');
       club = (candidates || []).find(c => nameToSlug(c.courseName || c.fullName) === slug) || null;
     }
 
@@ -53,8 +64,9 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'Venue not found' });
     }
 
-    // Paid-tier gate — see matching TODO in pages/venue-display/[slug].jsx
-    // if (!club.displayEnabled) return res.status(404).json({ error: 'Not enabled' });
+    if (!isDisplayActive(club)) {
+      return res.status(404).json({ error: 'TV Display not active for this venue' });
+    }
 
     const displayName = club.courseName || club.fullName;
     const data = await getVenueDisplayData(supabase, club.id, displayName);

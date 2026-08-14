@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, cloneElement } from 'react';
+import { useEffect, useState, cloneElement } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { supabase } from '../lib/supabaseClient';
@@ -437,12 +437,12 @@ function PlayerBreakdown({ entries }) {
 }
 
 // Recent drives table
-function DriveHistory({ entries, lastDriveDate, limitToFree, isClub }) {
+function DriveHistory({ entries, lastDriveDate, limitToFree }) {
   const daysSince = lastDriveDate ? Math.floor((Date.now() - new Date(lastDriveDate)) / 86400000) : null;
   const nudge = daysSince === null
-    ? (isClub ? "No drives submitted yet — get your players on the board!" : "You haven't submitted a drive yet — get on the board!")
+    ? "You haven't submitted a drive yet — get on the board!"
     : daysSince > 14
-    ? `It's been ${daysSince} days since ${isClub ? 'the last submission' : 'your last submission'}. Time to rip another one?`
+    ? `It's been ${daysSince} days since your last submission. Time to rip another one?`
     : null;
   const FREE_LIMIT = 3;
   const isLimited = limitToFree && entries.length > FREE_LIMIT;
@@ -456,14 +456,14 @@ function DriveHistory({ entries, lastDriveDate, limitToFree, isClub }) {
           {nudge && <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: MUT }}>{nudge}</p>}
         </div>
         {entries.length > 0 && (
-          <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.78rem', padding: '0.38rem 0.85rem', borderRadius: 6, textDecoration: 'none' }}>{isClub ? '+ Submit a Drive' : '+ Submit Drive'}</a>
+          <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.78rem', padding: '0.38rem 0.85rem', borderRadius: 6, textDecoration: 'none' }}>+ Submit Drive</a>
         )}
       </div>
 
       {entries.length === 0 ? (
         <div style={{ padding: '3rem', textAlign: 'center', color: MUT }}>
           <p style={{ marginBottom: '1rem' }}>No drives submitted yet.</p>
-          <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, padding: '0.55rem 1.25rem', borderRadius: 7, textDecoration: 'none', fontSize: '0.9rem' }}>{isClub ? 'Submit a Drive →' : 'Submit your first drive →'}</a>
+          <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, padding: '0.55rem 1.25rem', borderRadius: 7, textDecoration: 'none', fontSize: '0.9rem' }}>Submit your first drive →</a>
         </div>
       ) : (
         <div style={{ overflowX: 'auto' }}>
@@ -510,178 +510,6 @@ function DriveHistory({ entries, lastDriveDate, limitToFree, isClub }) {
 }
 
 // Weekly leaderboard — split by category, resets every Monday
-// ── Infinite-loop horizontal scroll row (category cards) ─────────────────────
-// Ported directly from index.jsx — same loop/drag/hint behaviour, so venue
-// accounts get the identical scroll feel they'd recognise from the homepage.
-function InfiniteScrollRow({ items, renderItem, cardWidth = 210, gap = 10 }) {
-  const scrollRef = useRef(null);
-  const [showHint, setShowHint] = useState(true);
-  const loopItems = [...items, ...items, ...items];
-  const drag = useRef({ isDown: false, startX: 0, startScrollLeft: 0, moved: false });
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const setWidth = el.scrollWidth / 3;
-    el.scrollLeft = setWidth; // start in the middle copy
-  }, [items]);
-
-  function handleScroll() {
-    const el = scrollRef.current;
-    if (!el) return;
-    const setWidth = el.scrollWidth / 3;
-    if (el.scrollLeft < setWidth * 0.5) {
-      el.scrollLeft += setWidth;
-    } else if (el.scrollLeft > setWidth * 1.5) {
-      el.scrollLeft -= setWidth;
-    }
-  }
-
-  function dismissHint() {
-    setShowHint(false);
-  }
-
-  function handlePointerDown(e) {
-    if (e.pointerType !== 'mouse') { dismissHint(); return; }
-    const el = scrollRef.current;
-    drag.current = { isDown: true, startX: e.clientX, startScrollLeft: el.scrollLeft, moved: false, pointerId: e.pointerId };
-    el.style.cursor = 'grabbing';
-  }
-
-  function handlePointerMove(e) {
-    if (e.pointerType !== 'mouse' || !drag.current.isDown) return;
-    const el = scrollRef.current;
-    const dx = e.clientX - drag.current.startX;
-    if (Math.abs(dx) > 3 && !drag.current.moved) {
-      drag.current.moved = true;
-      el.setPointerCapture?.(e.pointerId);
-    }
-    if (drag.current.moved) el.scrollLeft = drag.current.startScrollLeft - dx;
-    dismissHint();
-  }
-
-  function endDrag(e) {
-    if (e.pointerType && e.pointerType !== 'mouse') return;
-    drag.current.isDown = false;
-    const el = scrollRef.current;
-    if (el) {
-      el.style.cursor = 'grab';
-      if (e.pointerId != null && el.hasPointerCapture?.(e.pointerId)) el.releasePointerCapture(e.pointerId);
-    }
-  }
-
-  function handleClickCapture(e) {
-    if (drag.current.moved) {
-      e.preventDefault();
-      e.stopPropagation();
-      drag.current.moved = false;
-    }
-  }
-
-  return (
-    <div style={{ position: 'relative' }}>
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={endDrag}
-        onPointerLeave={endDrag}
-        onPointerCancel={endDrag}
-        onClickCapture={handleClickCapture}
-        onTouchStart={dismissHint}
-        className="rb-scroll-row"
-        style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', marginLeft: -18, marginRight: -18, paddingLeft: 18, paddingRight: 18, cursor: 'grab', touchAction: 'pan-x' }}
-      >
-        <div style={{ display: 'flex', alignItems: 'stretch', gap }}>
-          {loopItems.map((item, i) => (
-            <div key={`${item.key}-${i}`} style={{ flex: `0 0 ${cardWidth}px`, minWidth: 0, display: 'flex' }}>
-              {renderItem(item)}
-            </div>
-          ))}
-          {showHint && (
-            <div aria-hidden style={{ position: 'sticky', right: 0, alignSelf: 'stretch', width: 0, flexShrink: 0, zIndex: 2, pointerEvents: 'none' }}>
-              <div style={{ position: 'absolute', top: '50%', right: 14, transform: 'translateY(-50%)', width: 44, height: 44, borderRadius: '50%', background: 'rgba(20,20,20,0.55)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.45)', animation: 'rbArrowPulse 1.6s ease-in-out infinite' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.95)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18" /></svg>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-      <style jsx>{`
-        .rb-scroll-row::-webkit-scrollbar { display: none; }
-        .rb-scroll-row { scrollbar-width: none; -ms-overflow-style: none; }
-        @keyframes rbArrowPulse {
-          0%, 100% { opacity: 0.55; transform: translate(0,-50%); }
-          50% { opacity: 1; transform: translate(4px,-50%); }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-const CATEGORY_MEDALS = ['🥇', '🥈', '🥉'];
-
-function DashboardCategoryCard({ cat, router }) {
-  const { top3, label, key } = cat;
-  const href = `/leaderboard?${new URLSearchParams(
-    key === 'mens' ? { gender: 'male', hcp: 'u20' } :
-    key === 'mens_hcp' ? { gender: 'male', hcp: 'o20' } :
-    key === 'womens' ? { gender: 'female', hcp: 'u20' } :
-    key === 'womens_hcp' ? { gender: 'female', hcp: 'o20' } :
-    key === 'youth' ? { age: 'u16' } :
-    { age: '55+' }
-  ).toString()}`;
-  return (
-    <div
-      onClick={() => router.push(href)}
-      style={{ background: BG2, border: `1px solid ${top3.length ? 'rgba(255,0,144,0.2)' : BDR}`, padding: '16px 18px', display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0, minHeight: 200, cursor: 'pointer', borderRadius: 8, transition: 'border-color .15s' }}
-      onMouseEnter={(ev) => { ev.currentTarget.style.borderColor = 'rgba(255,0,144,0.5)'; }}
-      onMouseLeave={(ev) => { ev.currentTarget.style.borderColor = top3.length ? 'rgba(255,0,144,0.2)' : BDR; }}
-    >
-      <span style={{ fontSize: 10, color: ORG, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 10 }}>{label}</span>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: top3.length === 0 ? 'center' : 'flex-start' }}>
-        {top3.length === 0 ? (
-          <div style={{ fontSize: 12, color: DIM, lineHeight: 1.6 }}>No entry yet —<br />be the first!</div>
-        ) : (
-          top3.map((e, i) => (
-            <div key={`${e.orgId}-${e.player}-${i}`} style={{ display: 'flex', flexDirection: 'column', gap: 3, padding: '9px 0', borderBottom: i < top3.length - 1 ? `1px solid ${BDR}` : 'none' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0, flex: 1, overflow: 'hidden' }}>
-                  <span style={{ fontSize: 13, flexShrink: 0 }}>{CATEGORY_MEDALS[i]}</span>
-                  <span style={{ fontWeight: 700, fontSize: 13, color: TXT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.player}</span>
-                </div>
-                <div style={{ flexShrink: 0 }}>
-                  <span style={{ fontFamily: DISP, fontSize: 18, color: i === 0 ? ORG : MUT, letterSpacing: .5 }}>{Number(e.dist)}</span>
-                  <span style={{ fontSize: 10, color: DIM, marginLeft: 2 }}>yds</span>
-                </div>
-              </div>
-              {e.club && (
-                <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.club}</div>
-              )}
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Weekly leaderboard for club/venue accounts — a venue's players compete
-// across every category, not just one, so this shows all of them at once
-// in the same horizontally-scrollable row used on the homepage, rather than
-// the single-category view individual/simulator accounts see.
-function AllCategoriesWeeklyBoard({ categories }) {
-  const router = useRouter();
-  return (
-    <div style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, padding: '1.1rem 1.25rem 1.25rem' }}>
-      <h2 style={{ margin: '0 0 3px', fontSize: '0.95rem', fontWeight: 600 }}>This Week's Leaderboard — All Categories</h2>
-      <p style={{ margin: '0 0 16px', fontSize: '0.82rem', color: ORG }}>Know someone who could top these?</p>
-      <InfiniteScrollRow items={categories} renderItem={(cat) => <DashboardCategoryCard cat={cat} router={router} />} />
-    </div>
-  );
-}
-
 const WEEKLY_MEDALS = ['🥇', '🥈', '🥉'];
 function WeeklyLeaderboard({ weeklyData }) {
   const { weekStart, weekEnd, hasSubmitted, category, myBest, rank, total, top5, clubId } = weeklyData;
@@ -751,9 +579,17 @@ function WeeklyLeaderboard({ weeklyData }) {
   );
 }
 
-function TvDisplayPromo({ club, onManageClick }) {
+function TvDisplayPromo({ club, onManageClick, onStartTrial }) {
   const hasSponsor = !!(club?.sponsorName || club?.sponsorLogoUrl);
   const displayUrl = club?.customSlug ? `rippingbombs.com/venue-display/${club.customSlug}` : null;
+
+  const TRIAL_DAYS = 90;
+  const trialStartedAt = club?.display_trial_started_at ? new Date(club.display_trial_started_at) : null;
+  const subscribed = !!club?.display_subscribed;
+  const daysLeft = trialStartedAt ? TRIAL_DAYS - Math.floor((Date.now() - trialStartedAt.getTime()) / 86400000) : null;
+  const trialExpired = !!(trialStartedAt && !subscribed && daysLeft <= 0);
+  const displayActive = subscribed || (!!trialStartedAt && !trialExpired);
+
   return (
     <div style={{ background: `linear-gradient(135deg, ${BG2}, ${BG3})`, border: `1px solid ${ORG}`, borderRadius: 10, padding: '1.25rem 1.5rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, flex: '1 1 320px' }}>
@@ -762,10 +598,10 @@ function TvDisplayPromo({ club, onManageClick }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 3 }}>
             <span style={{ fontSize: '0.95rem', fontWeight: 800 }}>TV Display &amp; Sponsors</span>
             <span style={{ background: 'rgba(255,0,144,0.15)', color: ORG, border: `1px solid ${ORG}`, borderRadius: 20, padding: '1px 9px', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
-              Free for your first 3 months
+              {subscribed ? 'Active' : trialExpired ? 'Trial ended' : trialStartedAt ? `Trial active · ${daysLeft}d left` : 'Free for your first 3 months'}
             </span>
           </div>
-          {displayUrl ? (
+          {displayActive && displayUrl ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
               <code style={{ fontSize: '0.8rem', color: TXT, background: 'rgba(255,255,255,0.06)', padding: '3px 8px', borderRadius: 5 }}>{displayUrl}</code>
               <button
@@ -775,9 +611,17 @@ function TvDisplayPromo({ club, onManageClick }) {
                 Copy
               </button>
             </div>
-          ) : (
+          ) : displayActive ? (
             <p style={{ margin: 0, fontSize: '0.82rem', color: MUT, lineHeight: 1.5, maxWidth: 480 }}>
               Show a live, always-on leaderboard on any TV at your venue. Set a custom URL below to get your link.
+            </p>
+          ) : trialExpired ? (
+            <p style={{ margin: 0, fontSize: '0.82rem', color: MUT, lineHeight: 1.5, maxWidth: 480 }}>
+              Your free trial has ended. Contact <a href="mailto:team@rippingbombs.com" style={{ color: ORG }}>team@rippingbombs.com</a> to keep your screen live.
+            </p>
+          ) : (
+            <p style={{ margin: 0, fontSize: '0.82rem', color: MUT, lineHeight: 1.5, maxWidth: 480 }}>
+              Show a live, always-on leaderboard on any TV at your venue — free for your first 3 months.
             </p>
           )}
         </div>
@@ -789,9 +633,19 @@ function TvDisplayPromo({ club, onManageClick }) {
         <a href="/for-venues" target="_blank" rel="noreferrer" style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.55rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none', whiteSpace: 'nowrap' }}>
           See it in action
         </a>
-        <button onClick={onManageClick} style={{ background: ORG, color: '#000', fontWeight: 700, border: 'none', padding: '0.55rem 1.1rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.82rem', whiteSpace: 'nowrap' }}>
-          {hasSponsor ? 'Manage Sponsor' : 'Set Up Sponsor'}
-        </button>
+        {displayActive ? (
+          <button onClick={onManageClick} style={{ background: ORG, color: '#000', fontWeight: 700, border: 'none', padding: '0.55rem 1.1rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.82rem', whiteSpace: 'nowrap' }}>
+            {hasSponsor ? 'Manage Sponsor' : 'Set Up Sponsor'}
+          </button>
+        ) : trialExpired ? (
+          <a href="mailto:team@rippingbombs.com?subject=Continue%20TV%20Display" style={{ background: ORG, color: '#000', fontWeight: 700, border: 'none', padding: '0.55rem 1.1rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.82rem', whiteSpace: 'nowrap', textDecoration: 'none' }}>
+            Contact Us
+          </a>
+        ) : (
+          <button onClick={onStartTrial} style={{ background: ORG, color: '#000', fontWeight: 700, border: 'none', padding: '0.55rem 1.1rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.82rem', whiteSpace: 'nowrap' }}>
+            Start My Free Trial
+          </button>
+        )}
       </div>
     </div>
   );
@@ -909,7 +763,6 @@ export default function DashboardPage() {
   const [totalClubs, setTotalClubs] = useState(null);
   const [globalAvgBest, setGlobalAvgBest] = useState(null);
   const [weeklyData, setWeeklyData] = useState(null);
-  const [weeklyCategoryLeaders, setWeeklyCategoryLeaders] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -971,29 +824,6 @@ export default function DashboardPage() {
       .select('orgId, dist, age, hcp, gender, date, player, club')
       .gte('date', weekStart.toISOString())
       .lt('date', weekEnd.toISOString());
-
-    // Category-split weekly leaders — used for club/venue accounts, who care
-    // about all categories rather than just their own submitted player's.
-    // Same CATEGORIES/filter logic as the homepage's weekly category cards,
-    // so the two stay visually and logically consistent.
-    if (clubData.accountType === 'club') {
-      const CATEGORIES = [
-        { key: 'mens',       label: 'Men',                 filter: e => e.gender === 'male'   && Number(e.age) >= 16 && Number(e.age) <= 54 && Number(e.hcp) < 20  },
-        { key: 'mens_hcp',   label: 'Men High Handicap',   filter: e => e.gender === 'male'   && Number(e.age) >= 16 && Number(e.age) <= 54 && Number(e.hcp) >= 20 },
-        { key: 'womens',     label: 'Women',                filter: e => e.gender === 'female' && Number(e.age) >= 16 && Number(e.age) <= 54 && Number(e.hcp) < 20  },
-        { key: 'womens_hcp', label: 'Women High Handicap', filter: e => e.gender === 'female' && Number(e.age) >= 16 && Number(e.age) <= 54 && Number(e.hcp) >= 20 },
-        { key: 'youth',      label: 'Youth (Under 16)',    filter: e => Number(e.age) < 16 },
-        { key: 'senior',     label: 'Senior (55+)',        filter: e => Number(e.age) >= 55 },
-      ];
-      const categoryLeaders = CATEGORIES.map((cat) => ({
-        ...cat,
-        top3: (weeklyAllEntries || [])
-          .filter(cat.filter)
-          .sort((a, b) => Number(b.dist) - Number(a.dist))
-          .slice(0, 3),
-      }));
-      setWeeklyCategoryLeaders(categoryLeaders);
-    }
 
     if (myWeeklyEntries.length === 0) {
       // Not submitted yet this week — show the overall weekly top 5 across all
@@ -1126,6 +956,17 @@ export default function DashboardPage() {
     setShowModal(false);
   };
 
+  const handleStartTrial = async () => {
+    const startedAt = new Date().toISOString();
+    const { error } = await supabase.from('clubs').update({
+      display_trial_started_at: startedAt,
+    }).eq('id', club.id);
+    if (error) { window.alert('Something went wrong starting your trial. Please try again.'); return; }
+    const updated = { ...club, display_trial_started_at: startedAt };
+    setClub(updated);
+    localStorage.setItem('rb_club', JSON.stringify(updated));
+  };
+
   const distances = entries.map((e) => Number(e.dist));
   const longest = distances[0] ?? null;
   const average = avg(distances);
@@ -1217,9 +1058,7 @@ export default function DashboardPage() {
         )}
 
         {/* Weekly leaderboard — split by category, resets every Monday */}
-        {club?.accountType === 'club'
-          ? (weeklyCategoryLeaders && <AllCategoriesWeeklyBoard categories={weeklyCategoryLeaders} />)
-          : (weeklyData && <WeeklyLeaderboard weeklyData={weeklyData} />)}
+        {weeklyData && <WeeklyLeaderboard weeklyData={weeklyData} />}
 
         {/* Player breakdown (club accounts with multiple players) */}
         {club?.accountType === 'club' && entries.length > 0 && (
@@ -1235,13 +1074,12 @@ export default function DashboardPage() {
           }
           lastDriveDate={lastDriveDate}
           limitToFree={club?.accountType === 'simulator' && !club?.isPremium}
-          isClub={club?.accountType === 'club'}
         />
 
         {/* TV Display & Sponsors promo — club accounts only */}
         {club?.accountType === 'club' && (
           <>
-            <TvDisplayPromo club={club} onManageClick={() => setShowModal(true)} />
+            <TvDisplayPromo club={club} onManageClick={() => setShowModal(true)} onStartTrial={handleStartTrial} />
             <TierComparison />
           </>
         )}

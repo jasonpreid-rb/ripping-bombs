@@ -32,6 +32,17 @@ function nameToSlug(name) {
     .replace(/^-|-$/g, '');
 }
 
+// A venue can view its TV display once it's either started its 3-month free
+// trial (and that trial hasn't lapsed) or is on a paid subscription.
+// Kept in sync with the same check in pages/api/venue-display/[slug].jsx.
+const TRIAL_DAYS = 90;
+function isDisplayActive(club) {
+  if (club?.display_subscribed) return true;
+  if (!club?.display_trial_started_at) return false;
+  const daysElapsed = (Date.now() - new Date(club.display_trial_started_at).getTime()) / 86400000;
+  return daysElapsed < TRIAL_DAYS;
+}
+
 export async function getServerSideProps({ params }) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -41,7 +52,7 @@ export async function getServerSideProps({ params }) {
   // Try an exact match on the saved custom slug first
   let { data: club } = await supabase
     .from('clubs')
-    .select('id, fullName, courseName, location, country, customSlug')
+    .select('id, fullName, courseName, location, country, customSlug, display_trial_started_at, display_subscribed')
     .eq('customSlug', params.slug)
     .maybeSingle();
 
@@ -50,7 +61,7 @@ export async function getServerSideProps({ params }) {
   if (!club) {
     const { data: candidates } = await supabase
       .from('clubs')
-      .select('id, fullName, courseName, location, country, customSlug');
+      .select('id, fullName, courseName, location, country, customSlug, display_trial_started_at, display_subscribed');
     club = (candidates || []).find(c => nameToSlug(c.courseName || c.fullName) === params.slug) || null;
   }
 
@@ -58,8 +69,9 @@ export async function getServerSideProps({ params }) {
     return { notFound: true };
   }
 
-  // Paid-tier gate — see TODO in pages/api/venue-display/[slug].js
-  // if (!club.displayEnabled) return { notFound: true };
+  if (!isDisplayActive(club)) {
+    return { notFound: true };
+  }
 
   const displayName = club.courseName || club.fullName;
   const initialData = await getVenueDisplayData(supabase, club.id, displayName);
