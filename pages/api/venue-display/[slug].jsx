@@ -12,12 +12,25 @@
 import { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import { createClient } from '@supabase/supabase-js';
-import { getVenueDisplayData } from '../../../lib/venueDisplayData';
+import { getVenueDisplayData } from '../../lib/venueDisplayData';
 
 const ROTATE_MS = 16000;
 const POLL_MS = 30000;
 
 const FLAGS = { US: '🇺🇸', GB: '🇬🇧', CA: '🇨🇦', AU: '🇦🇺', DE: '🇩🇪' };
+
+// Matches the slug logic already used on the dashboard and /clubs/[slug] —
+// venues that haven't explicitly saved a custom URL still resolve via their
+// auto-generated courseName slug, instead of 404ing.
+function nameToSlug(name) {
+  return (name || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
 
 export async function getServerSideProps({ params }) {
   const supabase = createClient(
@@ -25,13 +38,42 @@ export async function getServerSideProps({ params }) {
     process.env.SUPABASE_SERVICE_ROLE_KEY
   );
 
-  const { data: club, error } = await supabase
+  // TEMPORARY diagnostic logging — check Vercel's Runtime Logs after hitting
+  // this URL, then remove this block once the 404 is root-caused.
+  console.log('[venue-display] requested slug:', JSON.stringify(params.slug));
+  console.log('[venue-display] SUPABASE_URL set:', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
+  console.log('[venue-display] SERVICE_ROLE_KEY set:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+  // Try an exact match on the saved custom slug first
+  let { data: club, error: exactErr } = await supabase
     .from('clubs')
     .select('id, fullName, courseName, location, country, customSlug')
     .eq('customSlug', params.slug)
-    .single();
+    .maybeSingle();
 
-  if (error || !club) {
+  console.log('[venue-display] exact customSlug match:', club, 'error:', exactErr);
+
+  // Fall back to the auto-generated (courseName-based) slug — covers venues
+  // that haven't opened the profile editor and explicitly saved a custom URL yet.
+  if (!club) {
+    const { data: candidates, error: candErr } = await supabase
+      .from('clubs')
+      .select('id, fullName, courseName, location, country, customSlug');
+
+    console.log('[venue-display] candidates fetch error:', candErr);
+    console.log('[venue-display] candidate count:', (candidates || []).length);
+    console.log('[venue-display] candidate slugs:', (candidates || []).map(c => ({
+      courseName: c.courseName,
+      fullName: c.fullName,
+      computedSlug: nameToSlug(c.courseName || c.fullName),
+    })));
+
+    club = (candidates || []).find(c => nameToSlug(c.courseName || c.fullName) === params.slug) || null;
+  }
+
+  console.log('[venue-display] final club match:', club);
+
+  if (!club) {
     return { notFound: true };
   }
 
