@@ -235,7 +235,7 @@ export default function App({ Component, pageProps }) {
   return (
     <>
       <Head><link rel="canonical" href={canonicalUrl} /></Head>
-      <Layout loggedOrg={loggedOrg} onLogout={()=>{ setLoggedOrg(null); localStorage.removeItem('rb_club'); }} unit={unit} setUnit={setUnit}
+      <Layout loggedOrg={loggedOrg} onLogout={()=>{ setLoggedOrg(null); localStorage.removeItem('rb_club'); router.push('/'); }} unit={unit} setUnit={setUnit}
         onAdminClick={()=>setAdminPw({show:true,val:''})} pendingCount={pendingCount}>
         <Component {...pageProps} {...sharedProps}/>
       </Layout>

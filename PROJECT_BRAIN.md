@@ -11,7 +11,8 @@ The platform is currently in pre-launch demo mode (launching September 2026) wit
 - Framework: Next.js (Pages Router)
 - Hosting: Vercel (auto-deploys from GitHub on push)
 - Database: Supabase (Postgres) — LIVE
-- Image Storage: Supabase Storage (planned)
+- Image Storage: Supabase Storage (planned) — private bucket, signed URLs, path convention `verification-photos/{playerId}/{submissionId}.jpg`
+- AI Photo Verification: Claude Haiku (vision) via Anthropic API (planned) — extracts distance from submission screenshot, flags mismatches for manual review
 - Email: Resend (via `pages/api/send-email.js`) — API key stored in Vercel env as `RESEND_API_KEY`
 - Analytics: Google Analytics GA4 (ID: G-5RCJDKVBER) — injected via next/script in _app.jsx
 
@@ -62,6 +63,7 @@ Stores individual drive submissions.
 - `is_simulator: true` entries are valid and appear on the all-time leaderboard
 - Demo entries use IDs prefixed `demo_` and can be bulk-deleted with: `DELETE FROM entries WHERE id LIKE 'demo_%';`
 - Foreign key constraint on `orgId` — must reference a real clubs.id
+- **Planned columns (not yet added)** for AI photo verification: `ai_extracted_distance`, `ai_verification_confidence`, `ai_verification_flag` (bool), `ai_verification_notes`
 
 ---
 
@@ -227,7 +229,15 @@ robots.txt          — allows all crawlers except blocked AI agents (handled in
 - Share to WhatsApp, Facebook, Instagram (download), or copy link
 - Each drive has a unique URL: `rippingbombs.com/drive/[id]`
 
-### 7. Email System (Resend)
+### 7. AI Photo Verification (planned, not yet built)
+- On submission, the uploaded screenshot is sent to Claude Haiku (vision) via a new API route, e.g. `pages/api/verify-drive-photo.js`
+- Haiku extracts the distance shown in the screenshot and compares it to the value the player typed
+- Mismatches or low-confidence extractions are flagged for manual admin review — never auto-rejected, to avoid false positives against legitimate submissions
+- Also does a basic sanity check that the image looks like a real sim/launch monitor UI (Trackman, GCQuad, Foresight, etc.) rather than an unrelated or obviously edited image
+- Estimated cost: ~$0.0025 per verification call (Haiku pricing $1/M input, $5/M output) — negligible until volume reaches thousands of submissions/month
+- Depends on the Supabase Storage migration below (needs a stable image URL/signed URL to pass to the API, rather than base64)
+
+### 8. Email System (Resend)
 - All emails sent server-side via `pages/api/send-email.js`
 - Sending domain: `rippingbombs.com` — verified via Cloudflare DNS auto-config
 - From address: `team@rippingbombs.com`
@@ -271,7 +281,8 @@ robots.txt          — allows all crawlers except blocked AI agents (handled in
 - **Launch date**: September 2026
 - **Current state**: Live on Vercel with demo data, accepting real submissions
 - **Next priorities**:
-  - Proper image storage via Supabase Storage buckets
+  - Proper image storage via Supabase Storage buckets — private bucket, signed URLs, replaces base64-in-DB
+  - AI photo verification (Claude Haiku vision) — flags distance mismatches for manual admin review; depends on Storage migration above
   - Authentication system to replace plain-text passwords
   - Real-time updates (Supabase subscriptions)
   - Individual player profile pages (`/drive/[id]`) ← drive/[id].jsx already exists
