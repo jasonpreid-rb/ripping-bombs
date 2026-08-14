@@ -12,7 +12,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import { createClient } from '@supabase/supabase-js';
-import { getVenueDisplayData } from '../../../lib/venueDisplayData';
+import { getVenueDisplayData } from '../../lib/venueDisplayData';
 
 const ROTATE_MS = 16000;
 const POLL_MS = 30000;
