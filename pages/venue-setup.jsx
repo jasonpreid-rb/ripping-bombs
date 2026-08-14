@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
 
 const ORG = '#FF0090';
 const TXT = '#f0f0f0';
@@ -60,18 +61,70 @@ function TipBox({ children }) {
   );
 }
 
-function WidgetSnippetGenerator() {
-  const [slug, setSlug] = useState('');
+// Read-only "here's your link, just copy it" box.
+function CopyBox({ value, copyValue }) {
   const [copied, setCopied] = useState(false);
 
-  const cleanSlug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(copyValue || value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <div
+        style={{
+          background: '#0d0d0d',
+          border: `1px solid ${BDR}`,
+          borderRadius: 6,
+          padding: '0.7rem 4.5rem 0.7rem 1rem',
+          fontSize: '0.85rem',
+          lineHeight: 1.5,
+          color: TXT,
+          fontFamily: 'monospace',
+          overflowX: 'auto',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {value}
+      </div>
+      <button
+        onClick={handleCopy}
+        style={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          background: copied ? ORG : 'rgba(255,255,255,0.08)',
+          color: copied ? '#0d0d0d' : TXT,
+          border: 'none',
+          borderRadius: 5,
+          padding: '5px 10px',
+          fontSize: '0.72rem',
+          fontWeight: 700,
+          cursor: 'pointer',
+        }}
+      >
+        {copied ? 'Copied ✓' : 'Copy'}
+      </button>
+    </div>
+  );
+}
+
+function WidgetSnippet({ slug }) {
   const snippet = `<iframe
-  src="https://rippingbombs.com/widget/${cleanSlug || 'your-venue'}"
+  src="https://rippingbombs.com/widget/${slug}"
   width="100%"
   height="480"
   style="border: none; max-width: 400px;"
   title="Longest Drive Leaderboard"
 ></iframe>`;
+
+  const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
     try {
@@ -85,35 +138,6 @@ function WidgetSnippetGenerator() {
 
   return (
     <div>
-      <label
-        style={{
-          display: 'block',
-          fontSize: '0.7rem',
-          color: MUT,
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          fontWeight: 700,
-          marginBottom: 6,
-        }}
-      >
-        Your venue's custom URL slug
-      </label>
-      <input
-        value={slug}
-        onChange={(e) => setSlug(e.target.value)}
-        placeholder="your-venue"
-        style={{
-          width: '100%',
-          boxSizing: 'border-box',
-          background: '#0d0d0d',
-          border: `1px solid ${BDR}`,
-          borderRadius: 6,
-          padding: '0.6rem 0.8rem',
-          color: TXT,
-          fontSize: '0.85rem',
-          marginBottom: 12,
-        }}
-      />
       <div style={{ position: 'relative' }}>
         <pre
           style={{
@@ -153,15 +177,95 @@ function WidgetSnippetGenerator() {
       </div>
       <div style={{ fontSize: '0.78rem', color: MUT, marginTop: 10, lineHeight: 1.6 }}>
         Paste this into your website's HTML, or into a "Custom HTML" / "Embed" block if you're on
-        Wix, Squarespace, WordPress, or similar. Not sure of your slug? It's the last part of your
-        display URL from Step 1 — <code style={{ background: 'rgba(255,255,255,0.06)', padding: '2px 6px', borderRadius: 4 }}>rippingbombs.com/venue-display/<strong style={{ color: TXT }}>your-slug</strong></code>.
+        Wix, Squarespace, WordPress, or similar.
       </div>
+    </div>
+  );
+}
+
+// Sponsor logo spec sheet — quick reference so uploads work right the first time.
+// NOTE: these are recommended specs, not yet confirmed against SponsorLogoUploader's
+// actual enforced limits — tighten/loosen once that component is checked.
+function SponsorSpecs() {
+  const specs = [
+    { label: 'File type', value: 'PNG or JPG (PNG with transparent background preferred)' },
+    { label: 'Recommended max size', value: '2 MB' },
+    { label: 'Recommended dimensions', value: '600 × 200px (3:1 landscape)' },
+    { label: 'Minimum width', value: '300px — smaller logos may look blurry on large TVs' },
+  ];
+
+  return (
+    <div
+      style={{
+        border: `1px solid ${BDR}`,
+        borderRadius: 8,
+        padding: '0.9rem 1.1rem',
+        marginTop: 12,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+      }}
+    >
+      {specs.map((s) => (
+        <div key={s.label} style={{ display: 'flex', gap: 10, fontSize: '0.8rem', lineHeight: 1.5 }}>
+          <span style={{ flex: '0 0 170px', color: MUT, fontWeight: 700 }}>{s.label}</span>
+          <span style={{ color: TXT }}>{s.value}</span>
+        </div>
+      ))}
     </div>
   );
 }
 
 export default function VenueSetupPage() {
   const router = useRouter();
+  const [club, setClub] = useState(null);
+  const [loadState, setLoadState] = useState('loading'); // 'loading' | 'ready' | 'no-slug' | 'error'
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadClub() {
+      const raw = typeof window !== 'undefined' && localStorage.getItem('rb_club');
+      if (!raw) {
+        if (!cancelled) setLoadState('error');
+        return;
+      }
+
+      let parsed;
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        if (!cancelled) setLoadState('error');
+        return;
+      }
+
+      const { data: freshClub, error } = await supabase
+        .from('clubs')
+        .select('*')
+        .eq('id', parsed.id)
+        .single();
+
+      if (cancelled) return;
+
+      if (error || !freshClub) {
+        // Fall back to the cached copy rather than failing outright.
+        setClub(parsed);
+        setLoadState(parsed.customSlug ? 'ready' : 'no-slug');
+        return;
+      }
+
+      setClub(freshClub);
+      setLoadState(freshClub.customSlug ? 'ready' : 'no-slug');
+    }
+
+    loadClub();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const slug = club?.customSlug || null;
+  const displayUrl = slug ? `rippingbombs.com/venue-display/${slug}` : null;
 
   return (
     <>
@@ -220,21 +324,36 @@ export default function VenueSetupPage() {
 
           {/* Steps */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.6rem', marginBottom: '2.5rem' }}>
-            <StepCard number={1} title="Get your venue's display URL">
-              Open <strong style={{ color: TXT }}>Edit Profile</strong> from your dashboard and hit{' '}
-              <strong style={{ color: TXT }}>Save Changes</strong> — a link based on your venue name is generated
-              automatically at{' '}
-              <code style={{ background: 'rgba(255,255,255,0.06)', padding: '2px 6px', borderRadius: 4, fontSize: '0.8rem' }}>
-                rippingbombs.com/venue-display/your-venue
-              </code>
-              . Want a different one? Just type it into the Custom URL field first. Either way, the link and a copy
-              button appear right on your dashboard once it's set.
+            <StepCard number={1} title="Your venue's display URL">
+              This is your live leaderboard link — open it on whatever's hooked up to the TV.
+              <div style={{ marginTop: 12 }}>
+                {loadState === 'loading' && (
+                  <div style={{ fontSize: '0.8rem', color: MUT }}>Loading your link…</div>
+                )}
+                {loadState === 'ready' && (
+                  <CopyBox value={displayUrl} copyValue={`https://${displayUrl}`} />
+                )}
+                {loadState === 'no-slug' && (
+                  <div style={{ fontSize: '0.8rem', color: MUT }}>
+                    You don't have a display URL yet — open <strong style={{ color: TXT }}>Edit Profile</strong> on
+                    your dashboard and hit <strong style={{ color: TXT }}>Save Changes</strong> and one will be
+                    generated automatically (or set your own in the Custom URL field).
+                  </div>
+                )}
+                {loadState === 'error' && (
+                  <div style={{ fontSize: '0.8rem', color: MUT }}>
+                    Couldn't load your link automatically — grab it from{' '}
+                    <strong style={{ color: TXT }}>Edit Profile</strong> on your dashboard instead.
+                  </div>
+                )}
+              </div>
             </StepCard>
 
             <StepCard number={2} title="Add a sponsor (optional, but it pays for itself)">
               If a local business is sponsoring your screen, click <strong style={{ color: TXT }}>Set Up Sponsor</strong>{' '}
               to upload their logo. It'll rotate onto the display automatically — no separate setup needed. Skip this
               step if you don't have a sponsor yet.
+              <SponsorSpecs />
             </StepCard>
 
             <StepCard number={3} title="Open the display link on your TV">
@@ -254,10 +373,18 @@ export default function VenueSetupPage() {
             </StepCard>
 
             <StepCard number={6} title="Optional: embed it on your own website too">
-              Want the leaderboard on your website as well as your TV? Paste your slug below and grab the embed
-              code — it works on Wix, Squarespace, WordPress, or any site that accepts custom HTML.
+              Want the leaderboard on your website as well as your TV? Here's your embed code — it works on Wix,
+              Squarespace, WordPress, or any site that accepts custom HTML.
               <div style={{ marginTop: 14 }}>
-                <WidgetSnippetGenerator />
+                {loadState === 'ready' && <WidgetSnippet slug={slug} />}
+                {loadState === 'loading' && (
+                  <div style={{ fontSize: '0.8rem', color: MUT }}>Loading your embed code…</div>
+                )}
+                {(loadState === 'no-slug' || loadState === 'error') && (
+                  <div style={{ fontSize: '0.8rem', color: MUT }}>
+                    Your embed code will appear here once your display URL is set (see step 1).
+                  </div>
+                )}
               </div>
             </StepCard>
           </div>
@@ -279,7 +406,7 @@ export default function VenueSetupPage() {
                 },
                 {
                   q: "My sponsor's logo isn't showing.",
-                  a: "Give it a minute to sync, then refresh the display once. If it still doesn't show, double check the logo uploaded successfully under TV Display & Sponsors in your dashboard.",
+                  a: "Give it a minute to sync, then refresh the display once. If it still doesn't show, double check the file matches the size/format guidelines above and uploaded successfully under TV Display & Sponsors in your dashboard.",
                 },
                 {
                   q: 'The leaderboard looks too small or too large on the TV.',
