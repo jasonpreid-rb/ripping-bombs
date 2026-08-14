@@ -21,32 +21,84 @@ const STICKY = { position:'sticky', zIndex:2 };
 const RANK_W = 52;
 const PLAYER_W = 180;
 
+// Click-and-drag horizontal panning, matching the category-card rows on the
+// homepage: native touch/trackpad momentum scrolling is left alone, mouse
+// users get grab-to-pan since the scrollbar is hidden, and a fading arrow
+// hints that the table scrolls until the user's first interaction with it.
 function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
   const COLS = ['Rank','Player','Distance','Club','HCP','Age','Gender','Course','Event','Date','Tier','Share'];
   const scrollRef = useRef(null);
+  const [showHint, setShowHint] = useState(true);
+  const [canScroll, setCanScroll] = useState(false);
+  const drag = useRef({ isDown:false, startX:0, startScrollLeft:0, moved:false });
 
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
+    setCanScroll(el.scrollWidth > el.clientWidth);
+  }, [rows]);
 
-    // React's onWheel is passive by default, so preventDefault() inside a
-    // JSX handler is silently ignored (page scrolls AND div scrolls at once).
-    // Attaching manually with { passive:false } lets us actually stop the
-    // vertical page scroll when we redirect it into horizontal table scroll.
-    const handleWheel = (e) => {
-      const canScrollH = el.scrollWidth > el.clientWidth;
-      if (!canScrollH) return;
-      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return; // let native horizontal gestures pass through
+  function dismissHint() {
+    setShowHint(false);
+  }
+
+  function handlePointerDown(e) {
+    if (e.pointerType !== 'mouse') { dismissHint(); return; } // touch: native scroll handles it
+    const el = scrollRef.current;
+    drag.current = { isDown:true, startX:e.clientX, startScrollLeft: el.scrollLeft, moved:false, pointerId:e.pointerId };
+    el.style.cursor = 'grabbing';
+    // Not calling setPointerCapture on mousedown itself — that would retarget
+    // every plain click to this container instead of the row underneath, so
+    // row clicks would never fire. Capture is applied lazily below, only
+    // once real dragging is detected.
+  }
+
+  function handlePointerMove(e) {
+    if (e.pointerType !== 'mouse' || !drag.current.isDown) return;
+    const el = scrollRef.current;
+    const dx = e.clientX - drag.current.startX;
+    if (Math.abs(dx) > 3 && !drag.current.moved) {
+      drag.current.moved = true;
+      el.setPointerCapture?.(e.pointerId);
+    }
+    if (drag.current.moved) el.scrollLeft = drag.current.startScrollLeft - dx;
+    dismissHint();
+  }
+
+  function endDrag(e) {
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    drag.current.isDown = false;
+    const el = scrollRef.current;
+    if (el) {
+      el.style.cursor = 'grab';
+      if (e.pointerId != null && el.hasPointerCapture?.(e.pointerId)) el.releasePointerCapture(e.pointerId);
+    }
+  }
+
+  function handleClickCapture(e) {
+    // Suppress the click (row-open or Share button) that follows a drag, so
+    // panning the table doesn't also open an entry or fire a share.
+    if (drag.current.moved) {
       e.preventDefault();
-      el.scrollLeft += e.deltaY;
-    };
-
-    el.addEventListener('wheel', handleWheel, { passive: false });
-    return () => el.removeEventListener('wheel', handleWheel);
-  }, []);
+      e.stopPropagation();
+      drag.current.moved = false;
+    }
+  }
 
   return (
-    <div ref={scrollRef} style={{overflowX:'auto',border:`1px solid ${BDR}`,background:BG2}}>
+    <div style={{position:'relative'}}>
+    <div
+      ref={scrollRef}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={endDrag}
+      onPointerLeave={endDrag}
+      onPointerCancel={endDrag}
+      onClickCapture={handleClickCapture}
+      onTouchStart={dismissHint}
+      className="rb-table-scroll"
+      style={{overflowX:'auto',WebkitOverflowScrolling:'touch',border:`1px solid ${BDR}`,background:BG2,cursor:'grab',touchAction:'pan-x'}}
+    >
       <table style={{width:'100%',borderCollapse:'collapse',minWidth:750}}>
         <thead>
           <tr>
@@ -115,6 +167,22 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
         </tbody>
       </table>
       {rows.length===0&&<div style={{padding:'56px 0',textAlign:'center',color:DIM,fontFamily:SANS,fontSize:13}}>No drives recorded for this selection</div>}
+    </div>
+    {showHint && canScroll && rows.length>0 && (
+      <div aria-hidden style={{position:'absolute',top:0,bottom:0,right:0,width:44,pointerEvents:'none',display:'flex',alignItems:'center',justifyContent:'flex-end',paddingRight:14}}>
+        <div style={{width:44,height:44,borderRadius:'50%',background:'rgba(20,20,20,0.55)',border:'1px solid rgba(255,255,255,0.25)',backdropFilter:'blur(4px)',WebkitBackdropFilter:'blur(4px)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 14px rgba(0,0,0,0.45)',animation:'rbArrowPulse 1.6s ease-in-out infinite'}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.95)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+      </div>
+    )}
+    <style jsx>{`
+      .rb-table-scroll::-webkit-scrollbar { display: none; }
+      .rb-table-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+      @keyframes rbArrowPulse {
+        0%, 100% { opacity: 0.55; transform: translateX(0); }
+        50% { opacity: 1; transform: translateX(4px); }
+      }
+    `}</style>
     </div>
   );
 }
