@@ -749,8 +749,32 @@ function WeeklyCategoryScroll({ categories, weekStart, weekEnd }) {
 }
 
 function TvDisplayPromo({ club, onManageClick, onStartTrial }) {
+  const [copied, setCopied] = useState(false);
   const hasSponsor = !!(club?.sponsorName || club?.sponsorLogoUrl);
   const displayUrl = club?.customSlug ? `rippingbombs.com/venue-display/${club.customSlug}` : null;
+
+  const handleCopy = async (text) => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback for non-HTTPS/older browsers where navigator.clipboard is unavailable
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch (err) {
+      console.error('Copy failed:', err);
+    }
+  };
 
   const TRIAL_DAYS = 90;
   const trialStartedAt = club?.display_trial_started_at ? new Date(club.display_trial_started_at) : null;
@@ -774,10 +798,10 @@ function TvDisplayPromo({ club, onManageClick, onStartTrial }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
               <code style={{ fontSize: '0.8rem', color: TXT, background: 'rgba(255,255,255,0.06)', padding: '3px 8px', borderRadius: 5 }}>{displayUrl}</code>
               <button
-                onClick={() => navigator.clipboard?.writeText(`https://${displayUrl}`)}
-                style={{ background: 'transparent', border: `1px solid ${BDR}`, color: MUT, padding: '2px 8px', borderRadius: 5, fontSize: '0.7rem', cursor: 'pointer' }}
+                onClick={() => handleCopy(`https://${displayUrl}`)}
+                style={{ background: copied ? 'rgba(255,0,144,0.15)' : 'transparent', border: `1px solid ${copied ? ORG : BDR}`, color: copied ? ORG : MUT, padding: '2px 8px', borderRadius: 5, fontSize: '0.7rem', cursor: 'pointer', minWidth: 46, transition: 'all 0.15s ease' }}
               >
-                Copy
+                {copied ? 'Copied!' : 'Copy'}
               </button>
             </div>
           ) : displayActive ? (
