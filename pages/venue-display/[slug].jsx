@@ -181,13 +181,7 @@ export default function VenueDisplay({ slug, venue, initialData }) {
               <span key={d.key} className={`dot ${i === current ? 'active' : ''}`} />
             ))}
           </div>
-          <div className="cta">
-            <div className="qr" />
-            <div className="cta-text">
-              Scan to submit your drive · <b>rippingbombs.com/{slug}</b>
-            </div>
-          </div>
-          <div className="wordmark">RIPPING<b>BOMBS</b></div>
+          <a href="/" className="rb-logo" aria-label="Ripping Bombs home" />
         </footer>
       </div>
 
@@ -293,11 +287,15 @@ export default function VenueDisplay({ slug, venue, initialData }) {
         .dots { display: flex; gap: 8px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bdr); transition: background 0.3s ease, transform 0.3s ease; }
         .dot.active { background: var(--org); transform: scale(1.25); }
-        .cta { display: flex; align-items: center; gap: 12px; color: var(--mut); font-size: 12px; }
-        .qr { width: 44px; height: 44px; background: #fff; border-radius: 6px; }
-        .cta-text b { color: var(--txt); }
-        .wordmark { font-family: var(--disp); font-size: 14px; letter-spacing: 1px; color: var(--mut); }
-        .wordmark b { color: var(--org); }
+        .rb-logo {
+          width: 32px; height: 32px;
+          display: block;
+          background-color: var(--org);
+          -webkit-mask: url('/favicon.ico') center / contain no-repeat;
+          mask: url('/favicon.ico') center / contain no-repeat;
+          transition: transform 0.2s ease, filter 0.2s ease;
+        }
+        .rb-logo:hover { transform: scale(1.08); filter: drop-shadow(0 0 8px rgba(255, 0, 144, 0.65)); }
       `}</style>
     </>
   );
