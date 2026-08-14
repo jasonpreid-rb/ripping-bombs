@@ -9,7 +9,7 @@ import LaunchModal from '../components/LaunchModal';
 import { initData, db } from '../lib/data';
 import { ORGS_KEY, ENT_KEY, ADMIN_PW, SANS, ORG, MUT, BG2, BDR, TXT, DIM, DISP } from '../lib/constants';
 import { todayStr } from '../lib/constants';
-import { sendRegistrationNotification } from '../lib/email';
+import { sendRegistrationNotification, sendPlayerSubmissionNotice } from '../lib/email';
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
@@ -29,7 +29,7 @@ export default function App({ Component, pageProps }) {
   // Form state
   const [reg, setReg] = useState({ type:'simulator', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
   const [lgn, setLgn] = useState({ email:'', pw:'' });
-  const [form, setForm] = useState({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male', venueId:'', facility:'' });
+  const [form, setForm] = useState({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male', venueId:'', facility:'', playerEmail:'' });
 
   // Leaderboard filter state
   const [week, setWeek] = useState(null);
@@ -155,10 +155,15 @@ export default function App({ Component, pageProps }) {
       is_simulator: isSimulator,
       venue_id: form.venueId || null,
       facility_name: form.facility || null,
+      player_email: form.playerEmail || null,
     };
 
     const ok = await db.insertEntry(e);
     if (!ok) { toast('Submission failed — please try again'); return false; }
+
+    if (!isSimulator && e.player_email) {
+      sendPlayerSubmissionNotice(e, loggedOrg);
+    }
 
     const updatedEntries = [...entries, e];
     setEntries(updatedEntries);
@@ -170,7 +175,7 @@ export default function App({ Component, pageProps }) {
     const rank = sameGender.findIndex(x => x.id === e.id) + 1;
     const total = sameGender.length;
 
-    setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male', venueId:'', facility:'' });
+    setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male', venueId:'', facility:'', playerEmail:'' });
     toast('Drive submitted to the World Registry!');
     return { ok: true, rank, total, gender: e.gender };
   }

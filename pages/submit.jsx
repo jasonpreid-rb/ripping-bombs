@@ -199,16 +199,24 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
               </div>
             )}
 
-            {/* Player name — pre-filled and locked for simulator accounts */}
+            {/* Player name & email — pre-filled/locked for simulator accounts */}
             {isSimulator ? (
               <div style={{ gridColumn:'1/-1' }}>
                 <label style={{ display:'block', fontFamily:SANS, fontSize:11, fontWeight:600, color:MUT, marginBottom:5, textTransform:'uppercase', letterSpacing:.8 }}>Player</label>
                 <div style={{ background:BG3, border:`1px solid ${BDR}`, padding:'10px 14px', fontFamily:SANS, fontSize:14, color:DIM }}>{loggedOrg.fullName}</div>
               </div>
             ) : (
-              <div style={{ gridColumn:'1/-1' }}>
-                <Field label="Player Name" value={form.player} onChange={e=>setForm({...form,player:e.target.value})} placeholder="Full name" required/>
-              </div>
+              <>
+                <div style={{ gridColumn:'1/-1' }}>
+                  <Field label="Player Name" value={form.player} onChange={e=>setForm({...form,player:e.target.value})} placeholder="Full name" required/>
+                </div>
+                <div style={{ gridColumn:'1/-1' }}>
+                  <Field label="Player Email" type="email" value={form.playerEmail||''} onChange={e=>setForm({...form,playerEmail:e.target.value})} placeholder="player@example.com" required/>
+                  <div style={{ fontFamily:SANS, fontSize:11, color:DIM, marginTop:5 }}>
+                    We'll let them know their drive is live and how to claim or remove it — not shown publicly.
+                  </div>
+                </div>
+              </>
             )}
 
             {/* Gender — only shown for club accounts, simulator uses gender from registration */}
@@ -270,6 +278,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
             full
             onClick={async () => {
               if (isSimulator && simulatorWeeklyBlock) { alert('You have already submitted a drive this week. Simulator accounts are limited to one submission per week.'); return; }
+              if (!isSimulator && !form.playerEmail) { alert('Please enter the player\'s email so we can notify them.'); return; }
               if (!consent) { alert(isSimulator ? 'Please confirm your consent before submitting.' : 'Please confirm player consent before submitting.'); return; }
               // For simulator accounts, pre-fill player name and tournament from account
               if (isSimulator) {

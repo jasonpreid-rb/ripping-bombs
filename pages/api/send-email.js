@@ -38,6 +38,17 @@ export default async function handler(req, res) {
       });
     }
 
+    if (type === 'player_notice' && entry && entry.player_email) {
+      const distYds = entry.dist;
+      const distM = Math.round(distYds * 0.9144);
+      await resend.emails.send({
+        from: 'Ripping Bombs <team@rippingbombs.com>',
+        to: entry.player_email,
+        subject: `You're on the Ripping Bombs leaderboard!`,
+        text: `Hi ${entry.player},\n\n${org.courseName} has submitted your longest drive to Ripping Bombs, the global longest-drive leaderboard.\n\nDistance: ${distYds} yds (${distM} m)\nClub: ${entry.club}\nDate: ${entry.date}\n\nWant to claim this entry with your own free account, or would rather it wasn't public? Just reply to this email or contact team@rippingbombs.com and we'll sort it out.\n\nView the leaderboard: https://www.rippingbombs.com/leaderboard\n\nThe Ripping Bombs Team`,
+      });
+    }
+
     if (type === 'contact') {
       await resend.emails.send({
         from: 'Ripping Bombs <team@rippingbombs.com>',
