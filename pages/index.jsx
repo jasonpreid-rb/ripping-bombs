@@ -354,6 +354,34 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
 
   const MEDALS = ['🥇','🥈','🥉'];
 
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(({ q, a }) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: { '@type': 'Answer', text: a },
+    })),
+  };
+
+  const allTimeItemListSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Ripping Bombs — All-Time Category Leaders',
+    url: 'https://www.rippingbombs.com/leaderboard',
+    itemListElement: allTimeLeaders.flatMap(cat =>
+      cat.top3.map((e, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'Thing',
+          name: `${e.player} — ${cat.label}`,
+          description: `${cvt(e.dist)} ${unitLbl} — all-time ${cat.label} record${e.is_simulator ? ' (simulator)' : ''}`,
+        },
+      }))
+    ),
+  };
+
   // Maps a homepage category to the exact filter query the /leaderboard page
   // understands (see the matching useEffect there that reads router.query).
   const categoryHref = (key, allTime) => {
@@ -486,6 +514,8 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           url: 'https://www.rippingbombs.com',
           description: 'The free global leaderboard for longest golf drives — simulator venues and clubs submitting verified drives, ranked by category.',
         }) }}/>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}/>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(allTimeItemListSchema) }}/>
       </Head>
       <div style={{animation:'fi .4s ease'}}>
 
