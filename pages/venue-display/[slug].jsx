@@ -12,36 +12,12 @@
 import { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import { createClient } from '@supabase/supabase-js';
-import { getVenueDisplayData } from '../../lib/venueDisplayData';
+import { getVenueDisplayData } from '../../../lib/venueDisplayData';
 
 const ROTATE_MS = 16000;
 const POLL_MS = 30000;
 
 const FLAGS = { US: '🇺🇸', GB: '🇬🇧', CA: '🇨🇦', AU: '🇦🇺', DE: '🇩🇪' };
-
-// Matches the slug logic already used on the dashboard and /clubs/[slug] —
-// venues that haven't explicitly saved a custom URL still resolve via their
-// auto-generated courseName slug, instead of 404ing.
-function nameToSlug(name) {
-  return (name || '')
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
-}
-
-// A venue can view its TV display once it's either started its 3-month free
-// trial (and that trial hasn't lapsed) or is on a paid subscription.
-// Kept in sync with the same check in pages/api/venue-display/[slug].jsx.
-const TRIAL_DAYS = 90;
-function isDisplayActive(club) {
-  if (club?.display_subscribed) return true;
-  if (!club?.display_trial_started_at) return false;
-  const daysElapsed = (Date.now() - new Date(club.display_trial_started_at).getTime()) / 86400000;
-  return daysElapsed < TRIAL_DAYS;
-}
 
 export async function getServerSideProps({ params }) {
   const supabase = createClient(
@@ -49,29 +25,18 @@ export async function getServerSideProps({ params }) {
     process.env.SUPABASE_SERVICE_ROLE_KEY
   );
 
-  // Try an exact match on the saved custom slug first
-  let { data: club } = await supabase
+  const { data: club, error } = await supabase
     .from('clubs')
-    .select('id, fullName, courseName, location, country, customSlug, display_trial_started_at, display_subscribed')
+    .select('id, fullName, courseName, location, country, customSlug')
     .eq('customSlug', params.slug)
-    .maybeSingle();
+    .single();
 
-  // Fall back to the auto-generated (courseName-based) slug — covers venues
-  // that haven't opened the profile editor and explicitly saved a custom URL yet.
-  if (!club) {
-    const { data: candidates } = await supabase
-      .from('clubs')
-      .select('id, fullName, courseName, location, country, customSlug, display_trial_started_at, display_subscribed');
-    club = (candidates || []).find(c => nameToSlug(c.courseName || c.fullName) === params.slug) || null;
-  }
-
-  if (!club) {
+  if (error || !club) {
     return { notFound: true };
   }
 
-  if (!isDisplayActive(club)) {
-    return { notFound: true };
-  }
+  // Paid-tier gate — see TODO in pages/api/venue-display/[slug].js
+  // if (!club.displayEnabled) return { notFound: true };
 
   const displayName = club.courseName || club.fullName;
   const initialData = await getVenueDisplayData(supabase, club.id, displayName);
@@ -82,6 +47,8 @@ export async function getServerSideProps({ params }) {
       venue: {
         name: displayName,
         location: [club.location, club.country].filter(Boolean).join(', '),
+        locality: club.location || null,
+        countryCode: club.country || null,
       },
       initialData,
     },
@@ -134,10 +101,35 @@ export default function VenueDisplay({ slug, venue, initialData }) {
     <>
       <Head>
         <title>{venue.name} — Live Leaderboard</title>
+        <meta
+          name="description"
+          content={`Live longest drive leaderboard at ${venue.name}${venue.location ? `, ${venue.location}` : ''} — updated in real time on Ripping Bombs.`}
+        />
+        <link rel="canonical" href={`https://rippingbombs.com/venue-display/${slug}`} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
           rel="stylesheet"
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'SportsActivityLocation',
+              name: venue.name,
+              url: `https://rippingbombs.com/venue-display/${slug}`,
+              ...(venue.locality || venue.countryCode
+                ? {
+                    address: {
+                      '@type': 'PostalAddress',
+                      ...(venue.locality ? { addressLocality: venue.locality } : {}),
+                      ...(venue.countryCode ? { addressCountry: venue.countryCode } : {}),
+                    },
+                  }
+                : {}),
+            }),
+          }}
         />
       </Head>
 
@@ -193,7 +185,13 @@ export default function VenueDisplay({ slug, venue, initialData }) {
               <span key={d.key} className={`dot ${i === current ? 'active' : ''}`} />
             ))}
           </div>
-          <a href="/" className="rb-logo" aria-label="Ripping Bombs home" />
+          <div className="cta">
+            <div className="qr" />
+            <div className="cta-text">
+              Scan to submit your drive · <b>rippingbombs.com/{slug}</b>
+            </div>
+          </div>
+          <div className="wordmark">RIPPING<b>BOMBS</b></div>
         </footer>
       </div>
 
@@ -299,15 +297,11 @@ export default function VenueDisplay({ slug, venue, initialData }) {
         .dots { display: flex; gap: 8px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bdr); transition: background 0.3s ease, transform 0.3s ease; }
         .dot.active { background: var(--org); transform: scale(1.25); }
-        .rb-logo {
-          width: 32px; height: 32px;
-          display: block;
-          background-color: var(--org);
-          -webkit-mask: url('/favicon.ico') center / contain no-repeat;
-          mask: url('/favicon.ico') center / contain no-repeat;
-          transition: transform 0.2s ease, filter 0.2s ease;
-        }
-        .rb-logo:hover { transform: scale(1.08); filter: drop-shadow(0 0 8px rgba(255, 0, 144, 0.65)); }
+        .cta { display: flex; align-items: center; gap: 12px; color: var(--mut); font-size: 12px; }
+        .qr { width: 44px; height: 44px; background: #fff; border-radius: 6px; }
+        .cta-text b { color: var(--txt); }
+        .wordmark { font-family: var(--disp); font-size: 14px; letter-spacing: 1px; color: var(--mut); }
+        .wordmark b { color: var(--org); }
       `}</style>
     </>
   );
