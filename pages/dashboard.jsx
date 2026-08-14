@@ -1,4 +1,4 @@
-import { useEffect, useState, cloneElement } from 'react';
+import { useEffect, useState, useRef, cloneElement } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { supabase } from '../lib/supabaseClient';
@@ -437,12 +437,12 @@ function PlayerBreakdown({ entries }) {
 }
 
 // Recent drives table
-function DriveHistory({ entries, lastDriveDate, limitToFree }) {
+function DriveHistory({ entries, lastDriveDate, limitToFree, isClub }) {
   const daysSince = lastDriveDate ? Math.floor((Date.now() - new Date(lastDriveDate)) / 86400000) : null;
   const nudge = daysSince === null
-    ? "You haven't submitted a drive yet — get on the board!"
+    ? (isClub ? "No drives submitted yet — log your first player's drive!" : "You haven't submitted a drive yet — get on the board!")
     : daysSince > 14
-    ? `It's been ${daysSince} days since your last submission. Time to rip another one?`
+    ? (isClub ? `It's been ${daysSince} days since your last submission. Time to log another one?` : `It's been ${daysSince} days since your last submission. Time to rip another one?`)
     : null;
   const FREE_LIMIT = 3;
   const isLimited = limitToFree && entries.length > FREE_LIMIT;
@@ -456,14 +456,14 @@ function DriveHistory({ entries, lastDriveDate, limitToFree }) {
           {nudge && <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: MUT }}>{nudge}</p>}
         </div>
         {entries.length > 0 && (
-          <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.78rem', padding: '0.38rem 0.85rem', borderRadius: 6, textDecoration: 'none' }}>+ Submit Drive</a>
+          <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.78rem', padding: '0.38rem 0.85rem', borderRadius: 6, textDecoration: 'none' }}>+ Submit {isClub ? 'a' : 'Your'} Drive</a>
         )}
       </div>
 
       {entries.length === 0 ? (
         <div style={{ padding: '3rem', textAlign: 'center', color: MUT }}>
           <p style={{ marginBottom: '1rem' }}>No drives submitted yet.</p>
-          <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, padding: '0.55rem 1.25rem', borderRadius: 7, textDecoration: 'none', fontSize: '0.9rem' }}>Submit your first drive →</a>
+          <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, padding: '0.55rem 1.25rem', borderRadius: 7, textDecoration: 'none', fontSize: '0.9rem' }}>{isClub ? 'Submit a drive →' : 'Submit your first drive →'}</a>
         </div>
       ) : (
         <div style={{ overflowX: 'auto' }}>
@@ -575,6 +575,175 @@ function WeeklyLeaderboard({ weeklyData }) {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+// Horizontal-scrolling, all-category weekly leaderboard — used for club/venue
+// accounts, mirroring the homepage's "This Week" widget (index.jsx) so a
+// venue sees the same live competition view visitors see, not just their
+// own single category. Individual/simulator accounts keep WeeklyLeaderboard
+// above, since they only care about their own category.
+
+// Ported from index.jsx — same drag/loop-scroll behavior, just without the
+// full-bleed edge margins (dashboard cards are boxed, not edge-to-edge).
+function InfiniteScrollRow({ items, renderItem, cardWidth = 190, gap = 10 }) {
+  const scrollRef = useRef(null);
+  const [showHint, setShowHint] = useState(true);
+  const loopItems = [...items, ...items, ...items];
+  const drag = useRef({ isDown: false, startX: 0, startScrollLeft: 0, moved: false });
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const setWidth = el.scrollWidth / 3;
+    el.scrollLeft = setWidth;
+  }, [items]);
+
+  function handleScroll() {
+    const el = scrollRef.current;
+    if (!el) return;
+    const setWidth = el.scrollWidth / 3;
+    if (el.scrollLeft < setWidth * 0.5) {
+      el.scrollLeft += setWidth;
+    } else if (el.scrollLeft > setWidth * 1.5) {
+      el.scrollLeft -= setWidth;
+    }
+  }
+
+  function dismissHint() { setShowHint(false); }
+
+  function handlePointerDown(e) {
+    if (e.pointerType !== 'mouse') { dismissHint(); return; }
+    const el = scrollRef.current;
+    drag.current = { isDown: true, startX: e.clientX, startScrollLeft: el.scrollLeft, moved: false, pointerId: e.pointerId };
+    el.style.cursor = 'grabbing';
+  }
+
+  function handlePointerMove(e) {
+    if (e.pointerType !== 'mouse' || !drag.current.isDown) return;
+    const el = scrollRef.current;
+    const dx = e.clientX - drag.current.startX;
+    if (Math.abs(dx) > 3 && !drag.current.moved) {
+      drag.current.moved = true;
+      el.setPointerCapture?.(e.pointerId);
+    }
+    if (drag.current.moved) el.scrollLeft = drag.current.startScrollLeft - dx;
+    dismissHint();
+  }
+
+  function endDrag(e) {
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    drag.current.isDown = false;
+    const el = scrollRef.current;
+    if (el) {
+      el.style.cursor = 'grab';
+      if (e.pointerId != null && el.hasPointerCapture?.(e.pointerId)) el.releasePointerCapture(e.pointerId);
+    }
+  }
+
+  function handleClickCapture(e) {
+    if (drag.current.moved) {
+      e.preventDefault();
+      e.stopPropagation();
+      drag.current.moved = false;
+    }
+  }
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={endDrag}
+        onPointerLeave={endDrag}
+        onPointerCancel={endDrag}
+        onClickCapture={handleClickCapture}
+        onTouchStart={dismissHint}
+        className="rb-dash-scroll-row"
+        style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', cursor: 'grab', touchAction: 'pan-x' }}
+      >
+        <div style={{ display: 'flex', alignItems: 'stretch', gap }}>
+          {loopItems.map((item, i) => (
+            <div key={`${item.key}-${i}`} style={{ flex: `0 0 ${cardWidth}px`, minWidth: 0, display: 'flex' }}>
+              {renderItem(item)}
+            </div>
+          ))}
+          {showHint && (
+            <div aria-hidden style={{ position: 'sticky', right: 0, alignSelf: 'stretch', width: 0, flexShrink: 0, zIndex: 2, pointerEvents: 'none' }}>
+              <div style={{ position: 'absolute', top: '50%', right: 14, transform: 'translateY(-50%)', width: 40, height: 40, borderRadius: '50%', background: 'rgba(20,20,20,0.55)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.45)', animation: 'rbDashArrowPulse 1.6s ease-in-out infinite' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.95)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18" /></svg>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+      <style jsx>{`
+        .rb-dash-scroll-row::-webkit-scrollbar { display: none; }
+        .rb-dash-scroll-row { scrollbar-width: none; -ms-overflow-style: none; }
+        @keyframes rbDashArrowPulse {
+          0%, 100% { opacity: 0.55; transform: translate(0,-50%); }
+          50% { opacity: 1; transform: translate(4px,-50%); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function WeeklyCategoryCard({ cat }) {
+  const { top3, label } = cat;
+  return (
+    <div style={{ background: BG3, border: `1px solid ${top3.length ? 'rgba(255,0,144,0.2)' : BDR}`, borderRadius: 10, padding: '0.9rem 1rem', display: 'flex', flexDirection: 'column', minHeight: 200, width: '100%', boxSizing: 'border-box' }}>
+      <span style={{ fontSize: '0.68rem', color: ORG, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>{label}</span>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: top3.length === 0 ? 'center' : 'flex-start' }}>
+        {top3.length === 0 ? (
+          <div style={{ fontSize: '0.78rem', color: DIM, lineHeight: 1.6 }}>No entry yet —<br />be the first!</div>
+        ) : (
+          top3.map((e, i) => (
+            <div key={e.id || `${e.orgId}-${i}`} style={{ display: 'flex', flexDirection: 'column', gap: 3, padding: '0.5rem 0', borderBottom: i < top3.length - 1 ? `1px solid ${BDR}` : 'none' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0, flex: 1, overflow: 'hidden' }}>
+                  <span style={{ fontSize: '0.8rem', flexShrink: 0 }}>{WEEKLY_MEDALS[i] || `#${i + 1}`}</span>
+                  <span style={{ fontWeight: 700, fontSize: '0.8rem', color: TXT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.player}</span>
+                </div>
+                <div style={{ flexShrink: 0 }}>
+                  <span style={{ fontFamily: DISP, fontSize: '1.05rem', color: i === 0 ? ORG : MUT, letterSpacing: '.5px' }}>{Number(e.dist)}</span>
+                  <span style={{ fontSize: '0.6rem', color: DIM, marginLeft: 2 }}>yds</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, paddingLeft: 19 }}>
+                {e.org?.avatarUrl && (
+                  <img src={e.org.avatarUrl} onError={(ev) => { ev.target.style.display = 'none'; }} style={{ width: 16, height: 16, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                )}
+                {e.org?.country && <span style={{ fontSize: 11, flexShrink: 0 }}>{countryFlag(e.org.country)}</span>}
+                <span style={{ fontSize: '0.66rem', color: DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {e.org?.courseName || e.org?.fullName || '—'}
+                </span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function WeeklyCategoryScroll({ categories, weekStart, weekEnd }) {
+  const rangeLabel = fmtWeekRange(weekStart, weekEnd);
+  const daysLeft = daysUntilWeekReset(weekEnd);
+  return (
+    <div style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, overflow: 'hidden' }}>
+      <div style={{ padding: '1rem 1.25rem', borderBottom: `1px solid ${BDR}` }}>
+        <h2 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>This Week's Leaderboard</h2>
+        <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: MUT }}>
+          {rangeLabel} · resets in {daysLeft} day{daysLeft === 1 ? '' : 's'} · every category, platform-wide
+        </p>
+      </div>
+      <div style={{ padding: '1.1rem 1.25rem' }}>
+        <InfiniteScrollRow items={categories} renderItem={(cat) => <WeeklyCategoryCard cat={cat} />} />
+      </div>
     </div>
   );
 }
@@ -763,6 +932,7 @@ export default function DashboardPage() {
   const [totalClubs, setTotalClubs] = useState(null);
   const [globalAvgBest, setGlobalAvgBest] = useState(null);
   const [weeklyData, setWeeklyData] = useState(null);
+  const [weeklyCategoryLeaders, setWeeklyCategoryLeaders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -824,6 +994,30 @@ export default function DashboardPage() {
       .select('orgId, dist, age, hcp, gender, date, player, club')
       .gte('date', weekStart.toISOString())
       .lt('date', weekEnd.toISOString());
+
+    // For club/venue accounts, the weekly leaderboard shows every category at
+    // once (matching the homepage's widget) instead of just the club's own
+    // single best category — a club logs drives on behalf of many different
+    // players across many categories, so "my one category" doesn't fit them.
+    if (clubData.accountType === 'club') {
+      const orgIds = [...new Set((weeklyAllEntries || []).map((e) => e.orgId))];
+      const { data: weeklyOrgs } = orgIds.length
+        ? await supabase.from('clubs').select('id, courseName, fullName, avatarUrl, country').in('id', orgIds)
+        : { data: [] };
+      const orgMap = new Map((weeklyOrgs || []).map((o) => [o.id, o]));
+
+      const CATEGORY_KEYS = ['male_open', 'male_high_hcp', 'female_open', 'female_high_hcp', 'youth', 'senior'];
+      const categoryLeaders = CATEGORY_KEYS.map((key) => ({
+        key,
+        label: getCategoryLabel(key),
+        top3: (weeklyAllEntries || [])
+          .filter((e) => getCategory(e) === key)
+          .sort((a, b) => Number(b.dist) - Number(a.dist))
+          .slice(0, 3)
+          .map((e) => ({ ...e, org: orgMap.get(e.orgId) })),
+      }));
+      setWeeklyCategoryLeaders(categoryLeaders);
+    }
 
     if (myWeeklyEntries.length === 0) {
       // Not submitted yet this week — show the overall weekly top 5 across all
@@ -1057,8 +1251,13 @@ export default function DashboardPage() {
           <VsAverageBar myBest={longest} globalAvg={globalAvgBest} label="All Clubs on Platform" />
         )}
 
-        {/* Weekly leaderboard — split by category, resets every Monday */}
-        {weeklyData && <WeeklyLeaderboard weeklyData={weeklyData} />}
+        {/* Weekly leaderboard — club/venue accounts see every category, horizontal-scrolling,
+            matching the homepage's widget. Individual accounts keep the single-category view. */}
+        {club?.accountType === 'club' && weeklyData ? (
+          <WeeklyCategoryScroll categories={weeklyCategoryLeaders} weekStart={weeklyData.weekStart} weekEnd={weeklyData.weekEnd} />
+        ) : (
+          weeklyData && <WeeklyLeaderboard weeklyData={weeklyData} />
+        )}
 
         {/* Player breakdown (club accounts with multiple players) */}
         {club?.accountType === 'club' && entries.length > 0 && (
@@ -1074,6 +1273,7 @@ export default function DashboardPage() {
           }
           lastDriveDate={lastDriveDate}
           limitToFree={club?.accountType === 'simulator' && !club?.isPremium}
+          isClub={club?.accountType === 'club'}
         />
 
         {/* TV Display & Sponsors promo — club accounts only */}
