@@ -153,8 +153,8 @@ export default function App({ Component, pageProps }) {
       tournament: form.tournament,
       gender: form.gender,
       is_simulator: isSimulator,
-      venue_id: form.venueId || null,
-      facility_name: form.facility || null,
+      venueId: form.venueId || null,
+      facility: form.facility || null,
       player_email: form.playerEmail || null,
     };
 
