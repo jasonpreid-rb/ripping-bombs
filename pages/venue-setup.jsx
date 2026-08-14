@@ -183,15 +183,13 @@ function WidgetSnippet({ slug }) {
   );
 }
 
-// Sponsor logo spec sheet — quick reference so uploads work right the first time.
-// NOTE: these are recommended specs, not yet confirmed against SponsorLogoUploader's
-// actual enforced limits — tighten/loosen once that component is checked.
+// Sponsor logo spec sheet — matches SponsorLogoUploader.jsx and the actual
+// .sponsor-stage-logo box on the TV display (320×60px, object-fit: contain).
 function SponsorSpecs() {
   const specs = [
-    { label: 'File type', value: 'PNG or JPG (PNG with transparent background preferred)' },
-    { label: 'Recommended max size', value: '2 MB' },
-    { label: 'Recommended dimensions', value: '600 × 200px (3:1 landscape)' },
-    { label: 'Minimum width', value: '300px — smaller logos may look blurry on large TVs' },
+    { label: 'File type', value: 'PNG or SVG with a transparent background (looks best on the dark display); JPEG and WEBP also accepted' },
+    { label: 'Shape', value: 'Wide and short — around 5:1, like a banner rather than a square or tall logo' },
+    { label: 'Ideal size', value: '~640 × 120px or larger keeps it crisp even on 4K TVs. Bigger gets scaled down automatically; a tall or square logo will just look small, centered in a wide box' },
   ];
 
   return (

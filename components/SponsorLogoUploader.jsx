@@ -1,6 +1,12 @@
 import { useState } from 'react';
 
-const MAX_DIMENSION = 400;
+// The TV display renders on a fixed 1920×1080 canvas, then scales up via
+// CSS transform to fill the physical screen — so a 4K TV renders at 2x.
+// The sponsor logo box itself is 320×60px (see .sponsor-stage-logo in
+// venue-display/[slug].jsx), which needs ~640×120 physical pixels to stay
+// sharp at 2x. 800 gives that headroom without bloating uploads for
+// smaller/1080p venues.
+const MAX_DIMENSION = 800;
 
 // Same resize approach as AvatarUploader, but outputs PNG instead of JPEG
 // so transparent backgrounds (very common in sponsor logos) are preserved.
