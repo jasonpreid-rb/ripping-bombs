@@ -341,7 +341,7 @@ function VsAverageBar({ myBest, globalAvg, label }) {
 }
 
 // Standalone hero strip for global rank — sits between header and stat cards
-function RankStrip({ rank, totalClubs, percentile, category }) {
+function RankStrip({ rank, totalClubs, percentile, category, countryRank, countryTotal, countryPercentile, countryCode, myVenueRank, myVenueTotal, myVenuePercentile, myVenueName }) {
   if (!rank) return null;
   return (
     <div style={{
@@ -380,6 +380,54 @@ function RankStrip({ rank, totalClubs, percentile, category }) {
           </span>
         )}
       </div>
+
+      {/* Country rank — secondary row, only shown once we have a country
+          match for this account. width:100% forces it onto its own line
+          within the wrapping flex row above. */}
+      {countryRank && (
+        <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', borderTop: '1px solid rgba(255,0,144,0.2)', paddingTop: 10, marginTop: 2 }}>
+          {countryCode && cloneElement(countryFlag(countryCode), { style: { width: 20, height: 15, objectFit: 'cover', borderRadius: 2, flexShrink: 0 } })}
+          <span style={{ fontSize: '1.05rem', fontWeight: 800, color: TXT, letterSpacing: '-0.01em' }}>
+            #{countryRank}
+          </span>
+          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: MUT, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            in {countryCode || 'your country'}
+          </span>
+          {countryPercentile != null && (
+            <span style={{ background: 'rgba(255,255,255,0.08)', color: MUT, border: `1px solid ${BDR}`, borderRadius: 20, padding: '2px 10px', fontSize: '0.72rem', fontWeight: 600 }}>
+              Top {countryPercentile}%
+            </span>
+          )}
+          {countryTotal && (
+            <span style={{ fontSize: '0.74rem', color: MUT }}>
+              of {countryTotal.toLocaleString()}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Venue rank — third row, only shown once we know which venue the
+          player's best drive came from and have other entries to compare against. */}
+      {myVenueRank && (
+        <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', borderTop: '1px solid rgba(255,0,144,0.2)', paddingTop: 10, marginTop: 2 }}>
+          <span style={{ fontSize: '1.05rem', fontWeight: 800, color: TXT, letterSpacing: '-0.01em' }}>
+            #{myVenueRank}
+          </span>
+          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: MUT, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            at {myVenueName || 'this venue'}
+          </span>
+          {myVenuePercentile != null && (
+            <span style={{ background: 'rgba(255,255,255,0.08)', color: MUT, border: `1px solid ${BDR}`, borderRadius: 20, padding: '2px 10px', fontSize: '0.72rem', fontWeight: 600 }}>
+              Top {myVenuePercentile}%
+            </span>
+          )}
+          {myVenueTotal && (
+            <span style={{ fontSize: '0.74rem', color: MUT }}>
+              of {myVenueTotal.toLocaleString()}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -1001,6 +1049,11 @@ export default function DashboardPage() {
   const [rank, setRank] = useState(null);
   const [totalClubs, setTotalClubs] = useState(null);
   const [globalAvgBest, setGlobalAvgBest] = useState(null);
+  const [countryRank, setCountryRank] = useState(null);
+  const [countryTotal, setCountryTotal] = useState(null);
+  const [myVenueRank, setMyVenueRank] = useState(null);
+  const [myVenueTotal, setMyVenueTotal] = useState(null);
+  const [myVenueName, setMyVenueName] = useState(null);
   const [venueRank, setVenueRank] = useState(null);
   const [venueTotalRanked, setVenueTotalRanked] = useState(null);
   const [venueScorePercentile, setVenueScorePercentile] = useState(null);
@@ -1048,6 +1101,41 @@ export default function DashboardPage() {
       setRank(beatenBy + 1);
       setTotalClubs(allBests.length);
       setGlobalAvgBest(avg(allBests));
+
+      // Country rank — same "best drive per account" comparison as global rank,
+      // narrowed to accounts registered in the same country as this player.
+      // Country lives on the account (clubs table), not on individual entries,
+      // so this is a second lightweight query filtered at the DB level.
+      const myCountry = freshClub?.country || clubData.country;
+      if (myCountry) {
+        const { data: countryOrgs } = await supabase.from('clubs').select('id').eq('country', myCountry);
+        const countryIds = new Set((countryOrgs || []).map((o) => o.id));
+        countryIds.add(clubData.id); // guard in case this account's own row lags the query above
+        const countryBests = Object.entries(bestPerClub).filter(([id]) => countryIds.has(id));
+        const countryBeatenBy = countryBests.filter(([id, d]) => id !== clubData.id && d > myBest).length;
+        setCountryRank(countryBeatenBy + 1);
+        setCountryTotal(countryBests.length);
+      }
+
+      // Venue rank — where does this player's best drive rank among everyone
+      // who's submitted at that same registered venue? Based on `courseName`
+      // on the entry itself (set from the venue dropdown at submission time),
+      // not on the account's own venue — a player can submit from many venues.
+      const myVenue = sorted[0]?.courseName;
+      if (myVenue) {
+        const { data: venueEntries } = await supabase.from('entries').select('orgId, dist').eq('courseName', myVenue);
+        if (venueEntries) {
+          const bestPerVenueAccount = {};
+          venueEntries.forEach((e) => {
+            const d = Number(e.dist);
+            if (!bestPerVenueAccount[e.orgId] || d > bestPerVenueAccount[e.orgId]) bestPerVenueAccount[e.orgId] = d;
+          });
+          const venueBeatenBy = Object.entries(bestPerVenueAccount).filter(([id, d]) => id !== clubData.id && d > myBest).length;
+          setMyVenueRank(venueBeatenBy + 1);
+          setMyVenueTotal(Object.keys(bestPerVenueAccount).length);
+          setMyVenueName(myVenue);
+        }
+      }
     }
 
     // ——— Venue global composite rank (club accounts only) ———
@@ -1318,6 +1406,8 @@ export default function DashboardPage() {
   // Rank percentile label
   const percentile = rank && totalClubs ? Math.round((rank / totalClubs) * 100) : null;
   const rankSub = percentile != null ? `Top ${percentile}% globally` : null;
+  const countryPercentile = countryRank && countryTotal ? Math.round((countryRank / countryTotal) * 100) : null;
+  const myVenuePercentile = myVenueRank && myVenueTotal ? Math.round((myVenueRank / myVenueTotal) * 100) : null;
 
   if (loading) {
     return (
@@ -1385,7 +1475,20 @@ export default function DashboardPage() {
             categoriesCounted={venueCategoriesCounted}
           />
         ) : (
-          <RankStrip rank={rank} totalClubs={totalClubs} percentile={percentile} category={bestCategory} />
+          <RankStrip
+            rank={rank}
+            totalClubs={totalClubs}
+            percentile={percentile}
+            category={bestCategory}
+            countryRank={countryRank}
+            countryTotal={countryTotal}
+            countryPercentile={countryPercentile}
+            countryCode={club?.country}
+            myVenueRank={myVenueRank}
+            myVenueTotal={myVenueTotal}
+            myVenuePercentile={myVenuePercentile}
+            myVenueName={myVenueName}
+          />
         )}
 
         {/* Stat cards */}
