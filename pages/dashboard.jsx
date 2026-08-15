@@ -610,12 +610,23 @@ function DriveHistory({ entries, lastDriveDate, limitToFree, isClub }) {
 
 // Weekly leaderboard — split by category, resets every Monday
 const WEEKLY_MEDALS = ['🥇', '🥈', '🥉'];
+// Individual/simulator accounts' own single-category weekly view. Reuses
+// WeeklyCategoryCard — the exact same card component the club/venue scroll
+// row renders — so a player sees their category in the identical visual
+// style as the homepage, just as a single static card instead of a scroll
+// row of six, since only one category is relevant to them.
 function WeeklyLeaderboard({ weeklyData }) {
   const { weekStart, weekEnd, hasSubmitted, category, myBest, rank, total, top5, clubId } = weeklyData;
   const rangeLabel = fmtWeekRange(weekStart, weekEnd);
   const daysLeft = daysUntilWeekReset(weekEnd);
   const hasEntries = top5.length > 0;
   const leaderDist = hasEntries ? Number(top5[0].dist) : null;
+
+  const cat = {
+    key: category || 'overall',
+    label: category ? getCategoryLabel(category) : "This Week's Leaders",
+    top3: top5,
+  };
 
   return (
     <div style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, overflow: 'hidden' }}>
@@ -626,54 +637,32 @@ function WeeklyLeaderboard({ weeklyData }) {
         </p>
       </div>
 
-      {!hasEntries ? (
-        <div style={{ padding: '2rem 1.25rem', textAlign: 'center', color: MUT }}>
-          <p style={{ marginBottom: '1rem', fontSize: '0.88rem' }}>No drives submitted this week yet — every category resets Monday, so this is your chance to lead it.</p>
-          <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, padding: '0.55rem 1.25rem', borderRadius: 7, textDecoration: 'none', fontSize: '0.9rem' }}>Submit this week's drive →</a>
+      {hasSubmitted && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', padding: '1.1rem 1.25rem 0' }}>
+          <StatCard label={`Weekly Rank · ${getCategoryLabel(category)}`} value={rank ? `#${rank}` : '—'} accent sub={total ? `of ${total} this week` : null} />
+          <StatCard label="This Week's Best" value={fmt(myBest)} />
         </div>
-      ) : (
-        <>
-          {hasSubmitted ? (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', padding: '1.1rem 1.25rem', borderBottom: `1px solid ${BDR}` }}>
-              <StatCard label={`Weekly Rank · ${getCategoryLabel(category)}`} value={rank ? `#${rank}` : '—'} accent sub={total ? `of ${total} this week` : null} />
-              <StatCard label="This Week's Best" value={fmt(myBest)} />
-            </div>
-          ) : (
-            <div style={{ padding: '0.9rem 1.25rem', borderBottom: `1px solid ${BDR}`, background: 'rgba(255,0,144,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-              <div style={{ fontSize: '0.82rem', color: TXT }}>
-                This week's leader is out at <strong style={{ color: ORG }}>{fmt(leaderDist)}</strong> — think you can beat it?
-              </div>
-              <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.78rem', padding: '0.4rem 0.9rem', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}>Submit your drive →</a>
-            </div>
-          )}
-
-          <div>
-            {top5.map((e, i) => {
-              const isMe = e.orgId === clubId;
-              return (
-                <div key={`${e.orgId}-${i}`}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '0.8rem 1.25rem', borderBottom: i < top5.length - 1 ? `1px solid ${BDR}` : 'none', background: isMe ? 'rgba(255,0,144,0.06)' : 'transparent' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
-                    <span style={{ fontSize: '0.95rem', width: 22, flexShrink: 0, textAlign: 'center', color: DIM }}>{WEEKLY_MEDALS[i] || `#${i + 1}`}</span>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontWeight: 700, fontSize: '0.85rem', color: isMe ? ORG : TXT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {e.player}{isMe ? ' (you)' : ''}
-                      </div>
-                      <div style={{ fontSize: '0.72rem', color: DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {e.club || '—'}
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ flexShrink: 0, textAlign: 'right' }}>
-                    <span style={{ fontFamily: DISP, fontSize: '1.25rem', letterSpacing: '.5px', color: i === 0 ? ORG : TXT }}>{Number(e.dist)}</span>
-                    <span style={{ fontSize: '0.68rem', color: DIM, marginLeft: 3 }}>yds</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </>
       )}
+
+      {!hasSubmitted && hasEntries && (
+        <div style={{ margin: '1.1rem 1.25rem 0', padding: '0.9rem 1.1rem', borderRadius: 8, background: 'rgba(255,0,144,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+          <div style={{ fontSize: '0.82rem', color: TXT }}>
+            This week's leader is out at <strong style={{ color: ORG }}>{fmt(leaderDist)}</strong> — think you can beat it?
+          </div>
+          <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.78rem', padding: '0.4rem 0.9rem', borderRadius: 6, textDecoration: 'none', whiteSpace: 'nowrap' }}>Submit your drive →</a>
+        </div>
+      )}
+
+      <div style={{ padding: '1.1rem 1.25rem' }}>
+        {hasEntries ? (
+          <WeeklyCategoryCard cat={cat} meId={clubId} />
+        ) : (
+          <div style={{ textAlign: 'center', color: MUT, padding: '1rem 0' }}>
+            <p style={{ marginBottom: '1rem', fontSize: '0.88rem' }}>No drives submitted this week yet — every category resets Monday, so this is your chance to lead it.</p>
+            <a href="/submit" style={{ background: ORG, color: '#000', fontWeight: 700, padding: '0.55rem 1.25rem', borderRadius: 7, textDecoration: 'none', fontSize: '0.9rem' }}>Submit this week's drive →</a>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -791,7 +780,7 @@ function InfiniteScrollRow({ items, renderItem, cardWidth = 190, gap = 10 }) {
   );
 }
 
-function WeeklyCategoryCard({ cat }) {
+function WeeklyCategoryCard({ cat, meId }) {
   const { top3, label } = cat;
   return (
     <div style={{ background: BG3, border: `1px solid ${top3.length ? 'rgba(255,0,144,0.2)' : BDR}`, borderRadius: 10, padding: '0.9rem 1rem', display: 'flex', flexDirection: 'column', minHeight: 200, width: '100%', boxSizing: 'border-box' }}>
@@ -800,29 +789,32 @@ function WeeklyCategoryCard({ cat }) {
         {top3.length === 0 ? (
           <div style={{ fontSize: '0.78rem', color: DIM, lineHeight: 1.6 }}>No entry yet —<br />be the first!</div>
         ) : (
-          top3.map((e, i) => (
-            <div key={e.id || `${e.orgId}-${i}`} style={{ display: 'flex', flexDirection: 'column', gap: 3, padding: '0.5rem 0', borderBottom: i < top3.length - 1 ? `1px solid ${BDR}` : 'none' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0, flex: 1, overflow: 'hidden' }}>
-                  <span style={{ fontSize: '0.8rem', flexShrink: 0 }}>{WEEKLY_MEDALS[i] || `#${i + 1}`}</span>
-                  <span style={{ fontWeight: 700, fontSize: '0.8rem', color: TXT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.player}</span>
+          top3.map((e, i) => {
+            const isMe = meId != null && e.orgId === meId;
+            return (
+              <div key={e.id || `${e.orgId}-${i}`} style={{ display: 'flex', flexDirection: 'column', gap: 3, padding: '0.5rem 0', borderBottom: i < top3.length - 1 ? `1px solid ${BDR}` : 'none', background: isMe ? 'rgba(255,0,144,0.08)' : 'transparent', marginLeft: isMe ? -8 : 0, marginRight: isMe ? -8 : 0, paddingLeft: isMe ? 8 : 0, paddingRight: isMe ? 8 : 0, borderRadius: isMe ? 6 : 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0, flex: 1, overflow: 'hidden' }}>
+                    <span style={{ fontSize: '0.8rem', flexShrink: 0 }}>{WEEKLY_MEDALS[i] || `#${i + 1}`}</span>
+                    <span style={{ fontWeight: 700, fontSize: '0.8rem', color: isMe ? ORG : TXT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.player}{isMe ? ' (you)' : ''}</span>
+                  </div>
+                  <div style={{ flexShrink: 0 }}>
+                    <span style={{ fontFamily: DISP, fontSize: '1.05rem', color: i === 0 ? ORG : MUT, letterSpacing: '.5px' }}>{Number(e.dist)}</span>
+                    <span style={{ fontSize: '0.6rem', color: DIM, marginLeft: 2 }}>yds</span>
+                  </div>
                 </div>
-                <div style={{ flexShrink: 0 }}>
-                  <span style={{ fontFamily: DISP, fontSize: '1.05rem', color: i === 0 ? ORG : MUT, letterSpacing: '.5px' }}>{Number(e.dist)}</span>
-                  <span style={{ fontSize: '0.6rem', color: DIM, marginLeft: 2 }}>yds</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, paddingLeft: 19 }}>
+                  {e.org?.avatarUrl && (
+                    <img src={e.org.avatarUrl} onError={(ev) => { ev.target.style.display = 'none'; }} style={{ width: 16, height: 16, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  )}
+                  {e.org?.country && <span style={{ fontSize: 11, flexShrink: 0 }}>{countryFlag(e.org.country)}</span>}
+                  <span style={{ fontSize: '0.66rem', color: DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {e.org?.courseName || e.org?.fullName || '—'}
+                  </span>
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, paddingLeft: 19 }}>
-                {e.org?.avatarUrl && (
-                  <img src={e.org.avatarUrl} onError={(ev) => { ev.target.style.display = 'none'; }} style={{ width: 16, height: 16, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                )}
-                {e.org?.country && <span style={{ fontSize: 11, flexShrink: 0 }}>{countryFlag(e.org.country)}</span>}
-                <span style={{ fontSize: '0.66rem', color: DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {e.org?.courseName || e.org?.fullName || '—'}
-                </span>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
@@ -1231,17 +1223,21 @@ export default function DashboardPage() {
       .gte('date', weekStart.toISOString())
       .lt('date', weekEnd.toISOString());
 
+    // Org lookup (avatar, country, venue name) for whichever accounts show up
+    // in this week's entries — needed by both the club/venue category-scroll
+    // view and the individual player's single-category card, since both now
+    // render entries through the same homepage-style WeeklyCategoryCard.
+    const weeklyOrgIds = [...new Set((weeklyAllEntries || []).map((e) => e.orgId))];
+    const { data: weeklyOrgs } = weeklyOrgIds.length
+      ? await supabase.from('clubs').select('id, courseName, fullName, avatarUrl, country').in('id', weeklyOrgIds)
+      : { data: [] };
+    const weeklyOrgMap = new Map((weeklyOrgs || []).map((o) => [o.id, o]));
+
     // For club/venue accounts, the weekly leaderboard shows every category at
     // once (matching the homepage's widget) instead of just the club's own
     // single best category — a club logs drives on behalf of many different
     // players across many categories, so "my one category" doesn't fit them.
     if (clubData.accountType === 'club') {
-      const orgIds = [...new Set((weeklyAllEntries || []).map((e) => e.orgId))];
-      const { data: weeklyOrgs } = orgIds.length
-        ? await supabase.from('clubs').select('id, courseName, fullName, avatarUrl, country').in('id', orgIds)
-        : { data: [] };
-      const orgMap = new Map((weeklyOrgs || []).map((o) => [o.id, o]));
-
       const CATEGORY_KEYS = ['male_open', 'male_high_hcp', 'female_open', 'female_high_hcp', 'youth', 'senior'];
       const categoryLeaders = CATEGORY_KEYS.map((key) => ({
         key,
@@ -1250,7 +1246,7 @@ export default function DashboardPage() {
           .filter((e) => getCategory(e) === key)
           .sort((a, b) => Number(b.dist) - Number(a.dist))
           .slice(0, 3)
-          .map((e) => ({ ...e, org: orgMap.get(e.orgId) })),
+          .map((e) => ({ ...e, org: weeklyOrgMap.get(e.orgId) })),
       }));
       setWeeklyCategoryLeaders(categoryLeaders);
     }
@@ -1275,7 +1271,7 @@ export default function DashboardPage() {
         myBest: null,
         rank: null,
         total: ranked.length,
-        top5: ranked.slice(0, 5),
+        top5: ranked.slice(0, 5).map((e) => ({ ...e, org: weeklyOrgMap.get(e.orgId) })),
         clubId: clubData.id,
       });
     } else {
@@ -1303,7 +1299,7 @@ export default function DashboardPage() {
         myBest: Number(myBestEntry.dist),
         rank: myIndex >= 0 ? myIndex + 1 : ranked.length + 1,
         total: ranked.length,
-        top5: ranked.slice(0, 5),
+        top5: ranked.slice(0, 5).map((e) => ({ ...e, org: weeklyOrgMap.get(e.orgId) })),
         clubId: clubData.id,
       });
     }
