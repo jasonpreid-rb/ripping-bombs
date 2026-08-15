@@ -384,6 +384,52 @@ function RankStrip({ rank, totalClubs, percentile, category }) {
   );
 }
 
+// Standalone hero strip for venue composite rank (club/venue accounts) — averages
+// each category's percentile rank so a venue isn't judged on one lucky drive or
+// penalized for categories it hasn't got data in yet.
+function VenueRankStrip({ rank, totalVenues, scorePercentile, categoriesCounted }) {
+  if (!rank) return null;
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, rgba(255,0,144,0.14), rgba(255,0,144,0.03))',
+      border: '1px solid rgba(255,0,144,0.35)',
+      borderRadius: 12,
+      padding: '1.25rem 1.5rem',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      flexWrap: 'wrap',
+      gap: '0.75rem',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <span style={{ fontSize: '2.6rem', fontWeight: 900, color: ORG, letterSpacing: '-0.03em', lineHeight: 1 }}>
+          #{rank}
+        </span>
+        <span style={{ fontSize: '0.95rem', fontWeight: 700, color: TXT, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Global Venue Rank
+        </span>
+        {categoriesCounted > 0 && (
+          <span title="Averaged across each category's percentile rank among venues, so no single lucky drive or missing category skews it" style={{ background: 'rgba(255,255,255,0.08)', color: MUT, border: `1px solid ${BDR}`, borderRadius: 20, padding: '3px 11px', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.03em', cursor: 'help' }}>
+            {categoriesCounted} {categoriesCounted === 1 ? 'category' : 'categories'} counted
+          </span>
+        )}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+        {scorePercentile != null && (
+          <span style={{ background: 'rgba(255,0,144,0.16)', color: ORG, border: '1px solid rgba(255,0,144,0.3)', borderRadius: 20, padding: '4px 12px', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.03em' }}>
+            Top {scorePercentile}% avg. across categories
+          </span>
+        )}
+        {totalVenues && (
+          <span style={{ fontSize: '0.78rem', color: MUT }}>
+            of {totalVenues.toLocaleString()} venues worldwide
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Per-player breakdown table (for club accounts)
 function PlayerBreakdown({ entries }) {
   const players = {};
@@ -955,6 +1001,10 @@ export default function DashboardPage() {
   const [rank, setRank] = useState(null);
   const [totalClubs, setTotalClubs] = useState(null);
   const [globalAvgBest, setGlobalAvgBest] = useState(null);
+  const [venueRank, setVenueRank] = useState(null);
+  const [venueTotalRanked, setVenueTotalRanked] = useState(null);
+  const [venueScorePercentile, setVenueScorePercentile] = useState(null);
+  const [venueCategoriesCounted, setVenueCategoriesCounted] = useState(0);
   const [weeklyData, setWeeklyData] = useState(null);
   const [weeklyCategoryLeaders, setWeeklyCategoryLeaders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -998,6 +1048,75 @@ export default function DashboardPage() {
       setRank(beatenBy + 1);
       setTotalClubs(allBests.length);
       setGlobalAvgBest(avg(allBests));
+    }
+
+    // ——— Venue global composite rank (club accounts only) ———
+    // A venue's raw longest drive is really just the longest drive by whichever
+    // one player happened to submit through them — it doesn't say much about the
+    // venue itself, and it can't be compared apples-to-apples across categories
+    // with very different typical distances. So instead: rank all venues within
+    // each category, turn that into a percentile, then average the percentiles
+    // across whichever categories the venue actually has data in. A minimum
+    // drive count per category keeps one fluke submission from swinging things.
+    if ((freshClub?.accountType || clubData.accountType) === 'club') {
+      const MIN_DRIVES_PER_CATEGORY = 3;
+      const CATEGORY_KEYS = ['male_open', 'male_high_hcp', 'female_open', 'female_high_hcp', 'senior', 'youth'];
+
+      const { data: venueRows } = await supabase.from('clubs').select('id').eq('accountType', 'club');
+      const venueIds = new Set((venueRows || []).map((v) => v.id));
+
+      const { data: entriesForVenues } = await supabase.from('entries').select('orgId, dist, age, hcp, gender');
+      const venueEntries = (entriesForVenues || []).filter((e) => venueIds.has(e.orgId));
+
+      const perCategory = {};
+      CATEGORY_KEYS.forEach((key) => { perCategory[key] = {}; });
+      venueEntries.forEach((e) => {
+        const cat = getCategory(e);
+        const bucket = perCategory[cat];
+        if (!bucket) return;
+        const d = Number(e.dist);
+        if (!bucket[e.orgId]) bucket[e.orgId] = { best: d, count: 1 };
+        else {
+          bucket[e.orgId].count += 1;
+          if (d > bucket[e.orgId].best) bucket[e.orgId].best = d;
+        }
+      });
+
+      // Per category: rank eligible venues by best drive, convert rank -> percentile
+      // (lower % = better, matching the "Top X%" convention used elsewhere).
+      const venuePercentiles = {};
+      CATEGORY_KEYS.forEach((key) => {
+        const eligible = Object.entries(perCategory[key]).filter(([, v]) => v.count >= MIN_DRIVES_PER_CATEGORY);
+        const n = eligible.length;
+        if (n === 0) return;
+        eligible
+          .sort((a, b) => b[1].best - a[1].best)
+          .forEach(([orgId], idx) => {
+            const catPercentile = ((idx + 1) / n) * 100;
+            if (!venuePercentiles[orgId]) venuePercentiles[orgId] = [];
+            venuePercentiles[orgId].push(catPercentile);
+          });
+      });
+
+      const composite = {};
+      Object.entries(venuePercentiles).forEach(([orgId, arr]) => {
+        composite[orgId] = arr.reduce((s, v) => s + v, 0) / arr.length;
+      });
+
+      const compositeRanked = Object.entries(composite).sort((a, b) => a[1] - b[1]);
+      const myIndex = compositeRanked.findIndex(([orgId]) => orgId === clubData.id);
+
+      setVenueTotalRanked(compositeRanked.length || null);
+      if (myIndex >= 0) {
+        setVenueRank(myIndex + 1);
+        setVenueScorePercentile(Math.round(composite[clubData.id]));
+        setVenueCategoriesCounted(venuePercentiles[clubData.id].length);
+      } else {
+        // Not enough qualifying drives yet in any category to be ranked
+        setVenueRank(null);
+        setVenueScorePercentile(null);
+        setVenueCategoriesCounted(0);
+      }
     }
 
     // ——— Weekly leaderboard, split by category, Monday-start week ———
@@ -1254,8 +1373,20 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Global rank — standalone hero strip */}
-        <RankStrip rank={rank} totalClubs={totalClubs} percentile={percentile} category={bestCategory} />
+        {/* Global rank — standalone hero strip. Club accounts get the composite
+            cross-category venue rank; individual/simulator accounts keep the
+            single-best-drive rank, since that metric actually makes sense for
+            one person. */}
+        {club?.accountType === 'club' ? (
+          <VenueRankStrip
+            rank={venueRank}
+            totalVenues={venueTotalRanked}
+            scorePercentile={venueScorePercentile}
+            categoriesCounted={venueCategoriesCounted}
+          />
+        ) : (
+          <RankStrip rank={rank} totalClubs={totalClubs} percentile={percentile} category={bestCategory} />
+        )}
 
         {/* Stat cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.85rem' }}>
