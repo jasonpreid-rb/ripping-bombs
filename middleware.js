@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
 
-// AI crawlers and scrapers to block at the edge
+// AI training crawlers to block at the edge — these harvest content
+// periodically to build/update models, unrelated to any specific user
+// query. Deliberately does NOT include retrieval/citation crawlers
+// (OAI-SearchBot, ChatGPT-User, PerplexityBot, Amazonbot, Claude-User,
+// Claude-SearchBot, Perplexity-User) since blocking those prevents the
+// site from being discoverable or citable in AI-assisted search/answers.
+// AI crawler user-agents change a few times a year — worth revisiting.
 const BLOCKED_AGENTS = [
   'gptbot',
-  'chatgpt-user',
   'claudebot',
   'anthropic-ai',
   'google-extended',
@@ -14,9 +19,7 @@ const BLOCKED_AGENTS = [
   'bytespider',
   'imagesiftbot',
   'cohere-ai',
-  'perplexitybot',
   'youbot',
-  'amazonbot',
   'applebot-extended',
   'timpibot',
   'webzio-extended',
