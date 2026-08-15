@@ -312,7 +312,10 @@ export default function LeaderboardPage(props) {
       <div style={{padding:'28px 18px 80px',maxWidth:1000,margin:'0 auto'}}>
         {/* Sample data CTA */}
         <h1 style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:1,marginBottom:8,fontWeight:400}}>Global Golf Longest Drive Leaderboard</h1>
-        <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginBottom:20}}>New rankings every week — submit your drive to compete in this week's championship.</div>
+        <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginBottom:20}}>
+          New rankings every week — submit your drive to compete in this week's championship.{' '}
+          <Link href="/venue-leaderboard" style={{color:ORG,textDecoration:'none',borderBottom:'1px solid rgba(255,0,144,0.3)'}}>See how venues rank &rarr;</Link>
+        </div>
 
         {/* Week nav */}
         <div style={{background:allTime?BG2:'linear-gradient(135deg,rgba(255,0,144,0.14),rgba(255,0,144,0.03))',border:`1px solid ${allTime?BDR:'rgba(255,0,144,0.3)'}`,padding:'16px 20px',marginBottom:20,display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:14}}>

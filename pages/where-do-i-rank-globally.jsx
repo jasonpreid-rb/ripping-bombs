@@ -309,6 +309,7 @@ export default function WhereDoIRankGlobally({ totalGolfers, totalDrives, longes
         <Link href="/average-driver-distance-by-handicap" style={linkStyle}>Average Driver Distance By Handicap</Link>{' | '}
         <Link href="/golf-handicap-driving-distance" style={linkStyle}>Golf Handicap And Driving Distance</Link>{' | '}
         <Link href="/longest-drives-this-week" style={linkStyle}>Longest Drives This Week</Link>{' | '}
+        <Link href="/venue-leaderboard" style={linkStyle}>Venue Leaderboard</Link>{' | '}
         <Link href="/hall-of-fame" style={linkStyle}>Hall of Fame</Link>
       </SeoP>
 
