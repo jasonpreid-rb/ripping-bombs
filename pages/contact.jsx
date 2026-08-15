@@ -81,7 +81,7 @@ export default function ContactPage() {
           <div>
             <div style={{ fontFamily:DISP, fontSize:22, color:TXT, letterSpacing:1, marginBottom:20 }}>SEND A MESSAGE</div>
             {status==='success'
-              ? <div style={{ background:'rgba(163,230,53,0.1)', border:'1px solid rgba(163,230,53,0.3)', padding:'20px 24px', fontFamily:SANS, fontSize:14, color:ORG, fontWeight:600 }}>✓ Message sent! We'll be in touch shortly.</div>
+              ? <div style={{ background:'rgba(255,0,144,0.1)', border:'1px solid rgba(255,0,144,0.3)', padding:'20px 24px', fontFamily:SANS, fontSize:14, color:ORG, fontWeight:600 }}>✓ Message sent! We'll be in touch shortly.</div>
               : <>
                   <div style={{ marginBottom:14 }}>
                     <label style={{ display:'block', fontFamily:SANS, fontSize:11, fontWeight:600, color:MUT, marginBottom:5, textTransform:'uppercase', letterSpacing:.8 }}>Enquiry Type</label>
