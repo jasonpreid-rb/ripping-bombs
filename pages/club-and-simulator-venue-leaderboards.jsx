@@ -82,6 +82,12 @@ export default function ClubAndSimulatorVenueLeaderboards() {
         Simulator accounts can submit one drive per week. In practice, that means a player visits, takes their best shot at that week's leaderboard, then has a built-in reason to come back the following week and try to beat it — at your venue, on your simulators.
       </SeoP>
 
+      <SeoH2>How Does Our Venue Compare To Others?</SeoH2>
+      <SeoP>
+        Once your venue has enough submitted drives, it's ranked against every other registered venue worldwide — see{' '}
+        <a href="/venue-rankings" style={linkStyle}>venue rankings</a> for how the score is calculated and where venues currently stand.
+      </SeoP>
+
       <SeoCTA />
 
       <SeoH2>FAQ</SeoH2>

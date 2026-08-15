@@ -168,13 +168,13 @@ function VenueTable({ rows }) {
 export default function VenueLeaderboard({ ranked, totalVenuesRanked, totalVenuesTracked, totalDrives, topVenue }) {
   return (
     <SeoPage
-      title="Venue Leaderboard: How Golf & Simulator Venues Rank Globally | Ripping Bombs"
-      description="See how golf clubs and simulator venues rank against each other worldwide on Ripping Bombs, how the venue ranking score works, and where your venue stands right now."
+      title="Venue Rankings: How Golf & Simulator Venues Compete Globally | Ripping Bombs"
+      description="See how golf clubs and simulator venues compete against each other worldwide on Ripping Bombs — how the venue ranking score is calculated, the live rankings right now, and how your venue can climb them."
     >
       <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 10 }}>
         Live Venue Rankings
       </div>
-      <SeoH1>Venue Leaderboard: How Golf Venues Rank Against Each Other</SeoH1>
+      <SeoH1>Venue Rankings: How Golf Venues Compete Against Each Other</SeoH1>
       <SeoP>
         Every club and simulator venue on Ripping Bombs is competing on more than just one lucky drive. We track
         every submission from every venue worldwide and roll it up into a single, fair global venue ranking — so
@@ -259,9 +259,17 @@ export default function VenueLeaderboard({ ranked, totalVenuesRanked, totalVenue
         percentile way but against other individual golfers in their category.
       </SeoP>
 
+      <SeoH2>Don't Have a Venue Page Yet?</SeoH2>
+      <SeoP>
+        Every registered club and simulator venue gets its own free, auto-generated leaderboard page — see{' '}
+        <Link href="/club-and-simulator-venue-leaderboards" style={linkStyle}>how venue pages work</Link> for how
+        registration, approval, and tagging drives to your venue works before you show up here.
+      </SeoP>
+
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
         <Link href="/leaderboard" style={linkStyle}>Global Drives Leaderboard</Link>{' | '}
+        <Link href="/club-and-simulator-venue-leaderboards" style={linkStyle}>Club & Simulator Venue Leaderboards</Link>{' | '}
         <Link href="/where-do-i-rank-globally" style={linkStyle}>Where Do I Rank Globally?</Link>{' | '}
         <Link href="/average-driver-distance-by-handicap" style={linkStyle}>Average Driver Distance By Handicap</Link>{' | '}
         <Link href="/longest-drives-this-week" style={linkStyle}>Longest Drives This Week</Link>{' | '}

@@ -314,7 +314,7 @@ export default function LeaderboardPage(props) {
         <h1 style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:1,marginBottom:8,fontWeight:400}}>Global Golf Longest Drive Leaderboard</h1>
         <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginBottom:20}}>
           New rankings every week — submit your drive to compete in this week's championship.{' '}
-          <Link href="/venue-leaderboard" style={{color:ORG,textDecoration:'none',borderBottom:'1px solid rgba(255,0,144,0.3)'}}>See how venues rank &rarr;</Link>
+          <Link href="/venue-rankings" style={{color:ORG,textDecoration:'none',borderBottom:'1px solid rgba(255,0,144,0.3)'}}>See how venues rank &rarr;</Link>
         </div>
 
         {/* Week nav */}
