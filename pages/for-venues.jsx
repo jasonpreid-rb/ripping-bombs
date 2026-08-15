@@ -179,12 +179,12 @@ export default function ForVenues() {
           height: 100%;
           object-fit: cover;
           transform: translate(-50%, -50%) scale(1.08);
-          filter: blur(7px) brightness(0.45);
+          filter: blur(7px) brightness(0.75);
         }
         .hero-bg-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(180deg, rgba(8,8,12,0.55) 0%, rgba(8,8,12,0.85) 75%, ${BG2 || '#08080c'} 100%);
+          background: linear-gradient(180deg, rgba(8,8,12,0.25) 0%, rgba(8,8,12,0.55) 75%, ${BG2 || '#08080c'} 100%);
         }
         .hero-content {
           position: relative;
@@ -205,6 +205,7 @@ export default function ForVenues() {
           line-height: 1.05;
           letter-spacing: 0.5px;
           margin: 0 0 20px;
+          text-shadow: 0 2px 24px rgba(0,0,0,0.55);
         }
         .sub {
           font-size: 16px;
