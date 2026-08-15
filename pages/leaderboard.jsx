@@ -159,7 +159,20 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:11,color:DIM}}>{fmtDate(e.date)}</td>
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:10,fontWeight:600,color:ORG}}>{tier(e.dist)}</td>
                 <td style={{padding:'12px 14px'}}>
-                  <button onClick={ev=>{ev.stopPropagation();onShare(e);}} style={{background:`linear-gradient(135deg,#FF0090,#ff66c4)`,border:'none',color:'#fff',padding:'6px 12px',cursor:'pointer',fontSize:11,fontFamily:SANS,fontWeight:700,letterSpacing:.5}}>↗ SHARE</button>
+                  <button
+                    onClick={ev=>{ev.stopPropagation();onShare(e);}}
+                    aria-label="Share drive"
+                    title="Share"
+                    style={{background:'transparent',border:'none',padding:6,cursor:'pointer',display:'inline-flex',alignItems:'center',justifyContent:'center',lineHeight:0,borderRadius:6}}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={ORG} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="18" cy="5" r="3"/>
+                      <circle cx="6" cy="12" r="3"/>
+                      <circle cx="18" cy="19" r="3"/>
+                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                  </button>
                 </td>
               </tr>
             );
