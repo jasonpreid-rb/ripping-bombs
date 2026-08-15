@@ -30,24 +30,26 @@ export default function ForVenues() {
 
       <div className="page">
         <section className="hero">
-          <div className="eyebrow">FOR VENUES</div>
-          <h1>
-            A leaderboard your players<br />can't stop watching
-          </h1>
-          <p className="sub">
-            Drop this on any TV in your bays or clubhouse. It updates itself, rotates through
-            divisions automatically, and gives every golfer a reason to come back and chase
-            the board. Here's exactly what it looks like, running live right now.
-          </p>
-        </section>
-
-        <section className="venue-photo">
-          <img
-            src="/images/leaderboard-venue.png"
-            alt="The Ripping Bombs leaderboard running on a TV at Highland Ridge Golf Club, next to a live simulator bay"
-            loading="lazy"
-          />
-          <div className="venue-caption">Live at Highland Ridge Golf Club — Austin, TX</div>
+          <div className="hero-bg">
+            <img
+              src="/images/leaderboard-venue.png"
+              alt=""
+              aria-hidden="true"
+              loading="eager"
+            />
+            <div className="hero-bg-overlay" />
+          </div>
+          <div className="hero-content">
+            <div className="eyebrow">FOR VENUES</div>
+            <h1>
+              A leaderboard your players<br />can't stop watching
+            </h1>
+            <p className="sub">
+              Drop this on any TV in your bays or clubhouse. It updates itself, rotates through
+              divisions automatically, and gives every golfer a reason to come back and chase
+              the board. Here's exactly what it looks like, running live right now.
+            </p>
+          </div>
         </section>
 
         <section className="tv-wrap">
@@ -158,9 +160,37 @@ export default function ForVenues() {
           padding: 80px 24px 100px;
         }
         .hero {
-          max-width: 720px;
-          margin: 0 auto 56px;
+          position: relative;
+          margin: -80px -24px 56px;
+          padding: 140px 24px 90px;
           text-align: center;
+          overflow: hidden;
+        }
+        .hero-bg {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+        }
+        .hero-bg img {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transform: translate(-50%, -50%) scale(1.08);
+          filter: blur(7px) brightness(0.45);
+        }
+        .hero-bg-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(8,8,12,0.55) 0%, rgba(8,8,12,0.85) 75%, ${BG2 || '#08080c'} 100%);
+        }
+        .hero-content {
+          position: relative;
+          z-index: 1;
+          max-width: 720px;
+          margin: 0 auto;
         }
         .eyebrow {
           font-size: 12px;
@@ -182,29 +212,6 @@ export default function ForVenues() {
           color: ${MUT || '#8a8a96'};
           max-width: 560px;
           margin: 0 auto;
-        }
-
-        .venue-photo {
-          max-width: 980px;
-          margin: 0 auto 56px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        .venue-photo img {
-          width: 100%;
-          height: auto;
-          display: block;
-          border-radius: 16px;
-          box-shadow:
-            0 30px 80px -20px rgba(0, 0, 0, 0.7),
-            0 0 0 1px ${BDR || '#25252f'};
-        }
-        .venue-caption {
-          margin-top: 14px;
-          font-size: 12.5px;
-          letter-spacing: 0.3px;
-          color: ${MUT || '#8a8a96'};
         }
 
         .tv-wrap {
