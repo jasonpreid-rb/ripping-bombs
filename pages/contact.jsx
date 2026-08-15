@@ -57,12 +57,12 @@ export default function ContactPage() {
         <title>Contact Us | Ripping Bombs</title>
         <meta name="description" content="Get in touch with the Ripping Bombs team. Contact us for general enquiries, partnerships, sponsorships or press."/>
       </Head>
-      <div style={{ position:'relative', overflow:'hidden', padding: isMobile ? '90px 16px 50px' : '120px 18px 64px' }}>
+      <div style={{ position:'relative', overflow:'hidden', padding: isMobile ? '90px 16px 90px' : '120px 18px 150px' }}>
         <div style={{ position:'absolute', top:0, left:'50%', width:'100vw', height:'100%', transform:'translateX(-50%)', zIndex:0 }}>
           <img src="/images/rb-team.png" alt="" aria-hidden="true"
             style={{ position:'absolute', top:'50%', left:'50%', width:'100%', height:'100%', objectFit:'cover', transform:'translate(-50%,-50%) scale(1.08)', filter:'blur(7px) brightness(0.75)' }}/>
           <div style={{ position:'absolute', inset:0, background:'rgba(8,8,12,0.25)' }}/>
-          <div style={{ position:'absolute', left:0, right:0, bottom:0, height: isMobile ? '70%' : '85%', background:`linear-gradient(180deg, rgba(8,8,12,0) 0%, ${BG2} 100%)` }}/>
+          <div style={{ position:'absolute', left:0, right:0, bottom:0, top:'20%', background:`linear-gradient(180deg, rgba(8,8,12,0) 0%, ${BG2} 100%)` }}/>
         </div>
         <div style={{ position:'relative', zIndex:1, maxWidth:1000, margin:'0 auto' }}>
           <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:3, color:ORG, textTransform:'uppercase', marginBottom:10 }}>Get In Touch</div>
@@ -73,7 +73,8 @@ export default function ContactPage() {
         </div>
       </div>
 
-      <div style={{ padding: isMobile ? '0 16px 60px' : '0 18px 80px', maxWidth:1000, margin:'0 auto' }}>
+      <div style={{ background:BG2, padding: isMobile ? '0 16px 60px' : '0 18px 80px' }}>
+      <div style={{ maxWidth:1000, margin:'0 auto' }}>
 
         <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 36 : 40, alignItems:'start', paddingTop: isMobile ? 28 : 40 }}>
           {/* Form */}
@@ -158,6 +159,7 @@ export default function ContactPage() {
             <div style={{ fontFamily:SANS, fontSize:11, color:DIM, marginTop:6 }}>Munich, Bavaria, Germany — European HQ</div>
           </div>
         </div>
+      </div>
       </div>
     </>
   );

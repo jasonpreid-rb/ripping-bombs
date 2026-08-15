@@ -234,7 +234,7 @@ function SiteFooter() {
   };
 
   return (
-    <footer style={{ background: '#0e0e0e', borderTop: '1px solid rgba(255,255,255,0.07)', marginTop: 60 }}>
+    <footer style={{ background: '#0e0e0e', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '52px 18px 32px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 36, marginBottom: 40 }}>
           <div>
