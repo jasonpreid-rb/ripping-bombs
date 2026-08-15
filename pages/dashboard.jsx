@@ -341,6 +341,53 @@ function VsAverageBar({ myBest, globalAvg, label }) {
 }
 
 // Standalone hero strip for global rank — sits between header and stat cards
+function RankColumn({ label, rank, total, percentile, chip, sub, muted, first }) {
+  return (
+    <div style={{
+      flex: '1 1 200px',
+      minWidth: 170,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 8,
+      paddingLeft: first ? 0 : '1.5rem',
+      borderLeft: first ? 'none' : '1px solid rgba(255,0,144,0.2)',
+    }}>
+      <span style={{ fontSize: '0.72rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.07em', fontWeight: 700 }}>
+        {label}
+      </span>
+      {rank ? (
+        <>
+          <span style={{ fontSize: '2rem', fontWeight: 900, color: ORG, letterSpacing: '-0.03em', lineHeight: 1 }}>
+            #{rank}
+          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            {percentile != null && (
+              <span style={{ background: 'rgba(255,0,144,0.16)', color: ORG, border: '1px solid rgba(255,0,144,0.3)', borderRadius: 20, padding: '3px 10px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.02em' }}>
+                Top {percentile}%
+              </span>
+            )}
+            {total != null && (
+              <span style={{ fontSize: '0.74rem', color: MUT }}>
+                of {total.toLocaleString()}
+              </span>
+            )}
+          </div>
+          {chip}
+          {sub && (
+            <span style={{ fontSize: '0.72rem', color: MUT, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={sub}>
+              {sub}
+            </span>
+          )}
+        </>
+      ) : (
+        <span style={{ fontSize: '0.82rem', color: DIM, fontStyle: 'italic', lineHeight: 1.4 }}>
+          {muted || 'Not ranked yet'}
+        </span>
+      )}
+    </div>
+  );
+}
+
 function RankStrip({ rank, totalClubs, percentile, category, countryRank, countryTotal, countryPercentile, countryCode, myVenueRank, myVenueTotal, myVenuePercentile, myVenueName }) {
   if (!rank) return null;
   return (
@@ -350,84 +397,42 @@ function RankStrip({ rank, totalClubs, percentile, category, countryRank, countr
       borderRadius: 12,
       padding: '1.25rem 1.5rem',
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
       flexWrap: 'wrap',
-      gap: '0.75rem',
+      rowGap: '1.25rem',
     }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '2.6rem', fontWeight: 900, color: ORG, letterSpacing: '-0.03em', lineHeight: 1 }}>
-          #{rank}
-        </span>
-        <span style={{ fontSize: '0.95rem', fontWeight: 700, color: TXT, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          Global Rank
-        </span>
-        {category && (
-          <span style={{ background: 'rgba(255,255,255,0.08)', color: MUT, border: `1px solid ${BDR}`, borderRadius: 20, padding: '3px 11px', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.03em' }}>
+      <RankColumn
+        first
+        label="Global Rank"
+        rank={rank}
+        total={totalClubs}
+        percentile={percentile}
+        chip={category && (
+          <span style={{ alignSelf: 'flex-start', background: 'rgba(255,255,255,0.08)', color: MUT, border: `1px solid ${BDR}`, borderRadius: 20, padding: '3px 11px', fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.03em' }}>
             {getCategoryLabel(category)}
           </span>
         )}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-        {percentile != null && (
-          <span style={{ background: 'rgba(255,0,144,0.16)', color: ORG, border: '1px solid rgba(255,0,144,0.3)', borderRadius: 20, padding: '4px 12px', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.03em' }}>
-            Top {percentile}% globally
+      />
+      <RankColumn
+        label="Country Rank"
+        rank={countryRank}
+        total={countryTotal}
+        percentile={countryPercentile}
+        chip={countryCode && (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, alignSelf: 'flex-start' }}>
+            {cloneElement(countryFlag(countryCode), { style: { width: 18, height: 13, objectFit: 'cover', borderRadius: 2 } })}
+            <span style={{ fontSize: '0.72rem', color: MUT }}>{countryCode}</span>
           </span>
         )}
-        {totalClubs && (
-          <span style={{ fontSize: '0.78rem', color: MUT }}>
-            of {totalClubs.toLocaleString()} players worldwide
-          </span>
-        )}
-      </div>
-
-      {/* Country rank — secondary row, only shown once we have a country
-          match for this account. width:100% forces it onto its own line
-          within the wrapping flex row above. */}
-      {countryRank && (
-        <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', borderTop: '1px solid rgba(255,0,144,0.2)', paddingTop: 10, marginTop: 2 }}>
-          {countryCode && cloneElement(countryFlag(countryCode), { style: { width: 20, height: 15, objectFit: 'cover', borderRadius: 2, flexShrink: 0 } })}
-          <span style={{ fontSize: '1.05rem', fontWeight: 800, color: TXT, letterSpacing: '-0.01em' }}>
-            #{countryRank}
-          </span>
-          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: MUT, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            in {countryCode || 'your country'}
-          </span>
-          {countryPercentile != null && (
-            <span style={{ background: 'rgba(255,255,255,0.08)', color: MUT, border: `1px solid ${BDR}`, borderRadius: 20, padding: '2px 10px', fontSize: '0.72rem', fontWeight: 600 }}>
-              Top {countryPercentile}%
-            </span>
-          )}
-          {countryTotal && (
-            <span style={{ fontSize: '0.74rem', color: MUT }}>
-              of {countryTotal.toLocaleString()}
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Venue rank — third row, only shown once we know which venue the
-          player's best drive came from and have other entries to compare against. */}
-      {myVenueRank && (
-        <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', borderTop: '1px solid rgba(255,0,144,0.2)', paddingTop: 10, marginTop: 2 }}>
-          <span style={{ fontSize: '1.05rem', fontWeight: 800, color: TXT, letterSpacing: '-0.01em' }}>
-            #{myVenueRank}
-          </span>
-          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: MUT, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            at {myVenueName || 'this venue'}
-          </span>
-          {myVenuePercentile != null && (
-            <span style={{ background: 'rgba(255,255,255,0.08)', color: MUT, border: `1px solid ${BDR}`, borderRadius: 20, padding: '2px 10px', fontSize: '0.72rem', fontWeight: 600 }}>
-              Top {myVenuePercentile}%
-            </span>
-          )}
-          {myVenueTotal && (
-            <span style={{ fontSize: '0.74rem', color: MUT }}>
-              of {myVenueTotal.toLocaleString()}
-            </span>
-          )}
-        </div>
-      )}
+        muted="Add a country to your profile to see this"
+      />
+      <RankColumn
+        label="Venue Rank"
+        rank={myVenueRank}
+        total={myVenueTotal}
+        percentile={myVenuePercentile}
+        sub={myVenueName}
+        muted="Submit a drive with a venue selected to see this"
+      />
     </div>
   );
 }
