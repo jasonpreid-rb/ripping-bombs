@@ -10,6 +10,7 @@
 //     "tag your drive to this venue" flow
 
 import { useState } from 'react';
+import Head from 'next/head';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 import { ORG, MUT, TXT, BG2, BDR, SANS, DISP } from '../lib/constants';
 
@@ -31,11 +32,32 @@ export default function ClubAndSimulatorVenueLeaderboards() {
     { q: "What if players have already been tagging us, but we haven't registered yet?", a: <>Register your venue using the link above so you can claim and manage your page, or <a href="/contact" style={linkStyle}>get in touch</a> and we'll help set it up.</> },
   ];
 
+  // FAQPage schema needs plain-text answers — the last FAQ's JSX (with a
+  // live link) gets a plain-text equivalent here rather than trying to
+  // serialize JSX into the schema.
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(({ q }, i) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: i === faqs.length - 1
+          ? "Register your venue at rippingbombs.com/register so you can claim and manage your page, or get in touch via rippingbombs.com/contact and we'll help set it up."
+          : faqs[i].a,
+      },
+    })),
+  };
+
   return (
     <SeoPage
       title="Free Leaderboard Pages For Golf Clubs & Simulator Venues | Ripping Bombs"
       description="Every golf club and simulator venue gets a free, auto-generated leaderboard page with its own URL. Simulator players tag your venue and their drives rank automatically."
     >
+      <Head>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      </Head>
       <SeoH1>Every Golf Club & Simulator Venue Gets Its Own Free Leaderboard Page</SeoH1>
 
       <SeoP>

@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA } from '../components/SeoPageLayout';
@@ -166,11 +167,34 @@ function VenueTable({ rows }) {
 }
 
 export default function VenueLeaderboard({ ranked, totalVenuesRanked, totalVenuesTracked, totalDrives, topVenue }) {
+  // ItemList schema for the ranked venue table — gives search/AI crawlers a
+  // structured, machine-readable version of the rankings without them having
+  // to parse the HTML table. Capped to the same LEADERBOARD_LIMIT already
+  // shown on the page so the schema never claims more than what's rendered.
+  const itemListSchema = ranked.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Global Golf Venue Rankings',
+    description: 'Golf clubs and simulator venues ranked by composite score across driving distance categories on Ripping Bombs.',
+    numberOfItems: ranked.length,
+    itemListElement: ranked.map((v) => ({
+      '@type': 'ListItem',
+      position: v.rank,
+      name: v.name,
+      ...(v.location ? { item: { '@type': 'SportsActivityLocation', name: v.name, address: v.location } } : {}),
+    })),
+  } : null;
+
   return (
     <SeoPage
       title="Venue Rankings: How Golf & Simulator Venues Compete Globally | Ripping Bombs"
       description="See how golf clubs and simulator venues compete against each other worldwide on Ripping Bombs — how the venue ranking score is calculated, the live rankings right now, and how your venue can climb them."
     >
+      {itemListSchema && (
+        <Head>
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
+        </Head>
+      )}
       <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 10 }}>
         Live Venue Rankings
       </div>
