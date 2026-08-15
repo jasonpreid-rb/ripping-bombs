@@ -57,14 +57,24 @@ export default function ContactPage() {
         <title>Contact Us | Ripping Bombs</title>
         <meta name="description" content="Get in touch with the Ripping Bombs team. Contact us for general enquiries, partnerships, sponsorships or press."/>
       </Head>
-      <div style={{ padding: isMobile ? '24px 16px 60px' : '28px 18px 80px', maxWidth:1000, margin:'0 auto' }}>
-        <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:3, color:ORG, textTransform:'uppercase', marginBottom:10 }}>Get In Touch</div>
-        <h1 style={{ fontFamily:DISP, fontSize:'clamp(28px,5vw,48px)', color:TXT, letterSpacing:1, marginBottom:12, lineHeight:1.1 }}>Contact Ripping Bombs</h1>
-        <p style={{ fontFamily:SANS, fontSize:14, color:MUT, lineHeight:1.85, marginBottom: isMobile ? 28 : 40, maxWidth:580 }}>
-          Whether you're a golf club looking to register, a brand interested in partnership opportunities, or a journalist covering the launch — we'd love to hear from you.
-        </p>
+      <div style={{ position:'relative', overflow:'hidden', padding: isMobile ? '90px 16px 50px' : '120px 18px 64px' }}>
+        <div style={{ position:'absolute', top:0, left:'50%', width:'100vw', height:'100%', transform:'translateX(-50%)', zIndex:0 }}>
+          <img src="/images/rb-team.png" alt="" aria-hidden="true"
+            style={{ position:'absolute', top:'50%', left:'50%', width:'100%', height:'100%', objectFit:'cover', transform:'translate(-50%,-50%) scale(1.08)', filter:'blur(7px) brightness(0.75)' }}/>
+          <div style={{ position:'absolute', inset:0, background:`linear-gradient(180deg, rgba(8,8,12,0.25) 0%, rgba(8,8,12,0.55) 75%, ${BG2} 100%)` }}/>
+        </div>
+        <div style={{ position:'relative', zIndex:1, maxWidth:1000, margin:'0 auto' }}>
+          <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:3, color:ORG, textTransform:'uppercase', marginBottom:10 }}>Get In Touch</div>
+          <h1 style={{ fontFamily:DISP, fontSize:'clamp(28px,5vw,48px)', color:TXT, letterSpacing:1, marginBottom:12, lineHeight:1.1, textShadow:'0 2px 24px rgba(0,0,0,0.55)' }}>Contact Ripping Bombs</h1>
+          <p style={{ fontFamily:SANS, fontSize:14, color:MUT, lineHeight:1.85, maxWidth:580 }}>
+            Whether you're a golf club looking to register, a brand interested in partnership opportunities, or a journalist covering the launch — we'd love to hear from you.
+          </p>
+        </div>
+      </div>
 
-        <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 36 : 40, alignItems:'start' }}>
+      <div style={{ padding: isMobile ? '0 16px 60px' : '0 18px 80px', maxWidth:1000, margin:'0 auto' }}>
+
+        <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 36 : 40, alignItems:'start', paddingTop: isMobile ? 28 : 40 }}>
           {/* Form */}
           <div>
             <div style={{ fontFamily:DISP, fontSize:22, color:TXT, letterSpacing:1, marginBottom:20 }}>SEND A MESSAGE</div>
