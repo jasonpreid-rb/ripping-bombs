@@ -143,9 +143,19 @@ export default function ContactPage() {
         </div>
 
         <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 24 : 40, alignItems:'stretch', marginTop: isMobile ? 36 : 40 }}>
-          <div style={{ background:'#0e0e0e', border:'1px solid rgba(163,230,53,0.2)', padding:'24px', display:'flex', flexDirection:'column', justifyContent:'center' }}>
-            <div style={{ fontFamily:DISP, fontSize:18, color:'#fff', letterSpacing:1, marginBottom:6 }}>REGISTER YOUR CLUB</div>
-            <div style={{ fontFamily:SANS, fontSize:12, color:'rgba(255,255,255,0.5)', marginBottom:14 }}>Free to join. Start submitting your competition results to the global leaderboard.</div>
+          <div style={{ background:'#0e0e0e', border:'1px solid rgba(255,0,144,0.25)', padding:'24px', display:'flex', flexDirection:'column', justifyContent:'center' }}>
+            <div style={{ fontFamily:DISP, fontSize:18, color:'#fff', letterSpacing:1, marginBottom:8 }}>REGISTER YOUR CLUB</div>
+            <div style={{ fontFamily:SANS, fontSize:12, color:'rgba(255,255,255,0.55)', lineHeight:1.6, marginBottom:16 }}>
+              Free to join — get your venue on the global leaderboard and give every golfer a reason to come back and chase the board.
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:9, marginBottom:18 }}>
+              {['Your venue listed and selectable by every player','A public leaderboard page for your venue','Embeddable widget you can drop onto your own site'].map(item => (
+                <div key={item} style={{ display:'flex', alignItems:'flex-start', gap:8 }}>
+                  <span style={{ color:ORG, fontSize:12, fontWeight:700, marginTop:1, flexShrink:0 }}>✓</span>
+                  <span style={{ fontFamily:SANS, fontSize:12, color:'rgba(255,255,255,0.7)', lineHeight:1.5 }}>{item}</span>
+                </div>
+              ))}
+            </div>
             <button onClick={()=>router.push('/register')} style={{ background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:12, padding:'10px 20px', cursor:'pointer', letterSpacing:.5, width: isMobile ? '100%' : 'fit-content' }}>REGISTER FREE →</button>
           </div>
 
