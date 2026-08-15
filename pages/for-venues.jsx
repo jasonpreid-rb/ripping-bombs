@@ -41,6 +41,15 @@ export default function ForVenues() {
           </p>
         </section>
 
+        <section className="venue-photo">
+          <img
+            src="/images/leaderboard-venue.png"
+            alt="The Ripping Bombs leaderboard running on a TV at Highland Ridge Golf Club, next to a live simulator bay"
+            loading="lazy"
+          />
+          <div className="venue-caption">Live at Highland Ridge Golf Club — Austin, TX</div>
+        </section>
+
         <section className="tv-wrap">
           <div className="tv-frame">
             <div className="tv-cam" />
@@ -173,6 +182,29 @@ export default function ForVenues() {
           color: ${MUT || '#8a8a96'};
           max-width: 560px;
           margin: 0 auto;
+        }
+
+        .venue-photo {
+          max-width: 980px;
+          margin: 0 auto 56px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .venue-photo img {
+          width: 100%;
+          height: auto;
+          display: block;
+          border-radius: 16px;
+          box-shadow:
+            0 30px 80px -20px rgba(0, 0, 0, 0.7),
+            0 0 0 1px ${BDR || '#25252f'};
+        }
+        .venue-caption {
+          margin-top: 14px;
+          font-size: 12.5px;
+          letter-spacing: 0.3px;
+          color: ${MUT || '#8a8a96'};
         }
 
         .tv-wrap {
