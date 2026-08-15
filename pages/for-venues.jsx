@@ -38,6 +38,7 @@ export default function ForVenues() {
               loading="eager"
             />
             <div className="hero-bg-overlay" />
+            <div className="hero-bg-fade" />
           </div>
           <div className="hero-content">
             <div className="eyebrow">FOR VENUES</div>
@@ -184,7 +185,15 @@ export default function ForVenues() {
         .hero-bg-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(180deg, rgba(8,8,12,0.25) 0%, rgba(8,8,12,0.55) 75%, ${BG2 || '#08080c'} 100%);
+          background: rgba(8,8,12,0.25);
+        }
+        .hero-bg-fade {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 85%;
+          background: linear-gradient(180deg, rgba(8,8,12,0) 0%, ${BG2 || '#08080c'} 100%);
         }
         .hero-content {
           position: relative;
