@@ -224,6 +224,20 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
                 </div>
               </div>
 
+              {/* Date of birth — captured once at registration so age is derived
+                  automatically at submission time, instead of re-entered (and
+                  potentially mistyped) on every single drive. */}
+              <Field
+                label="Date of Birth"
+                type="date"
+                value={reg.dob}
+                onChange={e => setReg({ ...reg, dob: e.target.value })}
+                required
+              />
+              <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: -8, marginBottom: 14 }}>
+                Used to work out your age category — you won't need to enter it again on future drives.
+              </div>
+
               {/* Simulator brand — optional, visually de-emphasized */}
               <div style={{ marginBottom: 14, opacity: 0.8 }}>
                 <label style={{ display: 'block', fontFamily: SANS, fontSize: 10, fontWeight: 500, color: DIM, marginBottom: 5, textTransform: 'uppercase', letterSpacing: .8 }}>

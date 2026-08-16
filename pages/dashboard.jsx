@@ -1363,10 +1363,17 @@ export default function DashboardPage() {
     }
 
     if (myWeeklyEntries.length === 0) {
-      // Not submitted yet this week — show the overall weekly top 5 across all
-      // categories so the user sees real distances to beat and is prompted to submit.
+      // Not submitted yet this week. Use the player's known category from
+      // their most recent entry (any week) so the widget still shows their
+      // real category — e.g. a low-handicap 30-year-old should read "Men
+      // (Open)" even before this week's first submission, not "All
+      // categories". Only genuinely new accounts with zero entries ever
+      // fall back to showing the platform-wide field across every category.
+      const knownCategory = mostRecent ? getCategory(mostRecent) : null;
+
       const bestEntryPerClub = {};
       (weeklyAllEntries || []).forEach((e) => {
+        if (knownCategory && getCategory(e) !== knownCategory) return;
         const d = Number(e.dist);
         if (!bestEntryPerClub[e.orgId] || d > Number(bestEntryPerClub[e.orgId].dist)) {
           bestEntryPerClub[e.orgId] = e;
@@ -1378,7 +1385,7 @@ export default function DashboardPage() {
         weekStart,
         weekEnd,
         hasSubmitted: false,
-        category: null,
+        category: knownCategory,
         myBest: null,
         rank: null,
         total: ranked.length,

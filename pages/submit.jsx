@@ -14,6 +14,19 @@ function nameToSlug(name) {
     .replace(/\s+/g, '-');
 }
 
+// Age is derived from DOB (captured once at registration) as of the drive
+// date, rather than re-entered on every submission. Falls back gracefully
+// for any pre-existing simulator accounts registered before DOB was collected.
+function calcAge(dob, atDateStr) {
+  if (!dob) return null;
+  const dobDate = new Date(dob);
+  const at = atDateStr ? new Date(atDateStr) : new Date();
+  let age = at.getFullYear() - dobDate.getFullYear();
+  const m = at.getMonth() - dobDate.getMonth();
+  if (m < 0 || (m === 0 && at.getDate() < dobDate.getDate())) age--;
+  return age;
+}
+
 export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateProfileConsent, cvt, unitLbl, entries=[], approvedOrgs=[] }) {
   const [consent, setConsent] = useState(false);
   const [showProfilePrompt, setShowProfilePrompt] = useState(false);
@@ -238,7 +251,22 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
             <Field label="Date of Drive" type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})} required/>
             <div style={{ gridColumn:'1/-1' }}><Field label="Club Brand & Model" value={form.club} onChange={e=>setForm({...form,club:e.target.value})} placeholder="TaylorMade Qi10 LS" required/></div>
             <Field label="Handicap" type="number" value={form.hcp} onChange={e=>setForm({...form,hcp:e.target.value})} placeholder="5" min="-10" max="54" required/>
-            <Field label="Age" type="number" value={form.age} onChange={e=>setForm({...form,age:e.target.value})} placeholder="34" min="10" max="100" required/>
+            {isSimulator ? (
+              <div>
+                <label style={{ display:'block', fontFamily:SANS, fontSize:11, fontWeight:600, color:MUT, marginBottom:5, textTransform:'uppercase', letterSpacing:.8 }}>Age</label>
+                {loggedOrg.dob ? (
+                  <div style={{ background:BG3, border:`1px solid ${BDR}`, padding:'10px 14px', fontFamily:SANS, fontSize:14, color:DIM }}>
+                    {calcAge(loggedOrg.dob, form.date)} yrs
+                  </div>
+                ) : (
+                  <div style={{ background:BG3, border:`1px solid ${BDR}`, padding:'10px 14px', fontFamily:SANS, fontSize:12, color:DIM, lineHeight:1.5 }}>
+                    Add your date of birth in your profile to auto-fill age
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Field label="Age" type="number" value={form.age} onChange={e=>setForm({...form,age:e.target.value})} placeholder="34" min="10" max="100" required/>
+            )}
           </div>
 
           {form.dist&&Number(form.dist)>0&&(
@@ -279,10 +307,11 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
             onClick={async () => {
               if (isSimulator && simulatorWeeklyBlock) { alert('You have already submitted a drive this week. Simulator accounts are limited to one submission per week.'); return; }
               if (!isSimulator && !form.playerEmail) { alert('Please enter the player\'s email so we can notify them.'); return; }
+              if (isSimulator && !loggedOrg.dob) { alert('Please add your date of birth in your profile before submitting — this is used to place you in the correct age category.'); return; }
               if (!consent) { alert(isSimulator ? 'Please confirm your consent before submitting.' : 'Please confirm player consent before submitting.'); return; }
-              // For simulator accounts, pre-fill player name and tournament from account
+              // For simulator accounts, pre-fill player name, gender, and age from account
               if (isSimulator) {
-                setForm(f => ({ ...f, player: loggedOrg.fullName, tournament: 'Simulator', gender: loggedOrg.gender || 'male' }));
+                setForm(f => ({ ...f, player: loggedOrg.fullName, tournament: 'Simulator', gender: loggedOrg.gender || 'male', age: calcAge(loggedOrg.dob, f.date) }));
               }
               const result = await doSubmit();
               if (result && result.ok) {
