@@ -633,7 +633,7 @@ function WeeklyLeaderboard({ weeklyData }) {
       <div style={{ padding: '1rem 1.25rem', borderBottom: `1px solid ${BDR}` }}>
         <h2 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>This Week's Leaderboard</h2>
         <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: MUT }}>
-          {rangeLabel} · resets in {daysLeft} day{daysLeft === 1 ? '' : 's'}
+          {category ? getCategoryLabel(category) : 'All categories'} · {rangeLabel} · resets in {daysLeft} day{daysLeft === 1 ? '' : 's'}
         </p>
       </div>
 
@@ -799,7 +799,7 @@ function WeeklyCategoryCard({ cat, meId }) {
                     <span style={{ fontWeight: 700, fontSize: '0.8rem', color: isMe ? ORG : TXT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.player}{isMe ? ' (you)' : ''}</span>
                   </div>
                   <div style={{ flexShrink: 0 }}>
-                    <span style={{ fontFamily: DISP, fontSize: '1.05rem', color: i === 0 ? ORG : MUT, letterSpacing: '.5px' }}>{Number(e.dist)}</span>
+                    <span style={{ fontFamily: DISP, fontSize: '1.3rem', color: i === 0 ? ORG : MUT, letterSpacing: '.5px' }}>{Number(e.dist)}</span>
                     <span style={{ fontSize: '0.6rem', color: DIM, marginLeft: 2 }}>yds</span>
                   </div>
                 </div>
