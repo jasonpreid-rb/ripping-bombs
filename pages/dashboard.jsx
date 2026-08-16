@@ -935,6 +935,88 @@ function TvDisplayPromo({ club, onManageClick, onStartTrial }) {
   );
 }
 
+function ShareProfileCard({ club, rank, percentile }) {
+  const [copied, setCopied] = useState(false);
+  const [canNativeShare, setCanNativeShare] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.share) setCanNativeShare(true);
+  }, []);
+
+  const slug = club?.customSlug || nameToSlug(club?.fullName);
+  if (!slug) return null;
+
+  const profileUrl = `rippingbombs.com/profile/${slug}`;
+  const fullUrl = `https://${profileUrl}`;
+  const shareText = rank && percentile != null
+    ? `I'm ranked #${rank} (top ${percentile}%) for longest drive on Ripping Bombs`
+    : `Check out my longest drive stats on Ripping Bombs`;
+
+  const handleCopy = async () => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(fullUrl);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = fullUrl;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch (err) {
+      console.error('Copy failed:', err);
+    }
+  };
+
+  const handleNativeShare = async () => {
+    try {
+      await navigator.share({ title: 'Ripping Bombs', text: shareText, url: fullUrl });
+    } catch (err) {
+      // user cancelled or share failed — no-op
+    }
+  };
+
+  const xShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(fullUrl)}`;
+  const waShareUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText} ${fullUrl}`)}`;
+
+  const btnStyle = { background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.55rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'pointer' };
+
+  return (
+    <div style={{ background: `linear-gradient(135deg, ${BG2}, ${BG3})`, border: `1px solid ${ORG}`, borderRadius: 10, padding: '1.25rem 1.5rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, flex: '1 1 320px' }}>
+        <div>
+          <div style={{ fontSize: '0.95rem', fontWeight: 800, marginBottom: 3 }}>Share Your Profile</div>
+          <p style={{ margin: '0 0 8px', fontSize: '0.8rem', color: MUT, lineHeight: 1.5, maxWidth: 460 }}>
+            Drop this in your Instagram/TikTok bio or link-in-bio so viewers can see your ranking.
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <code style={{ fontSize: '0.8rem', color: TXT, background: 'rgba(255,255,255,0.06)', padding: '3px 8px', borderRadius: 5 }}>{profileUrl}</code>
+            <button
+              onClick={handleCopy}
+              style={{ background: copied ? 'rgba(255,0,144,0.15)' : 'transparent', border: `1px solid ${copied ? ORG : BDR}`, color: copied ? ORG : MUT, padding: '2px 8px', borderRadius: 5, fontSize: '0.7rem', cursor: 'pointer', minWidth: 46, transition: 'all 0.15s ease' }}
+            >
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        {canNativeShare && (
+          <button onClick={handleNativeShare} style={btnStyle}>Share…</button>
+        )}
+        <a href={xShareUrl} target="_blank" rel="noopener noreferrer" style={btnStyle}>Share on X</a>
+        <a href={waShareUrl} target="_blank" rel="noopener noreferrer" style={btnStyle}>WhatsApp</a>
+      </div>
+    </div>
+  );
+}
+
 function TierComparison() {
   const cell = { padding: '0.9rem 1rem', fontSize: '0.82rem', lineHeight: 1.5 };
   const check = (color) => <span style={{ color, fontWeight: 800, marginRight: 8 }}>✓</span>;
@@ -1490,6 +1572,12 @@ export default function DashboardPage() {
             myVenuePercentile={myVenuePercentile}
             myVenueName={myVenueName}
           />
+        )}
+
+        {/* Share profile link — individual/simulator accounts only, since that's
+            the public page (/profile/[slug]) their followers should land on. */}
+        {club?.accountType === 'simulator' && (
+          <ShareProfileCard club={club} rank={rank} percentile={percentile} />
         )}
 
         {/* Stat cards */}

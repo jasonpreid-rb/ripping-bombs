@@ -192,10 +192,15 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
           <span style={{ fontFamily:SANS, fontWeight:700, fontSize:12, color:copied?ORG:'#fff' }}>{copied?'Copied!':'Copy Link'}</span>
         </button>
       </div>
-      <button onClick={downloadImage} style={{ width:'100%', background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:12, padding:'11px', cursor:'pointer', letterSpacing:.5 }}>
-        ↓ Download Share Image (PNG)
+      <button onClick={downloadImage} title="Download Share Image (PNG)"
+        style={{ display:'flex', alignItems:'center', justifyContent:'center', width:48, height:48, margin:'0 auto', background:'transparent', border:'none', cursor:'pointer' }}>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={ORG} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+          <polyline points="16 6 12 2 8 6"/>
+          <line x1="12" y1="2" x2="12" y2="15"/>
+        </svg>
       </button>
-      <div style={{ fontFamily:SANS, fontSize:10, color:DIM, marginTop:10, textAlign:'center' }}>For Instagram: save the image then share as a post or story</div>
+      <div style={{ fontFamily:SANS, fontSize:10, color:DIM, marginTop:6, textAlign:'center' }}>For Instagram: save the image then share as a post or story</div>
     </Overlay>
   );
 }
