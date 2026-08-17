@@ -190,7 +190,7 @@ export default function App({ Component, pageProps }) {
   }
 
   const sharedProps = {
-    orgs, setOrgs, entries, setEntries, unit, setUnit, cvt, unitLbl,
+    orgs, setOrgs, entries, setEntries, loading, unit, setUnit, cvt, unitLbl,
     approvedOrgs, orgFor, pendingCount, loggedOrg, setLoggedOrg,
     toast, shareEnt, setShareEnt, detEnt, setDetEnt,
     reg, setReg, lgn, setLgn, form, setForm,
@@ -217,14 +217,15 @@ export default function App({ Component, pageProps }) {
     );
   }
 
-  if (loading) return (
-    <>
-      <Head><link rel="canonical" href={canonicalUrl} /></Head>
-      <div style={{ minHeight:'100vh', background:'#1a1a1a', display:'flex', alignItems:'center', justifyContent:'center' }}>
-        <div style={{ fontFamily:SANS, color:MUT, fontSize:13, letterSpacing:2 }}>LOADING...</div>
-      </div>
-    </>
-  );
+  // NOTE: we intentionally do NOT block rendering on `loading` here.
+  // Pages get their own real data via getStaticProps/getServerSideProps
+  // (see index.jsx's staticEntries/staticOrgs pattern) and should render
+  // immediately, both for SEO (Googlebot's initial HTML must contain real
+  // content, not a placeholder) and for perceived performance. `loading`,
+  // `orgs`, and `entries` are still passed down via sharedProps so any
+  // page that genuinely depends on the client-fetched global store (e.g.
+  // admin-adjacent or auth-dependent UI) can show its own local loading
+  // state instead of blanking the entire app.
 
   if (showAdmin) return (
     <AdminPanel orgs={orgs} entries={entries} setOrgs={setOrgs} setEntries={setEntries}
