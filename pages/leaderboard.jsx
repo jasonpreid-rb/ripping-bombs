@@ -201,14 +201,26 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
 }
 
 export default function LeaderboardPage(props) {
-  const { entries=[], orgs=[], approvedOrgs=[], orgFor=()=>null, cvt=d=>d, unitLbl='yds',
-    loading=false,
+  const { entries: propEntries=[], orgs: propOrgs=[], approvedOrgs: propApprovedOrgs=[],
+    staticEntries=[], staticOrgs=[],
+    cvt=d=>d, unitLbl='yds',
     detEnt, setDetEnt, shareEnt, setShareEnt,
     week, setWeek, allTime, setAllTime,
     fCountry, setFCountry, fHcp, setFHcp, fAge, setFAge,
     fClub, setFClub, fPlayer, setFPlayer, fGender, setFGender,
     fSimulator, setFSimulator,
     sortBy, setSortBy } = props;
+
+  // Prefer server-rendered data (getStaticProps below) so the leaderboard
+  // has real content in the initial HTML for crawlers/SEO. Falls back to
+  // the client-fetched global store (_app.jsx) only if static data is
+  // somehow empty, e.g. a brand-new deploy before first revalidation.
+  const entries = staticEntries.length ? staticEntries : propEntries;
+  // staticOrgs is already pre-filtered to status='approved' in getStaticProps,
+  // so it can serve directly as both the lookup list and approvedOrgs.
+  const orgs = staticOrgs.length ? staticOrgs : propOrgs;
+  const approvedOrgs = staticOrgs.length ? staticOrgs : propApprovedOrgs;
+  const orgFor = id => orgs.find(o => o.id === id);
 
   const currentWeek = week || nowWeek();
   const PAGE_SIZE = 25;
@@ -277,44 +289,6 @@ export default function LeaderboardPage(props) {
 
   const visibleRows = tableRows.slice(0, page * PAGE_SIZE);
   const hasMore = visibleRows.length < tableRows.length;
-
-  const skeletonRows = Array.from({ length: 8 });
-
-  if (loading) return (
-    <>
-      <Head>
-        <title>Global Golf Longest Drive Leaderboard | Ripping Bombs</title>
-        <meta name="description" content="The global longest drive leaderboard. See verified competition results from clubs and tournaments worldwide on Ripping Bombs."/>
-      </Head>
-      <div style={{padding:'28px 18px 80px',maxWidth:1000,margin:'0 auto'}}>
-        {/* Controls skeleton */}
-        <div style={{display:'flex',gap:10,marginBottom:20}}>
-          {[80,60,60].map((w,i)=><div key={i} style={{height:34,width:w,background:BG2,border:`1px solid ${BDR}`}}/>)}
-        </div>
-        {/* Filters skeleton */}
-        <div style={{display:'flex',gap:10,marginBottom:20}}>
-          <div style={{height:36,width:100,background:BG2,border:`1px solid ${BDR}`}}/>
-          <div style={{height:36,width:160,background:BG2,border:`1px solid ${BDR}`}}/>
-        </div>
-        {/* Table skeleton */}
-        <div style={{border:`1px solid ${BDR}`,background:BG2}}>
-          <div style={{padding:'11px 14px',borderBottom:`2px solid ${BDR}`,display:'flex',gap:16}}>
-            {[40,160,90,120,50,50].map((w,i)=><div key={i} style={{height:12,width:w,background:BDR}}/>)}
-          </div>
-          {skeletonRows.map((_,i)=>(
-            <div key={i} style={{padding:'14px',borderBottom:`1px solid ${BDR}`,display:'flex',gap:16,alignItems:'center',opacity:1-(i*0.08)}}>
-              <div style={{width:30,height:14,background:BDR,flexShrink:0}}/>
-              <div style={{width:140,height:14,background:BDR,flexShrink:0}}/>
-              <div style={{width:60,height:20,background:'rgba(255,0,144,0.15)',flexShrink:0}}/>
-              <div style={{width:100,height:12,background:BDR}}/>
-              <div style={{width:30,height:12,background:BDR}}/>
-              <div style={{width:30,height:12,background:BDR}}/>
-            </div>
-          ))}
-        </div>
-      </div>
-    </>
-  );
 
   return (
     <>
@@ -417,4 +391,33 @@ export default function LeaderboardPage(props) {
       </div>
     </>
   );
+}
+
+export async function getStaticProps() {
+  try {
+    const { supabase } = await import('../lib/supabaseClient');
+
+    const { data: entries } = await supabase
+      .from('entries')
+      .select('id, orgId, player, dist, club, hcp, age, gender, is_simulator, date, tournament')
+      .order('dist', { ascending: false });
+
+    const { data: orgs } = await supabase
+      .from('clubs')
+      .select('id, courseName, fullName, avatarUrl, country, location, status, badge, accountType, is_founding_member')
+      .eq('status', 'approved');
+
+    return {
+      props: {
+        staticEntries: entries || [],
+        staticOrgs: orgs || [],
+      },
+      revalidate: 600, // rebuild every 10 minutes, matching index.jsx
+    };
+  } catch {
+    return {
+      props: { staticEntries: [], staticOrgs: [] },
+      revalidate: 60,
+    };
+  }
 }
