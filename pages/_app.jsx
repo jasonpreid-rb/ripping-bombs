@@ -6,6 +6,7 @@ import { Analytics } from '@vercel/analytics/react';
 import Layout from '../components/Layout';
 import AdminPanel from '../components/AdminPanel';
 import LaunchModal from '../components/LaunchModal';
+import CookieConsent from '../components/CookieConsent';
 import { initData, db } from '../lib/data';
 import { ORGS_KEY, ENT_KEY, ADMIN_PW, SANS, ORG, MUT, BG2, BDR, TXT, DIM, DISP } from '../lib/constants';
 import { todayStr } from '../lib/constants';
@@ -269,6 +270,7 @@ export default function App({ Component, pageProps }) {
         </div>
       )}
 
+      <CookieConsent />
       <Analytics />
     </>
   );
