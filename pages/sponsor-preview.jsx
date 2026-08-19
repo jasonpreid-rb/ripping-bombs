@@ -64,7 +64,7 @@ export default function SponsorPreview() {
           <img
             src="https://pissmissileballs.com/cdn/shop/files/Group_3.svg?v=1762540896&width=600"
             alt="Piss Missile Balls"
-            style={{height:34,width:'auto',display:'block'}}
+            style={{height:52,width:'auto',display:'block'}}
           />
         </a>
 
