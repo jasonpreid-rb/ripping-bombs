@@ -43,22 +43,24 @@ export default function SponsorPreview() {
           />
         </a>
 
-        {/* --- Option B: logo only, larger, centered --- */}
+        {/* --- Option B: logo only, larger, centered, yellow banner --- */}
         <div style={{fontFamily:SANS,fontSize:11,fontWeight:700,color:DIM,letterSpacing:1.2,textTransform:'uppercase',marginBottom:10}}>
-          Option B — Logo only, banner style
+          Option B — Logo only, banner style, brand yellow
+        </div>
+        <div style={{textAlign:'center',fontFamily:SANS,fontSize:10,color:DIM,letterSpacing:1.2,textTransform:'uppercase',marginBottom:8}}>
+          Proudly brought to you by
         </div>
         <a
           href="https://pissmissileballs.com/"
           target="_blank"
           rel="noopener noreferrer sponsored"
           style={{
-            display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:8,
+            display:'flex',alignItems:'center',justifyContent:'center',
             marginBottom:36,padding:'22px 16px',
-            background:BG2,border:`1px solid ${BDR}`,
+            background:'#F2F913',border:`1px solid ${BDR}`,
             textDecoration:'none',
           }}
         >
-          <span style={{fontFamily:SANS,fontSize:10,color:DIM,letterSpacing:1.2,textTransform:'uppercase'}}>Proudly brought to you by</span>
           <img
             src="https://pissmissileballs.com/cdn/shop/files/Group_3.svg?v=1762540896&width=600"
             alt="Piss Missile Balls"
