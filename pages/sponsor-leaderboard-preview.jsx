@@ -38,7 +38,7 @@ export default function SponsorLeaderboardPreview() {
           rel="noopener noreferrer sponsored"
           style={{
             display:'flex',alignItems:'center',justifyContent:'center',
-            marginBottom:20,padding:'22px 16px',
+            marginBottom:20,padding:'10px 16px',
             background:'#F2F913',border:`1px solid ${BDR}`,
             textDecoration:'none',
           }}
