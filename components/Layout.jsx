@@ -287,7 +287,11 @@ function SiteFooter() {
           </div>
         </div>
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 20, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-          <div style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>© 2026 rippingbombs.com · HRH Collective LTD</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+            <span style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>© 2026 rippingbombs.com · HRH Collective LTD</span>
+            <a href="/privacy" style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.3)'}>Privacy</a>
+            <a href="/terms" style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.3)'}>Terms</a>
+          </div>
           <div style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>The global home of competition longest drives</div>
         </div>
       </div>

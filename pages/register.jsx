@@ -330,6 +330,13 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
 
           {/* Profile consent moved to post-submission flow — see submit.jsx note */}
 
+          <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginBottom: 12, textAlign: 'center', lineHeight: 1.5 }}>
+            By registering, you agree to our{' '}
+            <a href="/terms" style={{ color: MUT, textDecoration: 'underline' }}>Terms</a>
+            {' '}and{' '}
+            <a href="/privacy" style={{ color: MUT, textDecoration: 'underline' }}>Privacy Policy</a>.
+          </div>
+
           <Btn full onClick={() => doRegister(redirectTo)}>
             {isSimulator ? 'Create Account →' : 'Submit Registration →'}
           </Btn>

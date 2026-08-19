@@ -57,6 +57,8 @@ const corePages = [
   { slug: 'for-venues', priority: 0.8, changefreq: 'monthly' },
   { slug: 'submit-your-longest-drive', priority: 0.75, changefreq: 'monthly' },
   { slug: 'resources', priority: 0.7, changefreq: 'monthly' },
+  { slug: 'privacy', priority: 0.3, changefreq: 'yearly' },
+  { slug: 'terms', priority: 0.3, changefreq: 'yearly' },
 ];
 
 // Same slugify logic used elsewhere in the app (e.g. nameToSlug() in
