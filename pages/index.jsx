@@ -162,10 +162,14 @@ function InlineCalculator({ router }) {
 // user to scroll and disappears on their first interaction. Touch/trackpad
 // keeps native momentum scrolling; mouse users get click-and-drag panning,
 // since hiding the scrollbar removes their only other way to scroll.
+// The first and third copies exist purely so the loop has room to scroll
+// into — they're marked aria-hidden and removed from tab order so crawlers
+// and screen readers only ever see the single real (middle) copy, instead
+// of the same leaderboard content 3x.
 function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 }) {
   const scrollRef = useRef(null);
   const [showHint, setShowHint] = useState(true);
-  const loopItems = [...items, ...items, ...items];
+  const loopItems = [0, 1, 2].flatMap(set => items.map(item => ({ ...item, __set: set })));
   const drag = useRef({ isDown:false, startX:0, startScrollLeft:0, moved:false });
 
   useEffect(() => {
@@ -254,7 +258,7 @@ function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 })
       >
         <div style={{display:'flex',alignItems:'stretch',gap}}>
           {loopItems.map((item,i)=>(
-            <div key={`${item.key}-${i}`} style={{flex:`0 0 ${cardWidth}px`,minWidth:0,display:'flex'}}>
+            <div key={`${item.key}-${i}`} aria-hidden={item.__set!==1} tabIndex={item.__set!==1?-1:undefined} style={{flex:`0 0 ${cardWidth}px`,minWidth:0,display:'flex'}}>
               {renderItem(item)}
             </div>
           ))}
