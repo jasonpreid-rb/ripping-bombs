@@ -533,7 +533,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           <div style={{position:'relative',zIndex:1,padding:'clamp(40px,8vw,72px) 20px clamp(48px,8vw,72px)',display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center'}}>
             {/* Condensed brand header */}
             <div style={{fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:4,color:ORG,textTransform:'uppercase',marginBottom:12,background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
-              Every Drive Ranks
+              Live Global Simulator Database 
             </div>
             <h1 style={{fontFamily:DISP,fontSize:'clamp(42px,8vw,72px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:8,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
               LONG DRIVE LEADERBOARD
