@@ -529,10 +529,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           <div style={{position:'relative',zIndex:1,padding:'clamp(40px,8vw,72px) 20px clamp(48px,8vw,72px)',display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center'}}>
             {/* Condensed brand header */}
             <div style={{fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:4,color:ORG,textTransform:'uppercase',marginBottom:12,background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
-              The World's Longest Drive Leaderboard
+              Every Drive Ranks
             </div>
             <h1 style={{fontFamily:DISP,fontSize:'clamp(42px,8vw,72px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:8,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
-              EVERY DRIVE RANKS
+              LONG DRIVE LEADERBOARD
             </h1>
             <p style={{fontFamily:SANS,fontSize:14,color:'rgba(255,255,255,0.65)',maxWidth:440,margin:'0 auto 36px',lineHeight:1.6,letterSpacing:.3}}>
               See where your drive ranks against golfers your age, handicap &amp; gender — instantly.{' '}
