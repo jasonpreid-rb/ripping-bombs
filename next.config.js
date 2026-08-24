@@ -9,5 +9,14 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/golf-long-drive-competition',
+        destination: '/golf-longest-drive-competition',
+        permanent: true,
+      },
+    ]
+  },
 }
 module.exports = nextConfig
