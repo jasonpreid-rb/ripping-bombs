@@ -165,11 +165,17 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
 
       drawEnergy(ctx, W, 480);
 
+      ctx.textAlign = 'center';
       ctx.save();
       ctx.shadowColor = palette.glowA; ctx.shadowBlur = 44;
-      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 300px Arial Black, Arial'; ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 300px Arial Black, Arial';
       ctx.fillText(String(cvt(entry.dist)), W/2, 560);
       ctx.restore();
+      // ctx.restore() above reverts to the pre-save state, which does not
+      // include textAlign — re-assert it so every element below (badge,
+      // avatar initials, name, course, tournament, date, footer) stays
+      // centered instead of drifting right.
+      ctx.textAlign = 'center';
       ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.font = 'bold 48px Arial';
       ctx.fillText(unitLbl.toUpperCase(), W/2, 620);
 
