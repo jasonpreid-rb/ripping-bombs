@@ -247,6 +247,44 @@ robots.txt          — allows all crawlers except blocked AI agents (handled in
 
 ---
 
+## 🌱 Demo Data Conventions
+Reference this section to generate/insert new demo entries without needing the full DB dump shared each time.
+
+### `entries` table — demo row conventions
+- `id`: string, prefixed `demo_` + incrementing number (e.g. `demo_1045`). **Always check the current max `demo_` id in the live DB before inserting a new batch** — a CSV export can be stale and cause a duplicate-key error. Run this first: `SELECT id FROM entries WHERE id LIKE 'demo_%' ORDER BY CAST(SUBSTRING(id FROM 6) AS INTEGER) DESC LIMIT 1;` then start the new batch at least 100+ above that number to leave headroom.
+- `orgId`: must be a real `clubs.id`. Known-valid club IDs already used by demo data: `o1, o3, o4, o5, o6, o7, o8, o9, o10, o12, o14, o15, o16`. `o6` is the primary demo club and can be reused most often; spread the rest across the others for variety.
+- `photo`: empty string `''` for demo rows (no fake base64 images).
+- `is_simulator`: `false` for standard club demo rows (`true` is reserved for realistic simulator-account submissions like the few real/live entries).
+- `facility`, `venueId`, `avatarUrl`, `venue_id`, `facility_name`, `player_email`: leave empty for demo rows.
+- `tournament`: pick from existing pool — `Weekly Open, Club Championship, End of Month Cup, Founders Cup, July Invitational, Members Cup, Mid-Month Classic, Spring Classic, Summer Series, Summer Slam, Weekend Skins, Simulator Series`.
+- `club`: realistic current driver models, e.g. TaylorMade Stealth 2/Qi10, Callaway Paradym/Rogue ST, Titleist TSR2/TSR3, Ping G425/G430, Cobra Darkspeed, Mizuno ST-Z 230, Wilson Dynapower, Srixon ZX5.
+- `date`: ISO `YYYY-MM-DD`, spread across the demo period (Jan–Aug 2026 so far) rather than clustering on one day.
+
+### Category definitions (mirrors homepage/leaderboard logic)
+| Category | Age | Handicap | Gender |
+|---|---|---|---|
+| Men | 16–54 | < 20 | male |
+| Men High Handicap | 16–54 | ≥ 20 | male |
+| Women | 16–54 | < 20 | female |
+| Women High Handicap | 16–54 | ≥ 20 | female |
+| Youth | < 16 | any | any |
+| Senior | ≥ 55 | any | any |
+
+### Realistic "not huge" distance ranges (yards) for demo rows
+Keep demo drives modest/plausible — avoid record-setting numbers so they don't distort the all-time leaderboard:
+- Men: 195–260
+- Women: 160–215
+- Men High Handicap: 150–205
+- Women High Handicap: 125–175
+- Youth: 95–165
+- Senior: 150–215
+
+### Bulk operations
+- Delete all demo data: `DELETE FROM entries WHERE id LIKE 'demo_%';`
+- To add a new batch: generate rows following the ranges/conventions above, continuing the `demo_` id sequence, and insert via SQL (`INSERT INTO entries (id, "orgId", player, dist, club, hcp, age, photo, date, tournament, gender, is_simulator) VALUES (...)`) or the Supabase table editor — no need to share the live DB export to do this, this section has what's needed.
+
+---
+
 ## 🚨 Known Issues & Legacy Items
 - `how-to-register-page.jsx` has a `-page` suffix in the filename, making its URL `/how-to-register-page` not `/how-to-register` — rename if needed
 - `test-db.jsx` is a dev page — remove or password-protect before launch

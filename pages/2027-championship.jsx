@@ -22,15 +22,25 @@ const CATEGORIES = [
   { icon: '⭐', label: 'Senior',              desc: 'Age 55 and above' },
 ]
 
+const TOURNAMENTS = [
+  { name: 'Tournament 1', weeks: 'Weeks 1–13',  dates: 'Jan 1 – Apr 1, 2027' },
+  { name: 'Tournament 2', weeks: 'Weeks 14–26', dates: 'Apr 2 – Jul 1, 2027' },
+  { name: 'Tournament 3', weeks: 'Weeks 27–39', dates: 'Jul 2 – Sep 30, 2027' },
+  { name: 'Tournament 4', weeks: 'Weeks 40–52', dates: 'Oct 1 – Dec 30, 2027' },
+]
+
 const FAQS = [
-  { q: 'Who can enter the 2027 Championship?', a: 'Any registered simulator account. If you don\'t have an account yet, registration is free and takes under 2 minutes. Simulator accounts are auto-approved instantly.' },
+  { q: 'Who can enter the 2027 Golf Simulator League?', a: 'Any registered simulator account. If you don\'t have an account yet, registration is free and takes under 2 minutes. Simulator accounts are auto-approved instantly.' },
   { q: 'When do I select my championship category?', a: 'Category selection opens in January 2027. You\'ll be prompted to choose when you log in. Pick the category that fits your age, gender, and handicap — you can only compete in one.' },
-  { q: 'Can I change my category after selecting?', a: 'No. Once you\'ve selected your championship category for the season it is locked. Choose carefully.' },
+  { q: 'Can I change my category after selecting?', a: 'No. Once you\'ve selected your championship category for the season it is locked in across all four tournaments. Choose carefully.' },
+  { q: 'How is the 2027 season structured?', a: 'The season is divided into four tournaments of 13 weeks each — Tournament 1 (Jan 1–Apr 1), Tournament 2 (Apr 2–Jul 1), Tournament 3 (Jul 2–Sep 30), and Tournament 4 (Oct 1–Dec 30). Each tournament runs its own weekly leaderboards and crowns its own champion in every category.' },
+  { q: 'Do points reset between tournaments?', a: 'Yes. Your points reset to zero at the start of each new tournament, so everyone gets four fresh runs at a title over the course of the season.' },
+  { q: 'Can I win more than one tournament?', a: 'Yes — you can win as many of the four tournaments as you can in your chosen category. Your category stays the same for the whole season, across all four tournaments.' },
   { q: 'How are weekly points awarded?', a: '1st place earns 100 points, 2nd earns 70, 3rd earns 50, 4th earns 40, 5th earns 30, 6th earns 20, and every other submission earns 10 points. You earn points every week you submit — consistency matters as much as distance.' },
-  { q: 'Do my submissions before January 2027 count?', a: 'Points accumulation begins when the championship launches in January 2027. Submitting now builds your record and gets you on the leaderboard ahead of the season.' },
+  { q: 'Do my submissions before January 2027 count?', a: 'Points accumulation begins when the league launches in January 2027. Submitting now builds your record and gets you on the leaderboard ahead of Tournament 1.' },
   { q: 'Is there a limit on weekly submissions?', a: 'One drive per week. Only your best drive of the week counts toward your weekly points total.' },
   { q: 'What equipment is accepted?', a: 'Any calibrated launch monitor — Trackman, GCQuad, Foresight, Mevo+, and equivalents. A screenshot of the readout showing carry distance is required as evidence.' },
-  { q: 'Is entry free?', a: 'Yes. Registering and competing in the 2027 Championship is completely free.' },
+  { q: 'Is entry free?', a: 'Yes. Registering and competing in the 2027 Golf Simulator League is completely free.' },
 ]
 
 export default function Championship2027Page() {
@@ -39,8 +49,8 @@ export default function Championship2027Page() {
 
   return (
     <SeoPage
-      title="2027 Simulator Championship | Ripping Bombs"
-      description="The Ripping Bombs 2027 Simulator Championship — the world's largest online golf longest drive competition. One drive per week. Six categories. Points accumulate all season."
+      title="2027 Golf Simulator League Championship | Ripping Bombs"
+      description="The Ripping Bombs 2027 Golf Simulator League — four 13-week tournaments across the year, six categories, weekly leaderboards. The world's largest online golf simulator competition."
     >
       <div style={{maxWidth:760,margin:'0 auto',padding:'0 0 80px'}}>
 
@@ -49,14 +59,19 @@ export default function Championship2027Page() {
           <div style={{position:'absolute',inset:0,backgroundImage:"url('https://simlifegolf.com/wp-content/uploads/2022/12/20211013_133305-scaled.jpg')",backgroundSize:'cover',backgroundPosition:'center',filter:'brightness(0.35)',transform:'scale(1.05)'}}/>
           <div style={{position:'absolute',inset:0,background:'linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.5))'}}/>
           <div style={{position:'relative',zIndex:2,padding:'clamp(72px,12vw,120px) 20px clamp(72px,12vw,100px)',maxWidth:640}}>
-            <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:14,background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
-              Launching January 2027
+            <div style={{display:'flex',gap:8,justifyContent:'center',flexWrap:'wrap',marginBottom:14}}>
+              <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
+                Launching January 2027
+              </div>
+              <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:'rgba(255,255,255,0.75)',textTransform:'uppercase',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.25)',padding:'5px 16px',display:'inline-block'}}>
+                4 Tournaments · 13 Weeks Each
+              </div>
             </div>
             <div style={{fontFamily:DISP,fontSize:'clamp(48px,8vw,80px)',color:'#fff',letterSpacing:1,lineHeight:.95,marginBottom:20,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
-              THE WORLD'S BIGGEST<br/><span style={{color:ORG}}>SIM DRIVE</span><br/>COMP
+              THE WORLD'S BIGGEST<br/><span style={{color:ORG}}>GOLF SIMULATOR</span><br/>LEAGUE
             </div>
             <div style={{fontFamily:SANS,fontSize:15,color:'rgba(255,255,255,0.75)',lineHeight:1.75,maxWidth:500,margin:'0 auto 32px'}}>
-              Six categories. One drive per week. Points accumulate all season. The Ripping Bombs 2027 Simulator Championship could be the largest amateur golf competition on the planet.
+              Six categories. Four 13-week tournaments. One drive per week. The Ripping Bombs 2027 Golf Simulator League could be the largest competitive sim golf community on the planet.
             </div>
             <div style={{display:'flex',gap:10,justifyContent:'center',flexWrap:'wrap'}}>
               <button onClick={()=>router.push('/register')} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 32px',border:'none',cursor:'pointer',letterSpacing:.5}}>
@@ -74,12 +89,45 @@ export default function Championship2027Page() {
         {/* WHY IT'S BIG */}
         <div style={{marginBottom:56}}>
           <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>Why this is different</div>
-          <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:16}}>A SEASON-LONG COMPETITION, OPEN TO EVERYONE</div>
+          <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:16}}>A GOLF SIMULATOR LEAGUE, OPEN TO EVERYONE</div>
           <div style={{fontFamily:SANS,fontSize:14,color:MUT,lineHeight:1.85,marginBottom:16}}>
-            Most golf competitions are one-day events. You show up, you hit, you go home. The 2027 Ripping Bombs Simulator Championship is different — it runs all year, with a new weekly leaderboard resetting every Monday. Every drive you submit earns points. Every week is a chance to climb.
+            Most golf competitions are one-day events. You show up, you hit, you go home. The 2027 Ripping Bombs Golf Simulator League is different — it runs across four 13-week tournaments throughout the year, each with its own weekly leaderboard resetting every Monday. Every drive you submit earns points toward that tournament's title, and every week is a chance to climb.
           </div>
           <div style={{fontFamily:SANS,fontSize:14,color:MUT,lineHeight:1.85}}>
-            Because it's open to any registered simulator user anywhere in the world, with no entry fee and no travel required, this has the potential to become the largest amateur golf competition ever run. If you own a launch monitor, you're eligible.
+            Because it's open to any registered simulator user anywhere in the world, with no entry fee and no travel required, this has the potential to become the largest amateur golf simulator league ever run. If you own a launch monitor, you're eligible.
+          </div>
+        </div>
+
+        {/* SEASON CALENDAR */}
+        <div style={{marginBottom:56}}>
+          <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>Season structure</div>
+          <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:8}}>FOUR TOURNAMENTS. ONE SEASON.</div>
+          <div style={{fontFamily:SANS,fontSize:14,color:MUT,lineHeight:1.7,marginBottom:24}}>
+            The 52-week season splits evenly into four tournaments of 13 weeks each (52 ÷ 4 = 13). Every tournament begins on day one of its first week and runs through the last day of its thirteenth — its own weekly leaderboards, its own champion, in every category.
+          </div>
+
+          <div style={{display:'flex',gap:2,marginBottom:6}}>
+            {TOURNAMENTS.map((t,i)=>(
+              <div key={i} style={{flex:1,height:8,background:i%2===0?ORG:'rgba(255,0,144,0.35)'}}/>
+            ))}
+          </div>
+          <div style={{display:'flex',gap:2,marginBottom:20}}>
+            {TOURNAMENTS.map((t,i)=>(
+              <div key={i} style={{flex:1,fontFamily:SANS,fontSize:10,color:DIM,textAlign:i===0?'left':i===TOURNAMENTS.length-1?'right':'center'}}>{t.weeks}</div>
+            ))}
+          </div>
+
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:2,background:BDR}}>
+            {TOURNAMENTS.map((t,i)=>(
+              <div key={i} style={{background:BG2,padding:'20px 20px'}}>
+                <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:ORG,textTransform:'uppercase',marginBottom:6}}>{t.name}</div>
+                <div style={{fontFamily:DISP,fontSize:18,color:TXT,letterSpacing:.5,marginBottom:6}}>{t.dates}</div>
+                <div style={{fontFamily:SANS,fontSize:12,color:DIM}}>{t.weeks}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{fontFamily:SANS,fontSize:13,color:DIM,lineHeight:1.7,marginTop:16}}>
+            52 weeks ÷ 4 = 13-week tournaments, back to back all year. Dec 31 falls just outside week 52 as a single rest day before the next season opens.
           </div>
         </div>
 
@@ -106,7 +154,7 @@ export default function Championship2027Page() {
             ))}
           </div>
           <div style={{fontFamily:SANS,fontSize:13,color:DIM,lineHeight:1.7}}>
-            Points are awarded per category. You compete against others in your championship category only — not the global field.
+            Points are awarded per category, every week, inside each tournament. You compete against others in your championship category only — not the global field. Points reset to zero at the start of each new tournament.
           </div>
         </div>
 
@@ -116,8 +164,8 @@ export default function Championship2027Page() {
           <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:24}}>THREE STEPS TO COMPETE</div>
           {[
             {num:1,title:'Register a Simulator Account',body:'Free, takes under 2 minutes, auto-approved instantly. Select "Simulator / Individual" during registration.'},
-            {num:2,title:'Choose Your Championship Category',body:'When the championship opens in January 2027, log in and select the one category you want to compete in for the season. This cannot be changed once selected.'},
-            {num:3,title:'Submit One Drive Per Week',body:'Every week, submit your best drive with a screenshot of your launch monitor readout as evidence. Your weekly position earns you points. The more consistent you are, the higher you climb.'},
+            {num:2,title:'Choose Your Championship Category',body:'When the league opens in January 2027, log in and select the one category you want to compete in for the season. This applies across all four tournaments and cannot be changed once selected.'},
+            {num:3,title:'Submit One Drive Per Week',body:'Every week, submit your best drive with a screenshot of your launch monitor readout as evidence. Your weekly position earns you points toward that tournament\'s leaderboard. The more consistent you are, the higher you climb.'},
           ].map((step,i)=>(
             <div key={step.num} style={{display:'grid',gridTemplateColumns:'48px 1fr',gap:'0 20px'}}>
               <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
@@ -137,7 +185,7 @@ export default function Championship2027Page() {
           <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>Championships</div>
           <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:8}}>SIX CATEGORIES. ONE FOR YOU.</div>
           <div style={{fontFamily:SANS,fontSize:14,color:MUT,lineHeight:1.7,marginBottom:24}}>
-            Every player competes in one category only. Pick the one that fits — there's a leaderboard for everyone.
+            Every player competes in one category for the whole season, across all four tournaments. Pick the one that fits — there's a leaderboard for everyone.
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:2,background:BDR}}>
             {CATEGORIES.map((cat,i)=>(
@@ -156,7 +204,7 @@ export default function Championship2027Page() {
             START BUILDING YOUR<br/><span style={{color:ORG}}>RECORD NOW</span>
           </div>
           <div style={{fontFamily:SANS,fontSize:14,color:MUT,maxWidth:420,margin:'0 auto 24px',lineHeight:1.7}}>
-            Register today, submit weekly, and be ready when the championship opens in January 2027.
+            Register today, submit weekly, and be ready when the league opens with Tournament 1 in January 2027.
           </div>
           <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 36px',cursor:'pointer',letterSpacing:.5}}>
             REGISTER FREE →
