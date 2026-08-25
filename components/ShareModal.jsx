@@ -3,11 +3,23 @@ import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { fmtDate } from '../lib/constants';
 import { Overlay } from './UI';
 
+// Rank-tiered palettes — the card re-skins itself based on how the drive
+// placed. Default (no rank / not top 3) stays the standard brand pink.
+const PALETTES = {
+  1: { solid: '#FFD24D', strokeA: 'rgba(255,210,77,0.55)', fillA: 'rgba(255,210,77,0.10)', glowA: 'rgba(255,210,77,0.38)', dark: '#241a00', label: '1ST PLACE', medal: '🥇' },
+  2: { solid: '#D9E1EC', strokeA: 'rgba(217,225,236,0.55)', fillA: 'rgba(217,225,236,0.10)', glowA: 'rgba(217,225,236,0.32)', dark: '#14181e', label: '2ND PLACE', medal: '🥈' },
+  3: { solid: '#E8A15C', strokeA: 'rgba(232,161,92,0.55)', fillA: 'rgba(232,161,92,0.10)', glowA: 'rgba(232,161,92,0.34)', dark: '#241505', label: '3RD PLACE', medal: '🥉' },
+};
+const DEFAULT_PALETTE = { solid: '#FF0090', strokeA: 'rgba(255,0,144,0.5)', fillA: 'rgba(255,0,144,0.08)', glowA: 'rgba(255,0,144,0.35)', dark: '#1a0010', label: null, medal: null };
+
 export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
   const canvasRef = useRef(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [copied, setCopied] = useState(false);
   const driveUrl = `https://www.rippingbombs.com/drive/${entry.id}`;
+
+  const palette = PALETTES[entry.rank] || DEFAULT_PALETTE;
+  const isTiered = Boolean(PALETTES[entry.rank]);
 
   const getInitials = (fullName) => {
     if (!fullName) return '?';
@@ -18,6 +30,16 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
   };
 
   const drawAvatarCircle = (ctx, img, cx, cy, r, fullName) => {
+    // Glow ring in the tier color, then the avatar itself
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r + 6, 0, Math.PI * 2);
+    ctx.strokeStyle = palette.solid;
+    ctx.lineWidth = 3;
+    ctx.globalAlpha = 0.8;
+    ctx.stroke();
+    ctx.restore();
+
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
@@ -64,6 +86,53 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
     ctx.restore();
   };
 
+  // Diagonal corner ribbon for top-3 finishes — the signature element.
+  const drawRankRibbon = (ctx, W) => {
+    if (!isTiered) return;
+    ctx.save();
+    ctx.translate(W - 30, 30);
+    ctx.rotate(Math.PI / 4);
+    const ribbonW = 420, ribbonH = 58;
+    ctx.fillStyle = palette.solid;
+    ctx.fillRect(-ribbonW / 2, -ribbonH / 2, ribbonW, ribbonH);
+    ctx.fillStyle = palette.dark;
+    ctx.font = 'bold 26px Arial Black, Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`${palette.medal}  ${palette.label} THIS WEEK`, 0, 2);
+    ctx.textBaseline = 'alphabetic';
+    ctx.restore();
+  };
+
+  // Soft glow + a few fading motion-trail arcs behind the number, so the
+  // hero stat reads like impact rather than a printed figure.
+  const drawEnergy = (ctx, W, cy) => {
+    const grad = ctx.createRadialGradient(W / 2, cy, 40, W / 2, cy, 440);
+    grad.addColorStop(0, palette.glowA);
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.save();
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(W / 2, cy, 440, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 3; i++) {
+      const yOff = 56 * i;
+      const trail = ctx.createLinearGradient(110, cy + 260 - yOff, W / 2 - 150, cy - 40 - yOff * 0.6);
+      trail.addColorStop(0, 'rgba(255,255,255,0)');
+      trail.addColorStop(1, palette.solid);
+      ctx.strokeStyle = trail;
+      ctx.globalAlpha = 0.55 - i * 0.14;
+      ctx.lineWidth = 4 - i * 0.9;
+      ctx.beginPath();
+      ctx.moveTo(110, cy + 260 - yOff);
+      ctx.quadraticCurveTo(W / 2 - 300, cy + 120 - yOff * 0.8, W / 2 - 150, cy - 40 - yOff * 0.6);
+      ctx.stroke();
+    }
+    ctx.restore();
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -72,33 +141,46 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
     canvas.width = W; canvas.height = H;
 
     ctx.fillStyle = '#0e0e0e'; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = '#FF0090'; ctx.fillRect(0, 0, W, 8); ctx.fillRect(0, H-8, W, 8);
-    ctx.strokeStyle = 'rgba(255,0,144,0.04)'; ctx.lineWidth = 1;
+    ctx.fillStyle = palette.solid; ctx.fillRect(0, 0, W, 8); ctx.fillRect(0, H-8, W, 8);
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)'; ctx.lineWidth = 1;
     for (let x=0; x<W; x+=60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
     for (let y=0; y<H; y+=60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
 
     const drawContent = (flagImg, courseLogoImg, avatarImg) => {
       drawRBLogo(ctx, 80, 58, 80);
-      if (flagImg) ctx.drawImage(flagImg, W-160, 58, 80, 60);
-      ctx.strokeStyle = 'rgba(255,0,144,0.3)'; ctx.lineWidth = 1;
+      // Tiered cards free up the top-right corner for the rank ribbon, so
+      // the flag tucks in next to the logo instead.
+      if (flagImg) {
+        if (isTiered) ctx.drawImage(flagImg, 180, 58, 72, 54);
+        else ctx.drawImage(flagImg, W-160, 58, 80, 60);
+      }
+      drawRankRibbon(ctx, W);
+      ctx.strokeStyle = palette.strokeA; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(80,150); ctx.lineTo(W-80,150); ctx.stroke();
       if (courseLogoImg) {
         const clAspect = courseLogoImg.naturalWidth / courseLogoImg.naturalHeight;
         const clH = 100, clW = clH * clAspect;
         ctx.drawImage(courseLogoImg, (W-clW)/2, 170, clW, clH);
       }
+
+      drawEnergy(ctx, W, 480);
+
+      ctx.save();
+      ctx.shadowColor = palette.glowA; ctx.shadowBlur = 44;
       ctx.fillStyle = '#ffffff'; ctx.font = 'bold 300px Arial Black, Arial'; ctx.textAlign = 'center';
       ctx.fillText(String(cvt(entry.dist)), W/2, 560);
+      ctx.restore();
       ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.font = 'bold 48px Arial';
       ctx.fillText(unitLbl.toUpperCase(), W/2, 620);
 
       // From here on, lay everything out with a running cursor so optional
       // fields (facility/tournament) and the avatar never collide.
-      const badgeW=320, badgeH=44, badgeX=(W-badgeW)/2, badgeY=648;
-      ctx.strokeStyle='rgba(255,0,144,0.5)'; ctx.lineWidth=1; ctx.strokeRect(badgeX,badgeY,badgeW,badgeH);
-      ctx.fillStyle='rgba(255,0,144,0.08)'; ctx.fillRect(badgeX,badgeY,badgeW,badgeH);
+      const badgeText = isTiered ? `${palette.medal}  VERIFIED — ${palette.label}` : '✓  VERIFIED DISTANCE';
+      const badgeW = isTiered ? 440 : 320, badgeH=44, badgeX=(W-badgeW)/2, badgeY=648;
+      ctx.strokeStyle=palette.strokeA; ctx.lineWidth=1; ctx.strokeRect(badgeX,badgeY,badgeW,badgeH);
+      ctx.fillStyle=palette.fillA; ctx.fillRect(badgeX,badgeY,badgeW,badgeH);
       ctx.fillStyle='#ffffff'; ctx.font='bold 18px Arial'; ctx.letterSpacing='3px';
-      ctx.fillText('✓  VERIFIED DISTANCE', W/2, badgeY+29);
+      ctx.fillText(badgeText, W/2, badgeY+29);
       ctx.letterSpacing='0px';
 
       let cursorY = badgeY + badgeH; // bottom of badge
@@ -118,12 +200,12 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
 
       if (entry.facility) {
         cursorY += 38;
-        ctx.fillStyle='rgba(255,0,144,0.6)'; ctx.font='italic 26px Arial';
+        ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='italic 26px Arial';
         ctx.fillText(entry.facility, W/2, cursorY);
       }
       if (entry.tournament) {
-        cursorY += 36;
-        ctx.fillStyle='rgba(255,0,144,0.7)'; ctx.font='italic 28px Arial';
+        cursorY += 40;
+        ctx.fillStyle=palette.solid; ctx.font='bold italic 32px Arial';
         ctx.fillText(entry.tournament, W/2, cursorY);
       }
 
@@ -132,7 +214,7 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
       ctx.fillText(fmtDate(entry.date), W/2, cursorY);
 
       const lineY = Math.max(cursorY + 35, 950);
-      ctx.strokeStyle='rgba(255,0,144,0.3)'; ctx.lineWidth=1;
+      ctx.strokeStyle=palette.strokeA; ctx.lineWidth=1;
       ctx.beginPath(); ctx.moveTo(80,lineY); ctx.lineTo(W-80,lineY); ctx.stroke();
       ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='24px Arial';
       ctx.fillText('rippingbombs.com', W/2, lineY + 40);
@@ -167,7 +249,14 @@ export default function ShareModal({ entry, org, cvt, unitLbl, onClose }) {
   return (
     <Overlay onClose={onClose}>
       <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:2, color:ORG, marginBottom:6, textTransform:'uppercase' }}>Share This Drive</div>
-      <div style={{ fontFamily:DISP, fontSize:22, color:TXT, letterSpacing:.5, marginBottom:16 }}>{entry.player} — {cvt(entry.dist)} {unitLbl}</div>
+      <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16 }}>
+        <div style={{ fontFamily:DISP, fontSize:22, color:TXT, letterSpacing:.5 }}>{entry.player} — {cvt(entry.dist)} {unitLbl}</div>
+        {isTiered && (
+          <div style={{ fontFamily:SANS, fontSize:11, fontWeight:700, letterSpacing:1, color:palette.dark, background:palette.solid, padding:'3px 10px' }}>
+            {palette.medal} {palette.label}
+          </div>
+        )}
+      </div>
       <canvas ref={canvasRef} style={{ display:'none' }}/>
       {imageUrl && <img src={imageUrl} alt="Share card" style={{ width:'100%', marginBottom:16, border:`1px solid ${BDR}` }}/>}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:12 }}>
