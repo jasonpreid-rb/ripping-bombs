@@ -97,7 +97,7 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
       onClickCapture={handleClickCapture}
       onTouchStart={dismissHint}
       className="rb-table-scroll"
-      style={{overflowX:'auto',WebkitOverflowScrolling:'touch',border:`1px solid ${BDR}`,background:BG2,cursor:'grab',touchAction:'pan-x'}}
+      style={{overflowX:'auto',WebkitOverflowScrolling:'touch',border:`1px solid ${BDR}`,background:BG2,cursor:'grab'}}
     >
       <table style={{width:'100%',borderCollapse:'collapse',minWidth:750}}>
         <thead>
