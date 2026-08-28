@@ -61,6 +61,41 @@ function getCategoryLabel(cat) {
   }[cat] || 'All';
 }
 
+// ——— Peer-group bands (age / handicap) — narrower cuts than the six main
+// categories, used for the "Age Group Rank" / "Handicap Group Rank" cards.
+// A smaller pool means a more attainable, more frequently-changing rank,
+// which is the point: it gives players something closer than #1,247
+// globally to chase.
+const AGE_BANDS = [
+  { min: 0, max: 17, label: 'Under 18' },
+  { min: 18, max: 24, label: '18–24' },
+  { min: 25, max: 34, label: '25–34' },
+  { min: 35, max: 44, label: '35–44' },
+  { min: 45, max: 54, label: '45–54' },
+  { min: 55, max: 64, label: '55–64' },
+  { min: 65, max: 200, label: '65+' },
+];
+
+const HCP_BANDS = [
+  { min: 0, max: 5, label: '0–5' },
+  { min: 6, max: 10, label: '6–10' },
+  { min: 11, max: 15, label: '11–15' },
+  { min: 16, max: 20, label: '16–20' },
+  { min: 21, max: 27, label: '21–27' },
+  { min: 28, max: 54, label: '28+' },
+];
+
+function getBand(value, bands) {
+  const n = Number(value);
+  if (Number.isNaN(n)) return null;
+  return bands.find((b) => n >= b.min && n <= b.max) || null;
+}
+
+// Minimum other accounts required in a band before it's worth showing a rank —
+// "#1 of 1" isn't a rank worth boasting about, so these fall back to a muted
+// "not enough golfers yet" state instead (same pattern as venue composite rank).
+const MIN_BAND_SIZE = 5;
+
 // ——— Weekly leaderboard helpers (Monday-start week) ———
 
 function getWeekStart(date = new Date()) {
@@ -432,6 +467,52 @@ function RankStrip({ rank, totalClubs, percentile, category, countryRank, countr
         percentile={myVenuePercentile}
         sub={myVenueName}
         muted="Submit a drive with a venue selected to see this"
+      />
+    </div>
+  );
+}
+
+// Peer-group rank strip — Age Group and Handicap Group ranks. Kept separate
+// from RankStrip (Global/Country/Venue) since these two are specifically
+// about "players like you", not "everywhere you've played" — and because a
+// club/venue account represents many different players, so this strip only
+// ever renders for individual/simulator accounts.
+function PeerGroupRankStrip({ show, ageGroupRank, ageGroupTotal, ageGroupLabel, hcpGroupRank, hcpGroupTotal, hcpGroupLabel }) {
+  if (!show) return null;
+  return (
+    <div style={{
+      background: BG2,
+      border: `1px solid ${BDR}`,
+      borderRadius: 12,
+      padding: '1.25rem 1.5rem',
+      display: 'flex',
+      flexWrap: 'wrap',
+      rowGap: '1.25rem',
+    }}>
+      <RankColumn
+        first
+        label="Age Group Rank"
+        rank={ageGroupRank}
+        total={ageGroupTotal}
+        percentile={ageGroupRank && ageGroupTotal ? Math.round((ageGroupRank / ageGroupTotal) * 100) : null}
+        chip={ageGroupLabel && (
+          <span style={{ alignSelf: 'flex-start', background: 'rgba(255,255,255,0.08)', color: MUT, border: `1px solid ${BDR}`, borderRadius: 20, padding: '3px 11px', fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.03em' }}>
+            Age {ageGroupLabel}
+          </span>
+        )}
+        muted="Add your age to your profile to see this"
+      />
+      <RankColumn
+        label="Handicap Group Rank"
+        rank={hcpGroupRank}
+        total={hcpGroupTotal}
+        percentile={hcpGroupRank && hcpGroupTotal ? Math.round((hcpGroupRank / hcpGroupTotal) * 100) : null}
+        chip={hcpGroupLabel && (
+          <span style={{ alignSelf: 'flex-start', background: 'rgba(255,255,255,0.08)', color: MUT, border: `1px solid ${BDR}`, borderRadius: 20, padding: '3px 11px', fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.03em' }}>
+            {hcpGroupLabel} Handicap
+          </span>
+        )}
+        muted="Submit a drive with your handicap set to see this"
       />
     </div>
   );
@@ -1162,6 +1243,12 @@ export default function DashboardPage() {
   const [myVenueRank, setMyVenueRank] = useState(null);
   const [myVenueTotal, setMyVenueTotal] = useState(null);
   const [myVenueName, setMyVenueName] = useState(null);
+  const [ageGroupRank, setAgeGroupRank] = useState(null);
+  const [ageGroupTotal, setAgeGroupTotal] = useState(null);
+  const [ageGroupLabel, setAgeGroupLabel] = useState(null);
+  const [hcpGroupRank, setHcpGroupRank] = useState(null);
+  const [hcpGroupTotal, setHcpGroupTotal] = useState(null);
+  const [hcpGroupLabel, setHcpGroupLabel] = useState(null);
   const [venueRank, setVenueRank] = useState(null);
   const [venueTotalRanked, setVenueTotalRanked] = useState(null);
   const [venueScorePercentile, setVenueScorePercentile] = useState(null);
@@ -1196,7 +1283,7 @@ export default function DashboardPage() {
     setPrimaryCategory(mostRecent ? getCategory(mostRecent) : null);
 
     // Global rank + avg
-    const { data: allEntries } = await supabase.from('entries').select('orgId, dist');
+    const { data: allEntries } = await supabase.from('entries').select('orgId, dist, age, hcp');
     if (allEntries && sorted.length > 0) {
       const myBest = Number(sorted[0].dist);
       const bestPerClub = {};
@@ -1242,6 +1329,62 @@ export default function DashboardPage() {
           setMyVenueRank(venueBeatenBy + 1);
           setMyVenueTotal(Object.keys(bestPerVenueAccount).length);
           setMyVenueName(myVenue);
+        }
+      }
+
+      // Age Group / Handicap Group rank — same "best drive per account"
+      // comparison as country/venue rank, but narrowed to accounts whose
+      // *most recent* age/hcp falls in the same band as this player's. Bands
+      // are much narrower than the six main categories, so the pool is
+      // smaller and the rank is both more attainable and more likely to
+      // move next time this player (or a peer) submits — the point of
+      // showing it at all. Individual/simulator accounts only: a club
+      // account logs drives for many different players, so "their" age or
+      // handicap band doesn't mean anything.
+      if ((freshClub?.accountType || clubData.accountType) !== 'club' && mostRecent) {
+        const myAgeBand = getBand(mostRecent.age, AGE_BANDS);
+        const myHcpBand = getBand(mostRecent.hcp, HCP_BANDS);
+
+        // allEntries has no date column, so "most recent per account" isn't
+        // available here — instead, band every entry independently and let
+        // an account's *best drive within the band* stand for them, same
+        // approach as country/venue rank use above.
+        if (myAgeBand) {
+          const inBand = (allEntries || []).filter((e) => {
+            const b = getBand(e.age, AGE_BANDS);
+            return b && b.label === myAgeBand.label;
+          });
+          const bestPerAccount = {};
+          inBand.forEach((e) => {
+            const d = Number(e.dist);
+            if (!bestPerAccount[e.orgId] || d > bestPerAccount[e.orgId]) bestPerAccount[e.orgId] = d;
+          });
+          const accounts = Object.entries(bestPerAccount);
+          if (accounts.length >= MIN_BAND_SIZE) {
+            const beatenBy = accounts.filter(([id, d]) => id !== clubData.id && d > myBest).length;
+            setAgeGroupRank(beatenBy + 1);
+            setAgeGroupTotal(accounts.length);
+            setAgeGroupLabel(myAgeBand.label);
+          }
+        }
+
+        if (myHcpBand) {
+          const inBand = (allEntries || []).filter((e) => {
+            const b = getBand(e.hcp, HCP_BANDS);
+            return b && b.label === myHcpBand.label;
+          });
+          const bestPerAccount = {};
+          inBand.forEach((e) => {
+            const d = Number(e.dist);
+            if (!bestPerAccount[e.orgId] || d > bestPerAccount[e.orgId]) bestPerAccount[e.orgId] = d;
+          });
+          const accounts = Object.entries(bestPerAccount);
+          if (accounts.length >= MIN_BAND_SIZE) {
+            const beatenBy = accounts.filter(([id, d]) => id !== clubData.id && d > myBest).length;
+            setHcpGroupRank(beatenBy + 1);
+            setHcpGroupTotal(accounts.length);
+            setHcpGroupLabel(myHcpBand.label);
+          }
         }
       }
     }
@@ -1607,6 +1750,21 @@ export default function DashboardPage() {
             myVenueTotal={myVenueTotal}
             myVenuePercentile={myVenuePercentile}
             myVenueName={myVenueName}
+          />
+        )}
+
+        {/* Peer-group ranks — narrower, more attainable cuts (age band, handicap
+            band) than the global/country/venue ranks above. Individual/simulator
+            accounts only, same reasoning as the strip above. */}
+        {club?.accountType !== 'club' && (
+          <PeerGroupRankStrip
+            show={!!rank}
+            ageGroupRank={ageGroupRank}
+            ageGroupTotal={ageGroupTotal}
+            ageGroupLabel={ageGroupLabel}
+            hcpGroupRank={hcpGroupRank}
+            hcpGroupTotal={hcpGroupTotal}
+            hcpGroupLabel={hcpGroupLabel}
           />
         )}
 
