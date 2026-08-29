@@ -1,7 +1,7 @@
 import Head from "next/head";
-import { ORG, TXT, MUT, DIM, BDR, BG2, BG3, SANS, DISP } from "@/lib/constants";
+import { ORG, TXT, MUT, DIM, BDR, BG2, BG3, SANS, DISP } from "../lib/constants";
 // If your SEO wrapper lives at a different path, adjust this import.
-import SeoPageLayout from "@/components/SeoPageLayout";
+import SeoPageLayout from "../components/SeoPageLayout";
 
 /**
  * HOW-IT-WORKS / "FIND YOUR GLOBAL RANK" PAGE
@@ -124,9 +124,9 @@ export default function HowItWorks() {
         {/* CTA */}
         <section className="cta">
           <h3>Ready to find out where you stand?</h3>
-          <p>Find a partner venue near you and take your shot.</p>
-          <a className="cta-btn" href="/venues">
-            FIND A VENUE
+          <p>Register now and get your best drive on the board.</p>
+          <a className="cta-btn" href="https://www.rippingbombs.com/register">
+            REGISTER NOW
           </a>
         </section>
       </main>
