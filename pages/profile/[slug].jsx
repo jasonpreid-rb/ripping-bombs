@@ -29,6 +29,36 @@ function getCategory(entry) {
   return !Number.isNaN(hcp) && hcp >= 15 ? 'Men High Handicap' : 'Men';
 }
 
+// ——— Peer-group bands (age / handicap) — mirrors dashboard.jsx exactly, so a
+// player's band never disagrees between their dashboard and public profile.
+const AGE_BANDS = [
+  { min: 0, max: 17, label: 'Under 18' },
+  { min: 18, max: 24, label: '18–24' },
+  { min: 25, max: 34, label: '25–34' },
+  { min: 35, max: 44, label: '35–44' },
+  { min: 45, max: 54, label: '45–54' },
+  { min: 55, max: 64, label: '55–64' },
+  { min: 65, max: 200, label: '65+' },
+];
+
+const HCP_BANDS = [
+  { min: 0, max: 5, label: '0–5' },
+  { min: 6, max: 10, label: '6–10' },
+  { min: 11, max: 15, label: '11–15' },
+  { min: 16, max: 20, label: '16–20' },
+  { min: 21, max: 27, label: '21–27' },
+  { min: 28, max: 54, label: '28+' },
+];
+
+function getBand(value, bands) {
+  const n = Number(value);
+  if (Number.isNaN(n)) return null;
+  return bands.find((b) => n >= b.min && n <= b.max) || null;
+}
+
+// Same threshold as dashboard.jsx — below this, hide the rank rather than show "#1 of 1".
+const MIN_BAND_SIZE = 5;
+
 export async function getServerSideProps({ params }) {
   const { slug } = params;
 
@@ -65,6 +95,8 @@ export async function getServerSideProps({ params }) {
   // one personal best per account (orgId), so a player isn't out-ranked
   // by their own multiple submissions.
   let globalRank = null, globalTotal = 0, category = null, categoryRank = null, categoryTotal = 0;
+  let ageGroupRank = null, ageGroupTotal = 0, ageGroupLabel = null;
+  let hcpGroupRank = null, hcpGroupTotal = 0, hcpGroupLabel = null;
 
   if (personalBest) {
     const { data: allEntries } = await supabase
@@ -90,6 +122,45 @@ export async function getServerSideProps({ params }) {
       categoryTotal = sortedCategory.length;
       categoryRank = sortedCategory.findIndex(e => e.orgId === org.id) + 1;
       if (categoryRank === 0) categoryRank = null;
+
+      // Age Group / Handicap Group rank — narrower cuts than the main
+      // category, same "one best drive per account" comparison, restricted
+      // to accounts whose best-in-category entry falls in the same band as
+      // this player's. Mirrors dashboard.jsx's peer-group rank exactly.
+      const myAgeBand = getBand(personalBest.age, AGE_BANDS);
+      const myHcpBand = getBand(personalBest.hcp, HCP_BANDS);
+
+      if (myAgeBand) {
+        const inBand = bests.filter(e => {
+          const b = getBand(e.age, AGE_BANDS);
+          return b && b.label === myAgeBand.label;
+        });
+        if (inBand.length >= MIN_BAND_SIZE) {
+          const sortedBand = [...inBand].sort((a, b) => Number(b.dist) - Number(a.dist));
+          const idx = sortedBand.findIndex(e => e.orgId === org.id);
+          if (idx !== -1) {
+            ageGroupRank = idx + 1;
+            ageGroupTotal = sortedBand.length;
+            ageGroupLabel = myAgeBand.label;
+          }
+        }
+      }
+
+      if (myHcpBand) {
+        const inBand = bests.filter(e => {
+          const b = getBand(e.hcp, HCP_BANDS);
+          return b && b.label === myHcpBand.label;
+        });
+        if (inBand.length >= MIN_BAND_SIZE) {
+          const sortedBand = [...inBand].sort((a, b) => Number(b.dist) - Number(a.dist));
+          const idx = sortedBand.findIndex(e => e.orgId === org.id);
+          if (idx !== -1) {
+            hcpGroupRank = idx + 1;
+            hcpGroupTotal = sortedBand.length;
+            hcpGroupLabel = myHcpBand.label;
+          }
+        }
+      }
     }
   }
 
@@ -103,6 +174,12 @@ export async function getServerSideProps({ params }) {
       category,
       categoryRank,
       categoryTotal,
+      ageGroupRank,
+      ageGroupTotal,
+      ageGroupLabel,
+      hcpGroupRank,
+      hcpGroupTotal,
+      hcpGroupLabel,
     },
   };
 }
@@ -171,6 +248,55 @@ function RankStrip({ rank, total, category }) {
   );
 }
 
+// Peer-group rank strip — Age Group and Handicap Group ranks, mirrors
+// dashboard.jsx's PeerGroupRankStrip so the two surfaces feel like one product.
+function PeerGroupRankStrip({ show, ageGroupRank, ageGroupTotal, ageGroupLabel, hcpGroupRank, hcpGroupTotal, hcpGroupLabel }) {
+  if (!show) return null;
+  return (
+    <div style={{
+      background: BG2,
+      border: `1px solid ${BDR}`,
+      padding: '20px 24px',
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: 24,
+      marginBottom: 32,
+    }}>
+      <PeerGroupColumn label="Age Group Rank" rank={ageGroupRank} total={ageGroupTotal} tag={ageGroupLabel && `Age ${ageGroupLabel}`} muted="No age on file" />
+      <PeerGroupColumn label="Handicap Group Rank" rank={hcpGroupRank} total={hcpGroupTotal} tag={hcpGroupLabel && `${hcpGroupLabel} Handicap`} muted="No handicap on file" />
+    </div>
+  );
+}
+
+function PeerGroupColumn({ label, rank, total, tag, muted }) {
+  const percentile = rank && total ? Math.round((rank / total) * 100) : null;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 160 }}>
+      <div style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, color: DIM, letterSpacing: 1.5, textTransform: 'uppercase' }}>{label}</div>
+      {rank ? (
+        <>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{ fontFamily: DISP, fontSize: 26, color: TXT, letterSpacing: 0.5 }}>#{rank}</span>
+            {total > 0 && <span style={{ fontFamily: SANS, fontSize: 11, color: DIM }}>of {total}</span>}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            {tag && (
+              <span style={{ background: 'rgba(255,255,255,0.08)', color: MUT, border: `1px solid ${BDR}`, borderRadius: 20, padding: '2px 9px', fontFamily: SANS, fontSize: 10, fontWeight: 600, letterSpacing: 0.3 }}>
+                {tag}
+              </span>
+            )}
+            {percentile != null && (
+              <span style={{ fontFamily: SANS, fontSize: 10, color: DIM }}>Top {percentile}%</span>
+            )}
+          </div>
+        </>
+      ) : (
+        <div style={{ fontFamily: SANS, fontSize: 12, color: DIM }}>{muted}</div>
+      )}
+    </div>
+  );
+}
+
 function SocialHandle({ handle, href, icon }) {
   if (!handle) return null;
   const clean = handle.replace(/^@/, '');
@@ -187,7 +313,7 @@ function SocialHandle({ handle, href, icon }) {
   );
 }
 
-export default function PlayerProfile({ org, playerEntries, globalRank, globalTotal, category, categoryRank, categoryTotal }) {
+export default function PlayerProfile({ org, playerEntries, globalRank, globalTotal, category, categoryRank, categoryTotal, ageGroupRank, ageGroupTotal, ageGroupLabel, hcpGroupRank, hcpGroupTotal, hcpGroupLabel }) {
   const sorted = [...playerEntries].sort((a, b) => Number(b.dist) - Number(a.dist));
   const best = sorted[0];
   const avgDist = playerEntries.length
@@ -222,6 +348,8 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
         ...(avgDist ? [{ '@type': 'PropertyValue', name: 'Average Drive', value: `${avgDist} yards` }] : []),
         ...(globalRank ? [{ '@type': 'PropertyValue', name: 'Global Rank', value: `#${globalRank} of ${globalTotal}` }] : []),
         ...(categoryRank ? [{ '@type': 'PropertyValue', name: `${category} Rank`, value: `#${categoryRank} of ${categoryTotal}` }] : []),
+        ...(ageGroupRank ? [{ '@type': 'PropertyValue', name: `Age ${ageGroupLabel} Rank`, value: `#${ageGroupRank} of ${ageGroupTotal}` }] : []),
+        ...(hcpGroupRank ? [{ '@type': 'PropertyValue', name: `${hcpGroupLabel} Handicap Rank`, value: `#${hcpGroupRank} of ${hcpGroupTotal}` }] : []),
       ],
     }),
   };
@@ -282,6 +410,17 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
 
         {/* Global rank — standalone hero strip, same as the dashboard */}
         <RankStrip rank={globalRank} total={globalTotal} category={category} />
+
+        {/* Peer-group ranks — narrower, more attainable cuts than the strip above */}
+        <PeerGroupRankStrip
+          show={!!globalRank}
+          ageGroupRank={ageGroupRank}
+          ageGroupTotal={ageGroupTotal}
+          ageGroupLabel={ageGroupLabel}
+          hcpGroupRank={hcpGroupRank}
+          hcpGroupTotal={hcpGroupTotal}
+          hcpGroupLabel={hcpGroupLabel}
+        />
 
         {hasSocials && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 32 }}>
