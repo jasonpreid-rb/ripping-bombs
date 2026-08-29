@@ -46,7 +46,7 @@ function nameToSlug(name) {
     .replace(/\s+/g, '-');
 }
 
-export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, onAdminClick, pendingCount }) {
+export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, onAdminClick, pendingCount, onExitImpersonation }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
@@ -70,6 +70,16 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
 
   return (
     <div className="site-shell" style={{ minHeight: '100vh', background: '#1a1a1a', color: '#f0f0f0', fontFamily: SANS }}>
+
+      {/* Impersonation banner — shown whenever an admin is viewing as another account */}
+      {loggedOrg?._impersonating && (
+        <div style={{ background: '#f59e0b', padding: '9px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, position: 'relative', zIndex: 102, flexWrap: 'wrap' }}>
+          <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: '#111', letterSpacing: .5, textTransform: 'uppercase' }}>
+            👁 Viewing as {loggedOrg.courseName || loggedOrg.fullName} — Admin Mode
+          </span>
+          <button onClick={onExitImpersonation} style={{ background: '#111', border: 'none', color: '#f59e0b', fontFamily: SANS, fontWeight: 700, fontSize: 11, padding: '5px 12px', cursor: 'pointer' }}>Exit to Admin</button>
+        </div>
+      )}
 
       {/* Announcement Banner — hidden on mobile via .promo-banner CSS rule */}
       {!bannerDismissed && (

@@ -523,7 +523,7 @@ function OverviewTab({ orgs, entries, pending, approved, noSubmissions, setStatu
 }
 
 // ── main component ───────────────────────────────────────────────────────────
-export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, onClose, cvt, unitLbl }) {
+export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, onClose, cvt, unitLbl, onImpersonate }) {
   const [tab, setTab]       = useState('Overview');
   const [selOrg, setSelOrg] = useState(null);
   const [editing, setEditing] = useState(null);
@@ -705,6 +705,7 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
                           </div>
                           <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
                             <Btn small onClick={()=>setEditing({courseName:org.courseName,fullName:org.fullName,position:org.position,email:org.email,location:org.location,country:org.country})}>✎ Edit Details</Btn>
+                            <Btn small onClick={()=>onImpersonate(org)}>👁 View As</Btn>
                             {org.status==='pending'&&<Btn variant="approve" small onClick={async()=>{ await setStatus(org.id,'approved'); const ok=await sendApprovalEmail(org); toast(ok?'Approved & notified':'Approved (email failed)'); }}>✓ Approve</Btn>}
                             {org.status==='approved'&&<Btn variant="danger" small onClick={async()=>{ await setStatus(org.id,'disabled'); toast('Disabled'); }}>Disable</Btn>}
                             {org.status==='disabled'&&<Btn variant="approve" small onClick={async()=>{ await setStatus(org.id,'approved'); toast('Re-enabled'); }}>Re-enable</Btn>}

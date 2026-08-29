@@ -181,6 +181,21 @@ export default function App({ Component, pageProps }) {
     return { ok: true, rank, total, gender: e.gender };
   }
 
+  function startImpersonation(org) {
+    const impersonated = { ...org, _impersonating: true };
+    setLoggedOrg(impersonated);
+    localStorage.setItem('rb_club', JSON.stringify(impersonated));
+    setShowAdmin(false);
+    toast(`Viewing as ${org.courseName || org.fullName}`);
+    router.push('/dashboard');
+  }
+
+  function stopImpersonation() {
+    setLoggedOrg(null);
+    localStorage.removeItem('rb_club');
+    setShowAdmin(true);
+  }
+
   async function updateProfileConsent(orgId, consent) {
     const ok = await db.updateOrg(orgId, { profileConsent: consent });
     if (!ok) { toast('Could not save preference — please try again'); return false; }
@@ -230,7 +245,7 @@ export default function App({ Component, pageProps }) {
 
   if (showAdmin) return (
     <AdminPanel orgs={orgs} entries={entries} setOrgs={setOrgs} setEntries={setEntries}
-      toast={toast} cvt={cvt} unitLbl={unitLbl}
+      toast={toast} cvt={cvt} unitLbl={unitLbl} onImpersonate={startImpersonation}
       onClose={() => { setShowAdmin(false); localStorage.removeItem('rb_admin_auth'); }}/>
   );
 
@@ -238,7 +253,7 @@ export default function App({ Component, pageProps }) {
     <>
       <Head><link rel="canonical" href={canonicalUrl} /></Head>
       <Layout loggedOrg={loggedOrg} onLogout={()=>{ setLoggedOrg(null); localStorage.removeItem('rb_club'); router.push('/'); }} unit={unit} setUnit={setUnit}
-        onAdminClick={()=>setAdminPw({show:true,val:''})} pendingCount={pendingCount}>
+        onAdminClick={()=>setAdminPw({show:true,val:''})} pendingCount={pendingCount} onExitImpersonation={stopImpersonation}>
         <Component {...pageProps} {...sharedProps}/>
       </Layout>
 
