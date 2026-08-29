@@ -1,7 +1,5 @@
-import Head from "next/head";
 import { ORG, TXT, MUT, DIM, BDR, BG2, BG3, SANS, DISP } from "../lib/constants";
-// If your SEO wrapper lives at a different path, adjust this import.
-import SeoPageLayout from "../components/SeoPageLayout";
+import { SeoPage } from "../components/SeoPageLayout";
 
 /**
  * HOW-IT-WORKS / "FIND YOUR GLOBAL RANK" PAGE
@@ -52,14 +50,10 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <SeoPageLayout
+    <SeoPage
       title="How It Works — Find Your Global Rank | Ripping Bombs"
       description="Five steps to see how your longest drive stacks up against golfers worldwide. Swing at any partner simulator, upload your best shot, and get ranked."
     >
-      <Head>
-        <meta property="og:title" content="How It Works — Ripping Bombs" />
-      </Head>
-
       <main className="how">
         {/* HERO */}
         <section className="hero">
@@ -92,23 +86,43 @@ export default function HowItWorks() {
 
               <div className="step-media">
                 {step.media === "video" && (
-                  <div className="frame frame-video">
-                    <video
-                      src="/how-it-works/rip-drive.mp4"
-                      poster="/how-it-works/rip-drive-poster.jpg"
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                    />
+                  <div className="media-block">
+                    <div className="frame frame-video">
+                      <video
+                        src="/how-it-works/rip-drive.mp4"
+                        poster="/how-it-works/rip-drive-poster.jpg"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                      />
+                    </div>
+                    <a
+                      className="credit"
+                      href="https://www.instagram.com/mattybombs"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Footage: @Mattybombs
+                    </a>
                   </div>
                 )}
                 {step.media === "image" && (
-                  <div className="frame frame-image">
-                    <img
-                      src="/how-it-works/best-shot.jpg"
-                      alt="Simulator screen showing a Best Shot result with distance stats"
-                    />
+                  <div className="media-block">
+                    <div className="frame frame-image">
+                      <img
+                        src="/how-it-works/best-shot.jpg"
+                        alt="Simulator screen showing a Best Shot result with distance stats"
+                      />
+                    </div>
+                    <a
+                      className="credit"
+                      href="https://www.instagram.com/mattybombs"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Photo: @Mattybombs
+                    </a>
                   </div>
                 )}
                 {!step.media && (
@@ -243,6 +257,24 @@ export default function HowItWorks() {
           display: flex;
           justify-content: center;
         }
+        .media-block {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+        }
+        .credit {
+          font-family: ${SANS};
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.04em;
+          color: ${DIM};
+          text-decoration: none;
+        }
+        .credit:hover {
+          color: ${ORG};
+        }
         .frame {
           width: 100%;
           max-width: 300px;
@@ -325,6 +357,6 @@ export default function HowItWorks() {
           }
         }
       `}</style>
-    </SeoPageLayout>
+    </SeoPage>
   );
 }
