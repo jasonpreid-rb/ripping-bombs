@@ -139,6 +139,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
         <div style={{ cursor: 'pointer' }} onClick={() => navTo('/')}><RBLogoWhite height={30}/></div>
         <div className="desktop-nav" style={{ gap: 10, alignItems: 'center' }}>
           <UnitToggle/>
+          <NavBtn href="/how-it-works" label="How It Works"/>
           <NavBtn href="/leaderboard" label="Leaderboard"/>
           <NavBtn href="/hall-of-fame" label="Hall of Fame"/>
           <NavBtn href="/contact" label="Contact"/>
