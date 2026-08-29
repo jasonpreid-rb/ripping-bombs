@@ -9,57 +9,176 @@ import { SeoPage } from "../components/SeoPageLayout";
  *   /public/how-it-works/rip-drive.mp4          (5s, muted, no audio track)
  *   /public/how-it-works/rip-drive-poster.jpg   (poster frame for the video)
  *   /public/how-it-works/best-shot.jpg          (simulator "Best Shot" screen)
- *
- * All four provided as separate files alongside this one.
  */
 
 const steps = [
   {
     n: "01",
-    label: "STEP INTO A BAY",
-    title: "Find a bay.",
-    body: "Walk up to any Trackman, GCQuad, or Full Swing simulator at a Ripping Bombs venue. No sign-up required to swing.",
-  },
-  {
-    n: "02",
     label: "SWING AWAY",
-    title: "Rip your drive.",
+    title: "Rip your shot.",
     body: "Every swing is tracked automatically — carry, total distance, ball speed, all of it, the moment you make contact.",
     media: "video",
   },
   {
-    n: "03",
-    label: "WATCH THE SCREEN",
-    title: "Catch your best shot.",
-    body: "When the sim flags a personal best, it flashes right there on screen. That's the number that counts.",
+    n: "02",
+    label: "15 SECONDS, TOPS",
+    title: "Snap it, upload it.",
+    body: "When the sim flags your best shot, photograph the screen and upload it to Ripping Bombs. That's the whole step.",
     media: "image",
   },
   {
-    n: "04",
-    label: "15 SECONDS, TOPS",
-    title: "Snap it, upload it.",
-    body: "Photograph that screen and upload it to Ripping Bombs. We verify it and lock in your distance.",
-  },
-  {
-    n: "05",
+    n: "03",
     label: "INSTANT RESULT",
-    title: "See your global rank.",
-    body: "Your best drive gets slotted against every golfer on the leaderboard — worldwide, by category, live.",
+    title: "Get ranked.",
+    body: "We verify the shot and slot it onto the leaderboard — global, country, and age group. This is exactly what shows up on your profile.",
+    media: "rank",
   },
 ];
+
+// Static example numbers for the rank panel — illustrative only, not live data.
+const exampleRank = {
+  global: { rank: 482, total: 6140, percentile: 8, chip: "Men (Open)" },
+  country: { rank: 34, total: 812, percentile: 4, code: "us" },
+  age: { rank: 19, total: 940, percentile: 2, chip: "Age 25–34" },
+};
+
+function RankColumn({ label, rank, total, percentile, chip, first }) {
+  return (
+    <div
+      style={{
+        flex: "1 1 160px",
+        minWidth: 150,
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+        paddingLeft: first ? 0 : "1.5rem",
+        borderLeft: first ? "none" : "1px solid rgba(255,0,144,0.2)",
+      }}
+    >
+      <span
+        style={{
+          fontSize: "0.72rem",
+          color: MUT,
+          textTransform: "uppercase",
+          letterSpacing: "0.07em",
+          fontWeight: 700,
+        }}
+      >
+        {label}
+      </span>
+      <span
+        style={{
+          fontFamily: DISP,
+          fontSize: "2rem",
+          fontWeight: 900,
+          color: ORG,
+          letterSpacing: "-0.03em",
+          lineHeight: 1,
+        }}
+      >
+        #{rank}
+      </span>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+        <span
+          style={{
+            background: "rgba(255,0,144,0.16)",
+            color: ORG,
+            border: "1px solid rgba(255,0,144,0.3)",
+            borderRadius: 20,
+            padding: "3px 10px",
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            letterSpacing: "0.02em",
+          }}
+        >
+          Top {percentile}%
+        </span>
+        <span style={{ fontSize: "0.74rem", color: MUT }}>of {total.toLocaleString()}</span>
+      </div>
+      {chip && (
+        <span
+          style={{
+            alignSelf: "flex-start",
+            background: "rgba(255,255,255,0.08)",
+            color: MUT,
+            border: `1px solid ${BDR}`,
+            borderRadius: 20,
+            padding: "3px 11px",
+            fontSize: "0.7rem",
+            fontWeight: 600,
+            letterSpacing: "0.03em",
+          }}
+        >
+          {chip}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function RankPanel() {
+  return (
+    <div className="rank-panel-wrap">
+      <span className="rank-eyebrow">EXAMPLE — THIS IS WHAT YOUR PROFILE SHOWS</span>
+      <div
+        style={{
+          background: "linear-gradient(135deg, rgba(255,0,144,0.14), rgba(255,0,144,0.03))",
+          border: "1px solid rgba(255,0,144,0.35)",
+          borderRadius: 12,
+          padding: "1.25rem 1.5rem",
+          display: "flex",
+          flexWrap: "wrap",
+          rowGap: "1.25rem",
+        }}
+      >
+        <RankColumn
+          first
+          label="Global Rank"
+          rank={exampleRank.global.rank}
+          total={exampleRank.global.total}
+          percentile={exampleRank.global.percentile}
+          chip={exampleRank.global.chip}
+        />
+        <RankColumn
+          label="Country Rank"
+          rank={exampleRank.country.rank}
+          total={exampleRank.country.total}
+          percentile={exampleRank.country.percentile}
+          chip={
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <img
+                src={`https://flagcdn.com/w40/${exampleRank.country.code}.png`}
+                alt=""
+                style={{ width: 18, height: 13, objectFit: "cover", borderRadius: 2 }}
+              />
+              {exampleRank.country.code.toUpperCase()}
+            </span>
+          }
+        />
+        <RankColumn
+          label="Age Group Rank"
+          rank={exampleRank.age.rank}
+          total={exampleRank.age.total}
+          percentile={exampleRank.age.percentile}
+          chip={exampleRank.age.chip}
+        />
+      </div>
+    </div>
+  );
+}
 
 export default function HowItWorks() {
   return (
     <SeoPage
       title="How It Works — Find Your Global Rank | Ripping Bombs"
-      description="Five steps to see how your longest drive stacks up against golfers worldwide. Swing at any partner simulator, upload your best shot, and get ranked."
+      description="Three steps to see how your longest drive stacks up against golfers worldwide. Rip your shot, upload it, and get ranked instantly."
     >
       <main className="how">
         {/* HERO */}
         <section className="hero">
           <span className="eyebrow">HOW IT WORKS</span>
           <h1>
-            Five steps.
+            Three steps.
             <br />
             One screenshot.
             <br />
@@ -74,7 +193,12 @@ export default function HowItWorks() {
         {/* STEPS */}
         <section className="steps">
           {steps.map((step, i) => (
-            <article className="step" key={step.n} data-flip={i % 2 === 1}>
+            <article
+              className="step"
+              key={step.n}
+              data-flip={step.media !== "rank" && i % 2 === 1}
+              data-wide={step.media === "rank"}
+            >
               <div className="step-copy">
                 <div className="step-head">
                   <span className="step-n">{step.n}</span>
@@ -125,11 +249,7 @@ export default function HowItWorks() {
                     </a>
                   </div>
                 )}
-                {!step.media && (
-                  <div className="frame frame-empty" aria-hidden="true">
-                    <span className="frame-n">{step.n}</span>
-                  </div>
-                )}
+                {step.media === "rank" && <RankPanel />}
               </div>
             </article>
           ))}
@@ -156,7 +276,7 @@ export default function HowItWorks() {
         .hero {
           max-width: 880px;
           margin: 0 auto;
-          padding: 96px 24px 64px;
+          padding: 64px 0 48px;
           text-align: left;
         }
         .eyebrow {
@@ -172,8 +292,8 @@ export default function HowItWorks() {
         }
         .hero h1 {
           font-family: ${DISP};
-          font-size: clamp(40px, 7vw, 76px);
-          line-height: 1.02;
+          font-size: clamp(36px, 6vw, 64px);
+          line-height: 1.03;
           font-weight: 800;
           letter-spacing: -0.01em;
           margin: 0 0 24px;
@@ -192,9 +312,8 @@ export default function HowItWorks() {
 
         /* ---------- STEPS ---------- */
         .steps {
-          max-width: 1080px;
           margin: 0 auto;
-          padding: 0 24px 96px;
+          padding: 0 0 64px;
           display: flex;
           flex-direction: column;
           gap: 0;
@@ -204,7 +323,7 @@ export default function HowItWorks() {
           grid-template-columns: 1fr 1fr;
           gap: 56px;
           align-items: center;
-          padding: 64px 0;
+          padding: 56px 0;
           border-top: 1px solid ${BDR};
         }
         .step:last-child {
@@ -216,6 +335,9 @@ export default function HowItWorks() {
         .step[data-flip="true"] .step-copy,
         .step[data-flip="true"] .step-media {
           direction: ltr;
+        }
+        .step[data-wide="true"] {
+          grid-template-columns: 1fr;
         }
 
         .step-head {
@@ -239,7 +361,7 @@ export default function HowItWorks() {
         }
         .step-copy h2 {
           font-family: ${DISP};
-          font-size: clamp(28px, 3vw, 38px);
+          font-size: clamp(26px, 3vw, 34px);
           line-height: 1.1;
           font-weight: 800;
           margin: 0 0 16px;
@@ -256,6 +378,10 @@ export default function HowItWorks() {
         .step-media {
           display: flex;
           justify-content: center;
+        }
+        .step[data-wide="true"] .step-media {
+          justify-content: stretch;
+          margin-top: 8px;
         }
         .media-block {
           display: flex;
@@ -277,7 +403,7 @@ export default function HowItWorks() {
         }
         .frame {
           width: 100%;
-          max-width: 300px;
+          max-width: 280px;
           aspect-ratio: 9 / 16;
           background: ${BG3};
           border: 1px solid ${BDR};
@@ -291,23 +417,27 @@ export default function HowItWorks() {
           object-fit: cover;
           display: block;
         }
-        .frame-empty {
+
+        .rank-panel-wrap {
+          width: 100%;
           display: flex;
-          align-items: center;
-          justify-content: center;
+          flex-direction: column;
+          gap: 10px;
         }
-        .frame-n {
-          font-family: ${DISP};
-          font-size: 64px;
-          font-weight: 800;
-          color: ${BDR};
+        .rank-eyebrow {
+          font-family: ${SANS};
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          color: ${DIM};
+          text-transform: uppercase;
         }
 
         /* ---------- CTA ---------- */
         .cta {
           max-width: 720px;
           margin: 0 auto;
-          padding: 32px 24px 120px;
+          padding: 32px 0 80px;
           text-align: center;
         }
         .cta h3 {
@@ -337,22 +467,16 @@ export default function HowItWorks() {
 
         /* ---------- MOBILE ---------- */
         @media (max-width: 720px) {
-          .hero {
-            padding: 64px 20px 48px;
-          }
-          .steps {
-            padding: 0 20px 64px;
-          }
           .step {
             grid-template-columns: 1fr;
             gap: 28px;
-            padding: 40px 0;
+            padding: 36px 0;
           }
           .step[data-flip="true"] {
             direction: ltr;
           }
           .frame {
-            max-width: 240px;
+            max-width: 220px;
             margin: 0 auto;
           }
         }
