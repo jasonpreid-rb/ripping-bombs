@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { SeoPage, SeoH1, SeoH2, SeoP } from '../components/SeoPageLayout';
+import { SeoPage, SeoH1, SeoH2, SeoP, bestPerPlayer } from '../components/SeoPageLayout';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { countryFlag } from '../components/UI';
 import { useRouter } from 'next/router';
@@ -51,8 +51,9 @@ export default function HallOfFame({ entries: propEntries=[], orgs: propOrgs=[],
   // Has anyone hit 500 yet?
   const has500 = milestoneFirsts.find(m => m.threshold === 500)?.entry;
 
-  // Top 10 all-time
-  const top10 = approved.slice(0, 10);
+  // Top 10 all-time — one row per player (their own best drive), so the
+  // list reflects 10 different golfers rather than one golfer's 10 biggest.
+  const top10 = bestPerPlayer(approved).sort((a, b) => b.dist - a.dist).slice(0, 10);
 
   return (
     <SeoPage

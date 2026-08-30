@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
@@ -117,6 +118,8 @@ export function bestPerCategory(list) {
 
 export function FilteredLeaderboard({ title, description, heading, intro, entries, orgs, filter, cvt, unitLbl, showCategoryRecords }) {
   const router = useRouter();
+  const [activeCategory, setActiveCategory] = useState(null); // null = all categories
+
   const approvedOrgs = orgs.filter(o => o.status === 'approved');
   const orgFor = id => orgs.find(o => o.id === id);
 
@@ -124,9 +127,18 @@ export function FilteredLeaderboard({ title, description, heading, intro, entrie
     .filter(e => approvedOrgs.find(o => o.id === e.orgId))
     .filter(filter);
 
-  // One row per player, ranked by their own best verified distance.
-  const filtered = bestPerPlayer(matching).sort((a, b) => Number(b.dist) - Number(a.dist));
+  // When a category is active, scope the pool BEFORE computing per-player
+  // bests and ranks — this is what makes rank #3/#10/etc within that
+  // category correct, instead of just surfacing the #1 record.
+  const categoryPool = activeCategory ? matching.filter(e => getCategory(e) === activeCategory) : matching;
 
+  // One row per player, ranked by their own best verified distance
+  // (scoped to the active category, if any).
+  const filtered = bestPerPlayer(categoryPool).sort((a, b) => Number(b.dist) - Number(a.dist));
+
+  // Category record cards always reflect the FULL unfiltered pool, so the
+  // "#1 in each category" summary stays stable regardless of which
+  // category is currently selected below.
   const records = showCategoryRecords ? bestPerCategory(matching) : null;
 
   return (
@@ -137,13 +149,37 @@ export function FilteredLeaderboard({ title, description, heading, intro, entrie
 
       {records && (
         <>
-          <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:3, color:ORG, textTransform:'uppercase', marginBottom:10 }}>Category Records</div>
+          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:10 }}>
+            <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:3, color:ORG, textTransform:'uppercase' }}>Category Records</div>
+            {activeCategory && (
+              <button
+                onClick={() => setActiveCategory(null)}
+                style={{ background:'transparent', border:`1px solid ${BDR}`, color:DIM, fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:0.5, padding:'3px 10px', cursor:'pointer', textTransform:'uppercase' }}
+              >
+                ✕ Clear filter
+              </button>
+            )}
+          </div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))', gap:10, marginBottom:32 }}>
             {CATEGORY_KEYS.map((key) => {
               const rec = records[key];
+              const isActive = activeCategory === key;
               return (
-                <div key={key} style={{ background:BG2, border:`1px solid ${BDR}`, padding:'16px 16px 14px' }}>
-                  <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, color:DIM, textTransform:'uppercase', letterSpacing:0.8, marginBottom:8 }}>{CATEGORY_LABELS[key]}</div>
+                <div
+                  key={key}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setActiveCategory(isActive ? null : key)}
+                  onKeyDown={(ev) => { if (ev.key === 'Enter' || ev.key === ' ') setActiveCategory(isActive ? null : key); }}
+                  style={{
+                    background: BG2,
+                    border: `1px solid ${isActive ? ORG : BDR}`,
+                    padding: '16px 16px 14px',
+                    cursor: 'pointer',
+                    boxShadow: isActive ? `0 0 0 1px ${ORG}` : 'none',
+                  }}
+                >
+                  <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, color: isActive ? ORG : DIM, textTransform:'uppercase', letterSpacing:0.8, marginBottom:8 }}>{CATEGORY_LABELS[key]}</div>
                   {rec ? (
                     <>
                       <div style={{ fontFamily:DISP, fontSize:26, color:ORG, letterSpacing:0.5, lineHeight:1 }}>
@@ -159,6 +195,12 @@ export function FilteredLeaderboard({ title, description, heading, intro, entrie
             })}
           </div>
         </>
+      )}
+
+      {activeCategory && (
+        <div style={{ fontFamily:SANS, fontSize:12, color:MUT, marginBottom:16 }}>
+          Showing <span style={{ color:ORG, fontWeight:700 }}>{CATEGORY_LABELS[activeCategory]}</span> only — {filtered.length} player{filtered.length===1?'':'s'}
+        </div>
       )}
 
       {filtered.length > 0 && (
