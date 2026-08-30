@@ -72,7 +72,7 @@ export function SeoCTA() {
 // ——— Same six-category system used on the homepage / venue-rankings.jsx /
 // indoor-golf-league-ranking-system.jsx. Kept identical everywhere so a
 // player's category never shifts depending on which page they're viewed from.
-const CATEGORY_LABELS = {
+export const CATEGORY_LABELS = {
   male_open: 'Men (Open)',
   male_high_hcp: 'Men High Handicap',
   female_open: 'Women (Open)',
@@ -80,7 +80,7 @@ const CATEGORY_LABELS = {
   senior: 'Seniors',
   youth: 'Youth',
 };
-const CATEGORY_KEYS = Object.keys(CATEGORY_LABELS);
+export const CATEGORY_KEYS = Object.keys(CATEGORY_LABELS);
 
 export function getCategory(entry) {
   const age = Number(entry.age);

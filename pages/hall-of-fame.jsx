@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { SeoPage, SeoH1, SeoH2, SeoP, bestPerPlayer } from '../components/SeoPageLayout';
+import { SeoPage, SeoH1, SeoH2, SeoP, bestPerPlayer, bestPerCategory, CATEGORY_LABELS, CATEGORY_KEYS } from '../components/SeoPageLayout';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { countryFlag } from '../components/UI';
 import { useRouter } from 'next/router';
@@ -20,8 +20,15 @@ export default function HallOfFame({ entries: propEntries=[], orgs: propOrgs=[],
     .map(e => ({ ...e, dist: Number(e.dist) }))
     .sort((a, b) => b.dist - a.dist);
 
-  // All-time #1
+  // All-time #1 — overall open record across every category
   const allTimeRecord = approved[0] || null;
+
+  // Category records — best verified drive per category (Men, Men High
+  // Handicap, Women, Women High Handicap, Senior, Youth). Uses the same
+  // six-category system as the leaderboard pages, so a Women's or Youth
+  // record gets its own spotlight instead of needing to outdrive the
+  // open-category record just to appear on this page at all.
+  const categoryRecords = bestPerCategory(approved);
 
   // Country records — best drive per country
   // Country codes are normalized to uppercase for the dedup key, since
@@ -87,9 +94,9 @@ export default function HallOfFame({ entries: propEntries=[], orgs: propOrgs=[],
           <div style={{ fontFamily:SANS, fontWeight:700, fontSize:17, color:TXT, marginBottom:4 }}>
             {allTimeRecord.player}
           </div>
-          <div style={{ fontFamily:SANS, fontSize:13, color:MUT }}>
+          <div style={{ fontFamily:SANS, fontSize:13, color:MUT, display:'flex', alignItems:'center', justifyContent:'center', gap:4 }}>
             {orgFor(allTimeRecord.orgId)?.courseName || 'Simulator'}
-            {orgFor(allTimeRecord.orgId)?.country ? ` · ${countryFlag(orgFor(allTimeRecord.orgId).country)}` : ''}
+            {orgFor(allTimeRecord.orgId)?.country ? <>· {countryFlag(orgFor(allTimeRecord.orgId).country)}</> : null}
           </div>
           <button onClick={() => router.push(`/drive/${allTimeRecord.id}`)} style={{ background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:12, padding:'10px 24px', cursor:'pointer', letterSpacing:.5, marginTop:18 }}>
             VIEW DRIVE →
@@ -100,6 +107,45 @@ export default function HallOfFame({ entries: propEntries=[], orgs: propOrgs=[],
           <div style={{ fontFamily:SANS, fontSize:13, color:DIM }}>Records will appear here once drives are submitted.</div>
         </div>
       )}
+
+      {/* RECORDS BY CATEGORY */}
+      <SeoH2>Records By Category</SeoH2>
+      <SeoP>
+        The all-time record above is the open, all-comers mark — but it's realistically always going
+        to be a scratch Men's Open drive. Here's the longest verified drive in each Ripping Bombs
+        category, so Women's, Youth, Senior, and High Handicap records get their own spotlight.
+      </SeoP>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))', gap:10, marginBottom:40 }}>
+        {CATEGORY_KEYS.map((key) => {
+          const rec = categoryRecords[key];
+          const org = rec ? orgFor(rec.orgId) : null;
+          return (
+            <div
+              key={key}
+              onClick={() => rec && router.push(`/drive/${rec.id}`)}
+              style={{ background:BG2, border:`1px solid ${BDR}`, padding:'16px 16px 14px', cursor: rec ? 'pointer' : 'default' }}
+            >
+              <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, color:DIM, textTransform:'uppercase', letterSpacing:0.8, marginBottom:8 }}>
+                {CATEGORY_LABELS[key]}
+              </div>
+              {rec ? (
+                <>
+                  <div style={{ fontFamily:DISP, fontSize:26, color:ORG, letterSpacing:0.5, lineHeight:1 }}>
+                    {cvt ? cvt(rec.dist) : rec.dist} <span style={{ fontFamily:SANS, fontSize:10, color:DIM }}>{unitLbl || 'yds'}</span>
+                  </div>
+                  <div style={{ fontFamily:SANS, fontWeight:700, fontSize:13, color:TXT, marginTop:6 }}>{rec.player}</div>
+                  <div style={{ fontFamily:SANS, fontSize:11, color:MUT, marginTop:2, display:'flex', alignItems:'center', gap:4 }}>
+                    {org?.courseName || 'Simulator'}
+                    {org?.country ? <>· {countryFlag(org.country)}</> : null}
+                  </div>
+                </>
+              ) : (
+                <div style={{ fontFamily:SANS, fontSize:12, color:DIM, marginTop:4 }}>No verified drives yet</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
       {/* MILESTONE CHASE — 500 YARD TRACKER */}
       <SeoH2>The 500-Yard Chase</SeoH2>
