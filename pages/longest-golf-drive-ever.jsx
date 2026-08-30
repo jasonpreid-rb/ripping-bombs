@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
+import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA, bestPerPlayer } from '../components/SeoPageLayout';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { fmtDate } from '../lib/constants';
 
@@ -7,7 +7,10 @@ const linkStyle = { color: ORG };
 export default function Page({ entries=[], orgs=[], cvt=d=>d, unitLbl='yds' }) {
   const approvedOrgs = orgs.filter(o=>o.status==='approved');
   const orgFor = id => orgs.find(o=>o.id===id);
-  const allTimeBest = [...entries].filter(e=>approvedOrgs.find(o=>o.id===e.orgId)).sort((a,b)=>b.dist-a.dist).slice(0,10);
+  const matching = entries.filter(e=>approvedOrgs.find(o=>o.id===e.orgId));
+  // One row per player — their single longest verified drive — so the
+  // all-time Top 10 reflects 10 different golfers, not one golfer's 10 best.
+  const allTimeBest = bestPerPlayer(matching).sort((a,b)=>Number(b.dist)-Number(a.dist)).slice(0,10);
   return (
     <SeoPage title="Longest Golf Drive Ever | World Records | Ripping Bombs" description="What is the longest golf drive ever hit? Explore world records, professional long drive records, and the top verified competition drives on Ripping Bombs.">
       <SeoH1>Longest Golf Drive Ever</SeoH1>

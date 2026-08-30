@@ -68,20 +68,98 @@ export function SeoCTA() {
   );
 }
 
-export function FilteredLeaderboard({ title, description, heading, intro, entries, orgs, filter, cvt, unitLbl }) {
+// ——— Same six-category system used on the homepage / venue-rankings.jsx /
+// indoor-golf-league-ranking-system.jsx. Kept identical everywhere so a
+// player's category never shifts depending on which page they're viewed from.
+const CATEGORY_LABELS = {
+  male_open: 'Men (Open)',
+  male_high_hcp: 'Men High Handicap',
+  female_open: 'Women (Open)',
+  female_high_hcp: 'Women High Handicap',
+  senior: 'Seniors',
+  youth: 'Youth',
+};
+const CATEGORY_KEYS = Object.keys(CATEGORY_LABELS);
+
+export function getCategory(entry) {
+  const age = Number(entry.age);
+  const hcp = Number(entry.hcp);
+  const gender = (entry.gender || '').toLowerCase();
+  if (age < 16) return 'youth';
+  if (age >= 55) return 'senior';
+  if (gender === 'female') return hcp >= 20 ? 'female_high_hcp' : 'female_open';
+  return hcp >= 20 ? 'male_high_hcp' : 'male_open';
+}
+
+// Collapses a list of entries down to one row per player — that player's
+// single longest verified drive. Without this, a player with 10 submissions
+// occupied 10 rank positions instead of 1.
+export function bestPerPlayer(list) {
+  const best = {};
+  list.forEach((e) => {
+    const key = e.player;
+    if (!best[key] || Number(e.dist) > Number(best[key].dist)) best[key] = e;
+  });
+  return Object.values(best);
+}
+
+// Best verified entry per category, regardless of overall raw distance —
+// this is what lets a youth or high-handicap record surface at all, since
+// they'll almost never out-distance an open-category scratch golfer.
+export function bestPerCategory(list) {
+  const recs = {};
+  list.forEach((e) => {
+    const cat = getCategory(e);
+    if (!recs[cat] || Number(e.dist) > Number(recs[cat].dist)) recs[cat] = e;
+  });
+  return recs;
+}
+
+export function FilteredLeaderboard({ title, description, heading, intro, entries, orgs, filter, cvt, unitLbl, showCategoryRecords }) {
   const router = useRouter();
   const approvedOrgs = orgs.filter(o => o.status === 'approved');
   const orgFor = id => orgs.find(o => o.id === id);
-  const filtered = [...entries]
+
+  const matching = [...entries]
     .filter(e => approvedOrgs.find(o => o.id === e.orgId))
-    .filter(filter)
-    .sort((a, b) => b.dist - a.dist);
+    .filter(filter);
+
+  // One row per player, ranked by their own best verified distance.
+  const filtered = bestPerPlayer(matching).sort((a, b) => Number(b.dist) - Number(a.dist));
+
+  const records = showCategoryRecords ? bestPerCategory(matching) : null;
 
   return (
     <SeoPage title={`${title} | Ripping Bombs`} description={description}>
       <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:3, color:ORG, textTransform:'uppercase', marginBottom:10 }}>Global Leaderboard</div>
       <SeoH1>{heading}</SeoH1>
       <SeoP>{intro}</SeoP>
+
+      {records && (
+        <>
+          <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:3, color:ORG, textTransform:'uppercase', marginBottom:10 }}>Category Records</div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))', gap:10, marginBottom:32 }}>
+            {CATEGORY_KEYS.map((key) => {
+              const rec = records[key];
+              return (
+                <div key={key} style={{ background:BG2, border:`1px solid ${BDR}`, padding:'16px 16px 14px' }}>
+                  <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, color:DIM, textTransform:'uppercase', letterSpacing:0.8, marginBottom:8 }}>{CATEGORY_LABELS[key]}</div>
+                  {rec ? (
+                    <>
+                      <div style={{ fontFamily:DISP, fontSize:26, color:ORG, letterSpacing:0.5, lineHeight:1 }}>
+                        {cvt(rec.dist)} <span style={{ fontFamily:SANS, fontSize:10, color:DIM }}>{unitLbl}</span>
+                      </div>
+                      <div style={{ fontFamily:SANS, fontWeight:700, fontSize:13, color:TXT, marginTop:6 }}>{rec.player}</div>
+                    </>
+                  ) : (
+                    <div style={{ fontFamily:SANS, fontSize:12, color:DIM, marginTop:4 }}>No verified drives yet</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {filtered.length > 0 && (
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:12, marginBottom:28 }}>

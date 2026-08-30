@@ -1,4 +1,4 @@
-import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA } from '../components/SeoPageLayout';
+import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA, bestPerPlayer } from '../components/SeoPageLayout';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { nowWeek, weekLabel, sameWeek, fmtDate } from '../lib/constants';
 
@@ -6,10 +6,13 @@ export default function Page({ entries=[], orgs=[], cvt=d=>d, unitLbl='yds' }) {
   const approvedOrgs = orgs.filter(o=>o.status==='approved');
   const orgFor = id => orgs.find(o=>o.id===id);
   const thisWeek = nowWeek();
-  const weekEntries = [...entries]
+  const matching = entries
     .filter(e=>approvedOrgs.find(o=>o.id===e.orgId))
-    .filter(e=>sameWeek(e.date,thisWeek))
-    .sort((a,b)=>b.dist-a.dist)
+    .filter(e=>sameWeek(e.date,thisWeek));
+  // One row per player — their best drive of the week — so a player with
+  // several submissions this week doesn't occupy several rank positions.
+  const weekEntries = bestPerPlayer(matching)
+    .sort((a,b)=>Number(b.dist)-Number(a.dist))
     .slice(0,20);
   return (
     <SeoPage title="Longest Golf Drives Submitted This Week | Ripping Bombs" description="See the longest golf drives submitted this week from clubs and tournaments worldwide. Updated weekly on Ripping Bombs.">
