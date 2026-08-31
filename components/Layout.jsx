@@ -256,7 +256,7 @@ function SiteFooter() {
             <RBLogoWhite height={32}/>
             <div style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 14, marginBottom: 20, lineHeight: 1.7 }}>The global home of competition longest drives. Free to join, free to submit.</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {[['Leaderboard','/leaderboard'],['Clubs & Events','/clubs'],['For Venues','/for-venues'],['Register','/register'],['Login','/login'],['Contact Us','/contact']].map(([l,h]) => (
+              {[['Leaderboard','/leaderboard'],['All Guides & Leaderboards','/resources'],['Clubs & Events','/clubs'],['For Venues','/for-venues'],['Register','/register'],['Login','/login'],['Contact Us','/contact']].map(([l,h]) => (
                 <span key={h} onClick={() => router.push(h)} style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(255,255,255,0.55)', cursor: 'pointer' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.55)'}>{l}</span>
               ))}
             </div>
