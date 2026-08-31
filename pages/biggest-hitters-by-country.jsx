@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA } from '../components/SeoPageLayout';
 import { ORG, TXT, MUT, DIM, BG2, BG3, BDR, SANS, DISP, COUNTRIES, toSlug, tier } from '../lib/constants';
 import { countryFlag } from '../components/UI';
+import { WORLD_VIEWBOX, WORLD_PATHS, COUNTRY_XY } from '../lib/worldMapData';
 
 const linkStyle = { color: ORG, textDecoration: 'underline' };
 
@@ -14,37 +15,6 @@ function slugFor(country) {
   if (country.code === 'US') return 'longest-drive-usa';
   return `longest-drive-${toSlug(country.name)}`;
 }
-
-// Equirectangular projection (x = lon, y = lat) of each country's rough
-// centroid, mapped onto a 1000×460 viewBox. Approximate — this is a
-// stylised directory map, not a survey-accurate one.
-const COUNTRY_XY = {
-  AF: [683.3, 145.7], AL: [555.6, 125.2], DZ: [508.3, 158.4], AR: [322.2, 316.9], AU: [875.0, 293.9],
-  AT: [538.9, 109.9], BH: [638.9, 163.6], BE: [511.1, 102.2], BR: [347.2, 255.6], BG: [569.4, 120.1],
-  KH: [791.7, 196.8], CA: [205.6, 86.9],  CL: [302.8, 319.4], CN: [791.7, 140.6], CO: [300.0, 219.8],
-  HR: [544.4, 115.0], CZ: [541.7, 102.2], DK: [527.8, 86.9],  EG: [583.3, 161.0], FI: [572.2, 66.4],
-  FR: [505.6, 109.9], DE: [527.8, 99.7],  GH: [497.2, 209.6], GR: [561.1, 130.3], HK: [816.7, 173.8],
-  HU: [555.6, 109.9], IN: [716.7, 176.3], ID: [827.8, 235.1], IE: [477.8, 94.6],  IL: [597.2, 150.8],
-  IT: [533.3, 120.1], JP: [883.3, 138.0], KE: [605.6, 227.4], KR: [855.6, 138.0], KW: [633.3, 155.9],
-  MY: [783.3, 219.8], MX: [216.7, 171.2], MA: [483.3, 148.2], NL: [513.9, 97.1],  NZ: [983.3, 334.8],
-  NG: [522.2, 207.0], NO: [525.0, 74.1],  OM: [658.3, 176.3], PK: [694.4, 153.3], PH: [838.9, 196.8],
-  PL: [555.6, 97.1],  PT: [477.8, 130.3], QA: [641.7, 166.1], RO: [569.4, 112.4], RU: [761.1, 71.6],
-  SA: [625.0, 168.7], SG: [788.9, 227.4], ZA: [566.7, 304.1], ES: [488.9, 127.8], SE: [541.7, 71.6],
-  CH: [522.2, 109.9], TW: [836.1, 168.7], TH: [780.6, 191.7], TR: [597.2, 130.3], AE: [650.0, 168.7],
-  GB: [494.4, 92.0],  US: [227.8, 130.3], UY: [344.4, 314.3], VN: [800.0, 189.1], ZW: [583.3, 278.6],
-};
-
-// Rough, stylised continent silhouettes — decorative context for the dots,
-// not survey-accurate borders. Straight edges to match the site's
-// sharp-corner design language rather than smooth coastlines.
-const CONTINENTS = [
-  'M130,50 L330,50 L330,160 L280,235 L195,240 L145,190 L105,120 Z',           // North America
-  'M255,235 L355,230 L385,300 L355,405 L300,420 L265,375 L245,300 Z',        // South America
-  'M455,60 L605,55 L615,140 L540,155 L465,140 L445,100 Z',                    // Europe
-  'M455,150 L615,150 L625,260 L580,345 L515,345 L465,270 L445,200 Z',        // Africa
-  'M605,40 L910,40 L925,225 L800,265 L695,225 L615,150 L600,90 Z',           // Asia
-  'M825,260 L965,255 L975,330 L900,352 L825,320 Z',                          // Australia / Oceania
-];
 
 export default function BiggestHittersByCountry({ entries: propEntries=[], orgs: propOrgs=[], cvt, unitLbl, staticEntries=[], staticOrgs=[] }) {
   const router = useRouter();
@@ -77,10 +47,10 @@ export default function BiggestHittersByCountry({ entries: propEntries=[], orgs:
   const top10Countries = withData.slice(0, 10);
 
   const markerStyle = (rec) => {
-    if (!rec) return { r: 4, fill: DIM, glow: 'none' };
-    if (rec.dist >= 350) return { r: 10, fill: ORG, glow: `drop-shadow(0 0 8px ${ORG})` };
-    if (rec.dist >= 300) return { r: 8, fill: ORG, glow: `drop-shadow(0 0 5px ${ORG})` };
-    return { r: 6, fill: ORG, glow: `drop-shadow(0 0 2px ${ORG})` };
+    if (!rec) return { r: 8, fill: DIM, glow: 'none' };
+    if (rec.dist >= 350) return { r: 20, fill: ORG, glow: `drop-shadow(0 0 14px ${ORG})` };
+    if (rec.dist >= 300) return { r: 16, fill: ORG, glow: `drop-shadow(0 0 9px ${ORG})` };
+    return { r: 12, fill: ORG, glow: `drop-shadow(0 0 4px ${ORG})` };
   };
 
   return (
@@ -101,9 +71,9 @@ export default function BiggestHittersByCountry({ entries: propEntries=[], orgs:
 
       {/* WORLD MAP */}
       <div style={{ background:BG2, border:`1px solid ${BDR}`, padding:'20px 16px 8px', marginBottom:16 }}>
-        <svg viewBox="0 0 1000 460" style={{ width:'100%', height:'auto', display:'block' }}>
-          {CONTINENTS.map((d, i) => (
-            <path key={i} d={d} fill={BG3} stroke={BDR} strokeWidth="1" />
+        <svg viewBox={WORLD_VIEWBOX} style={{ width:'100%', height:'auto', display:'block' }}>
+          {Object.entries(WORLD_PATHS).map(([code, d]) => (
+            <path key={code} d={d} fill={BG3} stroke={BDR} strokeWidth="1.2" strokeLinejoin="round" />
           ))}
           {countryList.map((c) => {
             const xy = COUNTRY_XY[c.code];
@@ -117,6 +87,8 @@ export default function BiggestHittersByCountry({ entries: propEntries=[], orgs:
                 r={m.r}
                 fill={m.fill}
                 fillOpacity={c.record ? 0.9 : 0.5}
+                stroke="#1a1a1a"
+                strokeWidth={2}
                 style={{ filter:m.glow, cursor:'pointer', transition:'r .15s' }}
                 onClick={() => router.push(`/${c.slug}`)}
                 onMouseEnter={() => setHovered(c)}
