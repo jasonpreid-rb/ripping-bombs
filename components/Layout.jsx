@@ -310,7 +310,7 @@ function SiteFooter() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
             <span style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>The global home of competition longest drives</span>
             <a href="https://smollaunch.com" target="_blank" rel="noopener">
-              <img src="https://smollaunch.com/badges/featured-dark.svg" alt="Ripping Bombs — Featured on Smol Launch" loading="lazy" width="250" height="60" />
+              <img src="https://smollaunch.com/badges/featured-dark.svg" alt="Ripping Bombs — Featured on Smol Launch" loading="lazy" width="83" height="20" />
             </a>
           </div>
         </div>
