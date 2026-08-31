@@ -307,7 +307,12 @@ function SiteFooter() {
             <a href="/privacy" style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.3)'}>Privacy</a>
             <a href="/terms" style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.3)'}>Terms</a>
           </div>
-          <div style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>The global home of competition longest drives</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+            <span style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>The global home of competition longest drives</span>
+            <a href="https://smollaunch.com" target="_blank" rel="noopener">
+              <img src="https://smollaunch.com/badges/featured-dark.svg" alt="Ripping Bombs — Featured on Smol Launch" loading="lazy" width="250" height="60" />
+            </a>
+          </div>
         </div>
       </div>
     </footer>
