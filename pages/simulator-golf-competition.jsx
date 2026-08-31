@@ -82,7 +82,7 @@ export default function SimulatorGolfCompetition() {
             {[
               { href: "/trackman-long-drive", label: "Trackman Long Drive" },
               { href: "/online-golf-long-drive-leaderboard", label: "Online Leaderboard" },
-              { href: "/golf-long-drive-competition", label: "Run a Competition" },
+              { href: "/golf-longest-drive-competition", label: "Run a Competition" },
               { href: "/long-drive-golf-equipment", label: "Long Drive Equipment" },
             ].map(({ href, label }) => (
               <Link key={href} href={href} style={{ background: BG2, color: ORG, border: `1px solid ${BDR}`, borderRadius: 6, padding: "8px 14px", fontSize: 13, textDecoration: "none", fontFamily: SANS }}>{label}</Link>
