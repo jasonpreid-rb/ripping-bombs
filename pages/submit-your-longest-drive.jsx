@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA } from "../components/SeoPageLayout";
+import SeoFaq from "../components/SeoFaq";
 import { SANS, DISP, ORG, TXT, MUT, BG2, BG3, BDR } from "../lib/constants";
 
 export default function SubmitYourLongestDrive() {
@@ -8,7 +9,7 @@ export default function SubmitYourLongestDrive() {
       title="Submit Your Longest Drive — Register & Add Your Drive to the Global Leaderboard | Ripping Bombs"
       description="Ready to submit your longest golf drive? Register your club or simulator account and add your best drive to the Ripping Bombs global long drive leaderboard — free."
     >
-      <div style={{ maxWidth: 760 }}>
+      <>
         <p style={{ color: ORG, fontFamily: DISP, fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>Submit a Drive</p>
         <SeoH1>Submit Your Longest Drive to the Global Leaderboard</SeoH1>
         <SeoP>Ripping Bombs is the world's longest golf drive registry. Anyone can submit — golf clubs, simulator users, and individual players. Here's exactly how it works and what you need to get your drive on the record.</SeoP>
@@ -91,20 +92,17 @@ export default function SubmitYourLongestDrive() {
 
         <SeoCTA />
 
-        <SeoH2>FAQs</SeoH2>
-        {[
-          { q: "Is it free to submit?", a: "Yes. Ripping Bombs is completely free for clubs and simulator users. Registration, submission, and viewing the leaderboard are all free." },
-          { q: "How long does approval take for club accounts?", a: "Club account applications are typically reviewed within 24–48 hours. Simulator accounts are approved instantly." },
-          { q: "Can I submit drives from multiple players at my club?", a: "Yes. Club accounts can submit drives on behalf of any number of players. Each drive is tagged to the player by name." },
-          { q: "What if I entered the wrong distance?", a: "Contact us via the contact page and we'll correct or remove the entry." },
-          { q: "Does the drive need to be hit recently?", a: "No strict recency requirement, but the date of the drive must be accurately recorded. Drives appear on the weekly leaderboard for the week in which they were hit." },
-          { q: "Can individual players (not clubs) submit drives?", a: "Individual players should register a simulator account if they have a launch monitor. For course drives, ask your club to register and submit on your behalf." },
-        ].map(({ q, a }) => (
-          <div key={q} style={{ borderBottom: `1px solid ${BDR}`, paddingBottom: 18, marginBottom: 18 }}>
-            <p style={{ fontFamily: DISP, fontWeight: 700, color: TXT, marginBottom: 6, fontSize: 14 }}>{q}</p>
-            <p style={{ fontFamily: SANS, fontSize: 14, color: MUT, lineHeight: 1.8, margin: 0 }}>{a}</p>
-          </div>
-        ))}
+        <SeoFaq
+          title="FAQs"
+          faqs={[
+            { q: "Is it free to submit?", a: "Yes. Ripping Bombs is completely free for clubs and simulator users. Registration, submission, and viewing the leaderboard are all free." },
+            { q: "How long does approval take for club accounts?", a: "Club account applications are typically reviewed within 24–48 hours. Simulator accounts are approved instantly." },
+            { q: "Can I submit drives from multiple players at my club?", a: "Yes. Club accounts can submit drives on behalf of any number of players. Each drive is tagged to the player by name." },
+            { q: "What if I entered the wrong distance?", a: "Contact us via the contact page and we'll correct or remove the entry." },
+            { q: "Does the drive need to be hit recently?", a: "No strict recency requirement, but the date of the drive must be accurately recorded. Drives appear on the weekly leaderboard for the week in which they were hit." },
+            { q: "Can individual players (not clubs) submit drives?", a: "Individual players should register a simulator account if they have a launch monitor. For course drives, ask your club to register and submit on your behalf." },
+          ]}
+        />
 
         <div style={{ marginTop: 40 }}>
           <p style={{ fontFamily: DISP, fontWeight: 700, color: MUT, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Related Reading</p>
@@ -112,16 +110,16 @@ export default function SubmitYourLongestDrive() {
             {[
               { href: "/register", label: "Register" },
               { href: "/online-golf-long-drive-leaderboard", label: "View Leaderboard" },
-              { href: "/golf-long-drive-competition", label: "Run a Competition" },
+              { href: "/golf-longest-drive-competition", label: "Run a Competition" },
               { href: "/simulator-golf-competition", label: "Simulator Competitions" },
               { href: "/trackman-long-drive", label: "Trackman Long Drive" },
-              { href: "/how-to-register-page", label: "Registration Guide" },
+              { href: "/how-to-register", label: "Registration Guide" },
             ].map(({ href, label }) => (
               <Link key={href} href={href} style={{ background: BG2, color: ORG, border: `1px solid ${BDR}`, borderRadius: 6, padding: "8px 14px", fontSize: 13, textDecoration: "none", fontFamily: SANS }}>{label}</Link>
             ))}
           </div>
         </div>
-      </div>
+      </>
     </SeoPage>
   );
 }

@@ -1,6 +1,6 @@
-import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { SeoPage } from '../components/SeoPageLayout'
+import SeoFaq from '../components/SeoFaq'
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants'
 
 // ─── Inline mock UI components ───────────────────────────────────────────────
@@ -174,14 +174,13 @@ const FAQS = [
 
 export default function GolferProfilePage() {
   const router = useRouter()
-  const [openFaq, setOpenFaq] = useState(null)
 
   return (
     <SeoPage
       title="Your Golfer Profile, URL & World Ranking | Ripping Bombs"
       description="Register free and get your own golfer profile with a unique URL, personal dashboard, live world long-drive ranking, full drive history, and 2027 Championship points tracker."
     >
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '0 0 80px' }}>
+      <>
 
         {/* HERO */}
         <div style={{ position: 'relative', width: '100vw', marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
@@ -308,21 +307,9 @@ export default function GolferProfilePage() {
           </button>
         </div>
 
-        {/* FAQ */}
-        <div style={{ fontFamily: DISP, fontSize: 28, color: TXT, letterSpacing: 0.5, marginBottom: 20 }}>FAQ</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {FAQS.map(({ q, a }, i) => (
-            <div key={i} style={{ background: BG2, border: `1px solid ${openFaq === i ? 'rgba(255,0,144,0.25)' : BDR}`, overflow: 'hidden' }}>
-              <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width: '100%', background: 'none', border: 'none', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', gap: 16 }}>
-                <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 600, color: TXT, textAlign: 'left' }}>{q}</span>
-                <span style={{ fontFamily: SANS, fontSize: 18, color: ORG, flexShrink: 0, transform: openFaq === i ? 'rotate(45deg)' : 'none', transition: 'transform .2s' }}>+</span>
-              </button>
-              {openFaq === i && <div style={{ padding: '0 20px 18px', fontFamily: SANS, fontSize: 13, color: MUT, lineHeight: 1.75 }}>{a}</div>}
-            </div>
-          ))}
-        </div>
+        <SeoFaq title="FAQ" faqs={FAQS} />
 
-      </div>
+      </>
     </SeoPage>
   )
 }

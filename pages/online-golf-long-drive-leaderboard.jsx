@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA } from "../components/SeoPageLayout";
+import SeoFaq from "../components/SeoFaq";
 import { SANS, DISP, ORG, TXT, MUT, BG2, BG3, BDR } from "../lib/constants";
 
 export default function OnlineGolfLongDriveLeaderboard() {
@@ -8,7 +9,7 @@ export default function OnlineGolfLongDriveLeaderboard() {
       title="Online Golf Long Drive Leaderboard — Track & Compare Your Longest Drives | Ripping Bombs"
       description="The world's first online golf long drive leaderboard. Register your club, submit drives, and see how your biggest hitters rank against golfers worldwide."
     >
-      <div style={{ maxWidth: 760 }}>
+      <>
         <p style={{ color: ORG, fontFamily: DISP, fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>Global Leaderboard</p>
         <SeoH1>The Online Golf Long Drive Leaderboard</SeoH1>
         <SeoP>For the first time, golfers and clubs worldwide can submit their longest drives to a single, publicly visible leaderboard — filtered by category, country, handicap, age group, and more. This is Ripping Bombs.</SeoP>
@@ -54,25 +55,22 @@ export default function OnlineGolfLongDriveLeaderboard() {
 
         <SeoCTA />
 
-        <SeoH2>FAQs</SeoH2>
-        {[
-          { q: "Is the leaderboard free to view?", a: "Yes — the Ripping Bombs leaderboard is publicly visible to anyone. No account required to browse results." },
-          { q: "How often is the leaderboard updated?", a: "Continuously. New approved submissions appear immediately. The weekly leaderboard resets at the start of each ISO week (Monday 00:00 UTC)." },
-          { q: "Can I share my leaderboard position?", a: "Yes — every drive entry has a unique shareable URL and a one-click option to generate a branded share card for WhatsApp, Facebook, or Instagram." },
-          { q: "Is there a leaderboard for specific countries?", a: "You can filter the leaderboard by country. We also have dedicated pages for country-specific longest drive records including the UK, Australia, USA, Ireland, Canada, and more." },
-        ].map(({ q, a }) => (
-          <div key={q} style={{ borderBottom: `1px solid ${BDR}`, paddingBottom: 18, marginBottom: 18 }}>
-            <p style={{ fontFamily: DISP, fontWeight: 700, color: TXT, marginBottom: 6, fontSize: 14 }}>{q}</p>
-            <p style={{ fontFamily: SANS, fontSize: 14, color: MUT, lineHeight: 1.8, margin: 0 }}>{a}</p>
-          </div>
-        ))}
+        <SeoFaq
+          title="FAQs"
+          faqs={[
+            { q: "Is the leaderboard free to view?", a: "Yes — the Ripping Bombs leaderboard is publicly visible to anyone. No account required to browse results." },
+            { q: "How often is the leaderboard updated?", a: "Continuously. New approved submissions appear immediately. The weekly leaderboard resets at the start of each ISO week (Monday 00:00 UTC)." },
+            { q: "Can I share my leaderboard position?", a: "Yes — every drive entry has a unique shareable URL and a one-click option to generate a branded share card for WhatsApp, Facebook, or Instagram." },
+            { q: "Is there a leaderboard for specific countries?", a: "You can filter the leaderboard by country. We also have dedicated pages for country-specific longest drive records including the UK, Australia, USA, Ireland, Canada, and more." },
+          ]}
+        />
 
         <div style={{ marginTop: 40 }}>
           <p style={{ fontFamily: DISP, fontWeight: 700, color: MUT, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Related Reading</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
             {[
               { href: "/leaderboard", label: "Live Leaderboard" },
-              { href: "/golf-long-drive-competition", label: "Run a Long Drive Comp" },
+              { href: "/golf-longest-drive-competition", label: "Run a Long Drive Comp" },
               { href: "/simulator-golf-competition", label: "Simulator Competitions" },
               { href: "/longest-drive-uk", label: "Longest Drive UK" },
               { href: "/longest-drive-australia", label: "Longest Drive Australia" },
@@ -81,7 +79,7 @@ export default function OnlineGolfLongDriveLeaderboard() {
             ))}
           </div>
         </div>
-      </div>
+      </>
     </SeoPage>
   );
 }

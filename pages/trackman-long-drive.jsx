@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA, SeoTable } from "../components/SeoPageLayout";
+import SeoFaq from "../components/SeoFaq";
 import { SANS, DISP, ORG, TXT, MUT, BG2, BG3, BDR } from "../lib/constants";
 
 export default function TrackmanLongDrive() {
@@ -8,7 +9,7 @@ export default function TrackmanLongDrive() {
       title="Trackman Long Drive — Data, Competitions & Leaderboard Submissions | Ripping Bombs"
       description="Use Trackman to measure your longest drive, run an indoor long drive competition, and submit your results to the Ripping Bombs global leaderboard. Everything you need to know."
     >
-      <div style={{ maxWidth: 760 }}>
+      <>
         <p style={{ color: ORG, fontFamily: DISP, fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>Trackman & Launch Monitors</p>
         <SeoH1>Trackman Long Drive: Measure, Compete & Register Your Best</SeoH1>
         <SeoP>Trackman is the gold standard in golf ball-flight measurement. Whether you use it at a teaching facility, a simulator bay, or on the range, it produces the most accurate carry and total distance numbers available. Here's how to use that data for competition — and how to put it on the record.</SeoP>
@@ -73,18 +74,15 @@ export default function TrackmanLongDrive() {
 
         <SeoCTA />
 
-        <SeoH2>FAQs</SeoH2>
-        {[
-          { q: "Does it have to be Trackman specifically?", a: "No — Ripping Bombs accepts simulator submissions from any major launch monitor including Foresight, Garmin R10, Bushnell Launch Pro, FlightScope Mevo+, SkyTrak, and others. Trackman is just the most common in professional and coaching environments." },
-          { q: "Is Trackman indoor distance the same as outdoor?", a: "Trackman's outdoor simulation mode is calibrated to produce results consistent with real outdoor conditions. Carry distances are generally within a few yards of what you'd see on a calm day on the range." },
-          { q: "Can I use ball flight aids or distance boosts?", a: "No. All Ripping Bombs submissions must use standard outdoor ball flight with no assisted corrections or distance enhancements. The screenshot must reflect unassisted carry distance." },
-          { q: "What if I hit the drive at a golf academy or driving range?", a: "That's fine. Your submission location doesn't need to be your home simulator. As long as you have the screenshot and the drive is yours, it's valid." },
-        ].map(({ q, a }) => (
-          <div key={q} style={{ borderBottom: `1px solid ${BDR}`, paddingBottom: 18, marginBottom: 18 }}>
-            <p style={{ fontFamily: DISP, fontWeight: 700, color: TXT, marginBottom: 6, fontSize: 14 }}>{q}</p>
-            <p style={{ fontFamily: SANS, fontSize: 14, color: MUT, lineHeight: 1.8, margin: 0 }}>{a}</p>
-          </div>
-        ))}
+        <SeoFaq
+          title="FAQs"
+          faqs={[
+            { q: "Does it have to be Trackman specifically?", a: "No — Ripping Bombs accepts simulator submissions from any major launch monitor including Foresight, Garmin R10, Bushnell Launch Pro, FlightScope Mevo+, SkyTrak, and others. Trackman is just the most common in professional and coaching environments." },
+            { q: "Is Trackman indoor distance the same as outdoor?", a: "Trackman's outdoor simulation mode is calibrated to produce results consistent with real outdoor conditions. Carry distances are generally within a few yards of what you'd see on a calm day on the range." },
+            { q: "Can I use ball flight aids or distance boosts?", a: "No. All Ripping Bombs submissions must use standard outdoor ball flight with no assisted corrections or distance enhancements. The screenshot must reflect unassisted carry distance." },
+            { q: "What if I hit the drive at a golf academy or driving range?", a: "That's fine. Your submission location doesn't need to be your home simulator. As long as you have the screenshot and the drive is yours, it's valid." },
+          ]}
+        />
 
         <div style={{ marginTop: 40 }}>
           <p style={{ fontFamily: DISP, fontWeight: 700, color: MUT, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Related Reading</p>
@@ -100,7 +98,7 @@ export default function TrackmanLongDrive() {
             ))}
           </div>
         </div>
-      </div>
+      </>
     </SeoPage>
   );
 }

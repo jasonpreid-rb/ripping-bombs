@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA, SeoTable } from "../components/SeoPageLayout";
+import SeoFaq from "../components/SeoFaq";
 import { SANS, DISP, ORG, TXT, MUT, BG2, BDR } from "../lib/constants";
 
 export default function GolfLongestDriveCompetition() {
@@ -8,7 +9,7 @@ export default function GolfLongestDriveCompetition() {
       title="Golf Longest Drive Competition — How to Run One & Register Results | Ripping Bombs"
       description="Everything you need to know about running a golf longest drive competition at your club — format, rules, prizes, and how to register your results on a global leaderboard."
     >
-      <div style={{ maxWidth: 760 }}>
+      <>
         <p style={{ color: ORG, fontFamily: DISP, fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>Competition Guide</p>
         <SeoH1>Golf Longest Drive Competition — How They Work</SeoH1>
         <SeoP>The longest drive competition is one of golf's most popular and accessible side events. Whether it's run on a par-5 during a club day or as a standalone contest, the format is simple: whoever hits the ball furthest wins. Here's everything you need to know — from format to results registration.</SeoP>
@@ -77,18 +78,15 @@ export default function GolfLongestDriveCompetition() {
 
         <SeoCTA />
 
-        <SeoH2>FAQs</SeoH2>
-        {[
-          { q: "Do I need special equipment to run a longest drive competition?", a: "No. A standard driver, a measuring tape or rangefinder, and a designated tee area is all you need. For simulator events, any major launch monitor (Trackman, Foresight, Garmin, Bushnell) produces valid distance data." },
-          { q: "Can I run a longest drive competition indoors on a simulator?", a: "Absolutely. Simulator competitions are fully supported on Ripping Bombs. Results are tagged accordingly on the leaderboard so outdoor and indoor records are clearly distinguished." },
-          { q: "How do I register my club's competition results?", a: "Register your club on Ripping Bombs (it's free), get approved, and you can start submitting drives immediately." },
-          { q: "What distance counts as a good longest drive?", a: "For male club golfers, anything over 280 yards is genuinely impressive. Elite amateurs regularly hit 310–330 yards. For women, 220+ yards is an excellent mark." },
-        ].map(({ q, a }) => (
-          <div key={q} style={{ borderBottom: `1px solid ${BDR}`, paddingBottom: 18, marginBottom: 18 }}>
-            <p style={{ fontFamily: DISP, fontWeight: 700, color: TXT, marginBottom: 6, fontSize: 14 }}>{q}</p>
-            <p style={{ fontFamily: SANS, fontSize: 14, color: MUT, lineHeight: 1.8, margin: 0 }}>{a}</p>
-          </div>
-        ))}
+        <SeoFaq
+          title="FAQs"
+          faqs={[
+            { q: "Do I need special equipment to run a longest drive competition?", a: "No. A standard driver, a measuring tape or rangefinder, and a designated tee area is all you need. For simulator events, any major launch monitor (Trackman, Foresight, Garmin, Bushnell) produces valid distance data." },
+            { q: "Can I run a longest drive competition indoors on a simulator?", a: "Absolutely. Simulator competitions are fully supported on Ripping Bombs. Results are tagged accordingly on the leaderboard so outdoor and indoor records are clearly distinguished." },
+            { q: "How do I register my club's competition results?", a: "Register your club on Ripping Bombs (it's free), get approved, and you can start submitting drives immediately." },
+            { q: "What distance counts as a good longest drive?", a: "For male club golfers, anything over 280 yards is genuinely impressive. Elite amateurs regularly hit 310–330 yards. For women, 220+ yards is an excellent mark." },
+          ]}
+        />
 
         <div style={{ marginTop: 40 }}>
           <p style={{ fontFamily: DISP, fontWeight: 700, color: MUT, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Explore Related Pages</p>
@@ -107,7 +105,7 @@ export default function GolfLongestDriveCompetition() {
             ))}
           </div>
         </div>
-      </div>
+      </>
     </SeoPage>
   );
 }
