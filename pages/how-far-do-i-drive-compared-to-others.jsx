@@ -147,6 +147,56 @@ function AnimatedResult({ result, hcp, gender }) {
   );
 }
 
+// ── Embed code generator ──────────────────────────────────────────────────
+// Renders a copyable <iframe> snippet pointing at /embed/calculator, so
+// venues, blogs, and forum posts can drop the calculator into their own
+// page. This is the mechanism behind the "linkable asset" strategy — every
+// embed carries a live link back to Ripping Bombs.
+function EmbedCodeSection() {
+  const [copied, setCopied] = useState(false);
+  const embedCode = `<iframe src="https://www.rippingbombs.com/embed/calculator" width="100%" height="620" style="border:none;max-width:460px;" title="Golf Driving Distance Calculator by Ripping Bombs" loading="lazy"></iframe>`;
+
+  function copyCode() {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(embedCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'calculator_embed_code_copied', { event_category: 'engagement' });
+      }
+    }
+  }
+
+  return (
+    <Card style={{ marginBottom: 28 }}>
+      <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 2, color: ORG, textTransform: 'uppercase', marginBottom: 8 }}>
+        Add This To Your Site
+      </div>
+      <SeoP>
+        Run a golf blog, course website, or simulator venue page? Embed this calculator directly —
+        free, no sign-up, and it updates automatically as we refine the benchmarks.
+      </SeoP>
+      <div style={{ position: 'relative' }}>
+        <textarea
+          readOnly
+          value={embedCode}
+          onClick={e => e.target.select()}
+          rows={3}
+          style={{
+            width: '100%', background: BG3, border: `1px solid ${BDR}`, borderRadius: 0,
+            padding: '12px 14px', color: MUT, fontFamily: 'monospace', fontSize: 12,
+            resize: 'none', boxSizing: 'border-box', lineHeight: 1.5,
+          }}
+        />
+      </div>
+      <div style={{ display: 'flex', gap: 10, marginTop: 12, alignItems: 'center' }}>
+        <Btn variant="orange" onClick={copyCode}>{copied ? 'COPIED ✓' : 'COPY EMBED CODE'}</Btn>
+        <span style={{ fontFamily: SANS, fontSize: 11, color: DIM }}>Resize width/height freely — it's responsive up to 460px wide.</span>
+      </div>
+    </Card>
+  );
+}
+
 export default function PercentileCalculator() {
   const router = useRouter();
   const [distance, setDistance] = useState('');
@@ -224,6 +274,8 @@ export default function PercentileCalculator() {
 
         {result && <AnimatedResult result={result} hcp={hcp} gender={gender} />}
       </Card>
+
+      <EmbedCodeSection />
 
       {/* CTA strip — pink to match brand */}
       <div style={{ background:'rgba(255,0,144,0.05)', border:'1px solid rgba(255,0,144,0.2)', padding:'28px 24px', margin:'32px 0', textAlign:'center' }}>
