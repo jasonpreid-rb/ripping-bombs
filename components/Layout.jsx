@@ -277,14 +277,12 @@ function SiteFooter() {
               ))}
             </div>
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 1.5, color: DIM, marginBottom: 10, textTransform: 'uppercase' }}>Follow Us</div>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <a href="https://www.instagram.com/rippingbombs/" target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', padding: '9px 14px', textDecoration: 'none' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 12, color: '#fff' }}>Instagram</span>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <a href="https://www.instagram.com/rippingbombs/" target="_blank" rel="noreferrer" aria-label="Instagram" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, borderRadius: '50%', border: `1px solid ${ORG}`, textDecoration: 'none', transition: 'background .15s' }} onMouseEnter={e=>e.currentTarget.style.background='rgba(255,0,144,0.12)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={ORG} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
               </a>
-              <a href="https://www.facebook.com/rippingbombs/" target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#1877F2', padding: '9px 14px', textDecoration: 'none' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 12, color: '#fff' }}>Facebook</span>
+              <a href="https://www.facebook.com/rippingbombs/" target="_blank" rel="noreferrer" aria-label="Facebook" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, borderRadius: '50%', border: `1px solid ${ORG}`, textDecoration: 'none', transition: 'background .15s' }} onMouseEnter={e=>e.currentTarget.style.background='rgba(255,0,144,0.12)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill={ORG}><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
               </a>
             </div>
           </div>
