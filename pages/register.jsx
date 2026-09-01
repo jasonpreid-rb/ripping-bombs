@@ -119,7 +119,7 @@ function ChoiceStep({ onChoose, redirectTo }) {
   return (
     <div style={{ maxWidth: 540, margin: '0 auto', padding: '40px 18px 80px' }}>
       <div style={{ fontFamily: DISP, fontSize: 30, color: TXT, letterSpacing: 1, marginBottom: 8, textAlign: 'center' }}>
-        Welcome to Ripping Bombs 👋
+        Welcome to Ripping Bombs
       </div>
       <div style={{ fontFamily: SANS, fontSize: 14, color: MUT, marginBottom: 6, textAlign: 'center' }}>
         {redirectTo ? "One quick question and you'll be right back to submitting your drive." : "Free to join, forever. One quick question to get you set up."}
@@ -137,10 +137,15 @@ function ChoiceStep({ onChoose, redirectTo }) {
         {['simulator', 'club'].map(val => {
           const c = CHOICES[val];
           return (
-            <button
+            // The whole panel is clickable, plus an explicit button bottom-right
+            // for a clearer call to action. Using a div (not a nested button) as
+            // the panel itself, since a <button> can't contain another <button>.
+            <div
               key={val}
-              type="button"
+              role="button"
+              tabIndex={0}
               onClick={() => onChoose(val)}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onChoose(val); }}
               style={{
                 position: 'relative',
                 textAlign: 'left',
@@ -163,7 +168,7 @@ function ChoiceStep({ onChoose, redirectTo }) {
                 <span style={{ fontSize: 11, color: DIM }}>{c.sub}</span>
               </div>
               <div style={{ fontSize: 12.5, color: MUT, marginBottom: 12, lineHeight: 1.4 }}>{c.blurb}</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 6 }}>
                 {c.bullets.map(b => (
                   <div key={b} style={{ display: 'flex', gap: 7, fontSize: 11, color: DIM }}>
                     <span style={{ color: ORG }}>✓</span>
@@ -171,10 +176,16 @@ function ChoiceStep({ onChoose, redirectTo }) {
                   </div>
                 ))}
               </div>
-              <div style={{ marginTop: 14, fontSize: 12, fontWeight: 700, color: ORG }}>
-                Continue as {c.label.toLowerCase()} →
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={e => { e.stopPropagation(); onChoose(val); }}
+                  style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 12, padding: '8px 16px', cursor: 'pointer', letterSpacing: .3 }}
+                >
+                  Continue →
+                </button>
               </div>
-            </button>
+            </div>
           );
         })}
       </div>
