@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA } from "../components/SeoPageLayout";
+import SeoFaq from "../components/SeoFaq";
 import { SANS, DISP, ORG, TXT, MUT, DIM, BG2, BG3, BDR } from "../lib/constants";
 
 /**
@@ -149,7 +150,7 @@ export default function AverageGolfDriveDistanceByAge() {
       title="Average Golf Drive Distance by Age & Handicap — Find Your Real Rank | Ripping Bombs"
       description="See average golf drive distances by age, handicap, and gender — then get your own global, country, age group, and handicap group rank by submitting a drive on Ripping Bombs."
     >
-      <div style={{ maxWidth: 760 }}>
+      <>
         <p style={{ color: ORG, fontFamily: DISP, fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>
           Compare Your Distance
         </p>
@@ -216,19 +217,16 @@ export default function AverageGolfDriveDistanceByAge() {
 
         <SeoCTA />
 
-        <SeoH2>FAQs</SeoH2>
-        {[
-          { q: "What counts as a good driving distance for my age?", a: "It depends more on handicap than age alone — a 55-year-old scratch golfer will typically out-drive a 25-year-old 20-handicapper. That's why Ripping Bombs ranks you against both an age group and a handicap group separately, not just one bracket." },
-          { q: "How do I compare my drive to other golfers, not just a chart?", a: "Register and submit a photo of your longest drive — from a simulator or a verified on-course measurement. You'll get a global rank, a country rank, an age group rank, and a handicap group rank, updated as more golfers submit." },
-          { q: "Do I need to be a long drive competitor to get ranked?", a: "No. Every registered golfer gets ranked, regardless of skill level. The age group and handicap group ranks exist specifically so casual and high-handicap golfers have a meaningful comparison, not just a leaderboard full of long drive specialists." },
-          { q: "Does it work if I don't have access to a simulator?", a: "Yes — outdoor course drives are accepted too, clearly labelled separately from simulator entries so the two are never mixed unfairly." },
-          { q: "Is registering and getting ranked free?", a: "Yes, the global leaderboard and your personal rank are free. There are optional paid tiers for venues that want a TV display, but ranking yourself as a golfer costs nothing." },
-        ].map(({ q, a }) => (
-          <div key={q} style={{ borderBottom: `1px solid ${BDR}`, paddingBottom: 18, marginBottom: 18 }}>
-            <p style={{ fontFamily: DISP, fontWeight: 700, color: TXT, marginBottom: 6, fontSize: 14 }}>{q}</p>
-            <p style={{ fontFamily: SANS, fontSize: 14, color: MUT, lineHeight: 1.8, margin: 0 }}>{a}</p>
-          </div>
-        ))}
+        <SeoFaq
+          title="FAQs"
+          faqs={[
+            { q: "What counts as a good driving distance for my age?", a: "It depends more on handicap than age alone — a 55-year-old scratch golfer will typically out-drive a 25-year-old 20-handicapper. That's why Ripping Bombs ranks you against both an age group and a handicap group separately, not just one bracket." },
+            { q: "How do I compare my drive to other golfers, not just a chart?", a: "Register and submit a photo of your longest drive — from a simulator or a verified on-course measurement. You'll get a global rank, a country rank, an age group rank, and a handicap group rank, updated as more golfers submit." },
+            { q: "Do I need to be a long drive competitor to get ranked?", a: "No. Every registered golfer gets ranked, regardless of skill level. The age group and handicap group ranks exist specifically so casual and high-handicap golfers have a meaningful comparison, not just a leaderboard full of long drive specialists." },
+            { q: "Does it work if I don't have access to a simulator?", a: "Yes — outdoor course drives are accepted too, clearly labelled separately from simulator entries so the two are never mixed unfairly." },
+            { q: "Is registering and getting ranked free?", a: "Yes, the global leaderboard and your personal rank are free. There are optional paid tiers for venues that want a TV display, but ranking yourself as a golfer costs nothing." },
+          ]}
+        />
 
         <div style={{ marginTop: 40 }}>
           <p style={{ fontFamily: DISP, fontWeight: 700, color: MUT, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Related Reading</p>
@@ -245,7 +243,7 @@ export default function AverageGolfDriveDistanceByAge() {
             ))}
           </div>
         </div>
-      </div>
+      </>
     </SeoPage>
   );
 }

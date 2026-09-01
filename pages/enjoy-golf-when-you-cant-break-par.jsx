@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA } from "../components/SeoPageLayout";
+import SeoFaq from "../components/SeoFaq";
 import { SANS, DISP, ORG, TXT, MUT, DIM, BG2, BG3, BDR } from "../lib/constants";
 
 /**
@@ -140,7 +141,7 @@ export default function EnjoyGolfWhenYouCantBreakPar() {
       title="Can't Break Par? Here's a Golf Scoreboard You Can Actually Win | Ripping Bombs"
       description="Score gets harder to move the better you get — most golfers never break 80, let alone par. Here's why, and a leaderboard where distance, not your scorecard, decides where you rank."
     >
-      <div style={{ maxWidth: 760 }}>
+      <>
         <p style={{ color: ORG, fontFamily: DISP, fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>
           A Different Way to Win
         </p>
@@ -205,19 +206,16 @@ export default function EnjoyGolfWhenYouCantBreakPar() {
 
         <SeoCTA />
 
-        <SeoH2>FAQs</SeoH2>
-        {[
-          { q: "What percentage of golfers actually break par?", a: "Estimates vary depending on the data source, but the pattern is consistent: it's a very small fraction, often cited as somewhere around 1% or less of all golfers. It's a realistic goal for very few people — not a sign anything is wrong with your game if you don't." },
-          { q: "Is golf still worth playing if I never break 90?", a: "The vast majority of golfers who've played for years still haven't broken 90. Score is one measure of a round, not the only one — and it's not the only leaderboard available to you." },
-          { q: "Do I need a low handicap to compete in a long drive leaderboard?", a: "No. Ripping Bombs ranks every registered golfer against a handicap group and an age group specifically so high-handicap and casual golfers have a fair comparison, not just a leaderboard full of scratch players." },
-          { q: "I'm a beginner — can I still get ranked?", a: "Yes. There's no score or handicap requirement to register. One submitted drive gets you a global, country, age group, and handicap group rank." },
-          { q: "What's a good way to make golf more fun if I'm stuck at the same score?", a: "Playing forward tees, playing formats like scramble or wolf, and setting non-score goals (like a personal-best drive) all help. Getting a genuine, fair comparison on something other than your scorecard — like your longest drive — is another way to have a measurable goal that isn't tied to breaking a plateau you've hit for years." },
-        ].map(({ q, a }) => (
-          <div key={q} style={{ borderBottom: `1px solid ${BDR}`, paddingBottom: 18, marginBottom: 18 }}>
-            <p style={{ fontFamily: DISP, fontWeight: 700, color: TXT, marginBottom: 6, fontSize: 14 }}>{q}</p>
-            <p style={{ fontFamily: SANS, fontSize: 14, color: MUT, lineHeight: 1.8, margin: 0 }}>{a}</p>
-          </div>
-        ))}
+        <SeoFaq
+          title="FAQs"
+          faqs={[
+            { q: "What percentage of golfers actually break par?", a: "Estimates vary depending on the data source, but the pattern is consistent: it's a very small fraction, often cited as somewhere around 1% or less of all golfers. It's a realistic goal for very few people — not a sign anything is wrong with your game if you don't." },
+            { q: "Is golf still worth playing if I never break 90?", a: "The vast majority of golfers who've played for years still haven't broken 90. Score is one measure of a round, not the only one — and it's not the only leaderboard available to you." },
+            { q: "Do I need a low handicap to compete in a long drive leaderboard?", a: "No. Ripping Bombs ranks every registered golfer against a handicap group and an age group specifically so high-handicap and casual golfers have a fair comparison, not just a leaderboard full of scratch players." },
+            { q: "I'm a beginner — can I still get ranked?", a: "Yes. There's no score or handicap requirement to register. One submitted drive gets you a global, country, age group, and handicap group rank." },
+            { q: "What's a good way to make golf more fun if I'm stuck at the same score?", a: "Playing forward tees, playing formats like scramble or wolf, and setting non-score goals (like a personal-best drive) all help. Getting a genuine, fair comparison on something other than your scorecard — like your longest drive — is another way to have a measurable goal that isn't tied to breaking a plateau you've hit for years." },
+          ]}
+        />
 
         <div style={{ marginTop: 40 }}>
           <p style={{ fontFamily: DISP, fontWeight: 700, color: MUT, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Related Reading</p>
@@ -234,7 +232,7 @@ export default function EnjoyGolfWhenYouCantBreakPar() {
             ))}
           </div>
         </div>
-      </div>
+      </>
     </SeoPage>
   );
 }

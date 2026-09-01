@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA } from "../components/SeoPageLayout";
+import SeoFaq from "../components/SeoFaq";
 import { SANS, DISP, ORG, TXT, MUT, BG2, BG3, BDR } from "../lib/constants";
 
 export default function SimulatorGolfCompetition() {
@@ -8,7 +9,7 @@ export default function SimulatorGolfCompetition() {
       title="Simulator Golf Competition — Run a Long Drive Contest on Any Launch Monitor | Ripping Bombs"
       description="How to run a golf long drive competition on a simulator. Compatible with Trackman, Foresight, Garmin, Bushnell, and more. Submit results to a global online leaderboard."
     >
-      <div style={{ maxWidth: 760 }}>
+      <>
         <p style={{ color: ORG, fontFamily: DISP, fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>Simulator Competitions</p>
         <SeoH1>Golf Long Drive Competitions on a Simulator</SeoH1>
         <SeoP>Indoor golf simulators have changed the game. With launch monitors now delivering data-accurate drive measurements, simulator long drive competitions are a legitimate — and increasingly popular — format. Here's how to run one, and how to put your results on the global map.</SeoP>
@@ -63,18 +64,15 @@ export default function SimulatorGolfCompetition() {
 
         <SeoCTA />
 
-        <SeoH2>FAQs</SeoH2>
-        {[
-          { q: "Does the simulator setting matter?", a: "Yes. We recommend using standard outdoor conditions without any assisted ball flight. Using flat terrain with no wind assist produces the most comparable numbers across different systems and sessions." },
-          { q: "What distance metric counts — carry or total?", a: "Carry distance is the standard for simulator submissions. If your launch monitor only shows total distance, include a note when submitting." },
-          { q: "Can I enter as an individual, not a venue?", a: "Yes. Simulator accounts are available to individuals with home setups or personal launch monitors. You don't need to represent a business or venue." },
-          { q: "Is there a minimum distance to appear on the leaderboard?", a: "No minimum. All verified submissions appear. The leaderboard is fully filtered so your submission will always find its relevant category and cohort." },
-        ].map(({ q, a }) => (
-          <div key={q} style={{ borderBottom: `1px solid ${BDR}`, paddingBottom: 18, marginBottom: 18 }}>
-            <p style={{ fontFamily: DISP, fontWeight: 700, color: TXT, marginBottom: 6, fontSize: 14 }}>{q}</p>
-            <p style={{ fontFamily: SANS, fontSize: 14, color: MUT, lineHeight: 1.8, margin: 0 }}>{a}</p>
-          </div>
-        ))}
+        <SeoFaq
+          title="FAQs"
+          faqs={[
+            { q: "Does the simulator setting matter?", a: "Yes. We recommend using standard outdoor conditions without any assisted ball flight. Using flat terrain with no wind assist produces the most comparable numbers across different systems and sessions." },
+            { q: "What distance metric counts — carry or total?", a: "Carry distance is the standard for simulator submissions. If your launch monitor only shows total distance, include a note when submitting." },
+            { q: "Can I enter as an individual, not a venue?", a: "Yes. Simulator accounts are available to individuals with home setups or personal launch monitors. You don't need to represent a business or venue." },
+            { q: "Is there a minimum distance to appear on the leaderboard?", a: "No minimum. All verified submissions appear. The leaderboard is fully filtered so your submission will always find its relevant category and cohort." },
+          ]}
+        />
 
         <div style={{ marginTop: 40 }}>
           <p style={{ fontFamily: DISP, fontWeight: 700, color: MUT, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Related Reading</p>
@@ -90,7 +88,7 @@ export default function SimulatorGolfCompetition() {
             ))}
           </div>
         </div>
-      </div>
+      </>
     </SeoPage>
   );
 }
