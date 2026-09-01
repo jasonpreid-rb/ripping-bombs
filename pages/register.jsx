@@ -202,7 +202,10 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
   const redirectTo = typeof router.query.redirect === 'string' ? router.query.redirect : null;
   const isSimulator = reg.type !== 'club';
   const [showPw, setShowPw] = useState(false);
-  const [step, setStep] = useState(reg.type ? 'form' : 'choose');
+  // Always start on the choice screen — reg.type may already carry a default
+  // value from the parent's initial state, so it isn't a reliable signal that
+  // the user actually picked something.
+  const [step, setStep] = useState('choose');
   const [showTiers, setShowTiers] = useState(false);
 
   const CountrySelect = () => (
