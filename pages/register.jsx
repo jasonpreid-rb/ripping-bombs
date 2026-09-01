@@ -51,6 +51,24 @@ const TIERS = {
   },
 };
 
+// Copy for the step-1 choice cards — short enough to read at a glance
+const CHOICES = {
+  simulator: {
+    label: 'Individual',
+    sub: 'Simulator player',
+    badge: 'Most popular',
+    blurb: "Submit your own longest drives and see where you rank.",
+    bullets: ['See your rank vs players worldwide', 'Free, always — no card required', 'Approved instantly'],
+  },
+  club: {
+    label: 'Venue Operator',
+    sub: 'Club, range or sim bay',
+    badge: null,
+    blurb: 'Register your venue so players can find you and build your leaderboard.',
+    bullets: ['Global exposure for your venue', 'Free, always — no card required', 'Approved instantly'],
+  },
+};
+
 function TierPreview({ isSimulator }) {
   const t = isSimulator ? TIERS.simulator : TIERS.club;
   const colStyle = { flex: '1 1 220px', minWidth: 0 };
@@ -96,11 +114,85 @@ function TierPreview({ isSimulator }) {
   );
 }
 
+// Step 1 — the single question. Big, tappable, welcoming. Nothing else competes for attention.
+function ChoiceStep({ onChoose, redirectTo }) {
+  return (
+    <div style={{ maxWidth: 540, margin: '0 auto', padding: '40px 18px 80px' }}>
+      <div style={{ fontFamily: DISP, fontSize: 30, color: TXT, letterSpacing: 1, marginBottom: 8, textAlign: 'center' }}>
+        Welcome to Ripping Bombs 👋
+      </div>
+      <div style={{ fontFamily: SANS, fontSize: 14, color: MUT, marginBottom: 6, textAlign: 'center' }}>
+        {redirectTo ? "One quick question and you'll be right back to submitting your drive." : "Free to join, forever. One quick question to get you set up."}
+      </div>
+      <div style={{ fontFamily: SANS, fontSize: 12, color: DIM, marginBottom: 32, textAlign: 'center' }}>
+        Already have an account?{' '}
+        <a href="/login" style={{ color: ORG, textDecoration: 'underline' }}>Log in</a>
+      </div>
+
+      <div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: TXT, textAlign: 'center', marginBottom: 16 }}>
+        Are you an individual, or a venue operator?
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {['simulator', 'club'].map(val => {
+          const c = CHOICES[val];
+          return (
+            <button
+              key={val}
+              type="button"
+              onClick={() => onChoose(val)}
+              style={{
+                position: 'relative',
+                textAlign: 'left',
+                width: '100%',
+                background: BG3,
+                border: `1px solid ${BDR}`,
+                borderTop: `2px solid ${ORG}`,
+                padding: '20px 20px 18px',
+                cursor: 'pointer',
+                fontFamily: SANS,
+              }}
+            >
+              {c.badge && (
+                <span style={{ position: 'absolute', top: -9, right: 16, background: ORG, color: '#000', fontSize: 9, fontWeight: 700, padding: '2px 7px', letterSpacing: .4, textTransform: 'uppercase' }}>
+                  {c.badge}
+                </span>
+              )}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
+                <span style={{ fontSize: 17, fontWeight: 700, color: TXT }}>{c.label}</span>
+                <span style={{ fontSize: 11, color: DIM }}>{c.sub}</span>
+              </div>
+              <div style={{ fontSize: 12.5, color: MUT, marginBottom: 12, lineHeight: 1.4 }}>{c.blurb}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {c.bullets.map(b => (
+                  <div key={b} style={{ display: 'flex', gap: 7, fontSize: 11, color: DIM }}>
+                    <span style={{ color: ORG }}>✓</span>
+                    <span>{b}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: 14, fontSize: 12, fontWeight: 700, color: ORG }}>
+                Continue as {c.label.toLowerCase()} →
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, textAlign: 'center', marginTop: 20 }}>
+        No credit card or payment details required to register.
+      </div>
+    </div>
+  );
+}
+
 export default function RegisterPage({ reg, setReg, doRegister }) {
   const router = useRouter();
   const redirectTo = typeof router.query.redirect === 'string' ? router.query.redirect : null;
   const isSimulator = reg.type !== 'club';
   const [showPw, setShowPw] = useState(false);
+  const [step, setStep] = useState(reg.type ? 'form' : 'choose');
+  const [showTiers, setShowTiers] = useState(false);
 
   const CountrySelect = () => (
     <div style={{ marginBottom: 14 }}>
@@ -121,6 +213,21 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
     </div>
   );
 
+  if (step === 'choose') {
+    return (
+      <>
+        <Head>
+          <title>Register | Ripping Bombs</title>
+          <meta name="description" content="Register your venue or simulator account on Ripping Bombs. Free to join. Submit verified longest drives to the global leaderboard." />
+        </Head>
+        <ChoiceStep
+          redirectTo={redirectTo}
+          onChoose={val => { setReg({ ...reg, type: val }); setStep('form'); }}
+        />
+      </>
+    );
+  }
+
   return (
     <>
       <Head>
@@ -129,45 +236,19 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
       </Head>
 
       <div style={{ maxWidth: 540, margin: '0 auto', padding: '28px 18px 80px' }}>
-        <div style={{ fontFamily: DISP, fontSize: 30, color: TXT, letterSpacing: 1, marginBottom: 6 }}>Create Your Account</div>
-        <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: 8 }}>
-          {redirectTo ? "Free to join — you'll be right back to finish submitting your drive in no time." : "Free to join, forever. Pick an account type below and you'll be set up in under a minute."}
-        </div>
-        <div style={{ fontFamily: SANS, fontSize: 12, color: DIM, marginBottom: 18 }}>
-          Already have an account?{' '}
-          <a href="/login" style={{ color: ORG, textDecoration: 'underline' }}>Log in</a>
-        </div>
+        {/* Compact header — the pitch already happened on the choice screen, so this
+            stays short on purpose to keep the form itself above the fold. */}
+        <button
+          type="button"
+          onClick={() => setStep('choose')}
+          style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 14, fontFamily: SANS, fontSize: 12, color: DIM }}
+        >
+          <span style={{ color: ORG }}>←</span>
+          <span>Registering as <strong style={{ color: TXT }}>{CHOICES[isSimulator ? 'simulator' : 'club'].label}</strong> · change</span>
+        </button>
 
-        {/* Benefit strip — gives a cold visitor a reason to keep going, reacts to account type */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 10 }}>
-          {(isSimulator
-            ? [
-                ['See your rank', 'vs players worldwide'],
-                ['Instant access', 'submit in minutes'],
-                ['Free, always', 'no card required'],
-              ]
-            : [
-                ['Global exposure', 'for your venue'],
-                ['Instant access', 'approved automatically'],
-                ['Free, always', 'no card required'],
-              ]
-          ).map(([title, sub]) => (
-            <div key={title} style={{
-              border: `1px solid ${BDR}`,
-              borderTop: `2px solid ${ORG}`,
-              background: 'rgba(255,0,144,0.04)',
-              padding: '14px 10px',
-              textAlign: 'center',
-              transition: 'transform .15s',
-            }}>
-              <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: TXT, lineHeight: 1.3 }}>{title}</div>
-              <div style={{ fontFamily: SANS, fontSize: 10, color: MUT, lineHeight: 1.3, marginTop: 3 }}>{sub}</div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, textAlign: 'center', marginBottom: 24 }}>
-          No credit card or payment details required to register.
+        <div style={{ fontFamily: DISP, fontSize: 24, color: TXT, letterSpacing: .5, marginBottom: 16 }}>
+          {isSimulator ? "Let's set up your account" : "Let's register your venue"}
         </div>
 
         <Card>
@@ -175,40 +256,20 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
             Just a couple of quick questions — fields marked <span style={{ color: ORG }}>*</span> are required, everything else is optional.
           </div>
 
-          {/* Account type toggle */}
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', fontFamily: SANS, fontSize: 11, fontWeight: 600, color: MUT, marginBottom: 8, textTransform: 'uppercase', letterSpacing: .8 }}>
-              Account Type
-            </label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              {[['simulator', 'Individual / Simulator'], ['club', 'Venue']].map(([val, label]) => (
-                <button
-                  key={val}
-                  type="button"
-                  onClick={() => setReg({ ...reg, type: val })}
-                  style={{ position: 'relative', padding: '12px 8px', background: 'transparent', border: `1px solid ${reg.type === val ? ORG : BDR}`, color: reg.type === val ? ORG : MUT, fontFamily: SANS, fontWeight: 600, fontSize: 12, cursor: 'pointer', letterSpacing: .3, textAlign: 'center', transition: 'all .15s' }}
-                >
-                  {val === 'simulator' && (
-                    <span style={{ position: 'absolute', top: -8, right: 6, background: ORG, color: '#000', fontSize: 9, fontWeight: 700, padding: '2px 6px', letterSpacing: .4, textTransform: 'uppercase' }}>
-                      Most Popular
-                    </span>
-                  )}
-                  {label}
-                </button>
-              ))}
-            </div>
-            <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 8 }}>
-              {isSimulator
-                ? 'Submit your own simulator longest drives with screenshot evidence. Account approved instantly — no waiting required.'
-                : 'Register your venue so players can find you and assign their drives to you — building your local leaderboard and giving you exposure. You can also submit results directly. Account approved instantly — no waiting required.'}
-            </div>
-          </div>
-
-          {/* Free vs paid tier explainer — updates with account type */}
-          <TierPreview isSimulator={isSimulator} />
+          {/* Free vs paid tier explainer — collapsed by default so it doesn't push
+              the form fields down; still one tap away for anyone curious. */}
+          <button
+            type="button"
+            onClick={() => setShowTiers(s => !s)}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', background: 'none', border: `1px solid ${BDR}`, padding: '10px 14px', marginBottom: 14, cursor: 'pointer', fontFamily: SANS, fontSize: 11.5, color: MUT, textAlign: 'left' }}
+          >
+            <span style={{ color: ORG }}>{showTiers ? '▾' : '▸'}</span>
+            <span>What's included — Free vs {isSimulator ? 'Premium' : 'TV Display & Sponsors'}</span>
+          </button>
+          {showTiers && <TierPreview isSimulator={isSimulator} />}
 
           {/* Section: personal / venue details */}
-          <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: ORG, textTransform: 'uppercase', letterSpacing: 1, marginTop: 4, marginBottom: 14, paddingTop: 18, borderTop: `1px solid ${BDR}` }}>
+          <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: ORG, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 14 }}>
             Your Details
           </div>
 
