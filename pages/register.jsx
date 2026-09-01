@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { COUNTRIES, ORG, MUT, TXT, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
@@ -99,6 +100,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
   const router = useRouter();
   const redirectTo = typeof router.query.redirect === 'string' ? router.query.redirect : null;
   const isSimulator = reg.type !== 'club';
+  const [showPw, setShowPw] = useState(false);
 
   const CountrySelect = () => (
     <div style={{ marginBottom: 14 }}>
@@ -127,9 +129,13 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
       </Head>
 
       <div style={{ maxWidth: 540, margin: '0 auto', padding: '28px 18px 80px' }}>
-        <div style={{ fontFamily: DISP, fontSize: 30, color: TXT, letterSpacing: 1, marginBottom: 6 }}>Register</div>
-        <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: 18 }}>
-          {redirectTo ? "Free to join. You'll be taken straight back to finish submitting your drive." : 'Free to join. Select your account type below.'}
+        <div style={{ fontFamily: DISP, fontSize: 30, color: TXT, letterSpacing: 1, marginBottom: 6 }}>Create Your Account</div>
+        <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: 8 }}>
+          {redirectTo ? "Free to join — you'll be right back to finish submitting your drive in no time." : "Free to join, forever. Pick an account type below and you'll be set up in under a minute."}
+        </div>
+        <div style={{ fontFamily: SANS, fontSize: 12, color: DIM, marginBottom: 18 }}>
+          Already have an account?{' '}
+          <a href="/login" style={{ color: ORG, textDecoration: 'underline' }}>Log in</a>
         </div>
 
         {/* Benefit strip — gives a cold visitor a reason to keep going, reacts to account type */}
@@ -165,6 +171,10 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
         </div>
 
         <Card>
+          <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginBottom: 18 }}>
+            Just a couple of quick questions — fields marked <span style={{ color: ORG }}>*</span> are required, everything else is optional.
+          </div>
+
           {/* Account type toggle */}
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', fontFamily: SANS, fontSize: 11, fontWeight: 600, color: MUT, marginBottom: 8, textTransform: 'uppercase', letterSpacing: .8 }}>
@@ -197,6 +207,11 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
           {/* Free vs paid tier explainer — updates with account type */}
           <TierPreview isSimulator={isSimulator} />
 
+          {/* Section: personal / venue details */}
+          <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: ORG, textTransform: 'uppercase', letterSpacing: 1, marginTop: 4, marginBottom: 14, paddingTop: 18, borderTop: `1px solid ${BDR}` }}>
+            Your Details
+          </div>
+
           {/* Shared name field */}
           <Field
             label="Your Full Name"
@@ -204,6 +219,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
             onChange={e => setReg({ ...reg, fullName: e.target.value })}
             placeholder="e.g. James Hargreaves"
             required
+            autoFocus
           />
 
           {/* Simulator fields */}
@@ -310,6 +326,11 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
             </>
           )}
 
+          {/* Section: login credentials */}
+          <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: ORG, textTransform: 'uppercase', letterSpacing: 1, marginTop: 8, marginBottom: 14, paddingTop: 18, borderTop: `1px solid ${BDR}` }}>
+            Login Details
+          </div>
+
           {/* Shared auth fields */}
           <Field
             label="Email Address"
@@ -321,12 +342,24 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
           />
           <Field
             label="Password"
-            type="password"
+            type={showPw ? 'text' : 'password'}
             value={reg.pw}
             onChange={e => setReg({ ...reg, pw: e.target.value })}
             placeholder="Choose a password"
             required
+            suffix={
+              <button
+                type="button"
+                onClick={() => setShowPw(s => !s)}
+                style={{ background: 'none', border: 'none', color: DIM, fontFamily: SANS, fontSize: 11, fontWeight: 600, letterSpacing: .3, cursor: 'pointer', padding: 0 }}
+              >
+                {showPw ? 'Hide' : 'Show'}
+              </button>
+            }
           />
+          <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: -8, marginBottom: 14 }}>
+            This is just for logging back in — keep it somewhere safe.
+          </div>
 
           {/* Profile consent moved to post-submission flow — see submit.jsx note */}
 
@@ -342,7 +375,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
           </Btn>
 
           <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 12, textAlign: 'center' }}>
-            All accounts are approved instantly.
+            No waiting around — every account is approved instantly.
           </div>
         </Card>
       </div>

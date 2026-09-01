@@ -10,12 +10,15 @@ export function Card({children,style:sx={}}){
   return <div style={{background:BG2,border:`1px solid ${BDR}`,borderRadius:0,padding:24,...sx}}>{children}</div>;
 }
 
-export function Field({label,type="text",value,onChange,placeholder,min,max,required}){
+export function Field({label,type="text",value,onChange,placeholder,min,max,required,autoFocus,suffix}){
   return <div style={{marginBottom:14}}>
     <label style={{display:"block",fontFamily:SANS,fontSize:11,fontWeight:600,color:MUT,marginBottom:5,textTransform:"uppercase",letterSpacing:.8}}>{label}{required&&<span style={{color:ORG,marginLeft:2}}>*</span>}</label>
-    <input type={type} value={value} onChange={onChange} placeholder={placeholder} min={min} max={max}
-      style={{width:"100%",background:BG3,border:`1px solid ${BDR}`,borderRadius:0,padding:"10px 14px",color:TXT,fontFamily:SANS,fontSize:14,outline:"none",boxSizing:"border-box",transition:"border-color .2s"}}
-      onFocus={e=>e.target.style.borderColor=ORG} onBlur={e=>e.target.style.borderColor=BDR}/>
+    <div style={{position:"relative"}}>
+      <input type={type} value={value} onChange={onChange} placeholder={placeholder} min={min} max={max} autoFocus={autoFocus}
+        style={{width:"100%",background:BG3,border:`1px solid ${BDR}`,borderRadius:0,padding:suffix?"10px 48px 10px 14px":"10px 14px",color:TXT,fontFamily:SANS,fontSize:14,outline:"none",boxSizing:"border-box",transition:"border-color .2s"}}
+        onFocus={e=>e.target.style.borderColor=ORG} onBlur={e=>e.target.style.borderColor=BDR}/>
+      {suffix&&<div style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)"}}>{suffix}</div>}
+    </div>
   </div>;
 }
 
