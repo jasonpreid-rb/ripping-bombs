@@ -144,7 +144,10 @@ function InlineCalculator({ router }) {
         <>
           <AnimatedCalcResult result={result} hcp={hcp} gender={gender}/>
           <div style={{marginTop:20,textAlign:'center'}}>
-            <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:13,padding:'11px 26px',cursor:'pointer',letterSpacing:.5}}>
+            <button onClick={()=>{
+              if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_calc_register_click',{event_category:'engagement',location:'post_calc_cta'});
+              router.push('/register');
+            }} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:13,padding:'11px 26px',cursor:'pointer',letterSpacing:.5}}>
               SUBMIT YOUR REAL DRIVE →
             </button>
           </div>
@@ -406,7 +409,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
     const { top3 } = cat;
     return (
       <div
-        onClick={()=>router.push(categoryHref(cat.key, false))}
+        onClick={()=>{
+          if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_category_card_click',{event_category:'engagement',section:'weekly',category:cat.key});
+          router.push(categoryHref(cat.key, false));
+        }}
         style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,width:'100%',minWidth:0,minHeight:220,cursor:'pointer',transition:'border-color .15s'}}
         onMouseEnter={ev=>{ev.currentTarget.style.borderColor='rgba(255,0,144,0.5)';}}
         onMouseLeave={ev=>{ev.currentTarget.style.borderColor=top3.length?'rgba(255,0,144,0.2)':BDR;}}>
@@ -451,7 +457,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
     const { top3 } = cat;
     return (
       <div
-        onClick={()=>router.push(categoryHref(cat.key, true))}
+        onClick={()=>{
+          if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_category_card_click',{event_category:'engagement',section:'all_time',category:cat.key});
+          router.push(categoryHref(cat.key, true));
+        }}
         style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.15)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,width:'100%',minWidth:0,minHeight:220,cursor:'pointer',transition:'border-color .15s'}}
         onMouseEnter={ev=>{ev.currentTarget.style.borderColor='rgba(255,0,144,0.4)';}}
         onMouseLeave={ev=>{ev.currentTarget.style.borderColor=top3.length?'rgba(255,0,144,0.15)':BDR;}}>
@@ -540,7 +549,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             </h1>
             <p style={{fontFamily:SANS,fontSize:14,color:'rgba(255,255,255,0.65)',maxWidth:440,margin:'0 auto 36px',lineHeight:1.6,letterSpacing:.3}}>
               See where your drive ranks against golfers your age, handicap &amp; gender — instantly.{' '}
-              <a href="/sim-distance-real-or-fake" style={{color:ORG,textDecoration:'underline'}}>
+              <a href="/sim-distance-real-or-fake" onClick={()=>{if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_sim_link_click',{event_category:'engagement'});}} style={{color:ORG,textDecoration:'underline'}}>
                 Think your sim number might be inflated?
               </a>
             </p>
@@ -557,7 +566,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                 <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:6}}>Live from the Registry</div>
                 <div style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>{currentWeekLabel} — Category Leaders</div>
               </div>
-              <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
+              <button onClick={()=>{
+                if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_full_leaderboard_click',{event_category:'engagement',section:'weekly'});
+                router.push('/leaderboard');
+              }} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
             </div>
             <InfiniteScrollRow items={weeklyLeaders} bg="#0e0e0e" renderItem={cat => <WeeklyCard cat={cat}/>}/>
           </div>
@@ -571,7 +583,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                 <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:MUT,textTransform:'uppercase',marginBottom:6}}>Hall of Records</div>
                 <div style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>All-Time Category Leaders</div>
               </div>
-              <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
+              <button onClick={()=>{
+                if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_full_leaderboard_click',{event_category:'engagement',section:'all_time'});
+                router.push('/leaderboard');
+              }} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
             </div>
             <InfiniteScrollRow items={allTimeLeaders} bg="#111" renderItem={cat => <AllTimeCard cat={cat}/>}/>
           </div>
@@ -621,10 +636,16 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
               </div>
             </div>
             <div style={{display:'flex',flexDirection:'column',gap:10,flexShrink:0,width:'100%',maxWidth:260}}>
-              <button onClick={()=>router.push('/2027-championship')} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 28px',border:'none',cursor:'pointer',letterSpacing:.5}}>
+              <button onClick={()=>{
+                if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_2027_find_out_more_click',{event_category:'engagement'});
+                router.push('/2027-championship');
+              }} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 28px',border:'none',cursor:'pointer',letterSpacing:.5}}>
                 FIND OUT MORE →
               </button>
-              <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid rgba(255,0,144,0.3)`,color:ORG,fontFamily:SANS,fontWeight:600,fontSize:13,padding:'12px 28px',cursor:'pointer',letterSpacing:.5}}>
+              <button onClick={()=>{
+                if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_register_click',{event_category:'engagement',location:'2027_promo'});
+                router.push('/register');
+              }} style={{background:'transparent',border:`1px solid rgba(255,0,144,0.3)`,color:ORG,fontFamily:SANS,fontWeight:600,fontSize:13,padding:'12px 28px',cursor:'pointer',letterSpacing:.5}}>
                 Register Free
               </button>
             </div>
@@ -656,7 +677,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           <div style={{maxWidth:1000,margin:'0 auto',background:'rgba(255,0,144,0.05)',border:'1px solid rgba(255,0,144,0.2)',padding:'40px 32px',textAlign:'center',marginBottom:60}}>
             <div style={{fontFamily:DISP,fontSize:'clamp(24px,5vw,40px)',color:TXT,letterSpacing:1,marginBottom:10}}>FREE TO JOIN. FREE TO SUBMIT.</div>
             <div style={{fontFamily:SANS,fontSize:14,color:MUT,marginBottom:28}}>Built for golfers who love sending it.</div>
-            <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 36px',borderRadius:0,cursor:'pointer'}}>REGISTER NOW FREE →</button>
+            <button onClick={()=>{
+              if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_register_click',{event_category:'engagement',location:'bottom_cta_strip'});
+              router.push('/register');
+            }} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 36px',borderRadius:0,cursor:'pointer'}}>REGISTER NOW FREE →</button>
           </div>
 
           {/* FAQ */}
@@ -665,7 +689,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             <div style={{display:'flex',flexDirection:'column',gap:8}}>
               {faqs.map(({q,a},i)=>(
                 <div key={i} style={{background:BG2,border:`1px solid ${openFaq===i?'rgba(255,0,144,0.25)':BDR}`,overflow:'hidden'}}>
-                  <button onClick={()=>setOpenFaq(openFaq===i?null:i)} aria-expanded={openFaq===i} style={{width:'100%',background:'none',border:'none',padding:'16px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer',gap:16}}>
+                  <button onClick={()=>{
+                    if(openFaq!==i && typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_faq_open',{event_category:'engagement',question:q});
+                    setOpenFaq(openFaq===i?null:i);
+                  }} aria-expanded={openFaq===i} style={{width:'100%',background:'none',border:'none',padding:'16px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer',gap:16}}>
                     <span style={{fontFamily:SANS,fontSize:14,fontWeight:600,color:TXT,textAlign:'left'}}>{q}</span>
                     <span style={{fontFamily:SANS,fontSize:18,color:ORG,flexShrink:0,transform:openFaq===i?'rotate(45deg)':'none',transition:'transform .2s'}}>+</span>
                   </button>
