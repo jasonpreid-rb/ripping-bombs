@@ -81,6 +81,7 @@ export default function SimulatorGolfCompetition() {
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
             {[
               { href: "/trackman-long-drive", label: "Trackman Long Drive" },
+              { href: "/enjoy-golf-when-you-cant-break-par", label: "Can't Break Par? Read This" },
               { href: "/online-golf-long-drive-leaderboard", label: "Online Leaderboard" },
               { href: "/golf-longest-drive-competition", label: "Run a Competition" },
               { href: "/long-drive-golf-equipment", label: "Long Drive Equipment" },
