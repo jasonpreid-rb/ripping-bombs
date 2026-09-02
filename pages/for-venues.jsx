@@ -12,6 +12,7 @@
 // 1:1 depending on how constants.js is currently structured.
 
 import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ORG, TXT, MUT, DIM, BDR, BG2, BG3, SANS, DISP } from '../lib/constants';
 
@@ -95,6 +96,18 @@ export default function ForVenues() {
             <div>
               <div className="proof-title">Your venue on the global stage</div>
               <div className="proof-body">Your top drives show up against every other Ripping Bombs venue, not just your own walls.</div>
+            </div>
+          </div>
+          <div className="proof-item">
+            <div className="proof-num">04</div>
+            <div>
+              <div className="proof-title">Run your own events</div>
+              <div className="proof-body">
+                Create a branded competition to fill your quiet bay hours.{' '}
+                <Link href="/how-to-host-a-golf-simulator-event" className="proof-link">
+                  See how it works →
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -290,11 +303,11 @@ export default function ForVenues() {
         }
 
         .proof {
-          max-width: 900px;
+          max-width: 1080px;
           margin: 0 auto 80px;
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 32px;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 24px;
         }
         .proof-item {
           background: ${BG3 || '#121218'};
@@ -317,6 +330,12 @@ export default function ForVenues() {
           font-size: 13.5px;
           line-height: 1.55;
           color: ${MUT || '#8a8a96'};
+        }
+        .proof-link {
+          color: ${ORG || '#ff0090'};
+          font-weight: 700;
+          text-decoration: none;
+          white-space: nowrap;
         }
 
         .tiers {

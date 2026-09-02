@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { COUNTRIES, ORG, MUT, TXT, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { Card, Field, Btn } from '../components/UI';
@@ -103,6 +104,13 @@ function TierPreview({ isSimulator }) {
               <span>{item}</span>
             </div>
           ))}
+          {!isSimulator && (
+            <div style={{ fontFamily: SANS, fontSize: 11, marginBottom: 5 }}>
+              <Link href="/how-to-host-a-golf-simulator-event" style={{ color: ORG, textDecoration: 'underline' }}>
+                See how venues run these events →
+              </Link>
+            </div>
+          )}
           <div style={{ fontFamily: SANS, fontSize: 11, color: TXT, marginTop: 4 }}>
             <strong style={{ color: ORG }}>{t.paidPrice}</strong>
           </div>
