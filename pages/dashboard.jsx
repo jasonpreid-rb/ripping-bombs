@@ -6,6 +6,7 @@ import PlayerAvatar from '../components/PlayerAvatar';
 import AvatarUploader from '../components/AvatarUploader';
 import SponsorLogoUploader from '../components/SponsorLogoUploader';
 import VenueEventsSection from '../components/VenueEventsSection';
+import PlayerEventInvites from '../components/PlayerEventInvites';
 import { getVenueEvents } from '../lib/events';
 import { countryFlag } from '../components/UI';
 import { DISP } from '../lib/constants';
@@ -1735,6 +1736,11 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Event invites — individual/simulator accounts only */}
+        {club?.accountType === 'simulator' && (
+          <PlayerEventInvites orgId={club.id} />
+        )}
 
         {/* Global rank — standalone hero strip. Club accounts get the composite
             cross-category venue rank; individual/simulator accounts keep the
