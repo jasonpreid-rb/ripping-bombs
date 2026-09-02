@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { ORG, TXT, MUT, DIM, BDR, BG2, BG3, SANS, DISP } from '../lib/constants';
@@ -26,6 +27,8 @@ const FAQS = [
 ];
 
 export default function VenueEventGuide() {
+  const [openFaq, setOpenFaq] = useState(null);
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -196,13 +199,56 @@ export default function VenueEventGuide() {
         {/* FAQ */}
         <section style={{ padding: '56px 24px', backgroundColor: BG3, borderTop: `1px solid ${BDR}` }}>
           <div style={{ maxWidth: 720, margin: '0 auto' }}>
-            <h2 style={{ fontFamily: DISP, fontSize: 26, textAlign: 'center', marginBottom: 28 }}>FAQ</h2>
-            {FAQS.map((f) => (
-              <div key={f.q} style={{ marginBottom: 20, borderBottom: `1px solid ${BDR}`, paddingBottom: 18 }}>
-                <h3 style={{ fontFamily: DISP, fontSize: 16, margin: '0 0 6px' }}>{f.q}</h3>
-                <p style={{ color: MUT, lineHeight: 1.6, margin: 0, fontSize: 14 }}>{f.a}</p>
-              </div>
-            ))}
+            <div style={{ fontFamily: DISP, fontSize: 28, color: TXT, letterSpacing: 0.5, marginBottom: 20, textAlign: 'center' }}>
+              FAQ
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {FAQS.map(({ q, a }, i) => (
+                <div
+                  key={i}
+                  style={{ background: BG2, border: `1px solid ${openFaq === i ? 'rgba(255,0,144,0.25)' : BDR}`, overflow: 'hidden' }}
+                >
+                  <button
+                    onClick={() => {
+                      if (openFaq !== i && typeof window !== 'undefined' && window.gtag)
+                        window.gtag('event', 'event_guide_faq_open', { event_category: 'engagement', question: q });
+                      setOpenFaq(openFaq === i ? null : i);
+                    }}
+                    aria-expanded={openFaq === i}
+                    style={{
+                      width: '100%',
+                      background: 'none',
+                      border: 'none',
+                      padding: '16px 20px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      gap: 16,
+                    }}
+                  >
+                    <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 600, color: TXT, textAlign: 'left' }}>{q}</span>
+                    <span
+                      style={{
+                        fontFamily: SANS,
+                        fontSize: 18,
+                        color: ORG,
+                        flexShrink: 0,
+                        transform: openFaq === i ? 'rotate(45deg)' : 'none',
+                        transition: 'transform .2s',
+                      }}
+                    >
+                      +
+                    </span>
+                  </button>
+                  <div style={{ display: 'grid', gridTemplateRows: openFaq === i ? '1fr' : '0fr', transition: 'grid-template-rows .2s ease' }}>
+                    <div style={{ overflow: 'hidden' }}>
+                      <div style={{ padding: '0 20px 18px', fontFamily: SANS, fontSize: 13, color: MUT, lineHeight: 1.75 }}>{a}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
