@@ -5,23 +5,23 @@ import { ORG, TXT, MUT, DIM, BDR, BG2, BG3, SANS, DISP } from '../lib/constants'
 const FAQS = [
   {
     q: 'How do I create an event on Ripping Bombs?',
-    a: "From your venue dashboard, open the Events section and click Create Event. Set your dates, add a description, choose entry criteria (age and gender groups pull straight from the age/gender info players already give you at registration), and upload sponsor branding if you have it. Ripping Bombs generates a shareable link and QR code the moment you save.",
+    a: 'Open Events in your venue dashboard, hit Create Event, set your dates and entry criteria. Ripping Bombs generates a shareable link and QR code instantly.',
   },
   {
-    q: 'Do players need to download an app or create a new account?',
-    a: 'No. Players tap the event link or scan the QR code, and if they don\u2019t have a Ripping Bombs profile yet they\u2019re created one automatically the first time they submit a drive. There\u2019s nothing to install on the bay.',
+    q: 'Do players need to download an app?',
+    a: 'No. They tap the link or scan the QR code. A profile is created automatically the first time they submit a drive.',
   },
   {
     q: 'Can I restrict an event to certain ages or genders?',
-    a: 'Yes. Set entry criteria when you create the event \u2014 for example a Youth-only after-school event, a Women\u2019s Wednesday event, or a Senior weekday event \u2014 and Ripping Bombs checks each player\u2019s existing profile against that criteria automatically before letting them submit.',
+    a: 'Yes — set criteria when you create the event and Ripping Bombs checks each player automatically before they can submit.',
   },
   {
-    q: 'How do I invite players to an event?',
-    a: 'Two ways: search for players already in the Ripping Bombs system by name and invite them directly, or paste a list of emails. Invited players see an in-app notification banner on their dashboard with the event details and a one-tap join.',
+    q: 'How do I invite players?',
+    a: 'Search by name or paste a list of emails. Invited players see a banner on their dashboard with a one-tap join.',
   },
   {
-    q: 'How does this help fill quiet bay times?',
-    a: 'A named event with a deadline and a live leaderboard gives players a reason to book a bay outside your busiest hours \u2014 a Tuesday-morning senior league, a weekday-afternoon youth event, or a slow-season sponsor challenge all convert dead time into booked time, because people show up to compete, not just to hit balls.',
+    q: 'How does this fill quiet bay times?',
+    a: 'A deadline and a live leaderboard give players a reason to book hours nobody else wants — a Tuesday-morning league beats an empty bay every time.',
   },
 ];
 
@@ -41,27 +41,24 @@ export default function VenueEventGuide() {
     '@type': 'HowTo',
     name: 'How to Host a Golf Simulator Event',
     step: [
-      { '@type': 'HowToStep', name: 'Create the event', text: 'Set dates, description, entry criteria, and optional sponsor branding from your venue dashboard.' },
-      { '@type': 'HowToStep', name: 'Share the link or QR code', text: 'Ripping Bombs generates a shareable event page and QR code automatically for in-bay signage or social posts.' },
-      { '@type': 'HowToStep', name: 'Invite players', text: 'Search existing players by name or paste a list of emails to send in-app invites.' },
-      { '@type': 'HowToStep', name: 'Run it', text: 'Players submit drives from the bay; the leaderboard updates live and eligibility is enforced automatically.' },
+      { '@type': 'HowToStep', name: 'Create the event', text: 'Set dates, entry criteria, and sponsor branding from your dashboard.' },
+      { '@type': 'HowToStep', name: 'Share it', text: 'Get a branded page and QR code instantly.' },
+      { '@type': 'HowToStep', name: 'Invite players', text: 'Search by name or paste emails.' },
+      { '@type': 'HowToStep', name: 'Run it', text: 'The leaderboard and eligibility checks run themselves.' },
     ],
   };
 
   return (
     <>
       <Head>
-        <title>How to Host a Golf Simulator Event & Fill Quiet Bay Time | Ripping Bombs</title>
+        <title>How to Host a Golf Simulator Event | Ripping Bombs</title>
         <meta
           name="description"
-          content="A step-by-step guide for golf simulator venues to create branded longest-drive events and leaderboards that turn slow weekday and off-peak hours into booked bay time."
+          content="Turn your quietest bay hours into booked ones. Create a branded golf simulator event with a live leaderboard in minutes."
         />
         <link rel="canonical" href="https://rippingbombs.com/how-to-host-a-golf-simulator-event/" />
-        <meta property="og:title" content="How to Host a Golf Simulator Event & Fill Quiet Bay Time" />
-        <meta
-          property="og:description"
-          content="Create a branded longest-drive event in minutes and give players a reason to book your quietest hours."
-        />
+        <meta property="og:title" content="How to Host a Golf Simulator Event" />
+        <meta property="og:description" content="Turn dead bay time into booked time — set up an event in minutes." />
         <meta property="og:url" content="https://rippingbombs.com/how-to-host-a-golf-simulator-event/" />
         <meta property="og:type" content="article" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -70,119 +67,149 @@ export default function VenueEventGuide() {
 
       <main style={{ backgroundColor: BG2, color: TXT, fontFamily: SANS }}>
         {/* Hero */}
-        <section style={{ padding: '72px 20px 48px', borderBottom: `1px solid ${BDR}`, maxWidth: 880, margin: '0 auto' }}>
-          <p style={{ color: ORG, fontFamily: DISP, letterSpacing: 1, textTransform: 'uppercase', fontSize: 13, marginBottom: 12 }}>
+        <section
+          style={{
+            padding: '90px 24px 70px',
+            textAlign: 'center',
+            borderBottom: `1px solid ${BDR}`,
+            background: `radial-gradient(ellipse at top, rgba(255,0,144,0.08), transparent 60%)`,
+          }}
+        >
+          <div style={{ color: ORG, fontFamily: DISP, letterSpacing: 3, textTransform: 'uppercase', fontSize: 12, fontWeight: 700, marginBottom: 18 }}>
             For Venues
-          </p>
-          <h1 style={{ fontFamily: DISP, fontSize: 40, lineHeight: 1.15, margin: 0 }}>
-            How to Host a Golf Simulator Event (and Fill Your Quietest Bay Hours)
+          </div>
+          <h1 style={{ fontFamily: DISP, fontSize: 48, lineHeight: 1.05, letterSpacing: 0.5, margin: '0 auto', maxWidth: 760 }}>
+            Empty bays don&apos;t sell themselves.<br />
+            <span style={{ color: ORG }}>Events do.</span>
           </h1>
-          <p style={{ color: MUT, fontSize: 18, lineHeight: 1.6, marginTop: 20 }}>
-            Empty bays on a Tuesday morning aren&apos;t a scheduling problem &mdash; they&apos;re a motivation problem.
-            A branded longest-drive event with a live leaderboard gives players a reason to book the hours nobody
-            else wants. Here&apos;s exactly how to set one up on Ripping Bombs, start to finish.
+          <p style={{ color: MUT, fontSize: 17, lineHeight: 1.6, maxWidth: 520, margin: '22px auto 0' }}>
+            Give players a leaderboard to chase and a deadline to beat. Set up your first branded
+            event in about five minutes.
           </p>
+          <Link
+            href="#steps"
+            style={{
+              display: 'inline-block',
+              marginTop: 32,
+              background: ORG,
+              color: '#000',
+              fontFamily: DISP,
+              fontSize: 15,
+              letterSpacing: 0.5,
+              padding: '14px 34px',
+              textDecoration: 'none',
+            }}
+          >
+            See How It Works ↓
+          </Link>
         </section>
 
-        {/* Why events fill quiet time */}
-        <section style={{ padding: '48px 20px', maxWidth: 880, margin: '0 auto' }}>
-          <h2 style={{ fontFamily: DISP, fontSize: 26, marginBottom: 16 }}>
-            Why events move bookings into off-peak hours
+        {/* Stat strip */}
+        <section
+          style={{
+            maxWidth: 900,
+            margin: '0 auto',
+            padding: '48px 24px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 24,
+            borderBottom: `1px solid ${BDR}`,
+          }}
+        >
+          {[
+            { n: '5 min', l: 'to set up an event' },
+            { n: '0', l: 'apps players have to download' },
+            { n: '24/7', l: 'the leaderboard updates itself' },
+          ].map((s) => (
+            <div key={s.l} style={{ textAlign: 'center' }}>
+              <div style={{ fontFamily: DISP, fontSize: 36, color: ORG }}>{s.n}</div>
+              <div style={{ color: MUT, fontSize: 13, marginTop: 4 }}>{s.l}</div>
+            </div>
+          ))}
+        </section>
+
+        {/* Why */}
+        <section style={{ maxWidth: 720, margin: '0 auto', padding: '56px 24px', textAlign: 'center' }}>
+          <h2 style={{ fontFamily: DISP, fontSize: 28, margin: '0 0 14px' }}>
+            Your slowest hour is someone&apos;s free hour
           </h2>
-          <p style={{ color: MUT, lineHeight: 1.7, marginBottom: 16 }}>
-            Open bay time competes with every other free-time option a player has. A named event with a deadline,
-            a leaderboard, and bragging rights does not &mdash; it gives players a specific reason to show up at a
-            specific time. Venues running weekday or off-peak events on Ripping Bombs use that structure to:
+          <p style={{ color: MUT, fontSize: 16, lineHeight: 1.7 }}>
+            A named event beats open bay time every time. Run a weekday senior league, an
+            after-school youth event, or an off-season sponsor challenge — anything with a
+            leaderboard and a clock turns dead hours into booked ones.
           </p>
-          <ul style={{ color: MUT, lineHeight: 1.9, paddingLeft: 20 }}>
-            <li>Fill weekday mornings and afternoons with a recurring senior or after-school youth event</li>
-            <li>Turn a slow month into a themed sponsor challenge with branded prizes</li>
-            <li>Give members-only or women&apos;s-league nights a live leaderboard instead of a paper sign-in sheet</li>
-            <li>Re-activate lapsed players with an invite the moment a new event opens</li>
-          </ul>
         </section>
 
-        {/* Step by step */}
-        <section style={{ padding: '48px 20px', backgroundColor: BG3, borderTop: `1px solid ${BDR}`, borderBottom: `1px solid ${BDR}` }}>
-          <div style={{ maxWidth: 880, margin: '0 auto' }}>
-            <h2 style={{ fontFamily: DISP, fontSize: 26, marginBottom: 24 }}>Setting up an event, step by step</h2>
-
-            {[
-              {
-                n: '01',
-                title: 'Create the event',
-                body: 'From your venue dashboard, open Events and hit Create Event. Add your dates, a short description, and optional sponsor branding. Set entry criteria if you want to target a specific group \u2014 age and gender checks use the info players already gave you at registration, so nothing new is required from them.',
-              },
-              {
-                n: '02',
-                title: 'Get your shareable link and QR code',
-                body: 'Every event gets its own branded public page automatically, plus an on-demand QR code you can print for the bay, the front desk, or a table tent. No design work needed.',
-              },
-              {
-                n: '03',
-                title: 'Invite players two ways',
-                body: 'Search your existing player base by name and invite them directly, or paste a list of emails for players who haven\u2019t been in yet. Invited players get an in-app banner the next time they open Ripping Bombs, with a one-tap join.',
-              },
-              {
-                n: '04',
-                title: 'Let the leaderboard run itself',
-                body: 'Players submit from the bay as normal \u2014 the event is pre-selected so there\u2019s no extra step \u2014 and the live leaderboard, the \u201cWho\u2019s Competing\u201d list, and eligibility checks all update automatically. If someone doesn\u2019t meet the entry criteria, they get a clear reason instead of a confusing error.',
-              },
-            ].map((s) => (
-              <div key={s.n} style={{ display: 'flex', gap: 20, marginBottom: 28 }}>
-                <div style={{ fontFamily: DISP, fontSize: 28, color: ORG, minWidth: 48 }}>{s.n}</div>
-                <div>
-                  <h3 style={{ fontFamily: DISP, fontSize: 19, margin: '0 0 8px' }}>{s.title}</h3>
-                  <p style={{ color: MUT, lineHeight: 1.7, margin: 0 }}>{s.body}</p>
+        {/* Steps */}
+        <section id="steps" style={{ padding: '56px 24px', backgroundColor: BG3, borderTop: `1px solid ${BDR}`, borderBottom: `1px solid ${BDR}` }}>
+          <div style={{ maxWidth: 900, margin: '0 auto' }}>
+            <h2 style={{ fontFamily: DISP, fontSize: 28, textAlign: 'center', marginBottom: 40 }}>
+              Four steps. That&apos;s it.
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }}>
+              {[
+                { n: '01', title: 'Create it', body: 'Dates, criteria, sponsor logo. Done.' },
+                { n: '02', title: 'Share it', body: 'Instant link + QR code, ready to print.' },
+                { n: '03', title: 'Invite players', body: 'Search by name or paste emails.' },
+                { n: '04', title: 'Watch it run', body: 'Live leaderboard, zero admin.' },
+              ].map((s) => (
+                <div key={s.n} style={{ background: BG2, border: `1px solid ${BDR}`, padding: '24px 20px' }}>
+                  <div style={{ fontFamily: DISP, fontSize: 30, color: ORG, marginBottom: 10 }}>{s.n}</div>
+                  <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 6 }}>{s.title}</div>
+                  <div style={{ color: MUT, fontSize: 13.5, lineHeight: 1.5 }}>{s.body}</div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* Event ideas for quiet times */}
-        <section style={{ padding: '48px 20px', maxWidth: 880, margin: '0 auto' }}>
-          <h2 style={{ fontFamily: DISP, fontSize: 26, marginBottom: 16 }}>
-            Event ideas built for your slowest hours
+        {/* Ideas */}
+        <section style={{ maxWidth: 900, margin: '0 auto', padding: '56px 24px' }}>
+          <h2 style={{ fontFamily: DISP, fontSize: 28, textAlign: 'center', marginBottom: 32 }}>
+            Built for the hours nobody books
           </h2>
-          <p style={{ color: MUT, lineHeight: 1.7, marginBottom: 16 }}>
-            Looking for a starting point? See our full breakdown of{' '}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 20 }}>
+            {[
+              { title: 'Senior mornings', body: 'Fills the gap before lunch rush.' },
+              { title: 'After-school youth', body: 'Turns a dead 3–5pm into a standing booking.' },
+              { title: "Women's league night", body: 'A low-traffic evening, live leaderboard included.' },
+              { title: 'Off-season sponsor challenge', body: 'Branded prizes to carry your slowest month.' },
+            ].map((idea) => (
+              <div key={idea.title} style={{ borderLeft: `3px solid ${ORG}`, paddingLeft: 16 }}>
+                <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>{idea.title}</div>
+                <div style={{ color: MUT, fontSize: 13.5, lineHeight: 1.5 }}>{idea.body}</div>
+              </div>
+            ))}
+          </div>
+          <p style={{ color: DIM, fontSize: 13, textAlign: 'center', marginTop: 32 }}>
+            More formats:{' '}
             <Link href="/golf-club-longest-drive-competition-ideas" style={{ color: ORG }}>
-              longest-drive competition ideas
+              competition ideas
             </Link>{' '}
-            for more formats, or read how venues are already running{' '}
+            ·{' '}
             <Link href="/club-and-simulator-venue-leaderboards" style={{ color: ORG }}>
-              club and simulator venue leaderboards
-            </Link>{' '}
-            day to day.
+              venue leaderboards
+            </Link>
           </p>
-          <ul style={{ color: MUT, lineHeight: 1.9, paddingLeft: 20 }}>
-            <li><strong style={{ color: TXT }}>Weekday-morning senior event</strong> &mdash; fills the hours between the morning and lunch rush</li>
-            <li><strong style={{ color: TXT }}>After-school youth event</strong> &mdash; converts a dead 3&ndash;5pm window into a standing booking</li>
-            <li><strong style={{ color: TXT }}>Women&apos;s league night</strong> &mdash; a low-traffic evening with a purpose-built leaderboard</li>
-            <li><strong style={{ color: TXT }}>Off-season sponsor challenge</strong> &mdash; branded prizes to keep bays booked through your slowest month</li>
-          </ul>
         </section>
 
         {/* FAQ */}
-        <section style={{ padding: '48px 20px', backgroundColor: BG3, borderTop: `1px solid ${BDR}` }}>
-          <div style={{ maxWidth: 880, margin: '0 auto' }}>
-            <h2 style={{ fontFamily: DISP, fontSize: 26, marginBottom: 24 }}>Common questions</h2>
+        <section style={{ padding: '56px 24px', backgroundColor: BG3, borderTop: `1px solid ${BDR}` }}>
+          <div style={{ maxWidth: 720, margin: '0 auto' }}>
+            <h2 style={{ fontFamily: DISP, fontSize: 26, textAlign: 'center', marginBottom: 28 }}>FAQ</h2>
             {FAQS.map((f) => (
-              <div key={f.q} style={{ marginBottom: 24, borderBottom: `1px solid ${BDR}`, paddingBottom: 20 }}>
-                <h3 style={{ fontFamily: DISP, fontSize: 17, margin: '0 0 8px' }}>{f.q}</h3>
-                <p style={{ color: MUT, lineHeight: 1.7, margin: 0 }}>{f.a}</p>
+              <div key={f.q} style={{ marginBottom: 20, borderBottom: `1px solid ${BDR}`, paddingBottom: 18 }}>
+                <h3 style={{ fontFamily: DISP, fontSize: 16, margin: '0 0 6px' }}>{f.q}</h3>
+                <p style={{ color: MUT, lineHeight: 1.6, margin: 0, fontSize: 14 }}>{f.a}</p>
               </div>
             ))}
           </div>
         </section>
 
         {/* CTA */}
-        <section style={{ padding: '56px 20px 80px', maxWidth: 880, margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontFamily: DISP, fontSize: 26, marginBottom: 12 }}>Ready to fill your quiet hours?</h2>
-          <p style={{ color: MUT, marginBottom: 28 }}>
-            Set up your venue account and create your first event in a few minutes.
-          </p>
+        <section style={{ padding: '64px 24px 90px', maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{ fontFamily: DISP, fontSize: 30, marginBottom: 10 }}>Book the hours you&apos;re losing.</h2>
+          <p style={{ color: MUT, marginBottom: 28 }}>Five minutes. No card required.</p>
           <Link
             href="/register"
             style={{
@@ -190,9 +217,9 @@ export default function VenueEventGuide() {
               backgroundColor: ORG,
               color: '#000',
               fontFamily: DISP,
-              padding: '14px 32px',
+              fontSize: 15,
+              padding: '14px 34px',
               textDecoration: 'none',
-              borderRadius: 0,
             }}
           >
             Get Started
