@@ -5,6 +5,8 @@ import { supabase } from '../lib/supabaseClient';
 import PlayerAvatar from '../components/PlayerAvatar';
 import AvatarUploader from '../components/AvatarUploader';
 import SponsorLogoUploader from '../components/SponsorLogoUploader';
+import VenueEventsSection from '../components/VenueEventsSection';
+import { getVenueEvents } from '../lib/events';
 import { countryFlag } from '../components/UI';
 import { DISP } from '../lib/constants';
 
@@ -1255,6 +1257,7 @@ export default function DashboardPage() {
   const [venueCategoriesCounted, setVenueCategoriesCounted] = useState(0);
   const [weeklyData, setWeeklyData] = useState(null);
   const [weeklyCategoryLeaders, setWeeklyCategoryLeaders] = useState([]);
+  const [venueEvents, setVenueEvents] = useState({ current: [], previous: [] });
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -1272,6 +1275,14 @@ export default function DashboardPage() {
 
     const { data: freshClub } = await supabase.from('clubs').select('*').eq('id', clubData.id).single();
     setClub(freshClub || clubData);
+
+    // Custom events — club accounts only, part of the TV Display & Sponsors tier
+    if ((freshClub || clubData)?.accountType === 'club') {
+      try {
+        const ev = await getVenueEvents(clubData.id);
+        setVenueEvents(ev);
+      } catch { /* non-critical — leave the section empty rather than blocking the dashboard */ }
+    }
 
     const { data: clubEntries } = await supabase.from('entries').select('*').eq('orgId', clubData.id);
     const sorted = (clubEntries || []).sort((a, b) => Number(b.dist) - Number(a.dist));
@@ -1816,6 +1827,11 @@ export default function DashboardPage() {
           limitToFree={club?.accountType === 'simulator' && !club?.isPremium}
           isClub={club?.accountType === 'club'}
         />
+
+        {/* Custom Events & Competitions — club accounts only, bundled into TV Display */}
+        {club?.accountType === 'club' && (
+          <VenueEventsSection venueId={club.id} initialEvents={venueEvents} />
+        )}
 
         {/* TV Display & Sponsors promo — club accounts only */}
         {club?.accountType === 'club' && (

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { TXT, MUT, ORG, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { tier, todayStr, toB64 } from '../lib/constants';
 import { Card, Field, PhotoField, Btn } from '../components/UI';
+import { getEventBySlug, checkEligibility, joinEvent } from '../lib/events';
 
 // Mirrors nameToSlug() in pages/profile/[slug].jsx — keep in sync
 function nameToSlug(name) {
@@ -32,7 +33,25 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
   const [showProfilePrompt, setShowProfilePrompt] = useState(false);
   const [rankResult, setRankResult] = useState(null);
   const [venueLocked, setVenueLocked] = useState(false);
+  const [eventData, setEventData] = useState(null); // { event, venue }
+  const [eventError, setEventError] = useState('');
   const router = useRouter();
+
+  // Event flow: a "Join & Submit" link from /e/[slug] arrives as
+  // /submit?event=<slug>. Load the event, lock the venue to the one
+  // hosting it, and tag the entry so it counts toward that event's
+  // leaderboard rather than being guessed from the date.
+  useEffect(() => {
+    if (!router.isReady) return;
+    const eventSlug = router.query.event;
+    if (!eventSlug) return;
+    getEventBySlug(eventSlug).then(result => {
+      if (!result) { setEventError('This event link may have expired or been removed.'); return; }
+      setEventData(result);
+      setForm(f => ({ ...f, eventId: result.event.id, venueId: result.venue?.id || f.venueId, tournament: result.event.name }));
+      setVenueLocked(true);
+    });
+  }, [router.isReady, router.query.event]);
 
   // Auto-connect flow: a venue's QR poster links to /submit?venue=<id>.
   // If that matches a real, approved club, pre-select and lock it so the
@@ -70,6 +89,18 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
 
   const isSimulator = loggedOrg.accountType === 'simulator';
 
+  // Event eligibility — only relevant when arriving via an /e/[slug] "Join" link.
+  const eventEligibility = eventData ? checkEligibility(eventData.event, loggedOrg) : null;
+
+  // Best-effort auto-join: someone may land here with the link shared directly
+  // rather than via the "Join" button on the event page. Silent — ineligible
+  // players are already blocked below before this would matter.
+  useEffect(() => {
+    if (eventData && eventEligibility?.eligible) {
+      joinEvent(eventData.event.id, loggedOrg).catch(() => {});
+    }
+  }, [eventData?.event?.id, eventEligibility?.eligible]);
+
   // Once-per-week check for simulator accounts
   const simulatorWeeklyBlock = (() => {
     if (!isSimulator) return null;
@@ -91,6 +122,25 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
     return existingThisWeek || null;
   })();
 
+  if (eventError) {
+    return (
+      <div style={{ padding: '80px 18px', textAlign: 'center' }}>
+        <div style={{ fontFamily: DISP, fontSize: 26, color: TXT, marginBottom: 10 }}>Event Not Found</div>
+        <div style={{ fontFamily: SANS, fontSize: 13, color: MUT }}>{eventError}</div>
+      </div>
+    );
+  }
+
+  if (eventData && eventEligibility && !eventEligibility.eligible) {
+    return (
+      <div style={{ padding: '80px 18px', textAlign: 'center' }}>
+        <div style={{ fontFamily: DISP, fontSize: 26, color: TXT, marginBottom: 10 }}>Not Eligible</div>
+        <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: 20 }}>{eventEligibility.reason}</div>
+        <Btn onClick={() => router.push(`/e/${router.query.event}`)}>Back to Event →</Btn>
+      </div>
+    );
+  }
+
   return (
     <>
       <Head>
@@ -104,6 +154,16 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
             ? `${loggedOrg.fullName} · Simulator Drive`
             : `${loggedOrg.courseName} · ${loggedOrg.location}`}
         </div>
+
+        {/* Event banner — shown when arriving via an /e/[slug] "Join" link */}
+        {eventData && (
+          <div style={{ background:'rgba(255,0,144,0.08)', border:`1px solid ${ORG}`, padding:'16px 18px', marginBottom:20, fontFamily:SANS }}>
+            <div style={{ fontSize:15, fontWeight:700, color:ORG, marginBottom:4 }}>🏆 {eventData.event.name}</div>
+            <div style={{ fontSize:12, color:MUT, lineHeight:1.6 }}>
+              This drive will count toward the event leaderboard, hosted by {eventData.venue?.courseName}.
+            </div>
+          </div>
+        )}
 
         {/* Post-registration welcome banner */}
         {isSimulator && router.query.welcome === '1' && (
@@ -139,7 +199,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
             {isSimulator ? (
               <div style={{ gridColumn:'1/-1' }}>
                 <label style={{ display:'block', fontFamily:SANS, fontSize:11, fontWeight:600, color:MUT, marginBottom:5, textTransform:'uppercase', letterSpacing:.8 }}>Event</label>
-                <div style={{ background:BG3, border:`1px solid ${BDR}`, padding:'10px 14px', fontFamily:SANS, fontSize:14, color:DIM }}>Simulator</div>
+                <div style={{ background:BG3, border:`1px solid ${BDR}`, padding:'10px 14px', fontFamily:SANS, fontSize:14, color:DIM }}>{eventData ? eventData.event.name : 'Simulator'}</div>
               </div>
             ) : (
               <div style={{ gridColumn:'1/-1' }}>
@@ -170,19 +230,21 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
                     <div style={{ background: 'rgba(255,0,144,0.06)', border: `1px solid rgba(255,0,144,0.3)`, padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
                       <span style={{ fontFamily: SANS, fontSize: 14, color: TXT }}>
                         {'\u2713 '}
-                        {approvedOrgs.find(o => o.id === form.venueId)?.courseName || 'Venue'}
-                        <span style={{ color: ORG, fontWeight: 600, marginLeft: 6, fontSize: 11 }}>(from QR code)</span>
+                        {approvedOrgs.find(o => o.id === form.venueId)?.courseName || eventData?.venue?.courseName || 'Venue'}
+                        <span style={{ color: ORG, fontWeight: 600, marginLeft: 6, fontSize: 11 }}>{eventData ? '(event venue)' : '(from QR code)'}</span>
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => setVenueLocked(false)}
-                        style={{ background: 'none', border: 'none', color: DIM, fontFamily: SANS, fontSize: 11, textDecoration: 'underline', cursor: 'pointer', padding: 0 }}
-                      >
-                        Change
-                      </button>
+                      {!eventData && (
+                        <button
+                          type="button"
+                          onClick={() => setVenueLocked(false)}
+                          style={{ background: 'none', border: 'none', color: DIM, fontFamily: SANS, fontSize: 11, textDecoration: 'underline', cursor: 'pointer', padding: 0 }}
+                        >
+                          Change
+                        </button>
+                      )}
                     </div>
                     <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 5 }}>
-                      This venue was selected automatically from the QR code you scanned.
+                      {eventData ? 'This venue is fixed by the event you joined.' : 'This venue was selected automatically from the QR code you scanned.'}
                     </div>
                   </>
                 ) : (

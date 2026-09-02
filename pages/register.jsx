@@ -46,6 +46,7 @@ const TIERS = {
       'Live leaderboard on your venue\u2019s TV, always up to date',
       'Add a sponsor\u2019s logo to your screen',
       'Sell the sponsor slot to a local business — it typically covers the subscription with margin left over',
+      'Run your own branded competitions — e.g. a youth long-drive night — with a shareable link, QR code and entry criteria',
     ],
     note: 'Every venue starts on the free tier — upgrade to TV Display & Sponsors anytime from your dashboard, no card required to register.',
   },

@@ -30,7 +30,7 @@ export default function App({ Component, pageProps }) {
   // Form state
   const [reg, setReg] = useState({ type:'simulator', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
   const [lgn, setLgn] = useState({ email:'', pw:'' });
-  const [form, setForm] = useState({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male', venueId:'', facility:'', playerEmail:'' });
+  const [form, setForm] = useState({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male', venueId:'', facility:'', playerEmail:'', eventId:'' });
 
   // Leaderboard filter state
   const [week, setWeek] = useState(null);
@@ -157,6 +157,7 @@ export default function App({ Component, pageProps }) {
       venueId: form.venueId || null,
       facility: form.facility || null,
       player_email: form.playerEmail || null,
+      eventId: form.eventId || null,
     };
 
     const ok = await db.insertEntry(e);
@@ -176,7 +177,7 @@ export default function App({ Component, pageProps }) {
     const rank = sameGender.findIndex(x => x.id === e.id) + 1;
     const total = sameGender.length;
 
-    setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male', venueId:'', facility:'', playerEmail:'' });
+    setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male', venueId:'', facility:'', playerEmail:'', eventId:'' });
     toast('Drive submitted to the World Registry!');
     return { ok: true, rank, total, gender: e.gender };
   }
