@@ -8,34 +8,37 @@ export default function AuthCallback() {
   useEffect(() => {
     if (!router.isReady) return;
 
+    // TEMP DEBUG — remove once the flow is confirmed working
+    console.log("[auth/callback] full URL:", window.location.href);
+    console.log("[auth/callback] hash:", window.location.hash);
+    console.log("[auth/callback] query:", router.query);
+
     const next = typeof router.query.next === "string" ? router.query.next : "/";
     let settled = false;
 
-    const finish = (hasSession) => {
+    const finish = (hasSession, reason) => {
+      console.log("[auth/callback] finish() called — hasSession:", hasSession, "reason:", reason);
       if (settled) return;
       settled = true;
       router.replace(hasSession ? next : "/login?error=auth_failed");
     };
 
-    // Fast path: session may already be available (e.g. the hash was
-    // parsed before this effect ran).
-    supabase.auth.getSession().then(({ data }) => {
-      if (data?.session) finish(true);
+    supabase.auth.getSession().then(({ data, error }) => {
+      console.log("[auth/callback] getSession() result:", data, "error:", error);
+      if (data?.session) finish(true, "getSession");
     });
 
-    // Reliable path: fires once Supabase finishes parsing the redirect
-    // URL and persisting the session — avoids the race where getSession()
-    // is called before that async parsing has completed.
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("[auth/callback] onAuthStateChange event:", event, "session:", !!session);
       if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
-        finish(!!session);
+        finish(!!session, `onAuthStateChange:${event}`);
       }
     });
 
-    // Safety net: if no session shows up within a few seconds, something
-    // genuinely failed (bad/expired code, provider error, etc.) — don't
-    // leave the user staring at "Signing you in..." forever.
-    const timeout = setTimeout(() => finish(false), 6000);
+    const timeout = setTimeout(() => {
+      console.log("[auth/callback] TIMEOUT hit — no session detected in time");
+      finish(false, "timeout");
+    }, 6000);
 
     return () => {
       listener?.subscription?.unsubscribe();
