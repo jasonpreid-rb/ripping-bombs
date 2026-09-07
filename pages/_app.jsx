@@ -54,7 +54,16 @@ export default function App({ Component, pageProps }) {
       .select('*')
       .eq('auth_user_id', userId)
       .single();
-    if (org) setLoggedOrg(org);
+    if (org) {
+      setLoggedOrg(org);
+      // Several pages (dashboard.jsx, etc.) check localStorage['rb_club']
+      // directly rather than the loggedOrg prop — mirror doLogin/doRegister
+      // here so a Google sign-in is recognized everywhere the same way a
+      // password sign-in already is.
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('rb_club', JSON.stringify(org));
+      }
+    }
   }
 
   useEffect(() => {
