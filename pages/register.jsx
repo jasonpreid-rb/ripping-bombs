@@ -213,7 +213,7 @@ function ChoiceStep({ onChoose, redirectTo }) {
 
 export default function RegisterPage({ reg, setReg, doRegister }) {
   const router = useRouter();
-  const redirectTo = typeof router.query.redirect === 'string' ? router.query.redirect : null;
+  const redirectTo = router.isReady && typeof router.query.redirect === 'string' ? router.query.redirect : null;
   const isSimulator = reg.type !== 'club';
   const [showPw, setShowPw] = useState(false);
   // Always start on the choice screen — reg.type may already carry a default
