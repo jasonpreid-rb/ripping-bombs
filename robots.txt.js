@@ -1,4 +1,11 @@
-User-agent: *
+// pages/robots.txt.js
+//
+// Dynamic robots.txt: serves a full "Disallow: /" to every crawler when the
+// request host is the dev subdomain, and the normal production policy
+// everywhere else. Delete public/robots.txt so this route is the only one
+// serving /robots.txt (Next.js will otherwise prefer the static file).
+
+const PRODUCTION_ROBOTS = `User-agent: *
 Allow: /
 
 # AI training crawlers — opted out of training-data collection.
@@ -53,3 +60,22 @@ User-agent: Webzio-Extended
 Disallow: /
 
 Sitemap: https://www.rippingbombs.com/sitemap.xml
+`;
+
+const DEV_ROBOTS = `User-agent: *
+Disallow: /
+`;
+
+export default function handler(req, res) {
+  const hostname = (req.headers.host || '').toLowerCase();
+  const isDev = hostname.startsWith('dev.');
+
+  res.setHeader('Content-Type', 'text/plain');
+
+  // Belt-and-suspenders: also send X-Robots-Tag on this route itself for dev.
+  if (isDev) {
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  }
+
+  res.status(200).send(isDev ? DEV_ROBOTS : PRODUCTION_ROBOTS);
+}

@@ -27,6 +27,7 @@ const BLOCKED_AGENTS = [
 
 export function middleware(request) {
   const userAgent = (request.headers.get('user-agent') || '').toLowerCase();
+  const hostname = (request.headers.get('host') || '').toLowerCase();
 
   const isBlocked = BLOCKED_AGENTS.some((agent) => userAgent.includes(agent));
 
@@ -39,7 +40,19 @@ export function middleware(request) {
     });
   }
 
-  return NextResponse.next();
+  // dev.rippingbombs.com should never be indexed. Belt-and-suspenders
+  // alongside pages/robots.txt.js (which stops future crawling) — this
+  // header actively tells Google to drop pages it has already crawled
+  // and indexed from this host. Keep both in sync if the dev host changes.
+  const isDevHost = hostname.startsWith('dev.');
+
+  const response = NextResponse.next();
+
+  if (isDevHost) {
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  }
+
+  return response;
 }
 
 export const config = {
