@@ -1265,10 +1265,34 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const raw = typeof window !== 'undefined' && localStorage.getItem('rb_club');
-    if (!raw) { router.replace('/login'); return; }
-    let parsed;
-    try { parsed = JSON.parse(raw); } catch { router.replace('/login'); return; }
-    loadData(parsed);
+    if (raw) {
+      let parsed;
+      try { parsed = JSON.parse(raw); } catch { router.replace('/login'); return; }
+      loadData(parsed);
+      return;
+    }
+
+    // No rb_club yet — this can legitimately happen right after a Google
+    // sign-in redirect, where _app.jsx's session hydration (which writes
+    // rb_club) is still an in-flight async DB call when this page mounts.
+    // Check the Supabase session directly before giving up, instead of
+    // immediately bouncing to /login.
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      const userId = data?.session?.user?.id;
+      if (!userId) { router.replace('/login'); return; }
+
+      const { data: org } = await supabase
+        .from('clubs')
+        .select('*')
+        .eq('auth_user_id', userId)
+        .single();
+
+      if (!org) { router.replace('/login'); return; }
+
+      localStorage.setItem('rb_club', JSON.stringify(org));
+      loadData(org);
+    })();
   }, []);
 
   const loadData = async (clubData) => {
