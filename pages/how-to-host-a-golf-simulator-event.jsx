@@ -59,10 +59,10 @@ export default function VenueEventGuide() {
           name="description"
           content="Turn your quietest bay hours into booked ones. Create a branded golf simulator event with a live leaderboard in minutes."
         />
-        <link rel="canonical" href="https://rippingbombs.com/how-to-host-a-golf-simulator-event/" />
+        <link rel="canonical" href="https://www.rippingbombs.com/how-to-host-a-golf-simulator-event/" />
         <meta property="og:title" content="How to Host a Golf Simulator Event" />
         <meta property="og:description" content="Turn dead bay time into booked time — set up an event in minutes." />
-        <meta property="og:url" content="https://rippingbombs.com/how-to-host-a-golf-simulator-event/" />
+        <meta property="og:url" content="https://www.rippingbombs.com/how-to-host-a-golf-simulator-event/" />
         <meta property="og:type" content="article" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />

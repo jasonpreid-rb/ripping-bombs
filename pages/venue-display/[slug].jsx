@@ -105,7 +105,7 @@ export default function VenueDisplay({ slug, venue, initialData }) {
           name="description"
           content={`Live longest drive leaderboard at ${venue.name}${venue.location ? `, ${venue.location}` : ''} — updated in real time on Ripping Bombs.`}
         />
-        <link rel="canonical" href={`https://rippingbombs.com/venue-display/${slug}`} />
+        <link rel="canonical" href={`https://www.rippingbombs.com/venue-display/${slug}`} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
@@ -118,7 +118,7 @@ export default function VenueDisplay({ slug, venue, initialData }) {
               '@context': 'https://schema.org',
               '@type': 'SportsActivityLocation',
               name: venue.name,
-              url: `https://rippingbombs.com/venue-display/${slug}`,
+              url: `https://www.rippingbombs.com/venue-display/${slug}`,
               ...(venue.locality || venue.countryCode
                 ? {
                     address: {
