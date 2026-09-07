@@ -44,6 +44,19 @@ export default function App({ Component, pageProps }) {
   const [fGender, setFGender] = useState('');
   const [sortBy, setSortBy] = useState('dist');
 
+  // Loads the clubs row linked to a Supabase Auth (Google) session and
+  // makes it the active loggedOrg. Shared by the on-mount check and the
+  // live listener below, since both need to do the same lookup.
+  async function hydrateFromSupabaseSession(userId) {
+    if (!userId) return;
+    const { data: org } = await supabase
+      .from('clubs')
+      .select('*')
+      .eq('auth_user_id', userId)
+      .single();
+    if (org) setLoggedOrg(org);
+  }
+
   useEffect(() => {
     initData().then(({ orgs, entries }) => {
       setOrgs(orgs);
@@ -59,21 +72,23 @@ export default function App({ Component, pageProps }) {
       }
 
       // Google-authenticated players: an rb_club (password-based) session
-      // always takes priority if one's already active. Otherwise, check for
-      // a Supabase Auth session and load the matching clubs row via
-      // auth_user_id, set by the on_auth_user_created trigger.
+      // always takes priority if one's already active on this initial load.
       if (!raw) {
-        supabase.auth.getSession().then(async ({ data }) => {
-          const userId = data?.session?.user?.id;
-          if (!userId) return;
-          const { data: org } = await supabase
-            .from('clubs')
-            .select('*')
-            .eq('auth_user_id', userId)
-            .single();
-          if (org) setLoggedOrg(org);
+        supabase.auth.getSession().then(({ data }) => {
+          hydrateFromSupabaseSession(data?.session?.user?.id);
         });
       }
+
+      // The OAuth redirect (Google → Supabase → /auth/callback → back here)
+      // lands on an already-mounted app, so the one-time check above won't
+      // catch a login that completes *after* this effect already ran. This
+      // listener catches that case as it happens.
+      const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN') {
+          hydrateFromSupabaseSession(session?.user?.id);
+        }
+      });
+      return () => listener?.subscription?.unsubscribe();
     }
   }, []);
 
