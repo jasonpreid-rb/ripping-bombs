@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { TXT, MUT, ORG, DIM, BG3, BDR, SANS, DISP } from '../lib/constants';
 import { Card, Field, Btn } from '../components/UI';
+import GoogleLoginButton from '../components/GoogleLoginButton';
 
 export default function LoginPage({ lgn, setLgn, doLogin, doForgotPassword }) {
   const router = useRouter();
@@ -135,6 +136,8 @@ export default function LoginPage({ lgn, setLgn, doLogin, doForgotPassword }) {
                   Register here
                 </span>
               </div>
+
+              <GoogleLoginButton redirectTo={redirectTo || '/'} />
             </>
           )}
         </Card>

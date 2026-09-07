@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { COUNTRIES, ORG, MUT, TXT, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { Card, Field, Btn } from '../components/UI';
 import { toB64 } from '../lib/constants';
+import GoogleLoginButton from '../components/GoogleLoginButton';
 
 const SIMULATORS = [
   "Trackman","Flightscope","GCQuad","Full Swing","Foresight Sports",
@@ -136,6 +137,10 @@ function ChoiceStep({ onChoose, redirectTo }) {
       <div style={{ fontFamily: SANS, fontSize: 12, color: DIM, marginBottom: 32, textAlign: 'center' }}>
         Already have an account?{' '}
         <a href="/login" style={{ color: ORG, textDecoration: 'underline' }}>Log in</a>
+      </div>
+
+      <div style={{ maxWidth: 340, margin: '0 auto 28px' }}>
+        <GoogleLoginButton redirectTo={redirectTo || '/'} label="Sign up with Google" />
       </div>
 
       <div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: TXT, textAlign: 'center', marginBottom: 16 }}>
