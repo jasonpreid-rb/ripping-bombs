@@ -8,6 +8,7 @@ import AdminPanel from '../components/AdminPanel';
 import LaunchModal from '../components/LaunchModal';
 import CookieConsent from '../components/CookieConsent';
 import { initData, db } from '../lib/data';
+import { supabase } from '../lib/supabaseClient';
 import { ORGS_KEY, ENT_KEY, ADMIN_PW, SANS, ORG, MUT, BG2, BDR, TXT, DIM, DISP } from '../lib/constants';
 import { todayStr } from '../lib/constants';
 import { sendRegistrationNotification, sendPlayerSubmissionNotice } from '../lib/email';
@@ -55,6 +56,23 @@ export default function App({ Component, pageProps }) {
       if (localStorage.getItem('rb_admin_auth') === '1') setShowAdmin(true);
       if (!sessionStorage.getItem('rb_launch_seen')) {
         setTimeout(() => setShowLaunch(true), 10000);
+      }
+
+      // Google-authenticated players: an rb_club (password-based) session
+      // always takes priority if one's already active. Otherwise, check for
+      // a Supabase Auth session and load the matching clubs row via
+      // auth_user_id, set by the on_auth_user_created trigger.
+      if (!raw) {
+        supabase.auth.getSession().then(async ({ data }) => {
+          const userId = data?.session?.user?.id;
+          if (!userId) return;
+          const { data: org } = await supabase
+            .from('clubs')
+            .select('*')
+            .eq('auth_user_id', userId)
+            .single();
+          if (org) setLoggedOrg(org);
+        });
       }
     }
   }, []);
@@ -253,7 +271,7 @@ export default function App({ Component, pageProps }) {
   return (
     <>
       <Head><link rel="canonical" href={canonicalUrl} /></Head>
-      <Layout loggedOrg={loggedOrg} onLogout={()=>{ setLoggedOrg(null); localStorage.removeItem('rb_club'); router.push('/'); }} unit={unit} setUnit={setUnit}
+      <Layout loggedOrg={loggedOrg} onLogout={()=>{ setLoggedOrg(null); localStorage.removeItem('rb_club'); supabase.auth.signOut(); router.push('/'); }} unit={unit} setUnit={setUnit}
         onAdminClick={()=>setAdminPw({show:true,val:''})} pendingCount={pendingCount} onExitImpersonation={stopImpersonation}>
         <Component {...pageProps} {...sharedProps}/>
       </Layout>
