@@ -137,7 +137,7 @@ export default function LoginPage({ lgn, setLgn, doLogin, doForgotPassword }) {
                 </span>
               </div>
 
-              <GoogleLoginButton redirectTo={redirectTo || '/'} />
+              <GoogleLoginButton redirectTo={redirectTo || '/dashboard'} />
             </>
           )}
         </Card>

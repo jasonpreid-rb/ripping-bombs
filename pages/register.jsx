@@ -140,7 +140,7 @@ function ChoiceStep({ onChoose, redirectTo }) {
       </div>
 
       <div style={{ maxWidth: 340, margin: '0 auto 28px' }}>
-        <GoogleLoginButton redirectTo={redirectTo || '/'} label="Sign up with Google" />
+        <GoogleLoginButton redirectTo={redirectTo || '/dashboard'} label="Sign up with Google" />
         <div style={{ fontFamily: SANS, fontSize: 10.5, color: DIM, textAlign: 'center', marginTop: 8 }}>
           For individual players only — venues register below
         </div>
