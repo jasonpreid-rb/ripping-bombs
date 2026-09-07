@@ -152,9 +152,16 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
             ⚙{pendingCount > 0 && <span style={{ position: 'absolute', top: -4, right: -4, width: 9, height: 9, background: ORG, borderRadius: '50%', display: 'block' }}/>}
           </button>
         </div>
-        <button className="mobile-how-it-works" onClick={() => navTo('/how-it-works')} style={{ display: 'none', background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 11, padding: '7px 12px', borderRadius: 0, cursor: 'pointer', letterSpacing: .3, whiteSpace: 'nowrap' }}>
-          How It Works
-        </button>
+        <div className="mobile-how-it-works" style={{ display: 'none', alignItems: 'center', gap: 8 }}>
+          <button onClick={() => navTo('/how-it-works')} style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 11, padding: '7px 12px', borderRadius: 0, cursor: 'pointer', letterSpacing: .3, whiteSpace: 'nowrap' }}>
+            How It Works
+          </button>
+          {!loggedOrg && (
+            <button onClick={() => navTo('/register')} style={{ background: ORG, border: `1px solid ${ORG}`, color: '#111', fontFamily: SANS, fontWeight: 700, fontSize: 11, padding: '7px 12px', borderRadius: 0, cursor: 'pointer', letterSpacing: .3, whiteSpace: 'nowrap' }}>
+              Register
+            </button>
+          )}
+        </div>
       </div>
 
       <style>{`
