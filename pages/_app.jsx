@@ -84,7 +84,14 @@ export default function App({ Component, pageProps }) {
       // catch a login that completes *after* this effect already ran. This
       // listener catches that case as it happens.
       const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_IN') {
+        // 'SIGNED_IN' fires for a live sign-in while already listening.
+        // 'INITIAL_SESSION' fires when Supabase recovers a session from
+        // the URL during its own startup — which is what actually happens
+        // right after the Google OAuth redirect lands back on the app.
+        // Both need to hydrate loggedOrg; missing INITIAL_SESSION was why
+        // Google sign-in appeared to succeed (no error) but never logged
+        // the user in.
+        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
           hydrateFromSupabaseSession(session?.user?.id);
         }
       });
