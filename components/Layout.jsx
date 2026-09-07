@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { RBLogoWhite } from './Logo';
 import { ORG, MUT, BDR, DIM, SANS, DISP } from '../lib/constants';
+import { supabase } from '../lib/supabaseClient';
 
 // "Compatible with" marquee — brand logos live in /public/logos/.
 // If a logo file is missing or fails to load, falls back to the brand name as text.
@@ -50,9 +51,28 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [player, setPlayer] = useState(null);
   const isM = unit === 'm';
   const isActive = path => router.pathname === path;
   const navTo = path => { router.push(path); setMenuOpen(false); };
+
+  // Player (Google/Supabase Auth) session — separate from the club/venue
+  // login system above, which uses the loggedOrg prop + rb_club localStorage.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setPlayer(data?.session?.user ?? null);
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setPlayer(session?.user ?? null);
+    });
+    return () => listener?.subscription?.unsubscribe();
+  }, []);
+
+  const doPlayerLogout = async () => {
+    await supabase.auth.signOut();
+    setPlayer(null);
+    setMenuOpen(false);
+  };
 
   const NavBtn = ({ href, label }) => (
     <button onClick={() => navTo(href)} style={{ background: isActive(href) ? ORG : 'transparent', border: isActive(href) ? 'none' : '1px solid rgba(255,255,255,0.15)', color: isActive(href) ? '#111' : 'rgba(255,255,255,0.7)', fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 16px', borderRadius: 0, cursor: 'pointer', letterSpacing: .3 }}>{label}</button>
@@ -146,7 +166,19 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           <NavBtn href="/contact" label="Contact"/>
           {loggedOrg
             ? <><NavBtn href="/dashboard" label="Dashboard"/><NavBtn href="/submit" label="Submit Drive"/><button onClick={onLogout} style={{ background: 'none', border: '1px solid rgba(220,80,80,0.3)', color: '#f87171', fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', cursor: 'pointer', borderRadius: 0 }}>Log Out</button></>
-            : <><NavBtn href="/login" label="Login"/><button onClick={() => navTo('/register')} style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 12, padding: '7px 16px', borderRadius: 0, cursor: 'pointer' }}>Register</button></>
+            : player
+              ? <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {player.user_metadata?.avatar_url && (
+                      <img src={player.user_metadata.avatar_url} alt="" width={26} height={26} style={{ borderRadius: '50%', display: 'block' }} />
+                    )}
+                    <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.8)' }}>
+                      {player.user_metadata?.full_name || player.email}
+                    </span>
+                  </div>
+                  <button onClick={doPlayerLogout} style={{ background: 'none', border: '1px solid rgba(220,80,80,0.3)', color: '#f87171', fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', cursor: 'pointer', borderRadius: 0 }}>Log Out</button>
+                </>
+              : <><NavBtn href="/login" label="Login"/><button onClick={() => navTo('/register')} style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 12, padding: '7px 16px', borderRadius: 0, cursor: 'pointer' }}>Register</button></>
           }
           <button onClick={onAdminClick} style={{ position: 'relative', background: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 0, color: 'rgba(255,255,255,0.5)', fontSize: 14, padding: '6px 10px', cursor: 'pointer' }}>
             ⚙{pendingCount > 0 && <span style={{ position: 'absolute', top: -4, right: -4, width: 9, height: 9, background: ORG, borderRadius: '50%', display: 'block' }}/>}
@@ -194,9 +226,9 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           <span style={{ width: 50, height: 50, borderRadius: '50%', background: ORG, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: '#111', boxShadow: '0 4px 16px rgba(255,0,144,0.45)', border: '3px solid #1a1a1a' }}>＋</span>
         </button>
 
-        <button onClick={() => navTo(loggedOrg ? '/dashboard' : '/login')} style={{ flex: 1, background: 'none', border: 'none', color: isActive('/dashboard') ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
+        <button onClick={() => loggedOrg ? navTo('/dashboard') : player ? doPlayerLogout() : navTo('/login')} style={{ flex: 1, background: 'none', border: 'none', color: isActive('/dashboard') ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
           <span style={{ fontSize: 18, lineHeight: 1 }}>☻</span>
-          <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600 }}>{loggedOrg ? 'Dashboard' : 'Login'}</span>
+          <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600 }}>{loggedOrg ? 'Dashboard' : player ? 'Log Out' : 'Login'}</span>
         </button>
 
         <button onClick={() => setMenuOpen(m => !m)} style={{ flex: 1, background: 'none', border: 'none', color: menuOpen ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
