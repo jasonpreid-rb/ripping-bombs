@@ -94,7 +94,9 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
         </div>
       )}
 
-      <style>{`
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
         .desktop-nav{display:flex}
         .bottom-tabbar{display:none}
@@ -133,7 +135,9 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           }
           main { margin: 0 !important; padding: 0 !important; }
         }
-      `}</style>
+      `,
+        }}
+      />
 
       {/* HEADER */}
       <div className="site-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(14,14,14,0.97)', position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(16px)', padding: '14px 22px' }}>
