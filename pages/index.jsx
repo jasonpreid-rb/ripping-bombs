@@ -257,7 +257,7 @@ function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 })
         onClickCapture={handleClickCapture}
         onTouchStart={dismissHint}
         className="rb-scroll-row"
-        style={{overflowX:'auto',WebkitOverflowScrolling:'touch',marginLeft:-18,marginRight:-18,paddingLeft:18,paddingRight:18,cursor:'grab',touchAction:'pan-x'}}
+        style={{overflowX:'auto',WebkitOverflowScrolling:'touch',marginLeft:-18,marginRight:-18,paddingLeft:18,paddingRight:18,cursor:'grab',touchAction:'pan-x pan-y'}}
       >
         <div style={{display:'flex',alignItems:'stretch',gap}}>
           {loopItems.map((item,i)=>(
@@ -746,10 +746,15 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           }
           .rb-calc-buttons {
             gap: 6px !important;
+            flex-direction: column !important;
           }
           .rb-calc-btn {
             padding: 10px 18px !important;
             font-size: 12px !important;
+            width: 100% !important;
+          }
+          .rb-calc-buttons > button {
+            width: 100% !important;
           }
 
           /* Weekly leaderboard: pulled tighter so it lands near the fold */
