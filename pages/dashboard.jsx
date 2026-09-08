@@ -1733,6 +1733,11 @@ export default function DashboardPage() {
     setClub(updated);
     localStorage.setItem('rb_club', JSON.stringify(updated));
     setShowModal(false);
+
+    // Gender/DOB just changed, which affects primaryCategory and
+    // weeklyData.category (the CompleteProfilePrompt-vs-leaderboard
+    // decision) — recompute now rather than waiting for a page refresh.
+    loadData(updated);
   };
 
   const handleStartTrial = async () => {
