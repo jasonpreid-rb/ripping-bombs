@@ -107,8 +107,8 @@ function InlineCalculator({ router }) {
   const lbl = {display:'block',fontFamily:SANS,fontSize:10,fontWeight:700,color:'rgba(255,255,255,0.5)',marginBottom:5,textTransform:'uppercase',letterSpacing:1};
 
   return (
-    <div style={{position:'relative',zIndex:1,maxWidth:700,margin:'0 auto',width:'100%'}}>
-      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))',gap:'0 12px',marginBottom:14}}>
+    <div className="rb-calc" style={{position:'relative',zIndex:1,maxWidth:700,margin:'0 auto',width:'100%'}}>
+      <div className="rb-calc-grid" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))',gap:'0 12px',marginBottom:14}}>
         <div style={{marginBottom:12}}>
           <label style={lbl}>Distance (yds)<span style={{color:ORG,marginLeft:2}}>*</span></label>
           <input type="number" value={dist} onChange={e=>setDist(e.target.value)} placeholder="e.g. 240" min={50} max={400} style={inp}/>
@@ -129,8 +129,8 @@ function InlineCalculator({ router }) {
           </select>
         </div>
       </div>
-      <div style={{display:'flex',gap:10}}>
-        <button onClick={calculate} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'13px 28px',border:'none',cursor:'pointer',letterSpacing:.5}}>
+      <div className="rb-calc-buttons" style={{display:'flex',gap:10}}>
+        <button className="rb-calc-btn" onClick={calculate} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'13px 28px',border:'none',cursor:'pointer',letterSpacing:.5}}>
           CALCULATE MY RANK →
         </button>
         {result && (
@@ -414,6 +414,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           router.push(categoryHref(cat.key, false));
         }}
         style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,width:'100%',minWidth:0,minHeight:220,cursor:'pointer',transition:'border-color .15s'}}
+        className="rb-weekly-card"
         onMouseEnter={ev=>{ev.currentTarget.style.borderColor='rgba(255,0,144,0.5)';}}
         onMouseLeave={ev=>{ev.currentTarget.style.borderColor=top3.length?'rgba(255,0,144,0.2)':BDR;}}>
         <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.label}</span>
@@ -533,23 +534,24 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
       <div style={{animation:'fi .4s ease'}}>
 
         {/* HERO — video bg + condensed header + calculator */}
-        <div id="distance-calculator" style={{position:'relative',overflow:'hidden'}}>
+        <div id="distance-calculator" className="rb-hero" style={{position:'relative',overflow:'hidden'}}>
           <video autoPlay muted loop playsInline poster="https://images.pexels.com/videos/33511561/tee-shot-33511561.jpeg?auto=compress&cs=tinysrgb&h=627&fit=crop&w=1200"
+            className="rb-hero-video"
             style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block',filter:'brightness(0.35)'}}>
             <source src="https://videos.pexels.com/video-files/33511561/14252773_2560_1440_60fps.mp4" type="video/mp4"/>
           </video>
           <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(0,0,0,0.2),rgba(0,0,0,0.7))'}}/>
-          <div style={{position:'relative',zIndex:1,padding:'clamp(40px,8vw,72px) 20px clamp(48px,8vw,72px)',display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center'}}>
+          <div className="rb-hero-content" style={{position:'relative',zIndex:1,padding:'clamp(40px,8vw,72px) 20px clamp(48px,8vw,72px)',display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center'}}>
             {/* Condensed brand header */}
-            <div style={{fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:4,color:ORG,textTransform:'uppercase',marginBottom:12,background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
+            <div className="rb-hero-badge" style={{fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:4,color:ORG,textTransform:'uppercase',marginBottom:12,background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
               Live Global Simulator Database 
             </div>
-            <h1 style={{fontFamily:DISP,fontSize:'clamp(42px,8vw,72px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:8,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
+            <h1 className="rb-hero-title" style={{fontFamily:DISP,fontSize:'clamp(42px,8vw,72px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:8,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
               LONG DRIVE LEADERBOARD
             </h1>
-            <p style={{fontFamily:SANS,fontSize:14,color:'rgba(255,255,255,0.65)',maxWidth:440,margin:'0 auto 36px',lineHeight:1.6,letterSpacing:.3}}>
-              See where your drive ranks against golfers your age, handicap &amp; gender — instantly.{' '}
-              <a href="/sim-distance-real-or-fake" onClick={()=>{if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_sim_link_click',{event_category:'engagement'});}} style={{color:ORG,textDecoration:'underline'}}>
+            <p className="rb-hero-sub" style={{fontFamily:SANS,fontSize:14,color:'rgba(255,255,255,0.65)',maxWidth:440,margin:'0 auto 36px',lineHeight:1.6,letterSpacing:.3}}>
+              <span>See where your drive ranks against golfers your age, handicap &amp; gender — instantly.{' '}</span>
+              <a href="/sim-distance-real-or-fake" className="rb-hero-sub-link" onClick={()=>{if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_sim_link_click',{event_category:'engagement'});}} style={{color:ORG,textDecoration:'underline'}}>
                 Think your sim number might be inflated?
               </a>
             </p>
@@ -559,12 +561,12 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
         </div>
 
         {/* WEEKLY LEADERS */}
-        <div style={{background:'#0e0e0e',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'40px 0 40px'}}>
+        <div className="rb-weekly-section" style={{background:'#0e0e0e',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'40px 0 40px'}}>
           <div style={{maxWidth:1200,margin:'0 auto',padding:'0 18px'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
+            <div className="rb-weekly-header" style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
               <div>
-                <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:6}}>Live from the Registry</div>
-                <div style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>{currentWeekLabel} — Category Leaders</div>
+                <div className="rb-weekly-eyebrow" style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:6}}>Live from the Registry</div>
+                <div className="rb-weekly-title" style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>{currentWeekLabel} — Category Leaders</div>
               </div>
               <button onClick={()=>{
                 if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_full_leaderboard_click',{event_category:'engagement',section:'weekly'});
@@ -709,6 +711,66 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
         </div>
         <EmailSignup/>
       </div>
+      <style jsx>{`
+        @media (max-width: 640px) {
+          /* Hero: less vertical padding, tighter title, shorter subtitle */
+          .rb-hero-content {
+            padding: 20px 18px 24px !important;
+          }
+          .rb-hero-badge {
+            font-size: 9px !important;
+            letter-spacing: 2px !important;
+            padding: 4px 12px !important;
+            margin-bottom: 8px !important;
+          }
+          .rb-hero-title {
+            font-size: clamp(30px, 9vw, 40px) !important;
+            letter-spacing: 1px !important;
+            margin-bottom: 4px !important;
+          }
+          .rb-hero-sub {
+            margin: 0 auto 16px !important;
+            font-size: 12px !important;
+          }
+          .rb-hero-sub-link {
+            display: none !important;
+          }
+
+          /* Calculator: tighter fields and buttons */
+          .rb-calc-grid {
+            gap: 0 8px !important;
+            margin-bottom: 6px !important;
+          }
+          .rb-calc-grid > div {
+            margin-bottom: 8px !important;
+          }
+          .rb-calc-buttons {
+            gap: 6px !important;
+          }
+          .rb-calc-btn {
+            padding: 10px 18px !important;
+            font-size: 12px !important;
+          }
+
+          /* Weekly leaderboard: pulled tighter so it lands near the fold */
+          .rb-weekly-section {
+            padding: 16px 0 20px !important;
+          }
+          .rb-weekly-header {
+            margin-bottom: 10px !important;
+          }
+          .rb-weekly-eyebrow {
+            display: none !important;
+          }
+          .rb-weekly-title {
+            font-size: 18px !important;
+          }
+          .rb-weekly-card {
+            min-height: 150px !important;
+            padding: 12px 14px !important;
+          }
+        }
+      `}</style>
     </>
   );
 }
