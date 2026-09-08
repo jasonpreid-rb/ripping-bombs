@@ -35,6 +35,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
   const [venueLocked, setVenueLocked] = useState(false);
   const [eventData, setEventData] = useState(null); // { event, venue }
   const [eventError, setEventError] = useState('');
+  const [formError, setFormError] = useState('');
   const router = useRouter();
 
   // Event flow: a "Join & Submit" link from /e/[slug] arrives as
@@ -147,6 +148,11 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
         <title>Submit A Drive | Ripping Bombs</title>
         <meta name="description" content="Submit your longest drive competition result to the Ripping Bombs global leaderboard." />
       </Head>
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (max-width: 560px) {
+          .submit-grid { grid-template-columns: 1fr !important; }
+        }
+      ` }} />
       <div style={{ maxWidth:560, margin:'0 auto', padding:'28px 18px 80px' }}>
         <div style={{ fontFamily:DISP, fontSize:28, color:TXT, letterSpacing:1, marginBottom:4 }}>Submit a Drive</div>
         <div style={{ fontFamily:SANS, fontSize:12, color:MUT, marginBottom:22 }}>
@@ -154,6 +160,19 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
             ? `${loggedOrg.fullName} · Simulator Drive`
             : `${loggedOrg.courseName} · ${loggedOrg.location}`}
         </div>
+
+        {/* Missing DOB — shown up front with a real link to fix it, rather than
+            a passive note buried in the form or a surprise alert() at submit
+            time. Most common right after a Google sign-up, which doesn't
+            collect DOB. */}
+        {isSimulator && !loggedOrg.dob && (
+          <div style={{ background:'rgba(255,0,144,0.08)', border:`1px solid ${ORG}`, padding:'16px 18px', marginBottom:20, fontFamily:SANS, display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
+            <div style={{ fontSize:12, color:TXT, lineHeight:1.6 }}>
+              <span style={{ fontWeight:700 }}>Add your date of birth</span> so we can place you in the right age category before you submit.
+            </div>
+            <Btn onClick={()=>router.push('/dashboard')} style={{ whiteSpace:'nowrap' }}>Complete Profile →</Btn>
+          </div>
+        )}
 
         {/* Event banner — shown when arriving via an /e/[slug] "Join" link */}
         {eventData && (
@@ -193,7 +212,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
         )}
 
         <Card>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+          <div className="submit-grid" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
 
             {/* Event name — locked to "Simulator" for simulator accounts */}
             {isSimulator ? (
@@ -321,8 +340,11 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
                     {calcAge(loggedOrg.dob, form.date)} yrs
                   </div>
                 ) : (
-                  <div style={{ background:BG3, border:`1px solid ${BDR}`, padding:'10px 14px', fontFamily:SANS, fontSize:12, color:DIM, lineHeight:1.5 }}>
-                    Add your date of birth in your profile to auto-fill age
+                  <div style={{ background:BG3, border:`1px solid ${BDR}`, padding:'10px 14px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, flexWrap:'wrap' }}>
+                    <span style={{ fontFamily:SANS, fontSize:11, color:DIM, lineHeight:1.5 }}>Add your date of birth to auto-fill age</span>
+                    <button type="button" onClick={()=>router.push('/dashboard')} style={{ background:'none', border:'none', color:ORG, fontFamily:SANS, fontWeight:700, fontSize:11, textDecoration:'underline', cursor:'pointer', padding:0, whiteSpace:'nowrap' }}>
+                      Add in Profile →
+                    </button>
                   </div>
                 )}
               </div>
@@ -364,13 +386,20 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
             </label>
           </div>
 
+          {formError && (
+            <div style={{ background:'rgba(248,113,113,0.08)', border:'1px solid rgba(248,113,113,0.4)', padding:'10px 14px', marginBottom:14, fontFamily:SANS, fontSize:12, color:'#f87171', lineHeight:1.5 }}>
+              {formError}
+            </div>
+          )}
+
           <Btn
             full
             onClick={async () => {
-              if (isSimulator && simulatorWeeklyBlock) { alert('You have already submitted a drive this week. Simulator accounts are limited to one submission per week.'); return; }
-              if (!isSimulator && !form.playerEmail) { alert('Please enter the player\'s email so we can notify them.'); return; }
-              if (isSimulator && !loggedOrg.dob) { alert('Please add your date of birth in your profile before submitting — this is used to place you in the correct age category.'); return; }
-              if (!consent) { alert(isSimulator ? 'Please confirm your consent before submitting.' : 'Please confirm player consent before submitting.'); return; }
+              setFormError('');
+              if (isSimulator && simulatorWeeklyBlock) { setFormError('You have already submitted a drive this week. Simulator accounts are limited to one submission per week.'); return; }
+              if (!isSimulator && !form.playerEmail) { setFormError("Please enter the player's email so we can notify them."); return; }
+              if (isSimulator && !loggedOrg.dob) { setFormError('Please add your date of birth in your profile before submitting — use the "Complete Profile" button above.'); return; }
+              if (!consent) { setFormError(isSimulator ? 'Please confirm your consent before submitting.' : 'Please confirm player consent before submitting.'); return; }
               // For simulator accounts, pre-fill player name, gender, and age from account
               if (isSimulator) {
                 setForm(f => ({ ...f, player: loggedOrg.fullName, tournament: 'Simulator', gender: loggedOrg.gender || 'male', age: calcAge(loggedOrg.dob, f.date) }));
