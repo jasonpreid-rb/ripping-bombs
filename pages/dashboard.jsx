@@ -64,6 +64,22 @@ function getCategoryLabel(cat) {
   }[cat] || 'All';
 }
 
+// Category normally comes from a player's own drive submission (age/hcp/gender
+// are collected on the /submit form). A brand-new account — especially via
+// Google sign-up, which collects neither — has no submissions yet, so there's
+// nothing to derive a category from. This approximates one from profile-level
+// gender + date of birth instead (handicap isn't a profile field, so this
+// can't distinguish open vs. high-handicap — it defaults to "open" until a
+// real submission refines it).
+function getCategoryFromProfile(club) {
+  if (!club?.dob) return null;
+  const ageMs = Date.now() - new Date(club.dob).getTime();
+  const age = Math.floor(ageMs / (365.25 * 24 * 60 * 60 * 1000));
+  if (age < 16) return 'youth';
+  if (age >= 55) return 'senior';
+  return (club.gender || '').toLowerCase() === 'female' ? 'female_open' : 'male_open';
+}
+
 // ——— Peer-group bands (age / handicap) — narrower cuts than the six main
 // categories, used for the "Age Group Rank" / "Handicap Group Rank" cards.
 // A smaller pool means a more attainable, more frequently-changing rank,
@@ -153,6 +169,8 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded, onSponsorLogoUp
     fullName: club?.fullName || '',
     location: club?.location || '',
     position: club?.position || '',
+    gender: club?.gender || '',
+    dob: club?.dob || '',
     instagram: club?.instagram || '',
     tiktok: club?.tiktok || '',
     twitter: club?.twitter || '',
@@ -235,15 +253,30 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded, onSponsorLogoUp
         {isSimulator && (
           <>
             <div style={{ borderTop: `1px solid ${BDR}`, marginTop: 8, paddingTop: 12 }}>
+              <div style={{ fontSize: '0.7rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Category Info <span style={{ color: DIM, fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(so we know which leaderboard to show you)</span></div>
+            </div>
+            <label style={labelStyle}>Gender</label>
+            <select style={inputStyle} value={form.gender} onChange={(e) => set('gender', e.target.value)}>
+              <option value="">Select…</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+            <label style={labelStyle}>Date of Birth</label>
+            <input type="date" style={inputStyle} value={form.dob} onChange={(e) => set('dob', e.target.value)} />
+          </>
+        )}
+        {isSimulator && (
+          <>
+            <div style={{ borderTop: `1px solid ${BDR}`, marginTop: 8, paddingTop: 12 }}>
               <div style={{ fontSize: '0.7rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Social Media <span style={{ color: DIM, fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional — shown on your public profile)</span></div>
             </div>
-            <label style={labelStyle}>📸 Instagram handle</label>
+            <label style={labelStyle}>📸 Instagram</label>
             <input style={inputStyle} value={form.instagram} onChange={(e) => set('instagram', e.target.value)} placeholder="@yourusername" />
-            <label style={labelStyle}>🎵 TikTok handle</label>
+            <label style={labelStyle}>🎵 TikTok</label>
             <input style={inputStyle} value={form.tiktok} onChange={(e) => set('tiktok', e.target.value)} placeholder="@yourusername" />
-            <label style={labelStyle}>𝕏 X / Twitter handle</label>
+            <label style={labelStyle}>𝕏 X / Twitter</label>
             <input style={inputStyle} value={form.twitter} onChange={(e) => set('twitter', e.target.value)} placeholder="@yourusername" />
-            <label style={labelStyle}>▶ YouTube handle</label>
+            <label style={labelStyle}>▶ YouTube</label>
             <input style={inputStyle} value={form.youtube} onChange={(e) => set('youtube', e.target.value)} placeholder="@yourchannel" />
           </>
         )}
@@ -699,7 +732,24 @@ const WEEKLY_MEDALS = ['🥇', '🥈', '🥉'];
 // row renders — so a player sees their category in the identical visual
 // style as the homepage, just as a single static card instead of a scroll
 // row of six, since only one category is relevant to them.
-function WeeklyLeaderboard({ weeklyData }) {
+// Shown instead of a guessed/generic leaderboard when a player has no
+// submitted drives yet AND no profile gender/dob set — i.e. we genuinely
+// have no basis for a category. Most common right after a Google sign-up,
+// which doesn't collect either.
+function CompleteProfilePrompt({ onEditClick }) {
+  return (
+    <div style={{ background: BG2, border: `1px solid ${ORG}`, borderRadius: 10, padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+      <div style={{ fontSize: '0.85rem', color: TXT }}>
+        Complete your profile so we know which leaderboard to show you.
+      </div>
+      <button onClick={onEditClick} style={{ background: ORG, color: '#000', fontWeight: 700, fontSize: '0.8rem', padding: '0.45rem 1rem', borderRadius: 6, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+        Edit Profile →
+      </button>
+    </div>
+  );
+}
+
+
   const { weekStart, weekEnd, hasSubmitted, category, myBest, rank, total, top5, clubId } = weeklyData;
   const rangeLabel = fmtWeekRange(weekStart, weekEnd);
   const daysLeft = daysUntilWeekReset(weekEnd);
@@ -1073,23 +1123,15 @@ function ShareProfileCard({ club, rank, percentile }) {
   const iconBtnStyle = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, background: 'transparent', border: `1px solid ${BDR}`, borderRadius: 8, cursor: 'pointer', padding: 0 };
 
   return (
-    <div style={{ background: `linear-gradient(135deg, ${BG2}, ${BG3})`, border: `1px solid ${ORG}`, borderRadius: 10, padding: '1.25rem 1.5rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, flex: '1 1 320px' }}>
-        <div>
-          <div style={{ fontSize: '0.95rem', fontWeight: 800, marginBottom: 3 }}>Share Your Profile</div>
-          <p style={{ margin: '0 0 8px', fontSize: '0.8rem', color: MUT, lineHeight: 1.5, maxWidth: 460 }}>
-            Drop this in your Instagram/TikTok bio or link-in-bio so viewers can see your ranking.
-          </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <code style={{ fontSize: '0.8rem', color: TXT, background: 'rgba(255,255,255,0.06)', padding: '3px 8px', borderRadius: 5 }}>{profileUrl}</code>
-            <button
-              onClick={handleCopy}
-              style={{ background: copied ? 'rgba(255,0,144,0.15)' : 'transparent', border: `1px solid ${copied ? ORG : BDR}`, color: copied ? ORG : MUT, padding: '2px 8px', borderRadius: 5, fontSize: '0.7rem', cursor: 'pointer', minWidth: 46, transition: 'all 0.15s ease' }}
-            >
-              {copied ? 'Copied!' : 'Copy'}
-            </button>
-          </div>
-        </div>
+    <div style={{ background: `linear-gradient(135deg, ${BG2}, ${BG3})`, border: `1px solid ${ORG}`, borderRadius: 10, padding: '0.85rem 1rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <code style={{ fontSize: '0.78rem', color: TXT, background: 'rgba(255,255,255,0.06)', padding: '3px 8px', borderRadius: 5 }}>{profileUrl}</code>
+        <button
+          onClick={handleCopy}
+          style={{ background: copied ? 'rgba(255,0,144,0.15)' : 'transparent', border: `1px solid ${copied ? ORG : BDR}`, color: copied ? ORG : MUT, padding: '2px 8px', borderRadius: 5, fontSize: '0.68rem', cursor: 'pointer', minWidth: 46, transition: 'all 0.15s ease' }}
+        >
+          {copied ? 'Copied!' : 'Copy'}
+        </button>
       </div>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         {canNativeShare && (
@@ -1316,7 +1358,7 @@ export default function DashboardPage() {
     const mostRecent = (clubEntries || [])
       .slice()
       .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
-    setPrimaryCategory(mostRecent ? getCategory(mostRecent) : null);
+    setPrimaryCategory(mostRecent ? getCategory(mostRecent) : getCategoryFromProfile(freshClub || clubData));
 
     // Global rank + avg
     const { data: allEntries } = await supabase.from('entries').select('orgId, dist, age, hcp');
@@ -1548,7 +1590,7 @@ export default function DashboardPage() {
       // (Open)" even before this week's first submission, not "All
       // categories". Only genuinely new accounts with zero entries ever
       // fall back to showing the platform-wide field across every category.
-      const knownCategory = mostRecent ? getCategory(mostRecent) : null;
+      const knownCategory = mostRecent ? getCategory(mostRecent) : getCategoryFromProfile(clubData);
 
       const bestEntryPerClub = {};
       (weeklyAllEntries || []).forEach((e) => {
@@ -1660,6 +1702,8 @@ export default function DashboardPage() {
       fullName: form.fullName,
       location: form.location,
       position: form.position,
+      gender: form.gender || null,
+      dob: form.dob || null,
       instagram: form.instagram || null,
       tiktok: form.tiktok || null,
       twitter: form.twitter || null,
@@ -1721,17 +1765,35 @@ export default function DashboardPage() {
         <title>{(club?.accountType === 'club' ? club?.courseName : club?.fullName) || 'Dashboard'} — Ripping Bombs</title>
       </Head>
 
+      {/* Mobile-only tightening: the flag now sits inline next to the name at
+          all sizes (see below), so this just removes the redundant nav-style
+          "View Leaderboard" link (the dashboard already shows a leaderboard
+          section further down) and hides the Premium promo card, keeping the
+          mobile dashboard closer to a simplified, app-like single column. */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (max-width: 680px) {
+          .db-header { gap: 0.6rem !important; padding-top: 0 !important; }
+          .db-leaderboard-link { display: none !important; }
+          .db-premium-promo { display: none !important; }
+        }
+      ` }} />
+
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '2rem 1rem', color: TXT, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.9rem' }}>
+        <div className="db-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
             <PlayerAvatar fullName={club?.fullName} avatarUrl={club?.avatarUrl} size={56} />
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: 4 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: 4 }}>
                 <h1 style={{ margin: 0, fontSize: 'clamp(1.4rem, 4vw, 2rem)', fontWeight: 800, letterSpacing: '-0.02em' }}>
                   {club?.accountType === 'club' ? (club?.courseName || 'My Dashboard') : (club?.fullName || 'My Dashboard')}
                 </h1>
+                {club?.country && (
+                  <span title={club.country} style={{ display: 'inline-block', lineHeight: 0 }}>
+                    {cloneElement(countryFlag(club.country), { style: { width: 20, height: 14, objectFit: 'cover', borderRadius: 2, display: 'block' } })}
+                  </span>
+                )}
                 {club?.is_founding_member && <FoundingBadge />}
                 {club?.badge === 'simulator' && (
                   <span style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)', borderRadius: 20, padding: '2px 10px', fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Simulator</span>
@@ -1745,19 +1807,12 @@ export default function DashboardPage() {
               </p>
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
-            {club?.country && (
-              <span title={club.country} style={{ display: 'inline-block' }}>
-                {cloneElement(countryFlag(club.country), { style: { width: 40, height: 30, objectFit: 'cover', borderRadius: 3, display: 'block' } })}
-              </span>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            <a href="/leaderboard" className="db-leaderboard-link" style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.5rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none' }}>View Leaderboard</a>
+            {club?.accountType === 'club' && (
+              <a href="/venue-qr" style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, padding: '0.5rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none', fontWeight: 700 }}>Get QR Poster</a>
             )}
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-              <a href="/leaderboard" style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.5rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none' }}>View Leaderboard</a>
-              {club?.accountType === 'club' && (
-                <a href="/venue-qr" style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, padding: '0.5rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none', fontWeight: 700 }}>Get QR Poster</a>
-              )}
-              <button onClick={() => setShowModal(true)} style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.5rem 1rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.82rem' }}>Edit Profile</button>
-            </div>
+            <button onClick={() => setShowModal(true)} style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.5rem 1rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.82rem' }}>Edit Profile</button>
           </div>
         </div>
 
@@ -1834,9 +1889,14 @@ export default function DashboardPage() {
         )}
 
         {/* Weekly leaderboard — club/venue accounts see every category, horizontal-scrolling,
-            matching the homepage's widget. Individual accounts keep the single-category view. */}
+            matching the homepage's widget. Individual accounts keep the single-category view.
+            If we can't determine a category at all (no submissions, no profile gender/dob —
+            most common right after a Google sign-up), prompt to complete the profile instead
+            of showing an ambiguous all-categories view. */}
         {club?.accountType === 'club' && weeklyData ? (
           <WeeklyCategoryScroll categories={weeklyCategoryLeaders} weekStart={weeklyData.weekStart} weekEnd={weeklyData.weekEnd} />
+        ) : club?.accountType === 'simulator' && weeklyData && !weeklyData.category ? (
+          <CompleteProfilePrompt onEditClick={() => setShowModal(true)} />
         ) : (
           weeklyData && <WeeklyLeaderboard weeklyData={weeklyData} />
         )}
@@ -1873,7 +1933,9 @@ export default function DashboardPage() {
 
         {/* Ripping Bombs Premium promo — individual/simulator accounts only */}
         {club?.accountType === 'simulator' && (
-          <IndividualPremiumPromo isPremium={!!club?.isPremium} />
+          <div className="db-premium-promo">
+            <IndividualPremiumPromo isPremium={!!club?.isPremium} />
+          </div>
         )}
 
         {/* Danger Zone */}
