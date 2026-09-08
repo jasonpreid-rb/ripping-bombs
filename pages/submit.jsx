@@ -170,7 +170,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
             <div style={{ fontSize:12, color:TXT, lineHeight:1.6 }}>
               <span style={{ fontWeight:700 }}>Add your date of birth</span> so we can place you in the right age category before you submit.
             </div>
-            <Btn onClick={()=>router.push('/dashboard')} style={{ whiteSpace:'nowrap' }}>Complete Profile →</Btn>
+            <Btn onClick={()=>router.push('/dashboard?edit=1')} style={{ whiteSpace:'nowrap' }}>Complete Profile →</Btn>
           </div>
         )}
 
@@ -342,7 +342,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
                 ) : (
                   <div style={{ background:BG3, border:`1px solid ${BDR}`, padding:'10px 14px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, flexWrap:'wrap' }}>
                     <span style={{ fontFamily:SANS, fontSize:11, color:DIM, lineHeight:1.5 }}>Add your date of birth to auto-fill age</span>
-                    <button type="button" onClick={()=>router.push('/dashboard')} style={{ background:'none', border:'none', color:ORG, fontFamily:SANS, fontWeight:700, fontSize:11, textDecoration:'underline', cursor:'pointer', padding:0, whiteSpace:'nowrap' }}>
+                    <button type="button" onClick={()=>router.push('/dashboard?edit=1')} style={{ background:'none', border:'none', color:ORG, fontFamily:SANS, fontWeight:700, fontSize:11, textDecoration:'underline', cursor:'pointer', padding:0, whiteSpace:'nowrap' }}>
                       Add in Profile →
                     </button>
                   </div>

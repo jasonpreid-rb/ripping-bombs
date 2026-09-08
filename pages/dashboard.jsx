@@ -1305,6 +1305,18 @@ export default function DashboardPage() {
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  // Deep link from submit.jsx's "Complete Profile" button (?edit=1) — opens
+  // straight into the edit modal instead of leaving the person to find the
+  // button themselves.
+  useEffect(() => {
+    if (!router.isReady) return;
+    if (router.query.edit === '1') {
+      setShowModal(true);
+      const { edit, ...rest } = router.query;
+      router.replace({ pathname: router.pathname, query: rest }, undefined, { shallow: true });
+    }
+  }, [router.isReady, router.query.edit]);
+
   useEffect(() => {
     const raw = typeof window !== 'undefined' && localStorage.getItem('rb_club');
     if (raw) {
