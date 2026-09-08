@@ -749,7 +749,7 @@ function CompleteProfilePrompt({ onEditClick }) {
   );
 }
 
-
+function WeeklyLeaderboard({ weeklyData }) {
   const { weekStart, weekEnd, hasSubmitted, category, myBest, rank, total, top5, clubId } = weeklyData;
   const rangeLabel = fmtWeekRange(weekStart, weekEnd);
   const daysLeft = daysUntilWeekReset(weekEnd);
