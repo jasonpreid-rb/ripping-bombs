@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { RBLogoWhite } from './Logo';
 import { ORG, MUT, BDR, DIM, SANS, DISP } from '../lib/constants';
 
@@ -52,10 +53,9 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const isM = unit === 'm';
   const isActive = path => router.pathname === path;
-  const navTo = path => { router.push(path); setMenuOpen(false); };
 
   const NavBtn = ({ href, label }) => (
-    <button onClick={() => navTo(href)} style={{ background: isActive(href) ? ORG : 'transparent', border: isActive(href) ? 'none' : '1px solid rgba(255,255,255,0.15)', color: isActive(href) ? '#111' : 'rgba(255,255,255,0.7)', fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 16px', borderRadius: 0, cursor: 'pointer', letterSpacing: .3 }}>{label}</button>
+    <Link href={href} onClick={() => setMenuOpen(false)} style={{ display: 'inline-block', textDecoration: 'none', background: isActive(href) ? ORG : 'transparent', border: isActive(href) ? 'none' : '1px solid rgba(255,255,255,0.15)', color: isActive(href) ? '#111' : 'rgba(255,255,255,0.7)', fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 16px', borderRadius: 0, cursor: 'pointer', letterSpacing: .3 }}>{label}</Link>
   );
 
   const UnitToggle = () => (
@@ -84,12 +84,12 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
       {/* Announcement Banner — hidden on mobile via .promo-banner CSS rule */}
       {!bannerDismissed && (
         <div className="promo-banner" style={{ background: ORG, padding: '9px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 101 }}>
-          <div onClick={() => router.push('/register')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Link href="/register" style={{ textDecoration: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: '#fff', letterSpacing: .5, textTransform: 'uppercase' }}>
               Submit Your Drive — Rank Globally, Instantly — FREE
             </span>
             <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 600, color: '#000', textDecoration: 'underline' }}>Register now</span>
-          </div>
+          </Link>
           <button onClick={() => setBannerDismissed(true)} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: 16, cursor: 'pointer', lineHeight: 1, padding: '0 4px' }}>✕</button>
         </div>
       )}
@@ -140,9 +140,9 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
       />
 
       {/* HEADER */}
-      <div className="site-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(14,14,14,0.97)', position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(16px)', padding: '14px 22px' }}>
-        <div style={{ cursor: 'pointer' }} onClick={() => navTo('/')}><RBLogoWhite height={30}/></div>
-        <div className="desktop-nav" style={{ gap: 10, alignItems: 'center' }}>
+      <header className="site-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(14,14,14,0.97)', position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(16px)', padding: '14px 22px' }}>
+        <Link href="/" style={{ display: 'inline-flex' }}><RBLogoWhite height={30}/></Link>
+        <nav aria-label="Primary" className="desktop-nav" style={{ gap: 10, alignItems: 'center' }}>
           <UnitToggle/>
           <NavBtn href="/how-it-works" label="How It Works"/>
           <NavBtn href="/leaderboard" label="Leaderboard"/>
@@ -150,23 +150,23 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           <NavBtn href="/contact" label="Contact"/>
           {loggedOrg
             ? <><NavBtn href="/dashboard" label="Dashboard"/><NavBtn href="/submit" label="Submit Drive"/><button onClick={onLogout} style={{ background: 'none', border: '1px solid rgba(220,80,80,0.3)', color: '#f87171', fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', cursor: 'pointer', borderRadius: 0 }}>Log Out</button></>
-            : <><NavBtn href="/login" label="Login"/><button onClick={() => navTo('/register')} style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 12, padding: '7px 16px', borderRadius: 0, cursor: 'pointer' }}>Register</button></>
+            : <><NavBtn href="/login" label="Login"/><Link href="/register" style={{ textDecoration: 'none', display: 'inline-block', background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 12, padding: '7px 16px', borderRadius: 0, cursor: 'pointer' }}>Register</Link></>
           }
           <button onClick={onAdminClick} style={{ position: 'relative', background: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 0, color: 'rgba(255,255,255,0.5)', fontSize: 14, padding: '6px 10px', cursor: 'pointer' }}>
             ⚙{pendingCount > 0 && <span style={{ position: 'absolute', top: -4, right: -4, width: 9, height: 9, background: ORG, borderRadius: '50%', display: 'block' }}/>}
           </button>
-        </div>
+        </nav>
         <div className="mobile-how-it-works" style={{ display: 'none', alignItems: 'center', gap: 8 }}>
-          <button onClick={() => navTo('/how-it-works')} style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 11, padding: '7px 12px', borderRadius: 0, cursor: 'pointer', letterSpacing: .3, whiteSpace: 'nowrap' }}>
+          <Link href="/how-it-works" style={{ textDecoration: 'none', display: 'inline-block', background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontFamily: SANS, fontWeight: 700, fontSize: 11, padding: '7px 12px', borderRadius: 0, cursor: 'pointer', letterSpacing: .3, whiteSpace: 'nowrap' }}>
             How It Works
-          </button>
+          </Link>
           {!loggedOrg && (
-            <button onClick={() => navTo('/register')} style={{ background: ORG, border: `1px solid ${ORG}`, color: '#111', fontFamily: SANS, fontWeight: 700, fontSize: 11, padding: '7px 12px', borderRadius: 0, cursor: 'pointer', letterSpacing: .3, whiteSpace: 'nowrap' }}>
+            <Link href="/register" style={{ textDecoration: 'none', display: 'inline-block', background: ORG, border: `1px solid ${ORG}`, color: '#111', fontFamily: SANS, fontWeight: 700, fontSize: 11, padding: '7px 12px', borderRadius: 0, cursor: 'pointer', letterSpacing: .3, whiteSpace: 'nowrap' }}>
               Register
-            </button>
+            </Link>
           )}
         </div>
-      </div>
+      </header>
 
       <style>{`
         .more-panel{top:58px}
@@ -174,50 +174,50 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
       `}</style>
 
       {menuOpen && (
-        <div className="more-panel" style={{ position: 'fixed', left: 0, right: 0, background: 'rgba(14,14,14,0.98)', borderBottom: '1px solid rgba(255,255,255,0.08)', zIndex: 99, padding: '16px 22px 20px', display: 'flex', flexDirection: 'column', gap: 10, animation: 'slideDown .2s ease' }}>
+        <nav aria-label="Mobile menu" className="more-panel" style={{ position: 'fixed', left: 0, right: 0, background: 'rgba(14,14,14,0.98)', borderBottom: '1px solid rgba(255,255,255,0.08)', zIndex: 99, padding: '16px 22px 20px', display: 'flex', flexDirection: 'column', gap: 10, animation: 'slideDown .2s ease' }}>
           {[['Leaderboard','/leaderboard'],['Hall of Fame','/hall-of-fame'],['Contact','/contact'],['Login','/login'],['Register','/register']].map(([label,href]) => (
-            <button key={href} onClick={() => navTo(href)} style={{ background: isActive(href) ? ORG : 'transparent', border: isActive(href) ? 'none' : '1px solid rgba(255,255,255,0.12)', color: isActive(href) ? '#111' : 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>{label}</button>
+            <Link key={href} href={href} onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none', background: isActive(href) ? ORG : 'transparent', border: isActive(href) ? 'none' : '1px solid rgba(255,255,255,0.12)', color: isActive(href) ? '#111' : 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>{label}</Link>
           ))}
           {loggedOrg && <>
-            <button onClick={() => navTo('/dashboard')} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Dashboard</button>
-            <button onClick={() => navTo('/submit')} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Submit Drive</button>
+            <Link href="/dashboard" onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Dashboard</Link>
+            <Link href="/submit" onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>Submit Drive</Link>
             <button onClick={() => { onLogout(); setMenuOpen(false); }} style={{ background: 'none', border: '1px solid rgba(220,80,80,0.3)', color: '#f87171', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', cursor: 'pointer', textAlign: 'left', borderRadius: 0 }}>Log Out</button>
           </>}
-        </div>
+        </nav>
       )}
 
       <main>{children}</main>
 
       {/* Bottom tab bar — mobile only, app-style nav */}
-      <div className="bottom-tabbar">
+      <nav aria-label="Bottom navigation" className="bottom-tabbar">
         {[
           { href: '/', label: 'Home', icon: '⌂' },
           { href: '/leaderboard', label: 'Ranks', icon: '☰' },
         ].map(t => (
-          <button key={t.href} onClick={() => navTo(t.href)} style={{ flex: 1, background: 'none', border: 'none', color: isActive(t.href) ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
+          <Link key={t.href} href={t.href} onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none', flex: 1, color: isActive(t.href) ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
             <span style={{ fontSize: 18, lineHeight: 1 }}>{t.icon}</span>
             <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600 }}>{t.label}</span>
-          </button>
+          </Link>
         ))}
 
         {/* Center raised submit button */}
-        <button onClick={() => navTo('/submit')} style={{ flex: 1, display: 'flex', justifyContent: 'center', position: 'relative', top: -16, background: 'none', border: 'none', cursor: 'pointer' }}>
+        <Link href="/submit" onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none', flex: 1, display: 'flex', justifyContent: 'center', position: 'relative', top: -16, cursor: 'pointer' }}>
           <span style={{ width: 50, height: 50, borderRadius: '50%', background: ORG, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: '#111', boxShadow: '0 4px 16px rgba(255,0,144,0.45)', border: '3px solid #1a1a1a' }}>＋</span>
-        </button>
+        </Link>
 
-        <button onClick={() => navTo(loggedOrg ? '/dashboard' : '/login')} style={{ flex: 1, background: 'none', border: 'none', color: isActive('/dashboard') ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
+        <Link href={loggedOrg ? '/dashboard' : '/login'} onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none', flex: 1, color: isActive('/dashboard') ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
           <span style={{ fontSize: 18, lineHeight: 1 }}>☻</span>
           <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600 }}>{loggedOrg ? 'Dashboard' : 'Login'}</span>
-        </button>
+        </Link>
 
         <button onClick={() => setMenuOpen(m => !m)} style={{ flex: 1, background: 'none', border: 'none', color: menuOpen ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
           <span style={{ fontSize: 18, lineHeight: 1 }}>⋯</span>
           <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600 }}>More</span>
         </button>
-      </div>
+      </nav>
 
       <div className="brand-marquee" style={{ background:'#0e0e0e', borderTop:'1px solid rgba(255,255,255,0.06)', borderBottom:'1px solid rgba(255,255,255,0.06)', padding:'18px 16px' }}>
-        <div onClick={() => navTo('/supported-simulators')} style={{ fontFamily:SANS, fontSize:9, fontWeight:700, letterSpacing:2, color:'rgba(255,255,255,0.18)', textTransform:'uppercase', textAlign:'center', marginBottom:12, cursor:'pointer' }}>Compatible with →</div>
+        <Link href="/supported-simulators" style={{ textDecoration: 'none', display: 'block', fontFamily:SANS, fontSize:9, fontWeight:700, letterSpacing:2, color:'rgba(255,255,255,0.18)', textTransform:'uppercase', textAlign:'center', marginBottom:12, cursor:'pointer' }}>Compatible with →</Link>
         <div className="brand-row" style={{ display:'flex', flexWrap:'wrap', justifyContent:'center', gap:10 }}>
           {SIM_BRANDS.map((brand, i) => (
             <MarqueeLogo key={i} name={brand.name} logo={brand.logo}/>
@@ -230,7 +230,6 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
 }
 
 function SiteFooter() {
-  const router = useRouter();
   const [enquiry, setEnquiry] = useState({ name: '', email: '', message: '' });
   const [sent, setSent] = useState(false);
 
@@ -268,7 +267,7 @@ function SiteFooter() {
             <div style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 14, marginBottom: 20, lineHeight: 1.7 }}>The global home of competition longest drives. Free to join, free to submit.</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[['Leaderboard','/leaderboard'],['All Guides & Leaderboards','/resources'],['Clubs & Events','/clubs'],['For Venues','/for-venues'],['Register','/register'],['Login','/login'],['Contact Us','/contact']].map(([l,h]) => (
-                <span key={h} onClick={() => router.push(h)} style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(255,255,255,0.55)', cursor: 'pointer' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.55)'}>{l}</span>
+                <Link key={h} href={h} style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.55)'}>{l}</Link>
               ))}
             </div>
           </div>
@@ -276,7 +275,7 @@ function SiteFooter() {
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 1.5, color: DIM, marginBottom: 12, textTransform: 'uppercase' }}>Leaderboards</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
               {[['Global Leaderboard','/leaderboard'],['Hall of Fame','/hall-of-fame'],['Biggest Hitters By Country','/biggest-hitters-by-country'],["Longest Men's Drives",'/longest-mens-drive'],["Longest Women's Drives",'/longest-womens-drive'],['Low Handicap','/longest-drive-low-handicap'],['Mid Handicap','/longest-drive-mid-handicap'],['High Handicap','/longest-drive-high-handicap'],['Seniors (55+)','/longest-drive-seniors'],['Juniors (U12)','/longest-drive-juniors-u12'],['Youth (13-16)','/longest-drive-juniors-13-16'],['Cadets (17-18)','/longest-drive-juniors-17-18']].map(([l,h]) => (
-                <a key={h} href={h} style={{ display: 'block', fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.4)'}>{l}</a>
+                <Link key={h} href={h} style={{ display: 'block', fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.4)'}>{l}</Link>
               ))}
             </div>
           </div>
@@ -284,7 +283,7 @@ function SiteFooter() {
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 1.5, color: DIM, marginBottom: 12, textTransform: 'uppercase' }}>Golf Guides</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginBottom: 20 }}>
               {[['Avg Distance By Handicap','/average-driver-distance-by-handicap'],['Longest Drives This Week','/longest-drives-this-week'],['How To Hit Farther','/how-to-hit-a-golf-ball-farther'],['Average Drive Distance','/average-golf-drive-distance'],['Longest Drive Ever','/longest-golf-drive-ever'],['What Is A Good Drive?','/what-is-a-good-drive-in-golf'],['Club Competition Ideas','/golf-club-longest-drive-competition-ideas'],['Long Drive Equipment','/long-drive-golf-equipment'],['Handicap & Distance','/golf-handicap-driving-distance'],['Promote Your Event','/how-to-promote-your-golf-event'],['Supported Simulators','/supported-simulators']].map(([l,h]) => (
-                <a key={h} href={h} style={{ display: 'block', fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.4)'}>{l}</a>
+                <Link key={h} href={h} style={{ display: 'block', fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.4)'}>{l}</Link>
               ))}
             </div>
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 1.5, color: DIM, marginBottom: 10, textTransform: 'uppercase' }}>Follow Us</div>
@@ -313,8 +312,8 @@ function SiteFooter() {
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 20, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
             <span style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>© 2026 rippingbombs.com · HRH Collective LTD</span>
-            <a href="/privacy" style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.3)'}>Privacy</a>
-            <a href="/terms" style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.3)'}>Terms</a>
+            <Link href="/privacy" style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.3)'}>Privacy</Link>
+            <Link href="/terms" style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.3)'}>Terms</Link>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
             <span style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>The global home of competition longest drives</span>

@@ -61,14 +61,13 @@ export function SeoTable({ headers, rows }) {
 }
 
 export function SeoCTA() {
-  const router = useRouter();
   return (
     <div style={{ background:'rgba(255,0,144,0.05)', border:'1px solid rgba(255,0,144,0.2)', padding:'28px 24px', margin:'32px 0', textAlign:'center' }}>
       <div style={{ fontFamily:DISP, fontSize:24, color:TXT, letterSpacing:1, marginBottom:8 }}>TRACK YOUR CLUB'S LONGEST DRIVES</div>
       <div style={{ fontFamily:SANS, fontSize:13, color:MUT, marginBottom:18 }}>Free to join. Register your course and start submitting verified drives to the global leaderboard.</div>
-      <button onClick={()=>router.push('/register')} style={{ background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:13, padding:'12px 28px', cursor:'pointer', letterSpacing:.5 }}>
+      <Link href="/register" style={{ display:'inline-block', textDecoration:'none', background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:13, padding:'12px 28px', cursor:'pointer', letterSpacing:.5 }}>
         REGISTER YOUR CLUB FREE →
-      </button>
+      </Link>
     </div>
   );
 }
@@ -241,7 +240,7 @@ export function FilteredLeaderboard({ title, description, heading, intro, entrie
                   onMouseEnter={el=>el.currentTarget.style.background='rgba(255,0,144,0.04)'}
                   onMouseLeave={el=>el.currentTarget.style.background='transparent'}>
                   <td style={{ padding:'10px 14px', fontFamily:SANS, fontSize:12, color:DIM }}>{i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`}</td>
-                  <td style={{ padding:'10px 14px', fontFamily:SANS, fontWeight:700, fontSize:14, color:TXT }}>{e.player}</td>
+                  <td style={{ padding:'10px 14px', fontFamily:SANS, fontWeight:700, fontSize:14, color:TXT }}><Link href={`/drive/${e.id}`} style={{ color:'inherit', textDecoration:'none' }}>{e.player}</Link></td>
                   <td style={{ padding:'10px 14px', fontFamily:DISP, fontSize:20, color:ORG }}>{cvt(e.dist)} <span style={{ fontFamily:SANS, fontSize:10, color:DIM }}>{unitLbl}</span></td>
                   <td style={{ padding:'10px 14px', fontFamily:SANS, fontSize:12, color:MUT }}>{e.club}</td>
                   <td style={{ padding:'10px 14px', fontFamily:SANS, fontSize:12, color:MUT }}>{e.hcp}</td>
@@ -259,9 +258,9 @@ export function FilteredLeaderboard({ title, description, heading, intro, entrie
       <div style={{ background:'#0e0e0e', border:'1px solid rgba(255,0,144,0.2)', padding:'28px 24px', textAlign:'center' }}>
         <div style={{ fontFamily:DISP, fontSize:24, color:'#fff', letterSpacing:1, marginBottom:8 }}>DOES YOUR CLUB HAVE A BIG HITTER?</div>
         <div style={{ fontFamily:SANS, fontSize:13, color:'rgba(255,255,255,0.5)', marginBottom:16 }}>Register free and submit your competition longest drive results to the global leaderboard.</div>
-        <button onClick={()=>router.push('/register')} style={{ background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:12, padding:'12px 28px', cursor:'pointer', letterSpacing:.5 }}>
+        <Link href="/register" style={{ display:'inline-block', textDecoration:'none', background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:12, padding:'12px 28px', cursor:'pointer', letterSpacing:.5 }}>
           REGISTER YOUR CLUB FREE →
-        </button>
+        </Link>
       </div>
     </SeoPage>
   );
@@ -349,16 +348,16 @@ export function CountryRecordPage({ countryCode, countryName, entries: propEntri
           <div style={{ fontFamily:SANS, fontSize:11, color:DIM, marginBottom:14 }}>{unitLbl || 'yards'}</div>
           <div style={{ fontFamily:SANS, fontWeight:700, fontSize:17, color:TXT, marginBottom:4 }}>{record.player}</div>
           <div style={{ fontFamily:SANS, fontSize:13, color:MUT }}>{orgFor(record.orgId)?.courseName || 'Simulator'}</div>
-          <button onClick={() => router.push(`/drive/${record.id}`)} style={{ background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:12, padding:'10px 24px', cursor:'pointer', letterSpacing:.5, marginTop:18 }}>
+          <Link href={`/drive/${record.id}`} style={{ display:'inline-block', textDecoration:'none', background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:12, padding:'10px 24px', cursor:'pointer', letterSpacing:.5, marginTop:18 }}>
             VIEW DRIVE →
-          </button>
+          </Link>
         </div>
       ) : (
         <div style={{ background:BG2, border:`1px solid ${BDR}`, padding:'32px 24px', textAlign:'center', marginBottom:40 }}>
           <div style={{ fontFamily:SANS, fontSize:13, color:DIM, marginBottom:16 }}>No verified drives from {countryName} yet — be the first.</div>
-          <button onClick={() => router.push('/register')} style={{ background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:12, padding:'10px 24px', cursor:'pointer', letterSpacing:.5 }}>
+          <Link href="/register" style={{ display:'inline-block', textDecoration:'none', background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:12, padding:'10px 24px', cursor:'pointer', letterSpacing:.5 }}>
             REGISTER FREE →
-          </button>
+          </Link>
         </div>
       )}
 
@@ -377,7 +376,7 @@ export function CountryRecordPage({ countryCode, countryName, entries: propEntri
                       <div style={{ fontFamily:DISP, fontSize:26, color:ORG, letterSpacing:0.5, lineHeight:1 }}>
                         {cvt ? cvt(rec.dist) : rec.dist} <span style={{ fontFamily:SANS, fontSize:10, color:DIM }}>{unitLbl || 'yds'}</span>
                       </div>
-                      <div style={{ fontFamily:SANS, fontWeight:700, fontSize:13, color:TXT, marginTop:6 }}>{rec.player}</div>
+                      <div style={{ fontFamily:SANS, fontWeight:700, fontSize:13, color:TXT, marginTop:6 }}><Link href={`/drive/${rec.id}`} style={{ color:'inherit', textDecoration:'none' }}>{rec.player}</Link></div>
                     </>
                   ) : (
                     <div style={{ fontFamily:SANS, fontSize:12, color:DIM, marginTop:4 }}>No verified drives yet</div>
@@ -401,7 +400,7 @@ export function CountryRecordPage({ countryCode, countryName, entries: propEntri
                 {top10.map((e, i) => (
                   <tr key={e.id} style={{ borderBottom:`1px solid ${BDR}`, cursor:'pointer' }} onClick={() => router.push(`/drive/${e.id}`)}>
                     <td style={{ padding:'10px 14px', fontFamily:SANS, fontSize:13, color:DIM }}>{i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`}</td>
-                    <td style={{ padding:'10px 14px', fontFamily:SANS, fontWeight:700, fontSize:14, color:TXT }}>{e.player}</td>
+                    <td style={{ padding:'10px 14px', fontFamily:SANS, fontWeight:700, fontSize:14, color:TXT }}><Link href={`/drive/${e.id}`} style={{ color:'inherit', textDecoration:'none' }}>{e.player}</Link></td>
                     <td style={{ padding:'10px 14px', fontFamily:DISP, fontSize:18, color:ORG }}>{cvt ? cvt(e.dist) : e.dist} <span style={{ fontFamily:SANS, fontSize:10, color:DIM }}>{unitLbl || 'yds'}</span></td>
                     <td style={{ padding:'10px 14px', fontFamily:SANS, fontSize:12, color:MUT }}>{e.club}</td>
                     <td style={{ padding:'10px 14px', fontFamily:SANS, fontSize:12, color:MUT }}>{orgFor(e.orgId)?.courseName || 'Simulator'}</td>
