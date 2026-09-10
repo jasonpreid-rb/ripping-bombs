@@ -9,7 +9,7 @@ import LaunchModal from '../components/LaunchModal';
 import CookieConsent from '../components/CookieConsent';
 import { initData, db } from '../lib/data';
 import { supabase } from '../lib/supabaseClient';
-import { ORGS_KEY, ENT_KEY, SANS, ORG, MUT, BG2, BDR, TXT, DIM, DISP } from '../lib/constants';
+import { ORGS_KEY, ENT_KEY, ADMIN_PW, SANS, ORG, MUT, BG2, BDR, TXT, DIM, DISP } from '../lib/constants';
 import { todayStr } from '../lib/constants';
 import { sendRegistrationNotification, sendPlayerSubmissionNotice } from '../lib/email';
 
@@ -24,27 +24,6 @@ export default function App({ Component, pageProps }) {
   const [toastMsg, setToastMsg] = useState(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [adminPw, setAdminPw] = useState({ show:false, val:'' });
-
-  async function tryAdminLogin() {
-    try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: adminPw.val }),
-      });
-      const json = await res.json();
-      if (json.ok) {
-        localStorage.setItem('rb_admin_auth', '1');
-        localStorage.setItem('rb_admin_pw', adminPw.val);
-        setShowAdmin(true);
-        setAdminPw({ show:false, val:'' });
-      } else {
-        toast(json.error || 'Incorrect password');
-      }
-    } catch (e) {
-      toast('Login failed, try again');
-    }
-  }
   const [showLaunch, setShowLaunch] = useState(false);
   const [shareEnt, setShareEnt] = useState(null);
   const [detEnt, setDetEnt] = useState(null);
@@ -186,26 +165,24 @@ export default function App({ Component, pageProps }) {
   }
 
   async function doLogin(redirectTo) {
-    // Search loaded orgs state first (already fetched from Supabase)
-    let org = orgs.find(o => o.email === lgn.email && o.pw === lgn.pw);
-
-    // If not found in state, query Supabase directly (handles edge case of stale state)
-    if (!org) {
-      try {
-        const { supabase } = await import('../lib/supabaseClient');
-        const { data } = await supabase
-          .from('clubs')
-          .select('*')
-          .eq('email', lgn.email)
-          .eq('pw', lgn.pw)
-          .single();
-        org = data;
-      } catch {}
+    // Verified server-side now — orgs state no longer even contains pw
+    // (see lib/data.js's CLUBS_SAFE_COLUMNS), and password comparison
+    // happens against the hashed value via /api/auth/login, which also
+    // transparently migrates any remaining legacy plaintext password.
+    let org;
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: lgn.email, pw: lgn.pw }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toast(data?.error || 'Invalid credentials'); return; }
+      org = data;
+    } catch {
+      toast('Something went wrong — please try again');
+      return;
     }
-
-    if (!org) { toast('Invalid credentials'); return; }
-    if (org.status === 'pending') { toast('Awaiting admin approval'); return; }
-    if (org.status !== 'approved') { toast('Account not active'); return; }
 
     setLoggedOrg(org);
     localStorage.setItem('rb_club', JSON.stringify(org));
@@ -327,7 +304,7 @@ export default function App({ Component, pageProps }) {
   if (showAdmin) return (
     <AdminPanel orgs={orgs} entries={entries} setOrgs={setOrgs} setEntries={setEntries}
       toast={toast} cvt={cvt} unitLbl={unitLbl} onImpersonate={startImpersonation}
-      onClose={() => { setShowAdmin(false); localStorage.removeItem('rb_admin_auth'); localStorage.removeItem('rb_admin_pw'); }}/>
+      onClose={() => { setShowAdmin(false); localStorage.removeItem('rb_admin_auth'); }}/>
   );
 
   return (
@@ -346,8 +323,8 @@ export default function App({ Component, pageProps }) {
             <div style={{fontFamily:DISP,fontSize:24,color:TXT,letterSpacing:1,marginBottom:20}}>Admin Access</div>
             <input type="password" value={adminPw.val} onChange={e=>setAdminPw({...adminPw,val:e.target.value})} placeholder="Enter admin password"
               style={{width:'100%',background:'#2e2e2e',border:`1px solid ${BDR}`,padding:'10px 14px',color:TXT,fontFamily:SANS,fontSize:14,outline:'none',marginBottom:14,boxSizing:'border-box'}}
-              onKeyDown={e=>{if(e.key==='Enter'){tryAdminLogin();}}}/>
-            <button onClick={tryAdminLogin}
+              onKeyDown={e=>{if(e.key==='Enter'){if(adminPw.val===ADMIN_PW){setShowAdmin(true);localStorage.setItem('rb_admin_auth','1');setAdminPw({show:false,val:''});}else{toast('Incorrect password');}}}}/>
+            <button onClick={()=>{if(adminPw.val===ADMIN_PW){setShowAdmin(true);localStorage.setItem('rb_admin_auth','1');setAdminPw({show:false,val:''});}else{toast('Incorrect password');}}}
               style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:12,padding:'10px 22px',cursor:'pointer',width:'100%'}}>
               Enter Dashboard →
             </button>

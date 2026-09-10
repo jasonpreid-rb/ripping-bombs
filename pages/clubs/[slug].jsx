@@ -2,6 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
+import { isSampleId } from '../../lib/data';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../../lib/constants';
 import { fmtDate, tier, nowWeek, weekLabel, prevWeek, nextWeek, sameWeek } from '../../lib/constants';
 import { BadgePill, countryFlag } from '../../components/UI';
@@ -284,10 +285,10 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
   // Google's eyes — noindex them until the venue has at least one real
   // submission, then they naturally become indexable and re-enter the
   // sitemap (see scripts/generate-sitemap.cjs). Clubs whose entries are
-  // entirely sample/demo data (id prefixed `demo_`) get the same treatment
-  // until a real submission comes in.
+  // entirely sample/demo data get the same treatment until a real
+  // submission comes in — see isSampleId() in lib/data.js for what counts.
   const isEmpty = clubEntries.length === 0;
-  const isDemoOnly = clubEntries.length > 0 && clubEntries.every(e => e.id?.startsWith('demo_'));
+  const isDemoOnly = clubEntries.length > 0 && clubEntries.every(e => isSampleId(e.id));
 
   const schema = {
     '@context': 'https://schema.org',
@@ -467,7 +468,7 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
                             <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 14, color: TXT }}>{e.player}</div>
                           )}
                           {e.is_simulator && <div style={{ fontFamily: SANS, fontSize: 10, color: DIM }}>simulator</div>}
-                          {e.id?.startsWith('demo_') && <div style={{ fontFamily: SANS, fontSize: 10, color: DIM }}>sample data</div>}
+                          {isSampleId(e.id) && <div style={{ fontFamily: SANS, fontSize: 10, color: DIM }}>sample data</div>}
                         </div>
                       </div>
                     </td>

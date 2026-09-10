@@ -5,11 +5,10 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { type, org, entry, subject, message } = req.body;
+  const { type, org, entry, subject, message, tempPassword } = req.body;
 
   try {
     if (type === 'registration') {
-      // Notify team@rippingbombs.com of new registration
       await resend.emails.send({
         from: 'Ripping Bombs <team@rippingbombs.com>',
         to: 'team@rippingbombs.com',
@@ -17,7 +16,6 @@ export default async function handler(req, res) {
         text: `New registration on Ripping Bombs (auto-approved, no action needed):\n\nCourse: ${org.courseName}\nFull Name: ${org.fullName || '—'}\nPosition: ${org.position || '—'}\nLocation: ${org.location}\nCountry: ${org.country || '—'}\nEmail: ${org.email}\n\nView in admin:\nhttps://www.rippingbombs.com`,
       });
 
-      // Welcome email to the registrant
       const isSimulator = org.accountType === 'simulator';
       await resend.emails.send({
         from: 'Ripping Bombs <team@rippingbombs.com>',
@@ -59,11 +57,14 @@ export default async function handler(req, res) {
     }
 
     if (type === 'forgot_password') {
+      // No longer sends the real password (it's hashed and unrecoverable
+      // now) — sends a freshly generated temporary password instead,
+      // supplied by /api/auth/forgot-password.
       await resend.emails.send({
         from: 'Ripping Bombs <team@rippingbombs.com>',
         to: org.email,
-        subject: 'Your Ripping Bombs password',
-        text: `Hi ${org.fullName},\n\nHere are your login details for Ripping Bombs:\n\nEmail: ${org.email}\nPassword: ${org.pw}\n\nLogin at: https://www.rippingbombs.com/login\n\nIf you did not request this, you can ignore this email.\n\nThe Ripping Bombs Team`,
+        subject: 'Your Ripping Bombs password has been reset',
+        text: `Hi ${org.fullName},\n\nWe've reset your Ripping Bombs password. Here's a temporary one to log in with:\n\nEmail: ${org.email}\nTemporary password: ${tempPassword}\n\nWe'd recommend changing it once you're logged in.\n\nLogin at: https://www.rippingbombs.com/login\n\nIf you did not request this, please contact team@rippingbombs.com immediately.\n\nThe Ripping Bombs Team`,
       });
     }
 

@@ -120,11 +120,14 @@ async function getDynamicData() {
     const date = safeDate(e.date);
     if (e.date && !date) skippedFutureDates++;
     [e.orgId, e.venueId].filter(Boolean).forEach((id) => {
-      // Sample/demo rows (id prefixed `demo_`) don't count toward making a
-      // venue "real" for sitemap purposes — mirrors the isDemoOnly check
-      // in pages/clubs/[slug].jsx so a demo-only venue stays out of the
-      // sitemap the same way an empty one does.
-      if (!e.id?.startsWith('demo_')) {
+      // Sample/demo rows don't count toward making a venue "real" for
+      // sitemap purposes — mirrors isSampleId() in lib/data.js and the
+      // isDemoOnly check in pages/clubs/[slug].jsx, so a demo-only venue
+      // stays out of the sitemap the same way an empty one does. Covers
+      // both the newer `demo_`-prefixed rows and the older o1-o16/e01-e31
+      // seed rows from initData().
+      const isSample = e.id?.startsWith('demo_') || /^[oe]\d+$/.test(e.id || '');
+      if (!isSample) {
         entryCountByOrg[id] = (entryCountByOrg[id] || 0) + 1;
       }
       if (date && (!lastEntryByOrg[id] || date > lastEntryByOrg[id])) {

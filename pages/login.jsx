@@ -7,9 +7,6 @@ import GoogleLoginButton from '../components/GoogleLoginButton';
 
 export default function LoginPage({ lgn, setLgn, doLogin, doForgotPassword }) {
   const router = useRouter();
-  // Preserves ?redirect= through login — e.g. someone scanning a venue's QR
-  // poster who isn't logged in yet gets sent back to /submit?venue=X instead
-  // of the generic dashboard after they log in.
   const redirectTo = typeof router.query.redirect === 'string' ? router.query.redirect : null;
   const [forgotMode, setForgotMode] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
@@ -19,21 +16,14 @@ export default function LoginPage({ lgn, setLgn, doLogin, doForgotPassword }) {
   const handleForgot = async () => {
     if (!forgotEmail) return;
     setSending(true);
-    // Pre-fill the email into lgn so doForgotPassword can find it
     setLgn({ ...lgn, email: forgotEmail });
-    // Small delay to let state settle, then call directly via fetch
     try {
-      const { supabase } = await import('../lib/supabaseClient');
-      const { data: org } = await supabase
-        .from('clubs')
-        .select('*')
-        .eq('email', forgotEmail)
-        .single();
-
-      await fetch('/api/send-email', {
+      // Server-side only now — never reads or handles the password
+      // client-side. Generates + emails a temporary password.
+      await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'forgot_password', org: org || { email: forgotEmail, fullName: 'there', pw: '' } }),
+        body: JSON.stringify({ email: forgotEmail }),
       });
     } catch {}
     setSending(false);
@@ -52,7 +42,7 @@ export default function LoginPage({ lgn, setLgn, doLogin, doForgotPassword }) {
         </div>
         <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: 28 }}>
           {forgotMode
-            ? 'Enter your email and we\'ll send your password.'
+            ? 'Enter your email and we\'ll send you a temporary password.'
             : 'Log in to submit your longest drive competition results.'}
         </div>
 
@@ -63,7 +53,7 @@ export default function LoginPage({ lgn, setLgn, doLogin, doForgotPassword }) {
                 <div style={{ fontSize: 28, marginBottom: 10 }}>✓</div>
                 <div style={{ fontFamily: SANS, fontSize: 13, color: ORG, marginBottom: 6 }}>Email sent!</div>
                 <div style={{ fontFamily: SANS, fontSize: 12, color: MUT, marginBottom: 20 }}>
-                  If that address is registered, you'll receive your password shortly.
+                  If that address is registered, you'll receive a temporary password shortly.
                 </div>
                 <button
                   onClick={() => { setForgotMode(false); setForgotSent(false); setForgotEmail(''); }}
@@ -82,7 +72,7 @@ export default function LoginPage({ lgn, setLgn, doLogin, doForgotPassword }) {
                   required
                 />
                 <Btn full onClick={handleForgot} disabled={sending}>
-                  {sending ? 'Sending...' : 'Send Password →'}
+                  {sending ? 'Sending...' : 'Send Temporary Password →'}
                 </Btn>
                 <div style={{ fontFamily: SANS, fontSize: 11, color: DIM, marginTop: 12, textAlign: 'center' }}>
                   <span onClick={() => setForgotMode(false)} style={{ color: ORG, cursor: 'pointer', fontWeight: 600 }}>
@@ -110,7 +100,6 @@ export default function LoginPage({ lgn, setLgn, doLogin, doForgotPassword }) {
                 required
               />
 
-              {/* Remember Me */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <input
