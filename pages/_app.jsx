@@ -44,26 +44,36 @@ export default function App({ Component, pageProps }) {
   const [fGender, setFGender] = useState('');
   const [sortBy, setSortBy] = useState('dist');
 
-  // Loads the clubs row linked to a Supabase Auth (Google) session and
-  // makes it the active loggedOrg. Shared by the on-mount check and the
-  // live listener below, since both need to do the same lookup.
-  async function hydrateFromSupabaseSession(userId) {
-    if (!userId) return;
-    const { data: org } = await supabase
-      .from('clubs')
-      .select('*')
-      .eq('auth_user_id', userId)
-      .single();
-    if (org) {
-      setLoggedOrg(org);
-      // Several pages (dashboard.jsx, etc.) check localStorage['rb_club']
-      // directly rather than the loggedOrg prop — mirror doLogin/doRegister
-      // here so a Google sign-in is recognized everywhere the same way a
-      // password sign-in already is.
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('rb_club', JSON.stringify(org));
+  // Loads/links/creates the clubs row for a Supabase Auth (Google) session
+  // and makes it the active loggedOrg. Goes through /api/auth/sync-google
+  // (service-role, server-side) rather than querying `clubs` directly —
+  // linking an existing password account by email requires an UPDATE,
+  // which the anon/authenticated roles are no longer permitted to do.
+  // Shared by the on-mount check and the live listener below, since both
+  // need to do the same lookup.
+  async function hydrateFromSupabaseSession(session) {
+    if (!session?.access_token) return;
+    try {
+      const res = await fetch('/api/auth/sync-google', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+      if (!res.ok) return;
+      const org = await res.json();
+      if (org) {
+        setLoggedOrg(org);
+        // Several pages (dashboard.jsx, etc.) check localStorage['rb_club']
+        // directly rather than the loggedOrg prop — mirror doLogin/doRegister
+        // here so a Google sign-in is recognized everywhere the same way a
+        // password sign-in already is.
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rb_club', JSON.stringify(org));
+        }
       }
-    }
+    } catch {}
   }
 
   useEffect(() => {
@@ -84,7 +94,7 @@ export default function App({ Component, pageProps }) {
       // always takes priority if one's already active on this initial load.
       if (!raw) {
         supabase.auth.getSession().then(({ data }) => {
-          hydrateFromSupabaseSession(data?.session?.user?.id);
+          hydrateFromSupabaseSession(data?.session);
         });
       }
 
@@ -101,7 +111,7 @@ export default function App({ Component, pageProps }) {
         // Google sign-in appeared to succeed (no error) but never logged
         // the user in.
         if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
-          hydrateFromSupabaseSession(session?.user?.id);
+          hydrateFromSupabaseSession(session);
         }
       });
       return () => listener?.subscription?.unsubscribe();

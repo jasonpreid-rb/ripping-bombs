@@ -1308,16 +1308,7 @@ export default function DashboardPage() {
   // Deep link from submit.jsx's "Complete Profile" button (?edit=1) — opens
   // straight into the edit modal instead of leaving the person to find the
   // button themselves.
-  useEffect(() => {
-    if (!router.isReady) return;
-    if (router.query.edit === '1') {
-      setShowModal(true);
-      const { edit, ...rest } = router.query;
-      router.replace({ pathname: router.pathname, query: rest }, undefined, { shallow: true });
-    }
-  }, [router.isReady, router.query.edit]);
-
-  useEffect(() => {
+    useEffect(() => {
     const raw = typeof window !== 'undefined' && localStorage.getItem('rb_club');
     if (raw) {
       let parsed;
@@ -1328,24 +1319,33 @@ export default function DashboardPage() {
 
     // No rb_club yet — this can legitimately happen right after a Google
     // sign-in redirect, where _app.jsx's session hydration (which writes
-    // rb_club) is still an in-flight async DB call when this page mounts.
-    // Check the Supabase session directly before giving up, instead of
-    // immediately bouncing to /login.
+    // rb_club) is still an in-flight async call when this page mounts.
+    // Goes through /api/auth/sync-google (service-role) rather than
+    // querying clubs directly, so it can link an existing password
+    // account by email (an UPDATE) instead of just reading — a plain
+    // select here would never find a brand-new Google sign-in's row.
     (async () => {
       const { data } = await supabase.auth.getSession();
-      const userId = data?.session?.user?.id;
-      if (!userId) { router.replace('/login'); return; }
+      const session = data?.session;
+      if (!session?.access_token) { router.replace('/login'); return; }
 
-      const { data: org } = await supabase
-        .from('clubs')
-        .select('*')
-        .eq('auth_user_id', userId)
-        .single();
+      try {
+        const res = await fetch('/api/auth/sync-google', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+        if (!res.ok) { router.replace('/login'); return; }
+        const org = await res.json();
+        if (!org) { router.replace('/login'); return; }
 
-      if (!org) { router.replace('/login'); return; }
-
-      localStorage.setItem('rb_club', JSON.stringify(org));
-      loadData(org);
+        localStorage.setItem('rb_club', JSON.stringify(org));
+        loadData(org);
+      } catch {
+        router.replace('/login');
+      }
     })();
   }, []);
 
