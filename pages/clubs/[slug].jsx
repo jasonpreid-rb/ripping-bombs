@@ -283,8 +283,11 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
   // Pages with no recorded drives yet are thin/near-duplicate content in
   // Google's eyes — noindex them until the venue has at least one real
   // submission, then they naturally become indexable and re-enter the
-  // sitemap (see scripts/generate-sitemap.cjs).
+  // sitemap (see scripts/generate-sitemap.cjs). Clubs whose entries are
+  // entirely sample/demo data (id prefixed `demo_`) get the same treatment
+  // until a real submission comes in.
   const isEmpty = clubEntries.length === 0;
+  const isDemoOnly = clubEntries.length > 0 && clubEntries.every(e => e.id?.startsWith('demo_'));
 
   const schema = {
     '@context': 'https://schema.org',
@@ -303,7 +306,7 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
       <Head>
         <title>{org.courseName} Longest Drive Leaderboard | Ripping Bombs</title>
         <meta name="description" content={metaDesc} />
-        {isEmpty && <meta name="robots" content="noindex, follow" />}
+        {(isEmpty || isDemoOnly) && <meta name="robots" content="noindex, follow" />}
         <link rel="canonical" href={canonicalUrl} />
         <meta property="og:title" content={`${org.courseName} | Ripping Bombs`} />
         <meta property="og:description" content={metaDesc} />
@@ -464,6 +467,7 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
                             <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 14, color: TXT }}>{e.player}</div>
                           )}
                           {e.is_simulator && <div style={{ fontFamily: SANS, fontSize: 10, color: DIM }}>simulator</div>}
+                          {e.id?.startsWith('demo_') && <div style={{ fontFamily: SANS, fontSize: 10, color: DIM }}>sample data</div>}
                         </div>
                       </div>
                     </td>

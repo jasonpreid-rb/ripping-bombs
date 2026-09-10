@@ -106,7 +106,7 @@ async function getDynamicData() {
   // actually shows drives (or vice versa).
   const { data: entryRows, error: entryErr } = await supabase
     .from('entries')
-    .select('orgId, venueId, date');
+    .select('id, orgId, venueId, date');
 
   if (entryErr) {
     console.warn('[sitemap] Could not fetch entries for lastmod:', entryErr.message);
@@ -120,7 +120,13 @@ async function getDynamicData() {
     const date = safeDate(e.date);
     if (e.date && !date) skippedFutureDates++;
     [e.orgId, e.venueId].filter(Boolean).forEach((id) => {
-      entryCountByOrg[id] = (entryCountByOrg[id] || 0) + 1;
+      // Sample/demo rows (id prefixed `demo_`) don't count toward making a
+      // venue "real" for sitemap purposes — mirrors the isDemoOnly check
+      // in pages/clubs/[slug].jsx so a demo-only venue stays out of the
+      // sitemap the same way an empty one does.
+      if (!e.id?.startsWith('demo_')) {
+        entryCountByOrg[id] = (entryCountByOrg[id] || 0) + 1;
+      }
       if (date && (!lastEntryByOrg[id] || date > lastEntryByOrg[id])) {
         lastEntryByOrg[id] = date;
       }
@@ -131,12 +137,12 @@ async function getDynamicData() {
     console.warn(`[sitemap] Ignored ${skippedFutureDates} entries.date value(s) that were invalid or in the future (after ${TODAY}) — check for typo'd data.`);
   }
 
-  // Venues with zero recorded drives are thin/near-duplicate pages —
-  // Google was leaving 50+ URLs as "Discovered - currently not indexed"
-  // with these mixed in. Excluding empty venues from the sitemap (and
-  // noindexing the page itself, see pages/clubs/[slug].jsx) keeps the
-  // sitemap smaller and raises trust in the URLs that remain. A venue
-  // reappears here automatically the moment it gets its first drive.
+  // Venues with zero real (non-demo) recorded drives are thin/near-duplicate
+  // pages — Google was leaving 50+ URLs as "Discovered - currently not
+  // indexed" with these mixed in. Excluding empty and demo-only venues from
+  // the sitemap (and noindexing the page itself, see pages/clubs/[slug].jsx)
+  // keeps the sitemap smaller and raises trust in the URLs that remain. A
+  // venue reappears here automatically the moment it gets its first real drive.
   const clubUrls = (clubRows || [])
     .filter((c) => (entryCountByOrg[c.id] || 0) > 0)
     .map((c) => {
