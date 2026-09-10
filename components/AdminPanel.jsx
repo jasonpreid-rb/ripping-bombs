@@ -608,7 +608,7 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
         <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
           {TABS.map(t=><TabBtn key={t} id={t}/>)}
           <button onClick={onClose} style={{ background:'none', border:`1px solid rgba(220,60,60,0.3)`, color:'#f87171', fontFamily:SANS, fontWeight:600, fontSize:11, padding:'6px 14px', cursor:'pointer' }}>← Back to Site</button>
-          <button onClick={()=>{ localStorage.removeItem('rb_admin_auth'); localStorage.removeItem('rb_admin_expiry'); onClose(); }} style={{ background:'rgba(248,113,113,0.12)', border:`1px solid rgba(248,113,113,0.4)`, color:'#f87171', fontFamily:SANS, fontWeight:700, fontSize:11, padding:'6px 14px', cursor:'pointer', letterSpacing:.5 }}>⏻ Log Out</button>
+          <button onClick={()=>{ localStorage.removeItem('rb_admin_auth'); localStorage.removeItem('rb_admin_expiry'); localStorage.removeItem('rb_admin_pw'); onClose(); }} style={{ background:'rgba(248,113,113,0.12)', border:`1px solid rgba(248,113,113,0.4)`, color:'#f87171', fontFamily:SANS, fontWeight:700, fontSize:11, padding:'6px 14px', cursor:'pointer', letterSpacing:.5 }}>⏻ Log Out</button>
         </div>
       </div>
 
@@ -781,7 +781,7 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
               <div style={{ background:'rgba(248,113,113,0.06)', border:'1px solid rgba(248,113,113,0.2)', padding:'20px 24px' }}>
                 <div style={{ fontFamily:SANS, fontWeight:700, fontSize:14, color:TXT, marginBottom:4 }}>Log Out of Admin</div>
                 <div style={{ fontFamily:SANS, fontSize:12, color:MUT, marginBottom:14 }}>Clears your admin session. You'll need to enter the password again to return.</div>
-                <Btn variant="danger" onClick={()=>{ localStorage.removeItem('rb_admin_auth'); localStorage.removeItem('rb_admin_expiry'); onClose(); toast('Logged out of admin'); }}>Log Out</Btn>
+                <Btn variant="danger" onClick={()=>{ localStorage.removeItem('rb_admin_auth'); localStorage.removeItem('rb_admin_expiry'); localStorage.removeItem('rb_admin_pw'); onClose(); toast('Logged out of admin'); }}>Log Out</Btn>
               </div>
             </div>
           </div>
