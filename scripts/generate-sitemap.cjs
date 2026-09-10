@@ -44,14 +44,26 @@ function safeDate(date) {
   return date <= TODAY ? date : null;
 }
 
+// One-time fallback lastmod for evergreen pages that don't have their own
+// explicit `lastmod` and aren't driven by live entry data (see
+// dynamicChangefreqs below). Deliberately a fixed string, not `new Date()`
+// — using the build date here would bump every static page's lastmod on
+// every single deploy, which is a false freshness signal search engines
+// can penalize trust for. Represents the date these pages were last
+// content-audited as a whole; update a page's own `lastmod` (in
+// corePages below, or on its entry in lib/seoPages.js) when you actually
+// edit its copy, and that takes priority over this fallback.
+const FALLBACK_LASTMOD = '2026-09-10';
+
 // Core, hand-maintained app pages. Update this list if you add/remove
 // a top-level app page (not an SEO content page — those go in seoPages.js).
+// login and register are deliberately excluded — thin form pages with no
+// unique content for search, not worth indexing (see pages/login.jsx and
+// pages/register.jsx for the matching noindex tags).
 const corePages = [
   { slug: '', priority: 1.0, changefreq: 'weekly' },
   { slug: 'leaderboard', priority: 0.95, changefreq: 'weekly' },
-  { slug: 'register', priority: 0.9, changefreq: 'monthly' },
   { slug: 'how-to-register', priority: 0.7, changefreq: 'monthly' },
-  { slug: 'login', priority: 0.6, changefreq: 'monthly' },
   { slug: 'contact', priority: 0.8, changefreq: 'monthly' },
   { slug: 'clubs', priority: 0.9, changefreq: 'weekly' },
   { slug: 'for-venues', priority: 0.8, changefreq: 'monthly' },
@@ -151,7 +163,7 @@ async function getDynamicData() {
     .map((c) => {
       const slug = c.customSlug || (c.courseName ? toSlug(c.courseName) : null);
       if (!slug) return null;
-      return urlEntry(`/clubs/${slug}`, 'weekly', 0.8, lastEntryByOrg[c.id] || null);
+      return urlEntry(`/clubs/${slug}`, 'weekly', 0.8, lastEntryByOrg[c.id] || FALLBACK_LASTMOD);
     })
     .filter(Boolean);
 
@@ -172,7 +184,7 @@ async function getDynamicData() {
     .map((p) => {
       const slug = p.customSlug || (p.fullName ? toSlug(p.fullName) : null);
       if (!slug) return null;
-      return urlEntry(`/profile/${slug}`, 'weekly', 0.7, lastEntryByOrg[p.id] || null);
+      return urlEntry(`/profile/${slug}`, 'weekly', 0.7, lastEntryByOrg[p.id] || FALLBACK_LASTMOD);
     })
     .filter(Boolean);
 
@@ -196,11 +208,11 @@ async function generate() {
   const dynamicChangefreqs = new Set(['weekly']);
 
   const core = corePages.map((p) =>
-    urlEntry(`/${p.slug}`.replace(/\/$/, '') || '/', p.changefreq, p.priority, dynamicChangefreqs.has(p.changefreq) ? siteWideLatest : null)
+    urlEntry(`/${p.slug}`.replace(/\/$/, '') || '/', p.changefreq, p.priority, p.lastmod || (dynamicChangefreqs.has(p.changefreq) ? siteWideLatest : null) || FALLBACK_LASTMOD)
   );
 
   const seo = seoPages.map((p) =>
-    urlEntry(`/${p.slug}`, p.changefreq, p.priority, safeDate(p.lastmod) || (dynamicChangefreqs.has(p.changefreq) ? siteWideLatest : null))
+    urlEntry(`/${p.slug}`, p.changefreq, p.priority, safeDate(p.lastmod) || (dynamicChangefreqs.has(p.changefreq) ? siteWideLatest : null) || FALLBACK_LASTMOD)
   );
 
   const all = [...core, ...seo, ...clubUrls, ...profileUrls];

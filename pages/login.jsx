@@ -35,6 +35,7 @@ export default function LoginPage({ lgn, setLgn, doLogin, doForgotPassword }) {
       <Head>
         <title>Login | Ripping Bombs</title>
         <meta name="description" content="Log in to your Ripping Bombs account to submit your longest drive competition results." />
+        <meta name="robots" content="noindex, follow" />
       </Head>
       <div style={{ maxWidth: 400, margin: '0 auto', padding: '28px 18px 80px' }}>
         <div style={{ fontFamily: DISP, fontSize: 30, color: TXT, letterSpacing: 1, marginBottom: 6 }}>

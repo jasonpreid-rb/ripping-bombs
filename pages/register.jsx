@@ -250,6 +250,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
         <Head>
           <title>Register | Ripping Bombs</title>
           <meta name="description" content="Register your venue or simulator account on Ripping Bombs. Free to join. Submit verified longest drives to the global leaderboard." />
+          <meta name="robots" content="noindex, follow" />
         </Head>
         <ChoiceStep
           redirectTo={redirectTo}
@@ -264,6 +265,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
       <Head>
         <title>Register | Ripping Bombs</title>
         <meta name="description" content="Register your venue or simulator account on Ripping Bombs. Free to join. Submit verified longest drives to the global leaderboard." />
+        <meta name="robots" content="noindex, follow" />
       </Head>
 
       <div style={{ maxWidth: 540, margin: '0 auto', padding: '28px 18px 80px' }}>
