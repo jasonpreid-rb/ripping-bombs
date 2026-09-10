@@ -545,13 +545,13 @@ export default function AdminPanel({ orgs, entries, setOrgs, setEntries, toast, 
   async function setStatus(id, status) {
     const up = orgs.map(o => o.id===id ? {...o, status} : o);
     setOrgs(up);
-    await db.updateOrg(id, { status });
+    await db.adminUpdateOrg(id, { status });
   }
 
   async function saveEdit(org) {
     const up = orgs.map(o => o.id===org.id ? {...o, ...editing} : o);
     setOrgs(up);
-    await db.updateOrg(org.id, editing);
+    await db.adminUpdateOrg(org.id, editing);
     setEditing(null);
     setSelOrg({...org, ...editing});
     toast('Club details saved');
