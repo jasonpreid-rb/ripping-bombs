@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, cloneElement } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { supabase } from '../lib/supabaseClient';
+import { db, CLUBS_SAFE_COLUMNS } from '../lib/data';
 import PlayerAvatar from '../components/PlayerAvatar';
 import AvatarUploader from '../components/AvatarUploader';
 import SponsorLogoUploader from '../components/SponsorLogoUploader';
@@ -167,6 +168,7 @@ function FoundingBadge() {
 function ProfileModal({ club, onSave, onClose, onAvatarUploaded, onSponsorLogoUploaded }) {
   const [form, setForm] = useState({
     fullName: club?.fullName || '',
+    email: club?.email || '',
     location: club?.location || '',
     position: club?.position || '',
     gender: club?.gender || '',
@@ -208,6 +210,11 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded, onSponsorLogoUp
 
         <label style={labelStyle}>Full Name</label>
         <input style={inputStyle} value={form.fullName} onChange={(e) => set('fullName', e.target.value)} placeholder="Your name" />
+        <label style={labelStyle}>Email</label>
+        <input style={inputStyle} type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="you@example.com" />
+        <div style={{ fontSize: '0.72rem', color: DIM, marginTop: -4, marginBottom: 4 }}>
+          This is what you use to log in. If you originally signed up with Google, changing this won't change which Google account signs you in.
+        </div>
         <label style={labelStyle}>Location</label>
         <input style={inputStyle} value={form.location} onChange={(e) => set('location', e.target.value)} placeholder="City, Country" />
         <label style={labelStyle}>Position / Role</label>
@@ -327,13 +334,15 @@ function DeleteModal({ club, onClose }) {
     setDeleting(true);
     setError('');
     try {
-      // Delete all entries first (FK constraint)
-      const { error: entriesErr } = await supabase.from('entries').delete().eq('orgId', club.id);
-      if (entriesErr) throw entriesErr;
-      // Delete the club record
-      const { error: clubErr } = await supabase.from('clubs').delete().eq('id', club.id);
-      if (clubErr) throw clubErr;
-      // Clear local session
+      // Service-role route — deletes this account's entries and the
+      // clubs row itself. The anon client has no delete permission on
+      // either table anymore, so this can no longer go direct.
+      const res = await fetch('/api/clubs/delete-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: club.id }),
+      });
+      if (!res.ok) throw new Error('Delete failed');
       localStorage.removeItem('rb_club');
       router.replace('/');
     } catch (err) {
@@ -1352,7 +1361,11 @@ export default function DashboardPage() {
   const loadData = async (clubData) => {
     setLoading(true);
 
-    const { data: freshClub } = await supabase.from('clubs').select('*').eq('id', clubData.id).single();
+    // Safe column list — excludes pw. This is this account's own record,
+    // so it's fine to read on the anon client (select policy is open),
+    // but pw should never be pulled into browser state regardless of
+    // whose account it is.
+    const { data: freshClub } = await supabase.from('clubs').select(CLUBS_SAFE_COLUMNS).eq('id', clubData.id).single();
     setClub(freshClub || clubData);
 
     // Custom events — club accounts only, part of the TV Display & Sponsors tier
@@ -1710,8 +1723,25 @@ export default function DashboardPage() {
       customSlug = candidate;
     }
 
-    const { error } = await supabase.from('clubs').update({
+    // Email changed — check nobody else already has it. Same read-only
+    // pattern as the customSlug clash check above (still permitted via
+    // the anon client's open select policy on clubs).
+    const newEmail = (form.email || '').trim();
+    if (newEmail && newEmail.toLowerCase() !== (club?.email || '').toLowerCase()) {
+      const { data: emailClash } = await supabase
+        .from('clubs')
+        .select('id')
+        .ilike('email', newEmail)
+        .neq('id', club.id)
+        .maybeSingle();
+      if (emailClash) return 'That email is already registered to another account.';
+    }
+
+    // Routed through db.updateOrg (service-role API route) — the anon
+    // client has no update permission on clubs anymore.
+    const ok = await db.updateOrg(club.id, {
       fullName: form.fullName,
+      email: newEmail || club.email,
       location: form.location,
       position: form.position,
       gender: form.gender || null,
@@ -1725,11 +1755,11 @@ export default function DashboardPage() {
         sponsorName: form.sponsorName || null,
         sponsorLink: form.sponsorLink || null,
       }),
-    }).eq('id', club.id);
+    });
 
-    if (error) return 'Something went wrong saving your profile. Please try again.';
+    if (!ok) return 'Something went wrong saving your profile. Please try again.';
 
-    const updated = { ...club, ...form, customSlug };
+    const updated = { ...club, ...form, email: newEmail || club.email, customSlug };
     setClub(updated);
     localStorage.setItem('rb_club', JSON.stringify(updated));
     setShowModal(false);
@@ -1742,10 +1772,9 @@ export default function DashboardPage() {
 
   const handleStartTrial = async () => {
     const startedAt = new Date().toISOString();
-    const { error } = await supabase.from('clubs').update({
-      display_trial_started_at: startedAt,
-    }).eq('id', club.id);
-    if (error) { window.alert('Something went wrong starting your trial. Please try again.'); return; }
+    // Routed through db.updateOrg — see handleProfileSave note above.
+    const ok = await db.updateOrg(club.id, { display_trial_started_at: startedAt });
+    if (!ok) { window.alert('Something went wrong starting your trial. Please try again.'); return; }
     const updated = { ...club, display_trial_started_at: startedAt };
     setClub(updated);
     localStorage.setItem('rb_club', JSON.stringify(updated));
@@ -1779,7 +1808,7 @@ export default function DashboardPage() {
   return (
     <>
       <Head>
-        <title>{`${(club?.accountType === 'club' ? club?.courseName : club?.fullName) || 'Dashboard'} — Ripping Bombs`}</title>
+        <title>{(club?.accountType === 'club' ? club?.courseName : club?.fullName) || 'Dashboard'} — Ripping Bombs</title>
       </Head>
 
       {/* Mobile-only tightening: the flag now sits inline next to the name at
