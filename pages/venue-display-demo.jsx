@@ -195,7 +195,7 @@ export default function VenueDisplayDemo() {
   return (
     <>
       <Head>
-        <title>{VENUE.name} — Live Leaderboard (Demo)</title>
+        <title>{`${VENUE.name} — Live Leaderboard (Demo)`}</title>
         <meta name="robots" content="noindex" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link

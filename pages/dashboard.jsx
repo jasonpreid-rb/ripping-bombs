@@ -1779,7 +1779,7 @@ export default function DashboardPage() {
   return (
     <>
       <Head>
-        <title>{(club?.accountType === 'club' ? club?.courseName : club?.fullName) || 'Dashboard'} — Ripping Bombs</title>
+        <title>{`${(club?.accountType === 'club' ? club?.courseName : club?.fullName) || 'Dashboard'} — Ripping Bombs`}</title>
       </Head>
 
       {/* Mobile-only tightening: the flag now sits inline next to the name at

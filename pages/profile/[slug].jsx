@@ -349,7 +349,7 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
   return (
     <>
       <Head>
-        <title>{profileName} - Golf Drive Stats | Ripping Bombs</title>
+        <title>{`${profileName} - Golf Drive Stats | Ripping Bombs`}</title>
         <meta name="description" content={metaDesc} />
         <link rel="canonical" href={canonicalUrl} />
         <meta property="og:type" content="profile" />

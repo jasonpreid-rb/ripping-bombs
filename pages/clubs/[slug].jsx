@@ -301,7 +301,7 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
   return (
     <>
       <Head>
-        <title>{org.courseName} Longest Drive Leaderboard | Ripping Bombs</title>
+        <title>{`${org.courseName} Longest Drive Leaderboard | Ripping Bombs`}</title>
         <meta name="description" content={metaDesc} />
         {(isEmpty || isDemoOnly) && <meta name="robots" content="noindex, follow" />}
         <link rel="canonical" href={canonicalUrl} />

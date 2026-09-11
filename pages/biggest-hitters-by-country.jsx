@@ -94,7 +94,7 @@ export default function BiggestHittersByCountry({ entries: propEntries=[], orgs:
                 onMouseEnter={() => setHovered(c)}
                 onMouseLeave={() => setHovered(null)}
               >
-                <title>{c.name}{c.record ? ` — ${cvt ? cvt(c.record.dist) : c.record.dist} ${unitLbl || 'yds'} (${c.record.player})` : ' — no verified drives yet'}</title>
+                <title>{`${c.name}${c.record ? ` — ${cvt ? cvt(c.record.dist) : c.record.dist} ${unitLbl || 'yds'} (${c.record.player})` : ' — no verified drives yet'}`}</title>
               </circle>
             );
           })}

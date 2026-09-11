@@ -100,7 +100,7 @@ export default function VenueDisplay({ slug, venue, initialData }) {
   return (
     <>
       <Head>
-        <title>{venue.name} — Live Leaderboard</title>
+        <title>{`${venue.name} — Live Leaderboard`}</title>
         <meta
           name="description"
           content={`Live longest drive leaderboard at ${venue.name}${venue.location ? `, ${venue.location}` : ''} — updated in real time on Ripping Bombs.`}

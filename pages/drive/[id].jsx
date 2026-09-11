@@ -69,7 +69,7 @@ export default function DrivePage({ staticEntry, staticOrg, entries, orgs, cvt, 
   return (
     <>
       <Head>
-        <title>{entry.player} — {distDisplay} {unit} | Ripping Bombs</title>
+        <title>{`${entry.player} — ${distDisplay} ${unit} | Ripping Bombs`}</title>
         <meta name="description" content={`${entry.player} hit ${distDisplay} ${unit} at ${org?.courseName||'a course'} on ${fmtDate(entry.date)}. Verified competition drive on Ripping Bombs.`}/>
         <meta property="og:title" content={`${entry.player} — ${distDisplay} ${unit} | Ripping Bombs`}/>
         <meta property="og:description" content={`${entry.player} hit ${distDisplay} ${unit} at ${org?.courseName||'a course'}. Verified competition drive.`}/>

@@ -90,7 +90,7 @@ export default function EventPage() {
   return (
     <>
       <Head>
-        <title>{event.name} | Ripping Bombs</title>
+        <title>{`${event.name} | Ripping Bombs`}</title>
         <meta name="description" content={event.description || `${event.name} — hosted by ${venue?.courseName || 'a Ripping Bombs venue'}.`} />
       </Head>
 
