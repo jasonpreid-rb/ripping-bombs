@@ -298,6 +298,20 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
   const approvedOrgs = orgs.filter(o=>o.status==='approved');
   const [openFaq, setOpenFaq] = useState(null);
 
+  // Hero video: desktop/tablet only (≥768px) — on mobile it never even
+  // mounts, so there's no video request, decode, or battery/data cost at
+  // all, just the (much lighter) poster image as a CSS background. Starts
+  // false so SSR/first paint never renders the <video> tag, then syncs to
+  // the real viewport on mount.
+  const [showHeroVideo, setShowHeroVideo] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    setShowHeroVideo(mq.matches);
+    const onChange = e => setShowHeroVideo(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
   const orgFor = id => orgs.find(o=>o.id===id);
 
   // Monday-start week boundary — must match the dashboard's getWeekStart/getWeekEnd
@@ -533,13 +547,30 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
       </Head>
       <div style={{animation:'fi .4s ease'}}>
 
-        {/* HERO — video bg + condensed header + calculator */}
-        <div id="distance-calculator" className="rb-hero" style={{position:'relative',overflow:'hidden'}}>
-          <video autoPlay muted loop playsInline poster="https://images.pexels.com/videos/33511561/tee-shot-33511561.jpeg?auto=compress&cs=tinysrgb&h=627&fit=crop&w=1200"
-            className="rb-hero-video"
-            style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block',filter:'brightness(0.35)'}}>
-            <source src="https://videos.pexels.com/video-files/33511561/14252773_2560_1440_60fps.mp4" type="video/mp4"/>
-          </video>
+        {/* HERO — video bg + condensed header + calculator
+            Video is still hotlinked from Pexels — swap for a self-hosted,
+            compressed file before this is fully done:
+              1. Download the source clip and compress it under 1.5MB, e.g.:
+                   ffmpeg -i source.mp4 -vf scale=1280:-1 -an -c:v libx264 \
+                     -crf 30 -preset slow -movflags +faststart hero-drive.mp4
+                 (silent/no-audio like the how-it-works clip — the video is
+                 muted anyway, so there's no reason to ship an audio track)
+              2. Drop the result at /public/hero/hero-drive.mp4
+              3. Update the <source> src below from the Pexels URL to
+                 /hero/hero-drive.mp4
+            Same pattern as /public/how-it-works/rip-drive.mp4 — see that
+            page's file-header comment for the precedent. */}
+        <div id="distance-calculator" className="rb-hero" style={{position:'relative',overflow:'hidden',backgroundImage:'url(https://images.pexels.com/videos/33511561/tee-shot-33511561.jpeg?auto=compress&cs=tinysrgb&h=627&fit=crop&w=1200)',backgroundSize:'cover',backgroundPosition:'center'}}>
+          {showHeroVideo && (
+            <video autoPlay muted loop playsInline preload="none" poster="https://images.pexels.com/videos/33511561/tee-shot-33511561.jpeg?auto=compress&cs=tinysrgb&h=627&fit=crop&w=1200"
+              className="rb-hero-video"
+              style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block',filter:'brightness(0.35)'}}>
+              {/* TODO: self-hosted, compressed replacement — see comment above the
+                  component for exact steps. Once /public/hero/hero-drive.mp4 exists,
+                  swap the src below from the hotlinked Pexels file to it. */}
+              <source src="https://videos.pexels.com/video-files/33511561/14252773_2560_1440_60fps.mp4" type="video/mp4"/>
+            </video>
+          )}
           <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(0,0,0,0.2),rgba(0,0,0,0.7))'}}/>
           <div className="rb-hero-content" style={{position:'relative',zIndex:1,padding:'clamp(40px,8vw,72px) 20px clamp(48px,8vw,72px)',display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center'}}>
             {/* Condensed brand header */}
