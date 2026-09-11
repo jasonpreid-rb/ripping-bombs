@@ -97,7 +97,6 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
       <style
         dangerouslySetInnerHTML={{
           __html: `
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
         .desktop-nav{display:flex}
         .bottom-tabbar{display:none}
         @media(max-width:680px){

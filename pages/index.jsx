@@ -819,10 +819,13 @@ export async function getStaticProps() {
   try {
     const { supabase } = await import('../lib/supabaseClient');
 
+    // Same cap and reasoning as pages/leaderboard.jsx — see the comment
+    // there for the full explanation.
     const { data: entries } = await supabase
       .from('entries')
       .select('id, orgId, player, dist, club, hcp, age, gender, is_simulator, date, tournament')
-      .order('dist', { ascending: false });
+      .order('dist', { ascending: false })
+      .limit(1000);
 
     const { data: orgs } = await supabase
       .from('clubs')

@@ -1,15 +1,13 @@
 import { Html, Head, Main, NextScript } from 'next/document';
+import { inter, bebasNeue } from '../lib/fonts';
 
 export default function Document() {
   return (
-    <Html lang="en">
+    <Html lang="en" className={`${inter.variable} ${bebasNeue.variable}`}>
       <Head>
         <link rel="icon" href="/favicon.ico"/>
         <link rel="icon" type="image/png" href="/favicon.png"/>
         <link rel="apple-touch-icon" href="/favicon.png"/>
-        <link rel="preconnect" href="https://fonts.googleapis.com"/>
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true"/>
-        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
         <meta name="theme-color" content="#1a1a1a"/>
         {/* Google Analytics */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-5RCJDKVBER"/>

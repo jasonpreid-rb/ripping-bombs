@@ -390,10 +390,21 @@ export async function getStaticProps() {
   try {
     const { supabase } = await import('../lib/supabaseClient');
 
+    // Capped rather than unlimited — an uncapped fetch here means the
+    // *entire* entries table gets serialized into every page load's
+    // initial HTML/JSON payload (Next embeds getStaticProps' return value
+    // for hydration), regardless of how many rows are actually rendered
+    // on screen. 1000 is deliberately generous rather than tight: filters
+    // for gender/age-bracket/simulator etc. all apply client-side against
+    // this same capped set, so too small a cap risks some filtered views
+    // going sparse or empty. Revisit this number if any specific filter
+    // combination starts looking thin — that's a sign to raise it, or to
+    // do the fuller server-side-paginated-filters rework instead.
     const { data: entries } = await supabase
       .from('entries')
       .select('id, orgId, player, dist, club, hcp, age, gender, is_simulator, date, tournament')
-      .order('dist', { ascending: false });
+      .order('dist', { ascending: false })
+      .limit(1000);
 
     const { data: orgs } = await supabase
       .from('clubs')
