@@ -1,17 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
+import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP, profileSlugFor } from '../lib/constants';
 import { fmtDate, tier } from '../lib/constants';
 import { Overlay, BadgePill, countryFlag } from './UI';
 import { supabase } from '../lib/supabaseClient';
-
-function nameToSlug(name) {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-');
-}
 
 export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl }) {
   const router = useRouter();
@@ -37,8 +29,7 @@ export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl 
 
   if (!entry) return null;
 
-  const isSimulator = entry.is_simulator === true;
-  const profileSlug = isSimulator && org?.fullName ? nameToSlug(org.fullName) : null;
+  const profileSlug = profileSlugFor(org);
 
   return (
     <Overlay onClose={onClose}>

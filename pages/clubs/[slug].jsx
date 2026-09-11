@@ -3,16 +3,12 @@ import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { isSampleId } from '../../lib/data';
-import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../../lib/constants';
+import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP, profileSlugFor } from '../../lib/constants';
 import { fmtDate, tier, nowWeek, weekLabel, prevWeek, nextWeek, sameWeek } from '../../lib/constants';
 import { BadgePill, countryFlag } from '../../components/UI';
 import PlayerAvatar from '../../components/PlayerAvatar';
 
 function toSlug(name) {
-  return name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
-}
-
-function nameToSlug(name) {
   return name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
 }
 
@@ -52,7 +48,7 @@ export async function getServerSideProps({ params }) {
   if (simOrgIds.length) {
     const { data } = await supabase
       .from('clubs')
-      .select('id, fullName, avatarUrl')
+      .select('id, fullName, avatarUrl, accountType, customSlug')
       .in('id', simOrgIds);
     simOrgs = data || [];
   }
@@ -452,7 +448,7 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
                 // tagged to this venue (orgId !== venue id). Venue-submitted players
                 // are not registered accounts and have no profile page.
                 const simOrg = (e.is_simulator && e.orgId !== org.id) ? simOrgMap[e.orgId] : null;
-                const profileSlug = simOrg?.fullName ? nameToSlug(simOrg.fullName) : null;
+                const profileSlug = profileSlugFor(simOrg);
                 return (
                   <tr key={e.id} style={{ borderBottom: `1px solid ${BDR}` }}>
                     <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: i < 3 ? ORG : DIM, fontWeight: i < 3 ? 700 : 400 }}>{rankLabel(i)}</td>

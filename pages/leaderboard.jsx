@@ -3,14 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect, useRef } from 'react';
 
-function nameToSlug(name) {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-');
-}
-import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
+import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP, profileSlugFor } from '../lib/constants';
 import { fmtDate, tier, nowWeek, weekLabel, prevWeek, nextWeek, sameWeek } from '../lib/constants';
 import { countryFlag, BadgePill } from '../components/UI';
 import EntryModal from '../components/EntryModal';
@@ -135,16 +128,16 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
                   <div style={{display:'flex',alignItems:'center',gap:8}}>
                     <PlayerAvatar fullName={org?.fullName || e.player} avatarUrl={org?.avatarUrl} size={28} />
                     <div>
-                      {e.is_simulator && org?.fullName ? (
+                      {(() => { const slug = profileSlugFor(org); return slug ? (
                         <Link
-                          href={`/profile/${nameToSlug(org.fullName)}`}
+                          href={`/profile/${slug}`}
                           onClick={ev=>ev.stopPropagation()}
                           style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:ORG,textDecoration:'none',borderBottom:`1px solid rgba(255,0,144,0.3)`}}>
                           {e.player}
                         </Link>
                       ) : (
                         <span style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>{e.player}</span>
-                      )}
+                      ); })()}
                       {org?.country&&countryFlag(org.country)}
                     </div>
                   </div>
@@ -404,7 +397,7 @@ export async function getStaticProps() {
 
     const { data: orgs } = await supabase
       .from('clubs')
-      .select('id, courseName, fullName, avatarUrl, country, location, status, badge, accountType, is_founding_member')
+      .select('id, courseName, fullName, avatarUrl, country, location, status, badge, accountType, is_founding_member, customSlug')
       .eq('status', 'approved');
 
     return {

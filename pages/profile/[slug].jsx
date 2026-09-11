@@ -2,18 +2,10 @@ import { cloneElement } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
-import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../../lib/constants';
+import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP, nameToSlug } from '../../lib/constants';
 import { fmtDate, tier } from '../../lib/constants';
 import { countryFlag, BadgePill } from '../../components/UI';
 import PlayerAvatar from '../../components/PlayerAvatar';
-
-export function nameToSlug(name) {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-');
-}
 
 // Category thresholds: Youth <16, Senior 55+, High Handicap 15+.
 // Age/Senior checks take priority so a 15-year-old is always Youth,

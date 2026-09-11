@@ -18,38 +18,45 @@ const QR_X = 102;
 const QR_Y = 1254;
 
 export default async function handler() {
-  const qrDataUrl = await QRCode.toDataURL('https://www.rippingbombs.com/register', {
-    width: QR_SIZE,
-    margin: 1,
-    color: { dark: '#000000ff', light: '#ffffffff' },
-  });
+  try {
+    const qrDataUrl = await QRCode.toDataURL('https://www.rippingbombs.com/register', {
+      width: QR_SIZE,
+      margin: 1,
+      color: { dark: '#000000ff', light: '#ffffffff' },
+    });
 
-  return new ImageResponse(
-    (
-      <div style={{ width: POSTER_WIDTH, height: POSTER_HEIGHT, display: 'flex', position: 'relative' }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={POSTER_BG_URL}
-          width={POSTER_WIDTH}
-          height={POSTER_HEIGHT}
-          style={{ position: 'absolute', top: 0, left: 0, objectFit: 'cover' }}
-        />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={qrDataUrl}
-          width={QR_SIZE}
-          height={QR_SIZE}
-          style={{ position: 'absolute', left: QR_X, top: QR_Y }}
-        />
-      </div>
-    ),
-    {
-      width: POSTER_WIDTH,
-      height: POSTER_HEIGHT,
-      headers: {
-        'Content-Disposition': 'attachment; filename="ripping-bombs-venue-poster.png"',
-        'Cache-Control': 'public, max-age=3600',
-      },
-    }
-  );
+    return new ImageResponse(
+      (
+        <div style={{ width: POSTER_WIDTH, height: POSTER_HEIGHT, display: 'flex', position: 'relative' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={POSTER_BG_URL}
+            width={POSTER_WIDTH}
+            height={POSTER_HEIGHT}
+            style={{ position: 'absolute', top: 0, left: 0, objectFit: 'cover' }}
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={qrDataUrl}
+            width={QR_SIZE}
+            height={QR_SIZE}
+            style={{ position: 'absolute', left: QR_X, top: QR_Y }}
+          />
+        </div>
+      ),
+      {
+        width: POSTER_WIDTH,
+        height: POSTER_HEIGHT,
+        headers: {
+          'Content-Disposition': 'attachment; filename="ripping-bombs-venue-poster.png"',
+          'Cache-Control': 'public, max-age=3600',
+        },
+      }
+    );
+  } catch (err) {
+    // Logs to Vercel function logs with a real stack trace instead of a
+    // bare, unexplained 500 — check the Vercel dashboard's Logs tab for this.
+    console.error('[poster/generic] failed to generate poster:', err);
+    return new Response('Failed to generate poster', { status: 500 });
+  }
 }
