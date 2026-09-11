@@ -2,6 +2,10 @@ import { supabaseAdmin } from '../../../lib/supabaseAdmin';
 
 // Place at: pages/api/clubs/delete.js
 // Service-role delete for a clubs row — admin panel "Delete club" action.
+// Also deletes the account's entries first (foreign key), matching the
+// self-service delete-account.js route — previously this only deleted
+// the clubs row and left that account's drive submissions orphaned in
+// the entries table.
 //
 // TODO: verify the requester is actually an authenticated admin before
 // trusting this. Right now anyone who can reach this endpoint can delete
@@ -15,8 +19,12 @@ export default async function handler(req, res) {
   if (!id) return res.status(400).json({ error: 'Missing id' });
 
   try {
-    const { error } = await supabaseAdmin.from('clubs').delete().eq('id', id);
-    if (error) throw error;
+    const { error: entriesErr } = await supabaseAdmin.from('entries').delete().eq('orgId', id);
+    if (entriesErr) throw entriesErr;
+
+    const { error: clubErr } = await supabaseAdmin.from('clubs').delete().eq('id', id);
+    if (clubErr) throw clubErr;
+
     res.status(200).json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

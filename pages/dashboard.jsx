@@ -1365,8 +1365,20 @@ export default function DashboardPage() {
     // so it's fine to read on the anon client (select policy is open),
     // but pw should never be pulled into browser state regardless of
     // whose account it is.
-    const { data: freshClub } = await supabase.from('clubs').select(CLUBS_SAFE_COLUMNS).eq('id', clubData.id).single();
-    setClub(freshClub || clubData);
+    const { data: freshClub } = await supabase.from('clubs').select(CLUBS_SAFE_COLUMNS).eq('id', clubData.id).maybeSingle();
+
+    // No row came back for this id — the account no longer exists (e.g.
+    // deleted via admin). Previously this fell back to the stale
+    // localStorage copy, which meant a deleted account's dashboard kept
+    // rendering as if it still existed. Clear the stale session and bounce
+    // to login instead of trusting cached data over what the database
+    // actually says.
+    if (!freshClub) {
+      localStorage.removeItem('rb_club');
+      router.replace('/login');
+      return;
+    }
+    setClub(freshClub);
 
     // Custom events — club accounts only, part of the TV Display & Sponsors tier
     if ((freshClub || clubData)?.accountType === 'club') {
