@@ -190,8 +190,8 @@ export default function WhereDoIRankGlobally({ totalGolfers, totalDrives, longes
 
   return (
     <SeoPage
-      title="Where Do I Rank Globally? Golf Driving Distance Ranking | Ripping Bombs"
-      description="See where your longest drive ranks against real golfers worldwide. Compare your distance to actual verified drives submitted to the Ripping Bombs global leaderboard and check your rank instantly."
+      title="Where Do I Rank Globally? | Ripping Bombs"
+      description="See where your longest drive ranks against real golfers worldwide. Compare your distance to verified drives and check your rank instantly."
     >
       <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 10 }}>
         Live Global Rank Check

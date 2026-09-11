@@ -52,8 +52,8 @@ export default function ClubAndSimulatorVenueLeaderboards() {
 
   return (
     <SeoPage
-      title="Free Leaderboard Pages For Golf Clubs & Simulator Venues | Ripping Bombs"
-      description="Every golf club and simulator venue gets a free, auto-generated leaderboard page with its own URL. Simulator players tag your venue and their drives rank automatically."
+      title="Free Leaderboards For Clubs & Sim Venues | Ripping Bombs"
+      description="Every golf club and simulator venue gets a free, auto-generated leaderboard page with its own URL on Ripping Bombs."
     >
       <Head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />

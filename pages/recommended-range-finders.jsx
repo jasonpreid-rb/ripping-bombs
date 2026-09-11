@@ -21,7 +21,7 @@ export default function Page() {
 
   return (
     <SeoPage
-      title="Best Golf Rangefinders 2025 | Recommended Range Finders | Ripping Bombs"
+      title="Best Golf Rangefinders 2025 | Ripping Bombs"
       description="Our pick of the best golf rangefinders in 2025, tested and ranked by accuracy, usability, and value. From budget laser finders to premium GPS hybrids."
     >
       <SeoH1>Recommended Golf Range Finders</SeoH1>

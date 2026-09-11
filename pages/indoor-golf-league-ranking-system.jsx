@@ -144,8 +144,8 @@ export default function RbrNumberPage({
 
   return (
     <SeoPage
-      title="Indoor Golf League Ranking System — What's Your RBR#? | Ripping Bombs"
-      description="The indoor golf league ranking system powering RBR# — a live rank number for indoor golf leagues, simulator venues, and long drive players, by category and country."
+      title="Indoor Golf League Ranking System | Ripping Bombs"
+      description="The indoor golf league ranking system powering RBR# — a live rank number for leagues, venues, and long drive players, by category."
     >
       <Head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />

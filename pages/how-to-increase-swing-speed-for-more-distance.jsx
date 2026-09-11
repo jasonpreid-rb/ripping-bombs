@@ -135,8 +135,8 @@ export default function IncreaseSwingSpeed() {
 
   return (
     <SeoPage
-      title="How to Increase Your Swing Speed for More Distance | Ripping Bombs"
-      description="Proven ways to increase golf swing speed and add real yards to your drives — plus how much distance each extra mph actually adds. See where the gains put you on the Ripping Bombs leaderboard."
+      title="How to Increase Swing Speed for Distance | Ripping Bombs"
+      description="Proven ways to increase golf swing speed and add real yards to your drives — plus how much distance each extra mph actually adds."
     >
       <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 10 }}>
         Distance Training Guide

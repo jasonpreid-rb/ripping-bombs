@@ -78,8 +78,8 @@ export default function SupportedSimulators() {
 
   return (
     <SeoPage
-      title="Supported Golf Simulators — TrackMan, Uneekor, SkyTrak, GCQuad, Full Swing | Ripping Bombs"
-      description="Ripping Bombs supports drive submissions from TrackMan, Uneekor, SkyTrak, Foresight GCQuad/GC3, and Full Swing simulators. Compete in the TrackMan long drive competition and global leaderboard from any supported launch monitor."
+      title="Supported Golf Simulators | Ripping Bombs"
+      description="Ripping Bombs supports drive submissions from TrackMan, Uneekor, SkyTrak, Foresight GCQuad/GC3, and Full Swing simulators."
     >
       <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:3, color:ORG, textTransform:'uppercase', marginBottom:10 }}>
         Simulator Compatibility

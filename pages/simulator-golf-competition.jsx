@@ -6,8 +6,8 @@ import { SANS, DISP, ORG, TXT, MUT, BG2, BG3, BDR } from "../lib/constants";
 export default function SimulatorGolfCompetition() {
   return (
     <SeoPage
-      title="Simulator Golf Competition — Run a Long Drive Contest on Any Launch Monitor | Ripping Bombs"
-      description="How to run a golf long drive competition on a simulator. Compatible with Trackman, Foresight, Garmin, Bushnell, and more. Submit results to a global online leaderboard."
+      title="Simulator Golf Competition Guide | Ripping Bombs"
+      description="How to run a golf long drive competition on a simulator — compatible with Trackman, Foresight, Garmin, Bushnell, and more."
     >
       <>
         <p style={{ color: ORG, fontFamily: DISP, fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>Simulator Competitions</p>

@@ -65,7 +65,7 @@ export default function HallOfFame({ entries: propEntries=[], orgs: propOrgs=[],
   return (
     <SeoPage
       title="Hall of Fame — Longest Drives & Records | Ripping Bombs"
-      description="The Ripping Bombs Hall of Fame: the longest drives ever recorded, country-by-country records, and major distance milestones — including the chase for the first verified 500-yard drive."
+      description="The Ripping Bombs Hall of Fame: the longest drives ever recorded, country-by-country records, and the chase for a 500-yard drive."
     >
       <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:3, color:ORG, textTransform:'uppercase', marginBottom:10 }}>
         Global Records

@@ -1,7 +1,7 @@
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 export default function Page() {
   return (
-    <SeoPage title="Indoor Golf League — How To Set One Up At Your Simulator Venue | Ripping Bombs" description="How to run an indoor golf league at a simulator venue. Formats, scoring systems, league structures, and how to keep competition running year-round.">
+    <SeoPage title="How to Set Up an Indoor Golf League | Ripping Bombs" description="How to run an indoor golf league at a simulator venue. Formats, scoring systems, league structures, and how to keep competition running year-round.">
       <SeoH1>Indoor Golf League — How To Set One Up</SeoH1>
       <SeoP>Indoor golf leagues have become one of the fastest-growing formats in the game. With simulator technology now delivering highly accurate distance and ball flight data, it's possible to run a genuinely competitive league without ever stepping outside — making them especially popular through autumn and winter.</SeoP>
 

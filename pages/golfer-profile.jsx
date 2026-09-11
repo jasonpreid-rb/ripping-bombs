@@ -178,7 +178,7 @@ export default function GolferProfilePage() {
   return (
     <SeoPage
       title="Your Golfer Profile, URL & World Ranking | Ripping Bombs"
-      description="Register free and get your own golfer profile with a unique URL, personal dashboard, live world long-drive ranking, full drive history, and 2027 Championship points tracker."
+      description="Register free and get your own golfer profile: a unique URL, personal dashboard, live world ranking, and full drive history."
     >
       <>
 

@@ -6,8 +6,8 @@ import { SANS, DISP, ORG, TXT, MUT, BG2, BG3, BDR } from "../lib/constants";
 export default function TrackmanLongDrive() {
   return (
     <SeoPage
-      title="Trackman Long Drive — Data, Competitions & Leaderboard Submissions | Ripping Bombs"
-      description="Use Trackman to measure your longest drive, run an indoor long drive competition, and submit your results to the Ripping Bombs global leaderboard. Everything you need to know."
+      title="Trackman Long Drive Leaderboard | Ripping Bombs"
+      description="Use Trackman to measure your longest drive, run an indoor competition, and submit results to the Ripping Bombs global leaderboard."
     >
       <>
         <p style={{ color: ORG, fontFamily: DISP, fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>Trackman & Launch Monitors</p>

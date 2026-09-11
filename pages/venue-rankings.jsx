@@ -187,8 +187,8 @@ export default function VenueLeaderboard({ ranked, totalVenuesRanked, totalVenue
 
   return (
     <SeoPage
-      title="Venue Rankings: How Golf & Simulator Venues Compete Globally | Ripping Bombs"
-      description="See how golf clubs and simulator venues compete against each other worldwide on Ripping Bombs — how the venue ranking score is calculated, the live rankings right now, and how your venue can climb them."
+      title="Venue Rankings | Ripping Bombs"
+      description="See how golf clubs and simulator venues compete worldwide on Ripping Bombs — how the ranking score works, and how your venue can climb it."
     >
       {itemListSchema && (
         <Head>

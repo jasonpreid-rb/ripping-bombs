@@ -29,7 +29,7 @@ export default function Page() {
   }
 
   return (
-    <SeoPage title="How To Promote Your Golf Event | Ripping Bombs" description="Learn how to promote your golf event and give it global exposure. Ripping Bombs connects golf events with players worldwide through verified longest drive leaderboards.">
+    <SeoPage title="How To Promote Your Golf Event | Ripping Bombs" description="Learn how to promote your golf event and give it global exposure through a verified longest drive leaderboard.">
       <SeoH1>How To Promote Your Golf Event</SeoH1>
       <SeoP>Running a golf event is one thing — getting the right players to hear about it, and giving participants something to remember and share, is another. Here's how forward-thinking tournament organisers and golf clubs are using Ripping Bombs to give their events a global audience.</SeoP>
       <SeoH2>Why Add Your Event To Ripping Bombs?</SeoH2>

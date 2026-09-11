@@ -138,8 +138,8 @@ function RankPreviewStrip() {
 export default function EnjoyGolfWhenYouCantBreakPar() {
   return (
     <SeoPage
-      title="Can't Break Par? Here's a Golf Scoreboard You Can Actually Win | Ripping Bombs"
-      description="Score gets harder to move the better you get — most golfers never break 80, let alone par. Here's why, and a leaderboard where distance, not your scorecard, decides where you rank."
+      title="A Golf Scoreboard You Can Actually Win | Ripping Bombs"
+      description="Most golfers never break 80, let alone par. Here's a leaderboard where distance, not your scorecard, decides where you rank."
     >
       <>
         <p style={{ color: ORG, fontFamily: DISP, fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>

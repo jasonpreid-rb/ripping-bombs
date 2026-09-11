@@ -6,7 +6,7 @@ const linkStyle = { color: ORG, textDecoration: 'underline' };
 
 export default function Page() {
   return (
-    <SeoPage title="Simulator Golf League | Compete For Your Country | Ripping Bombs" description="Join a simulator golf league anyone can compete in. Submit verified longest drive results from home and represent your country on a real global leaderboard.">
+    <SeoPage title="Simulator Golf League | Ripping Bombs" description="Join a simulator golf league anyone can compete in. Submit verified results from home and represent your country on Ripping Bombs.">
       <SeoH1>Simulator Golf League</SeoH1>
       <SeoP>You don't need a tour card, a sponsor, or a scratch <Link href="/golf-handicap-driving-distance" style={linkStyle}>handicap</Link> to represent your country in golf. With a simulator golf league, anyone with a launch monitor and a living room can step up to a genuinely international leaderboard — and that's exactly what Ripping Bombs is built for.</SeoP>
       <SeoH2>Everybody Is Welcome</SeoH2>

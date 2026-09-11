@@ -1,7 +1,7 @@
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 export default function Page() {
   return (
-    <SeoPage title="Golf Simulator Near Me — How To Find The Best Indoor Golf Venues | Ripping Bombs" description="Looking for a golf simulator near you? Tips on finding the best indoor golf venues, what to look for, and how to get the most out of your simulator session.">
+    <SeoPage title="Golf Simulator Near Me | Ripping Bombs" description="Looking for a golf simulator near you? Tips on finding the best indoor golf venues and getting the most out of your session.">
       <SeoH1>Golf Simulator Near Me — How To Find Indoor Golf Venues</SeoH1>
       <SeoP>The number of golf simulator venues has grown dramatically in recent years. From dedicated indoor golf centres to pub-based bays and private studio installs, there's a good chance there's a simulator closer to you than you think.</SeoP>
 

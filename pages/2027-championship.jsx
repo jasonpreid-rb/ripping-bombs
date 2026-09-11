@@ -50,7 +50,7 @@ export default function Championship2027Page() {
   return (
     <SeoPage
       title="2027 Golf Simulator League Championship | Ripping Bombs"
-      description="The Ripping Bombs 2027 Golf Simulator League — four 13-week tournaments across the year, six categories, weekly leaderboards. The world's largest online golf simulator competition."
+      description="The Ripping Bombs 2027 Golf Simulator League — four 13-week tournaments, six categories, weekly leaderboards, all year."
     >
       <div style={{maxWidth:760,margin:'0 auto',padding:'0 0 80px'}}>
 

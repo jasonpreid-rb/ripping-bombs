@@ -518,7 +518,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
     <>
       <Head>
         <title>Ripping Bombs | Longest Drive Leaderboard for Simulator Golf</title>
-        <meta name="description" content="Compare your longest golf drives on the free global leaderboard for simulator golf venues and clubs. Submit your drive, track rankings by category, and compete toward the 2027 Championship."/>
+        <meta name="description" content="Compare your longest golf drives on the free global leaderboard for simulator golf and clubs. Submit your drive and track rankings."/>
         <link rel="canonical" href="https://www.rippingbombs.com/"/>
 
         <meta property="og:title" content="Ripping Bombs | Longest Drive Leaderboard for Simulator Golf"/>

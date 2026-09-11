@@ -31,7 +31,7 @@ export default function Page() {
     <>
       <Head>
         <title>How To Increase Golf Simulator Bookings | Ripping Bombs</title>
-        <meta name="description" content="Practical, low-cost ways to increase bookings and repeat visits at your golf simulator venue, including a free downloadable poster that turns players into a global leaderboard." />
+        <meta name="description" content="Practical, low-cost ways to increase bookings and repeat visits at your golf simulator venue, including a free downloadable poster." />
       </Head>
 
       <div style={{ background: BG, minHeight: '100vh' }}>

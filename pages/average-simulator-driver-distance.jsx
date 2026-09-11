@@ -1,7 +1,7 @@
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 export default function Page() {
   return (
-    <SeoPage title="Average Golf Simulator Driver Distance — What's Normal? | Ripping Bombs" description="How far does the average golfer hit driver on a golf simulator? Benchmarks by handicap, simulator brand, and what to expect vs real course distances.">
+    <SeoPage title="Average Simulator Driver Distance | Ripping Bombs" description="How far does the average golfer hit driver on a golf simulator? Benchmarks by handicap, simulator brand, and what to expect vs real course distances.">
       <SeoH1>Average Golf Simulator Driver Distance</SeoH1>
       <SeoP>Simulator distances aren't always the same as outdoor distances — and knowing the difference matters, especially if you're using your simulator numbers to calibrate your game or track your longest drives against other players.</SeoP>
 

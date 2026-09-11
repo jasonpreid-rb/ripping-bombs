@@ -1,7 +1,7 @@
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 export default function Page() {
   return (
-    <SeoPage title="Longest Drive Challenge — How To Run One At Your Club | Ripping Bombs" description="Everything you need to run a longest drive challenge at your golf club or simulator venue. Formats, rules, scoring ideas, and how to get your results on the global leaderboard.">
+    <SeoPage title="Longest Drive Challenge Guide | Ripping Bombs" description="Everything you need to run a longest drive challenge at your club or simulator venue — formats, rules, scoring, and going global.">
       <SeoH1>Longest Drive Challenge — How To Run One At Your Club</SeoH1>
       <SeoP>The longest drive challenge is one of the most crowd-pleasing formats in golf. It requires no special equipment, works for every skill level, and creates a genuine moment of competition that players remember long after the day is over.</SeoP>
 

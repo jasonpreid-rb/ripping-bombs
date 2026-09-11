@@ -31,7 +31,7 @@ export default function Page() {
 
   return (
     <SeoPage
-      title="Popularity of Golf as a Sport | Golf Participation Stats 2025 | Ripping Bombs"
+      title="Popularity of Golf as a Sport | Ripping Bombs"
       description="How popular is golf? Explore global participation stats, growth trends, demographics, and which countries play the most golf in 2025."
     >
       <SeoH1>Popularity of Golf as a Sport</SeoH1>

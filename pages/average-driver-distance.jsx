@@ -1,7 +1,7 @@
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 export default function Page() {
   return (
-    <SeoPage title="Average Driver Distance — What Should You Be Hitting? | Ripping Bombs" description="How far does the average golfer hit their driver? Real-world distance data by handicap, age, and gender — plus how you compare to the world's longest amateur hitters.">
+    <SeoPage title="Average Driver Distance | Ripping Bombs" description="How far does the average golfer hit their driver? Real distance data by handicap, age, and gender — see how you compare on Ripping Bombs.">
       <SeoH1>Average Driver Distance — What Should You Be Hitting?</SeoH1>
       <SeoP>Most amateur golfers overestimate how far they hit their driver. The number in your head — usually taken from your best-ever shot on a downhill hole with a tailwind — rarely reflects your actual carry distance. Here's what the data really shows.</SeoP>
 

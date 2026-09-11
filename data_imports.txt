@@ -1,0 +1,34 @@
+components\AdminPanel.jsx:import { SEED_ORGS, SEED_ENTRIES, db } from '../lib/data';
+pages\clubs\[slug].jsx:import { isSampleId } from '../../lib/data';
+pages\clubs\[slug].jsx:  // submission comes in — see isSampleId() in lib/data.js for what counts.
+pages\dashboard.jsx:import { db, CLUBS_SAFE_COLUMNS } from '../lib/data';
+pages\_app.jsx:import { initData, db } from '../lib/data';
+pages\_app.jsx:    // (see lib/data.js's CLUBS_SAFE_COLUMNS), and password comparison
+_app_backup.jsx.jsx:import { initData, db } from '../lib/data';
+.next\dev\server\chunks\ssr\[root-of-the-server]__05sbj3e._.js:"[project]/lib/data.js [ssr] (ecmascript)", ((__turbopack_context__) => {
+.next\dev\server\chunks\ssr\[root-of-the-server]__05sbj3e._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [ssr] (ecmascript)");
+.next\dev\server\chunks\ssr\[root-of-the-server]__05sbj3e._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [ssr] (ecmascript)");
+.next\dev\server\chunks\ssr\[root-of-the-server]__0rtw_q5._.js:"[project]/lib/data.js [ssr] (ecmascript)", ((__turbopack_context__) => {
+.next\dev\server\chunks\ssr\[root-of-the-server]__0rtw_q5._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [ssr] (ecmascript)");
+.next\dev\server\chunks\ssr\[root-of-the-server]__0rtw_q5._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [ssr] (ecmascript)");
+.next\dev\server\chunks\ssr\[root-of-the-server]__1bwnnes._.js:"[project]/lib/data.js [ssr] (ecmascript)", ((__turbopack_context__) => {
+.next\dev\server\chunks\ssr\[root-of-the-server]__1bwnnes._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [ssr] (ecmascript)");
+.next\dev\server\chunks\ssr\[root-of-the-server]__1bwnnes._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [ssr] (ecmascript)");
+.next\dev\server\chunks\ssr\[root-of-the-server]__1f43tnj._.js:"[project]/lib/data.js [ssr] (ecmascript)", ((__turbopack_context__) => {
+.next\dev\server\chunks\ssr\[root-of-the-server]__1f43tnj._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [ssr] (ecmascript)");
+.next\dev\server\chunks\ssr\[root-of-the-server]__1f43tnj._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [ssr] (ecmascript)");
+.next\dev\server\chunks\ssr\[root-of-the-server]__1ned0hy._.js:"[project]/lib/data.js [ssr] (ecmascript)", ((__turbopack_context__) => {
+.next\dev\server\chunks\ssr\[root-of-the-server]__1ned0hy._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [ssr] (ecmascript)");
+.next\dev\server\chunks\ssr\[root-of-the-server]__1ned0hy._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [ssr] (ecmascript)");
+.next\dev\server\chunks\ssr\[root-of-the-server]__1s5nva8._.js:"[project]/lib/data.js [ssr] (ecmascript)", ((__turbopack_context__) => {
+.next\dev\server\chunks\ssr\[root-of-the-server]__1s5nva8._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [ssr] (ecmascript)");
+.next\dev\server\chunks\ssr\[root-of-the-server]__1s5nva8._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [ssr] (ecmascript)");
+.next\dev\static\chunks\[root-of-the-server]__163f62v._.js:"[project]/lib/data.js [client] (ecmascript)", ((__turbopack_context__) => {
+.next\dev\static\chunks\[root-of-the-server]__163f62v._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [client] (ecmascript)");
+.next\dev\static\chunks\[root-of-the-server]__163f62v._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [client] (ecmascript)");
+.next\dev\static\chunks\[root-of-the-server]__1tg-yy_._.js:"[project]/lib/data.js [client] (ecmascript)", ((__turbopack_context__) => {
+.next\dev\static\chunks\[root-of-the-server]__1tg-yy_._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [client] (ecmascript)");
+.next\dev\static\chunks\[root-of-the-server]__1tg-yy_._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [client] (ecmascript)");
+.next\dev\static\chunks\[root-of-the-server]__1zh97l9._.js:"[project]/lib/data.js [client] (ecmascript)", ((__turbopack_context__) => {
+.next\dev\static\chunks\[root-of-the-server]__1zh97l9._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [client] (ecmascript)");
+.next\dev\static\chunks\[root-of-the-server]__1zh97l9._.js:var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$data$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/data.js [client] (ecmascript)");

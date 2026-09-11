@@ -147,8 +147,8 @@ function DashboardScreenshot() {
 export default function AverageGolfDriveDistanceByAge() {
   return (
     <SeoPage
-      title="Average Golf Drive Distance by Age & Handicap — Find Your Real Rank | Ripping Bombs"
-      description="See average golf drive distances by age, handicap, and gender — then get your own global, country, age group, and handicap group rank by submitting a drive on Ripping Bombs."
+      title="Average Drive Distance by Age & Handicap | Ripping Bombs"
+      description="See average golf drive distances by age, handicap, and gender — then get your own real rank by submitting a drive on Ripping Bombs."
     >
       <>
         <p style={{ color: ORG, fontFamily: DISP, fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>

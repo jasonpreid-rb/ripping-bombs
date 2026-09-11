@@ -233,8 +233,8 @@ export default function PercentileCalculator() {
 
   return (
     <SeoPage
-      title="How Far Do I Drive Compared to Others? Golf Driving Distance Calculator | Ripping Bombs"
-      description="Find out how your golf driving distance compares to players of your age, gender and handicap. Free instant percentile calculator — see where you rank among amateur golfers worldwide."
+      title="How Far Do I Drive Compared to Others? | Ripping Bombs"
+      description="Find out how your golf driving distance compares to players of your age, gender and handicap. Free instant percentile calculator."
     >
       {/* Hero label */}
       <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:3, color:ORG, textTransform:'uppercase', marginBottom:10 }}>

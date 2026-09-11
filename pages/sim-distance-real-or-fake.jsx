@@ -27,7 +27,7 @@ export default function SimDistanceRealOrFake() {
   return (
     <SeoPage
       title="Is Your Golf Simulator Distance Real? | Ripping Bombs"
-      description="GSPro, TGC, Awesome Golf, and Rapsodo can overstate your longest drive. Here's how to know if your number is real — and how to get it verified on a real leaderboard."
+      description="GSPro, TGC, Awesome Golf, and Rapsodo can overstate your drive. Here's how to know if your number is real, and get it verified."
     >
       <div style={{maxWidth:760,margin:'0 auto',padding:'56px 18px 80px'}}>
 

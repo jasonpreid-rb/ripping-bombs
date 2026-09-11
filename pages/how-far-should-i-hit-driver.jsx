@@ -1,7 +1,7 @@
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 export default function Page() {
   return (
-    <SeoPage title="How Far Should I Hit My Driver? Distance Guide By Swing Speed | Ripping Bombs" description="Find out how far you should realistically hit your driver based on swing speed, age, and handicap. Real benchmarks, not best-case estimates.">
+    <SeoPage title="How Far Should I Hit My Driver? | Ripping Bombs" description="Find out how far you should realistically hit your driver based on swing speed, age, and handicap. Real benchmarks, not best-case estimates.">
       <SeoH1>How Far Should I Hit My Driver?</SeoH1>
       <SeoP>It's one of the most common questions in golf — and one of the most honestly answered by a launch monitor rather than the range. Here's a realistic guide to expected driver distance based on your actual swing speed.</SeoP>
 

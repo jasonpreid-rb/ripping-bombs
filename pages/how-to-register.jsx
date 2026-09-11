@@ -79,7 +79,7 @@ export default function HowToRegisterPage() {
   return (
     <SeoPage
       title="How to Register & Submit Your Drive | Ripping Bombs"
-      description="Join the world's largest amateur long drive registry. Register your club or simulator, submit your longest drive, and appear on the global leaderboard instantly."
+      description="Join the world's largest amateur long drive registry — register, submit your longest drive, and appear on the leaderboard instantly."
     >
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '48px 0 80px' }}>
 

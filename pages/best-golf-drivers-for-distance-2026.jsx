@@ -138,7 +138,7 @@ export default function BestDriversForDistance2026() {
   return (
     <SeoPage
       title="Best Golf Drivers for Distance in 2026 | Ripping Bombs"
-      description="The best golf drivers for distance in 2026, tested and ranked — plus what actually makes a driver go farther. See how your new numbers stack up on the Ripping Bombs leaderboard."
+      description="The best golf drivers for distance in 2026, tested and ranked — plus what actually makes a driver go farther."
     >
       <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 10 }}>
         2026 Buyer's Guide

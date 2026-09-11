@@ -6,8 +6,8 @@ import { SANS, DISP, ORG, TXT, MUT, BG2, BDR } from "../lib/constants";
 export default function GolfLongestDriveCompetition() {
   return (
     <SeoPage
-      title="Golf Longest Drive Competition — How to Run One & Register Results | Ripping Bombs"
-      description="Everything you need to know about running a golf longest drive competition at your club — format, rules, prizes, and how to register your results on a global leaderboard."
+      title="Golf Longest Drive Competition Guide | Ripping Bombs"
+      description="Everything you need to run a golf longest drive competition at your club — format, rules, prizes, and how to register results globally."
     >
       <>
         <p style={{ color: ORG, fontFamily: DISP, fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>Competition Guide</p>

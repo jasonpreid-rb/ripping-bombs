@@ -32,7 +32,7 @@ export default function Page() {
   return (
     <SeoPage
       title="How Is Golf Evolving? | The Future of Golf | Ripping Bombs"
-      description="How is golf changing? From AI technology and short-form formats to LIV Golf and sustainability — a detailed look at how the sport is evolving in 2025 and beyond."
+      description="How is golf changing? From technology and short-form formats to LIV Golf and sustainability — how the sport is evolving."
     >
       <SeoH1>How Is Golf Evolving?</SeoH1>
       <SeoP>

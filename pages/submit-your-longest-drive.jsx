@@ -6,8 +6,8 @@ import { SANS, DISP, ORG, TXT, MUT, BG2, BG3, BDR } from "../lib/constants";
 export default function SubmitYourLongestDrive() {
   return (
     <SeoPage
-      title="Submit Your Longest Drive — Register & Add Your Drive to the Global Leaderboard | Ripping Bombs"
-      description="Ready to submit your longest golf drive? Register your club or simulator account and add your best drive to the Ripping Bombs global long drive leaderboard — free."
+      title="Submit Your Longest Drive | Ripping Bombs"
+      description="Ready to submit your longest golf drive? Register your club or simulator account and add your best drive to the global leaderboard — free."
     >
       <>
         <p style={{ color: ORG, fontFamily: DISP, fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>Submit a Drive</p>

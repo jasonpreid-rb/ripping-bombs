@@ -55,8 +55,8 @@ export default function BiggestHittersByCountry({ entries: propEntries=[], orgs:
 
   return (
     <SeoPage
-      title="Biggest Hitters By Country — World Golf Distance Map | Ripping Bombs"
-      description="An interactive world map of the longest verified golf drives by country. See which countries have the biggest hitters, and every country's own longest-drive record page."
+      title="Biggest Hitters By Country | Ripping Bombs"
+      description="An interactive world map of the longest verified golf drives by country, with a record page for every country on Ripping Bombs."
     >
       <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:3, color:ORG, textTransform:'uppercase', marginBottom:10 }}>
         Global Records

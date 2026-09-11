@@ -314,10 +314,10 @@ export function CountryRecordPage({ countryCode, countryName, entries: propEntri
 
   return (
     <SeoPage
-      title={`Longest Golf Drives In ${countryName} — Records | Ripping Bombs`}
+      title={`Longest Drive In ${countryName} | Ripping Bombs`}
       description={hasData
-        ? `The longest verified competition golf drive ever recorded in ${countryName}, plus category records and the full ${countryName} leaderboard on Ripping Bombs.`
-        : `Be the first to put a verified longest drive record on the board for ${countryName} on Ripping Bombs.`}
+        ? `The longest verified golf drive recorded in ${countryName}, plus the country's full leaderboard and category records on Ripping Bombs.`
+        : `Be the first to put a verified longest drive on the board for ${countryName} on Ripping Bombs.`}
     >
       {!hasData && (
         <Head>

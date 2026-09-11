@@ -6,7 +6,7 @@ import { SANS, DISP, ORG, TXT, MUT, BG2, BG3, BDR } from "../lib/constants";
 export default function OnlineGolfLongDriveLeaderboard() {
   return (
     <SeoPage
-      title="Online Golf Long Drive Leaderboard — Track & Compare Your Longest Drives | Ripping Bombs"
+      title="Online Golf Long Drive Leaderboard | Ripping Bombs"
       description="The world's first online golf long drive leaderboard. Register your club, submit drives, and see how your biggest hitters rank against golfers worldwide."
     >
       <>

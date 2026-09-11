@@ -1,7 +1,7 @@
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable, SeoCTA } from '../components/SeoPageLayout';
 export default function Page() {
   return (
-    <SeoPage title="Golf Simulator Leaderboard — Track Your Best Drives Globally | Ripping Bombs" description="How golf simulator leaderboards work, what to look for in a venue, and how to get your simulator's longest drive results onto a real global leaderboard.">
+    <SeoPage title="Golf Simulator Leaderboard | Ripping Bombs" description="How golf simulator leaderboards work, what to look for in a venue, and how to get your simulator's longest drive results onto a real global leaderboard.">
       <SeoH1>Golf Simulator Leaderboard — Track Your Best Drives</SeoH1>
       <SeoP>A golf simulator leaderboard transforms a solitary practice session into a competitive event. Whether it's a local venue ranking or a global registry, seeing your name on a leaderboard against real players is one of the most effective ways to stay motivated and measure genuine progress.</SeoP>
 
