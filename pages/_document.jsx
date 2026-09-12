@@ -3,7 +3,7 @@ import { inter, bebasNeue } from '../lib/fonts';
 
 export default function Document() {
   return (
-   <Html lang="en" style={{ fontFamily: inter.style.fontFamily }}>
+    <Html lang="en" className={`${inter.variable} ${bebasNeue.variable}`}>
       <Head>
         <link rel="icon" href="/favicon.ico"/>
         <link rel="icon" type="image/png" href="/favicon.png"/>
@@ -20,14 +20,6 @@ export default function Document() {
             'https://www.facebook.com/rippingbombs/',
           ],
         }) }}/>
-        {/* Google Analytics */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-5RCJDKVBER"/>
-        <script dangerouslySetInnerHTML={{ __html: `
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-5RCJDKVBER');
-        `}}/>
       </Head>
       <body>
         <Main/>

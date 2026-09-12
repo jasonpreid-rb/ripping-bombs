@@ -7,6 +7,7 @@ import Layout from '../components/Layout';
 import AdminPanel from '../components/AdminPanel';
 import LaunchModal from '../components/LaunchModal';
 import CookieConsent from '../components/CookieConsent';
+import GoogleAnalytics from '../components/GoogleAnalytics';
 import { initData, db } from '../lib/data';
 import { supabase } from '../lib/supabaseClient';
 import { ORGS_KEY, ENT_KEY, SANS, ORG, MUT, BG2, BDR, TXT, DIM, DISP } from '../lib/constants';
@@ -365,6 +366,7 @@ export default function App({ Component, pageProps }) {
       )}
 
       <CookieConsent />
+      <GoogleAnalytics />
       <Analytics />
     </>
   );
