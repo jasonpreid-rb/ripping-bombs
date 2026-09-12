@@ -264,8 +264,7 @@ export default function IncreaseSwingSpeed() {
         <Link href="/best-golf-drivers-for-distance-2026" style={linkStyle}>Best Golf Drivers for Distance 2026</Link>{' | '}
         <Link href="/how-far-do-i-drive-compared-to-others" style={linkStyle}>How Far Do I Drive Compared to Others?</Link>{' | '}
         <Link href="/where-do-i-rank-globally" style={linkStyle}>Where Do I Rank Globally?</Link>{' | '}
-        <Link href="/average-driver-distance-by-handicap" style={linkStyle}>Average Driver Distance By Handicap</Link>{' | '}
-        <Link href="/golf-handicap-driving-distance" style={linkStyle}>Golf Handicap And Driving Distance</Link>{' | '}
+        <Link href="/average-golf-drive-distance-by-age" style={linkStyle}>Average Drive Distance By Age &amp; Handicap</Link>{' | '}
         <Link href="/how-to-hit-a-golf-ball-farther" style={linkStyle}>How To Hit A Golf Ball Farther</Link>
       </SeoP>
     </SeoPage>

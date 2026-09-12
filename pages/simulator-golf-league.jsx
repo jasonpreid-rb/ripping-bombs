@@ -8,7 +8,7 @@ export default function Page() {
   return (
     <SeoPage title="Simulator Golf League | Ripping Bombs" description="Join a simulator golf league anyone can compete in. Submit verified results from home and represent your country on Ripping Bombs.">
       <SeoH1>Simulator Golf League</SeoH1>
-      <SeoP>You don't need a tour card, a sponsor, or a scratch <Link href="/golf-handicap-driving-distance" style={linkStyle}>handicap</Link> to represent your country in golf. With a simulator golf league, anyone with a launch monitor and a living room can step up to a genuinely international leaderboard — and that's exactly what Ripping Bombs is built for.</SeoP>
+      <SeoP>You don't need a tour card, a sponsor, or a scratch <Link href="/average-golf-drive-distance-by-age" style={linkStyle}>handicap</Link> to represent your country in golf. With a simulator golf league, anyone with a launch monitor and a living room can step up to a genuinely international leaderboard — and that's exactly what Ripping Bombs is built for.</SeoP>
       <SeoH2>Everybody Is Welcome</SeoH2>
       <SeoP>Most competitive golf is gated by club membership, qualifying rounds, or invitation. A simulator golf league removes those barriers entirely. Junior, senior, high handicapper, scratch golfer — every category has its own leaderboard, so a 14-year-old on a Wilson Launch Pad and a low-single-figure player on a Trackman are both chasing a title that actually means something for their group. Check <Link href="/supported-simulators" style={linkStyle}>which simulators are supported</Link> to see if yours already qualifies.</SeoP>
       <SeoH2>Compete For Your Country, Not Just Your Club</SeoH2>

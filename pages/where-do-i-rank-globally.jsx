@@ -306,8 +306,7 @@ export default function WhereDoIRankGlobally({ totalGolfers, totalDrives, longes
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
         <Link href="/how-far-do-i-drive-compared-to-others" style={linkStyle}>How Far Do I Drive Compared to Others?</Link>{' | '}
-        <Link href="/average-driver-distance-by-handicap" style={linkStyle}>Average Driver Distance By Handicap</Link>{' | '}
-        <Link href="/golf-handicap-driving-distance" style={linkStyle}>Golf Handicap And Driving Distance</Link>{' | '}
+        <Link href="/average-golf-drive-distance-by-age" style={linkStyle}>Average Drive Distance By Age &amp; Handicap</Link>{' | '}
         <Link href="/longest-drives-this-week" style={linkStyle}>Longest Drives This Week</Link>{' | '}
         <Link href="/venue-rankings" style={linkStyle}>Venue Rankings</Link>{' | '}
         <Link href="/hall-of-fame" style={linkStyle}>Hall of Fame</Link>

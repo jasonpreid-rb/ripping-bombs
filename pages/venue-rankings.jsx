@@ -295,7 +295,7 @@ export default function VenueLeaderboard({ ranked, totalVenuesRanked, totalVenue
         <Link href="/leaderboard" style={linkStyle}>Global Drives Leaderboard</Link>{' | '}
         <Link href="/club-and-simulator-venue-leaderboards" style={linkStyle}>Club & Simulator Venue Leaderboards</Link>{' | '}
         <Link href="/where-do-i-rank-globally" style={linkStyle}>Where Do I Rank Globally?</Link>{' | '}
-        <Link href="/average-driver-distance-by-handicap" style={linkStyle}>Average Driver Distance By Handicap</Link>{' | '}
+        <Link href="/average-golf-drive-distance-by-age" style={linkStyle}>Average Drive Distance By Age &amp; Handicap</Link>{' | '}
         <Link href="/longest-drives-this-week" style={linkStyle}>Longest Drives This Week</Link>{' | '}
         <Link href="/hall-of-fame" style={linkStyle}>Hall of Fame</Link>
       </SeoP>

@@ -90,7 +90,7 @@ export default function TrackmanLongDrive() {
             {[
               { href: "/simulator-golf-competition", label: "Simulator Competitions" },
               { href: "/online-golf-long-drive-leaderboard", label: "Online Leaderboard" },
-              { href: "/average-driver-distance-by-handicap", label: "Distance by Handicap" },
+              { href: "/average-golf-drive-distance-by-age", label: "Distance by Age & Handicap" },
               { href: "/long-drive-golf-equipment", label: "Long Drive Equipment" },
               { href: "/submit-your-longest-drive", label: "Submit Your Drive" },
             ].map(({ href, label }) => (

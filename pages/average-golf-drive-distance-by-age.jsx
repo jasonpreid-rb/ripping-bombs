@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA } from "../components/SeoPageLayout";
+import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA, SeoTable } from "../components/SeoPageLayout";
 import SeoFaq from "../components/SeoFaq";
 import { SANS, DISP, ORG, TXT, MUT, DIM, BG2, BG3, BDR } from "../lib/constants";
 
@@ -40,6 +40,14 @@ const HCP_DISTANCE = [
   { bracket: "16–20", yards: "195–210" },
   { bracket: "21–27", yards: "180–195" },
   { bracket: "28+", yards: "165–180" },
+];
+
+const HCP_PRIORITY = [
+  { bracket: '28+', priority: 'Low — focus on making contact first', invest: 'Lessons on fundamentals and short game' },
+  { bracket: '15–28', priority: "Medium — gains will help but aren't primary", invest: 'Chipping, putting and course management' },
+  { bracket: '6–14', priority: 'Higher — distance starts to open up courses', invest: 'Balanced approach: distance + accuracy' },
+  { bracket: '0–5', priority: 'High — every yard matters at this level', invest: 'Speed training, fitting, technique refinement' },
+  { bracket: 'Scratch+', priority: 'Very high — marginal gains matter', invest: 'Launch monitor fitting, speed protocols' },
 ];
 
 // Static example numbers for the rank preview — illustrative only, matches
@@ -178,6 +186,22 @@ export default function AverageGolfDriveDistanceByAge() {
           70–80 yards, and the gap holds at almost every age.
         </SeoP>
         <DistanceTable rows={HCP_DISTANCE} leftLabel="Handicap Range" />
+
+        <SeoH2>Does Driving Distance Affect Handicap?</SeoH2>
+        <SeoP>
+          There's a common assumption that better golfers hit it further — but the relationship is more nuanced than most
+          people think. Research consistently shows driving distance has a moderate positive correlation with handicap:
+          lower handicappers do tend to hit it further on average, but the correlation is weaker than most golfers expect.
+          Short game skill, accuracy, and decision-making account for far more of the handicap difference between golfers
+          than driving distance alone.
+        </SeoP>
+        <SeoP>
+          How much distance should actually matter to <em>your</em> game depends on where you already are:
+        </SeoP>
+        <SeoTable
+          headers={['Handicap Range', 'Distance Priority', 'Better Investment']}
+          rows={HCP_PRIORITY.map(r => [r.bracket, r.priority, r.invest])}
+        />
 
         <SeoP>
           These ranges are useful for a rough gut check, but a bracket isn't a rank. "215–230 yards for your 40s" doesn't

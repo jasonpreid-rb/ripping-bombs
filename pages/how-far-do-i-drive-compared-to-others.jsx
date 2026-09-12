@@ -243,7 +243,7 @@ export default function PercentileCalculator() {
       <SeoH1>How Far Do I Drive Compared to Other Golfers?</SeoH1>
       <SeoP>
         Ever wondered whether your driving distance is above average — or where you really sit
-        compared to golfers of your age, <Link href="/golf-handicap-driving-distance" style={linkStyle}>handicap</Link>, and gender? Use our free calculator below to
+        compared to golfers of your age, <Link href="/average-golf-drive-distance-by-age" style={linkStyle}>handicap</Link>, and gender? Use our free calculator below to
         find out instantly. No sign-up required.
       </SeoP>
 
@@ -337,9 +337,7 @@ export default function PercentileCalculator() {
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
         <Link href="/where-do-i-rank-globally" style={linkStyle}>Where Do I Rank Globally?</Link>{' | '}
-        <Link href="/average-driver-distance-by-handicap" style={linkStyle}>Average Driver Distance By Handicap</Link>{' | '}
-        <Link href="/average-golf-drive-distance" style={linkStyle}>Average Golf Drive Distance</Link>{' | '}
-        <Link href="/golf-handicap-driving-distance" style={linkStyle}>Golf Handicap And Driving Distance</Link>{' | '}
+        <Link href="/average-golf-drive-distance-by-age" style={linkStyle}>Average Drive Distance By Age &amp; Handicap</Link>{' | '}
         <Link href="/how-to-hit-a-golf-ball-farther" style={linkStyle}>How To Hit A Golf Ball Farther</Link>{' | '}
         <Link href="/what-is-a-good-drive-in-golf" style={linkStyle}>What Is A Good Drive In Golf</Link>
       </SeoP>

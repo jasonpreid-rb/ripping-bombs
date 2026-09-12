@@ -99,7 +99,7 @@ export default function GolfLongestDriveCompetition() {
               { href: "/online-golf-long-drive-leaderboard", label: "Online Leaderboard" },
               { href: "/simulator-golf-competition", label: "Simulator Competitions" },
               { href: "/what-is-a-good-drive-in-golf", label: "What Is a Good Drive?" },
-              { href: "/average-golf-drive-distance", label: "Average Drive Distance" },
+              { href: "/average-golf-drive-distance-by-age", label: "Average Drive Distance" },
             ].map(({ href, label }) => (
               <Link key={href} href={href} style={{ background: BG2, color: ORG, border: `1px solid ${BDR}`, borderRadius: 6, padding: "8px 14px", fontSize: 13, textDecoration: "none", fontFamily: SANS }}>{label}</Link>
             ))}

@@ -222,7 +222,6 @@ export default function EnjoyGolfWhenYouCantBreakPar() {
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
             {[
               { href: "/average-golf-drive-distance-by-age", label: "Average Distance by Age & Handicap" },
-              { href: "/golf-handicap-driving-distance", label: "Handicap & Driving Distance" },
               { href: "/longest-drive-high-handicap", label: "High Handicap Leaderboard" },
               { href: "/longest-drive-amateur", label: "Amateur Leaderboard" },
               { href: "/where-do-i-rank-globally", label: "Where Do I Rank Globally?" },
