@@ -39,7 +39,7 @@ const FAQS = [
   { q: 'How are weekly points awarded?', a: '1st place earns 100 points, 2nd earns 70, 3rd earns 50, 4th earns 40, 5th earns 30, 6th earns 20, and every other submission earns 10 points. You earn points every week you submit — consistency matters as much as distance.' },
   { q: 'Do my submissions before January 2027 count?', a: 'Points accumulation begins when the league launches in January 2027. Submitting now builds your record and gets you on the leaderboard ahead of Tournament 1.' },
   { q: 'Is there a limit on weekly submissions?', a: 'One drive per week. Only your best drive of the week counts toward your weekly points total.' },
-  { q: 'What equipment is accepted?', a: 'Any calibrated launch monitor — Trackman, GCQuad, Foresight, Mevo+, and equivalents. A screenshot of the readout showing carry distance is required as evidence.' },
+  { q: 'What equipment is accepted?', a: <>Any calibrated launch monitor — Trackman, GCQuad, Foresight, Mevo+, and equivalents. A screenshot of the readout showing carry distance is required as evidence. Not sure if your readings are accurate? See our <a href="/sim-distance-real-or-fake" style={{color:ORG}}>guide on whether your simulator distance is real</a>.</> },
   { q: 'Is entry free?', a: 'Yes. Registering and competing in the 2027 Golf Simulator League is completely free.' },
 ]
 

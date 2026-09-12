@@ -20,7 +20,7 @@ export default function Page() {
         <Link href="/golf-longest-drive-competition" style={linkStyle}>Golf Longest Drive Competition</Link>{' | '}
         <Link href="/how-to-promote-your-golf-event" style={linkStyle}>How To Promote Your Golf Event</Link>{' | '}
         <Link href="/longest-drive-amateur" style={linkStyle}>Longest Drive Amateur</Link>{' | '}
-        <Link href="/simulator-golf-league" style={linkStyle}>Simulator Golf League</Link>
+        <Link href="/indoor-golf-league-ranking-system" style={linkStyle}>Indoor Golf League Ranking System</Link>
       </SeoP>
       <SeoCTA/>
     </SeoPage>

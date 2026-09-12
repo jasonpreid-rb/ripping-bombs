@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
-import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA } from '../components/SeoPageLayout';
+import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA, SeoTable } from '../components/SeoPageLayout';
 import { ORG, TXT, MUT, DIM, BG2, BDR, SANS, DISP } from '../lib/constants';
 
 const linkStyle = { color: ORG };
@@ -215,6 +215,46 @@ export default function RbrNumberPage({
         </Link>
       </div>
 
+      <SeoH2>League Formats To Consider</SeoH2>
+      <SeoP>
+        Most successful indoor leagues run 8–14 weeks — long enough to create meaningful standings but short enough to
+        keep engagement high throughout. A 10-week format with a finals week works well: it gives latecomers time to
+        catch up and keeps the top of the table competitive until the end.
+      </SeoP>
+      <SeoTable
+        headers={['Format', 'How It Works']}
+        rows={[
+          ['Strokeplay season', 'Players complete rounds over multiple weeks — lowest total score wins'],
+          ['Stableford points', 'Points per hole based on handicap — rewards consistent play'],
+          ['Match play draw', 'Weekly head-to-head matchups on a bracket or round-robin basis'],
+          ['Longest drive season', 'Weekly longest drive submissions — season total or single best wins'],
+          ['Combined format', 'Strokeplay + longest drive — overall champion wins both categories'],
+          ['Team league', 'Groups of 2–4 share a bay and submit team best drives or combined scores'],
+        ]}
+      />
+      <SeoP>
+        For strokeplay and Stableford formats, use players' existing WHS handicap index where possible. For longest
+        drive leagues specifically, splitting into handicap bands (scratch to 12, 13 to 20, 21+) creates fairer
+        categories than a pure open format — RBR# does this automatically for every submission.
+      </SeoP>
+
+      <SeoH2>How Accurate Is Simulator Distance Data?</SeoH2>
+      <SeoP>
+        On a well-calibrated system, very. Trackman, Foresight GC3/GCQuad, and Uneekor EYE XO all measure actual ball
+        speed, launch angle, and spin — the same metrics used to calculate distance on a real course — typically
+        accurate to within 1–3 yards.
+      </SeoP>
+      <SeoTable
+        headers={['Simulator', 'Distance Measurement Method', 'Accuracy']}
+        rows={[
+          ['Trackman', 'Dual Doppler radar', 'Very high'],
+          ['Foresight GCQuad', 'Photometric (camera-based)', 'Very high'],
+          ['Uneekor EYE XO', 'Photometric + infrared', 'High'],
+          ['FlightScope Mevo+', 'Single radar + photometric', 'Good'],
+          ['Garmin R10', 'Doppler radar', 'Moderate'],
+        ]}
+      />
+
       <SeoH2>RBR# by Category</SeoH2>
       <SeoP>
         Every player falls into exactly one of six categories based on age, handicap, and gender.
@@ -257,7 +297,6 @@ export default function RbrNumberPage({
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
         <Link href="/where-do-i-rank-globally" style={linkStyle}>Where Do I Rank Globally?</Link>{' | '}
-        <Link href="/indoor-golf-league" style={linkStyle}>Indoor Golf League</Link>{' | '}
         <Link href="/simulator-golf-competition" style={linkStyle}>Simulator Golf Competition</Link>{' | '}
         <Link href="/leaderboard" style={linkStyle}>Global Drives Leaderboard</Link>{' | '}
         <Link href="/venue-rankings" style={linkStyle}>Venue Rankings</Link>

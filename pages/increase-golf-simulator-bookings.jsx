@@ -92,7 +92,7 @@ export default function Page() {
 
           <h2 style={h2}>Explore Related Pages</h2>
           <p style={p}>
-            <Link href="/simulator-golf-league" style={linkStyle}>Simulator Golf League</Link>{' | '}
+            <Link href="/indoor-golf-league-ranking-system" style={linkStyle}>Indoor Golf League Ranking System</Link>{' | '}
             <Link href="/sim-distance-real-or-fake" style={linkStyle}>Is Your Sim Distance Real Or Fake</Link>{' | '}
             <Link href="/supported-simulators" style={linkStyle}>Supported Simulators</Link>{' | '}
             <Link href="/how-far-do-i-drive-compared-to-others" style={linkStyle}>Driving Distance Percentile Calculator</Link>{' | '}

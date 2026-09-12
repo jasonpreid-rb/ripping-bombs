@@ -59,7 +59,7 @@ export default function SimDistanceRealOrFake() {
             wind, altitude) also vary by platform, which is why the same swing can
             produce wildly different numbers on GSPro vs TGC vs Awesome Golf. If you're
             chasing a competitive sim number specifically, our{' '}
-            <Link href="/sim-golf-long-drive-championship" style={{color:ORG}}>
+            <Link href="/2027-championship" style={{color:ORG}}>
               simulator long drive championship guide
             </Link>{' '}
             breaks down which setups and venues produce the most consistent readings.
@@ -137,7 +137,7 @@ export default function SimDistanceRealOrFake() {
         <SeoP>
           <Link href="/how-to-hit-a-golf-ball-farther" style={linkStyle}>How To Hit A Golf Ball Farther</Link>{' | '}
           <Link href="/long-drive-golf-equipment" style={linkStyle}>Long Drive Golf Equipment</Link>{' | '}
-          <Link href="/simulator-golf-league" style={linkStyle}>Simulator Golf League</Link>{' | '}
+          <Link href="/indoor-golf-league-ranking-system" style={linkStyle}>Indoor Golf League Ranking System</Link>{' | '}
           <Link href="/supported-simulators" style={linkStyle}>Supported Simulators</Link>{' | '}
           <Link href="/what-is-a-good-drive-in-golf" style={linkStyle}>What Is A Good Drive In Golf</Link>
         </SeoP>

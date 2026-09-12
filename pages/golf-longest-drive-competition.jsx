@@ -95,7 +95,7 @@ export default function GolfLongestDriveCompetition() {
               { href: "/golf-club-longest-drive-competition-ideas", label: "Competition Ideas" },
               { href: "/how-to-promote-your-golf-event", label: "Promote Your Event" },
               { href: "/longest-drive-amateur", label: "Longest Drive Amateur" },
-              { href: "/simulator-golf-league", label: "Simulator Golf League" },
+              { href: "/indoor-golf-league-ranking-system", label: "Indoor Golf League Ranking System" },
               { href: "/online-golf-long-drive-leaderboard", label: "Online Leaderboard" },
               { href: "/simulator-golf-competition", label: "Simulator Competitions" },
               { href: "/what-is-a-good-drive-in-golf", label: "What Is a Good Drive?" },

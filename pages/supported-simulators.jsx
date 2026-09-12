@@ -175,7 +175,7 @@ export default function SupportedSimulators() {
         <Link href="/long-drive-golf-equipment" style={linkStyle}>Long Drive Golf Equipment</Link>{' | '}
         <Link href="/recommended-range-finders" style={linkStyle}>Recommended Range Finders</Link>{' | '}
         <Link href="/sim-distance-real-or-fake" style={linkStyle}>Is Your Sim Distance Real Or Fake</Link>{' | '}
-        <Link href="/simulator-golf-league" style={linkStyle}>Simulator Golf League</Link>
+        <Link href="/indoor-golf-league-ranking-system" style={linkStyle}>Indoor Golf League Ranking System</Link>
       </SeoP>
     </SeoPage>
   );

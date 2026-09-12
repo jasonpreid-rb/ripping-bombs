@@ -40,7 +40,7 @@ export default function Page() {
         <Link href="/golf-club-longest-drive-competition-ideas" style={linkStyle}>Longest Drive Competition Ideas</Link>{' | '}
         <Link href="/golf-longest-drive-competition" style={linkStyle}>Golf Longest Drive Competition</Link>{' | '}
         <Link href="/longest-drive-amateur" style={linkStyle}>Longest Drive Amateur</Link>{' | '}
-        <Link href="/simulator-golf-league" style={linkStyle}>Simulator Golf League</Link>
+        <Link href="/indoor-golf-league-ranking-system" style={linkStyle}>Indoor Golf League Ranking System</Link>
       </SeoP>
       <SeoCTA/>
       <div style={{background:BG2,border:`1px solid ${BDR}`,padding:'32px 28px',marginTop:8}}>
