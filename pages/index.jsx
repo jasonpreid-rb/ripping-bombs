@@ -386,23 +386,12 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
     })),
   };
 
-  const allTimeItemListSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: 'Ripping Bombs — All-Time Category Leaders',
-    url: 'https://www.rippingbombs.com/leaderboard',
-    itemListElement: allTimeLeaders.flatMap(cat =>
-      cat.top3.map((e, i) => ({
-        '@type': 'ListItem',
-        position: i + 1,
-        item: {
-          '@type': 'Thing',
-          name: `${e.player} — ${cat.label}`,
-          description: `${cvt(e.dist)} ${unitLbl} — all-time ${cat.label} record${e.is_simulator ? ' (simulator)' : ''}`,
-        },
-      }))
-    ),
-  };
+  // Note: previously had an ItemList schema here for all-time category
+  // leaders. Removed — its `position` values reset to 1/2/3 for every
+  // category instead of being unique across the whole list (a real Rich
+  // Results Test error), and a generic 'Thing'-typed ItemList doesn't
+  // qualify for any Google rich result feature regardless, so fixing the
+  // numbering would've added a passing-but-still-useless schema block.
 
   // Maps a homepage category to the exact filter query the /leaderboard page
   // understands (see the matching useEffect there that reads router.query).
@@ -544,7 +533,6 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           description: 'The free global leaderboard for longest golf drives — simulator venues and clubs submitting verified drives, ranked by category.',
         }) }}/>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}/>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(allTimeItemListSchema) }}/>
       </Head>
       <div style={{animation:'fi .4s ease'}}>
 

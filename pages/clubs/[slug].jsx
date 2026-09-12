@@ -296,6 +296,16 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
     sport: 'Golf',
   };
 
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.rippingbombs.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Clubs & Events', item: 'https://www.rippingbombs.com/clubs' },
+      { '@type': 'ListItem', position: 3, name: org.courseName, item: canonicalUrl },
+    ],
+  };
+
   const rankLabel = i => i === 0 ? '1st' : i === 1 ? '2nd' : i === 2 ? '3rd' : `#${i + 1}`;
 
   return (
@@ -310,6 +320,7 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
         <meta property="og:url" content={canonicalUrl} />
         <meta property="og:site_name" content="Ripping Bombs" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       </Head>
 
       <div style={{ padding: '28px 18px 80px', maxWidth: 1000, margin: '0 auto' }}>
