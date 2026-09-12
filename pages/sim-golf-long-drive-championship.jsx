@@ -50,9 +50,9 @@ export default function SimChampionshipPage() {
             <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:14,background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
               Submit anywhere, anytime
             </div>
-            <div style={{fontFamily:DISP,fontSize:'clamp(48px,8vw,80px)',color:'#fff',lineHeight:.95,marginBottom:20,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
+            <h1 style={{fontFamily:DISP,fontSize:'clamp(48px,8vw,80px)',color:'#fff',lineHeight:.95,marginBottom:20,textShadow:'0 4px 32px rgba(0,0,0,0.5)',fontWeight:400}}>
               THE WORLD'S<br/><span style={{color:ORG}}>SIM GOLF</span><br/>DRIVE COMP
-            </div>
+            </h1>
             <div style={{fontFamily:SANS,fontSize:15,color:'rgba(255,255,255,0.75)',lineHeight:1.75,maxWidth:500,margin:'0 auto 32px'}}>
               A season-long simulator long drive competition. One recorded drive per week. Category-based rankings with cumulative points across the season.
             </div>

@@ -86,9 +86,9 @@ export default function HowToRegisterPage() {
         {/* HERO */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 12 }}>Getting Started</div>
-          <div style={{ fontFamily: DISP, fontSize: 'clamp(36px,6vw,56px)', color: TXT, letterSpacing: 1, lineHeight: 1, marginBottom: 16 }}>
+          <h1 style={{ fontFamily: DISP, fontSize: 'clamp(36px,6vw,56px)', color: TXT, letterSpacing: 1, lineHeight: 1, marginBottom: 16, fontWeight: 400 }}>
             HOW TO <span style={{ color: ORG }}>REGISTER</span>
-          </div>
+          </h1>
           <div style={{ fontFamily: SANS, fontSize: 15, color: MUT, lineHeight: 1.7, maxWidth: 480, margin: '0 auto' }}>
             From sign-up to leaderboard in under 5 minutes. Select your account type to get started.
           </div>

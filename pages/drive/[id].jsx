@@ -58,7 +58,7 @@ export default function DrivePage({ staticEntry, staticOrg, entries, orgs, cvt, 
 
   if (!entry) return (
     <div style={{ padding:'80px 18px', textAlign:'center' }}>
-      <div style={{ fontFamily:DISP, fontSize:28, color:TXT, marginBottom:12 }}>Drive Not Found</div>
+      <h1 style={{ fontFamily:DISP, fontSize:28, color:TXT, marginBottom:12, fontWeight:400 }}>Drive Not Found</h1>
       <button onClick={()=>router.back()} style={{ background:'transparent', border:`1px solid ${ORG}`, color:ORG, fontFamily:SANS, fontWeight:700, fontSize:12, padding:'11px 24px', cursor:'pointer' }}>← Back</button>
     </div>
   );
@@ -84,10 +84,10 @@ export default function DrivePage({ staticEntry, staticOrg, entries, orgs, cvt, 
         <div style={{ background:BG2, border:'1px solid rgba(255,0,144,0.25)', padding:'32px 28px', marginBottom:20, position:'relative', overflow:'hidden' }}>
           <div style={{ position:'absolute', top:0, right:0, width:200, height:200, background:'rgba(255,0,144,0.03)', borderRadius:'0 0 0 200px' }}/>
           <div style={{ fontFamily:SANS, fontSize:10, fontWeight:700, letterSpacing:3, color:ORG, textTransform:'uppercase', marginBottom:12 }}>Verified Competition Drive</div>
-          <div style={{ fontFamily:DISP, fontSize:'clamp(28px,6vw,42px)', color:TXT, letterSpacing:.5, lineHeight:1.1, marginBottom:6 }}>
+          <h1 style={{ fontFamily:DISP, fontSize:'clamp(28px,6vw,42px)', color:TXT, letterSpacing:.5, lineHeight:1.1, marginBottom:6, fontWeight:400 }}>
             {entry.player}
             {org?.country && countryFlag(org.country)}
-          </div>
+          </h1>
           <div style={{ fontFamily:SANS, fontSize:13, color:MUT, marginBottom:24 }}>
             {org?.courseName}{entry.tournament?` · ${entry.tournament}`:''} · {fmtDate(entry.date)}
           </div>

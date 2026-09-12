@@ -597,7 +597,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             <div className="rb-weekly-header" style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
               <div>
                 <div className="rb-weekly-eyebrow" style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:6}}>Live from the Registry</div>
-                <div className="rb-weekly-title" style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>{currentWeekLabel} — Category Leaders</div>
+                <h2 className="rb-weekly-title" style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5,fontWeight:400}}>{currentWeekLabel} — Category Leaders</h2>
               </div>
               <button onClick={()=>{
                 if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_full_leaderboard_click',{event_category:'engagement',section:'weekly'});
@@ -614,7 +614,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
               <div>
                 <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:MUT,textTransform:'uppercase',marginBottom:6}}>Hall of Records</div>
-                <div style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>All-Time Category Leaders</div>
+                <h2 style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5,fontWeight:400}}>All-Time Category Leaders</h2>
               </div>
               <button onClick={()=>{
                 if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_full_leaderboard_click',{event_category:'engagement',section:'all_time'});
@@ -654,9 +654,9 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           <div style={{maxWidth:1000,margin:'0 auto',display:'flex',flexWrap:'wrap',alignItems:'center',gap:32}}>
             <div style={{flex:'1 1 280px',minWidth:0}}>
               <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>Launching January 2027</div>
-              <div style={{fontFamily:DISP,fontSize:'clamp(28px,4vw,48px)',color:TXT,letterSpacing:1,lineHeight:1,marginBottom:14}}>
+              <h2 style={{fontFamily:DISP,fontSize:'clamp(28px,4vw,48px)',color:TXT,letterSpacing:1,lineHeight:1,marginBottom:14,fontWeight:400}}>
                 THE WORLD'S BIGGEST<br/><span style={{color:ORG}}>DRIVE COMPETITION</span>
-              </div>
+              </h2>
               <div style={{fontFamily:SANS,fontSize:14,color:MUT,lineHeight:1.8,maxWidth:560,marginBottom:20}}>
                 The Ripping Bombs 2027 Simulator Championship — six categories, one drive per week, points accumulating all season. Open to any registered simulator user, anywhere in the world, completely free. This could be the largest amateur golf competition ever run.
               </div>
@@ -708,7 +708,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
 
           {/* CTA STRIP */}
           <div style={{maxWidth:1000,margin:'0 auto',background:'rgba(255,0,144,0.05)',border:'1px solid rgba(255,0,144,0.2)',padding:'40px 32px',textAlign:'center',marginBottom:60}}>
-            <div style={{fontFamily:DISP,fontSize:'clamp(24px,5vw,40px)',color:TXT,letterSpacing:1,marginBottom:10}}>FREE TO JOIN. FREE TO SUBMIT.</div>
+            <h2 style={{fontFamily:DISP,fontSize:'clamp(24px,5vw,40px)',color:TXT,letterSpacing:1,marginBottom:10,fontWeight:400}}>FREE TO JOIN. FREE TO SUBMIT.</h2>
             <div style={{fontFamily:SANS,fontSize:14,color:MUT,marginBottom:28}}>Built for golfers who love sending it.</div>
             <button onClick={()=>{
               if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_register_click',{event_category:'engagement',location:'bottom_cta_strip'});
@@ -718,7 +718,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
 
           {/* FAQ */}
           <div style={{maxWidth:1000,margin:'0 auto',marginBottom:60}}>
-            <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:20}}>FAQ</div>
+            <h2 style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:20,fontWeight:400}}>FAQ</h2>
             <div style={{display:'flex',flexDirection:'column',gap:8}}>
               {faqs.map(({q,a},i)=>(
                 <div key={i} style={{background:BG2,border:`1px solid ${openFaq===i?'rgba(255,0,144,0.25)':BDR}`,overflow:'hidden'}}>

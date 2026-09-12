@@ -54,7 +54,7 @@ export default function EventPage() {
   if (notFound) {
     return (
       <div style={{ padding: '80px 18px', textAlign: 'center' }}>
-        <div style={{ fontFamily: DISP, fontSize: 26, color: TXT, marginBottom: 10 }}>Event Not Found</div>
+        <h1 style={{ fontFamily: DISP, fontSize: 26, color: TXT, marginBottom: 10, fontWeight: 400 }}>Event Not Found</h1>
         <div style={{ fontFamily: SANS, fontSize: 13, color: MUT }}>This event link may have expired or been removed.</div>
       </div>
     );
@@ -102,7 +102,7 @@ export default function EventPage() {
           </div>
         )}
 
-        <div style={{ fontFamily: DISP, fontSize: 30, color: TXT, letterSpacing: 1, textAlign: 'center', marginBottom: 4 }}>{event.name}</div>
+        <h1 style={{ fontFamily: DISP, fontSize: 30, color: TXT, letterSpacing: 1, textAlign: 'center', marginBottom: 4, fontWeight: 400 }}>{event.name}</h1>
         <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, textAlign: 'center' }}>
           {venue?.courseName}{venue?.location ? ` · ${venue.location}` : ''}
         </div>

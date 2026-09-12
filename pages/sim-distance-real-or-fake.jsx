@@ -34,9 +34,9 @@ export default function SimDistanceRealOrFake() {
         <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:14}}>
           Simulator Distance
         </div>
-        <div style={{fontFamily:DISP,fontSize:'clamp(32px,6vw,48px)',color:TXT,letterSpacing:.5,lineHeight:1.05,marginBottom:24}}>
+        <h1 style={{fontFamily:DISP,fontSize:'clamp(32px,6vw,48px)',color:TXT,letterSpacing:.5,lineHeight:1.05,marginBottom:24,fontWeight:400}}>
           IS YOUR SIMULATOR LONGEST DRIVE ACTUALLY REAL?
-        </div>
+        </h1>
 
         <div style={{fontFamily:SANS,fontSize:14,color:MUT,lineHeight:1.85,marginBottom:48}}>
           Every golf simulator forum has the same thread: someone posts a 380-yard drive

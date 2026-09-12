@@ -303,7 +303,7 @@ export default function LeaderboardPage(props) {
             <button onClick={()=>setWeek(prevWeek(currentWeek))} disabled={allTime} style={{background:'transparent',border:`1px solid ${BDR}`,color:allTime?DIM:MUT,fontFamily:SANS,fontSize:14,padding:'8px 13px',cursor:allTime?'default':'pointer',opacity:allTime?0.4:1}}>‹</button>
             <div>
               <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:allTime?DIM:ORG,textTransform:'uppercase',marginBottom:3}}>🏆 Weekly Championship</div>
-              <div style={{fontFamily:DISP,fontSize:22,color:allTime?MUT:TXT,letterSpacing:.5}}>{allTime?'All-Time Leaderboard':weekLabel(currentWeek)}</div>
+              <h2 style={{fontFamily:DISP,fontSize:22,color:allTime?MUT:TXT,letterSpacing:.5,fontWeight:400}}>{allTime?'All-Time Leaderboard':weekLabel(currentWeek)}</h2>
             </div>
             <button onClick={()=>setWeek(nextWeek(currentWeek))} disabled={allTime} style={{background:'transparent',border:`1px solid ${BDR}`,color:allTime?DIM:MUT,fontFamily:SANS,fontSize:14,padding:'8px 13px',cursor:allTime?'default':'pointer',opacity:allTime?0.4:1}}>›</button>
           </div>

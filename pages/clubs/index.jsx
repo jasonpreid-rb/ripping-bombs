@@ -63,7 +63,7 @@ export default function ClubsDirectoryPage({ orgs, entries }) {
         <meta name="description" content="Browse all registered golf clubs and events on the Ripping Bombs global longest drive database. Find clubs by country and location." />
       </Head>
       <div style={{ padding: '28px 18px 80px', maxWidth: 1000, margin: '0 auto' }}>
-        <div style={{ fontFamily: DISP, fontSize: 36, color: TXT, letterSpacing: 1, marginBottom: 6 }}>Clubs &amp; Events</div>
+        <h1 style={{ fontFamily: DISP, fontSize: 36, color: TXT, letterSpacing: 1, marginBottom: 6, fontWeight: 400 }}>Clubs &amp; Events</h1>
         <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: 24 }}>All registered venues on the Ripping Bombs global database.</div>
 
         <input

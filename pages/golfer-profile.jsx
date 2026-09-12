@@ -190,9 +190,9 @@ export default function GolferProfilePage() {
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 3, color: ORG, textTransform: 'uppercase', marginBottom: 14, background: 'rgba(255,0,144,0.15)', border: '1px solid rgba(255,0,144,0.4)', padding: '5px 16px', display: 'inline-block' }}>
               Free for every registered golfer
             </div>
-            <div style={{ fontFamily: DISP, fontSize: 'clamp(44px,8vw,76px)', color: '#fff', letterSpacing: 1, lineHeight: 0.95, marginBottom: 20, textShadow: '0 4px 32px rgba(0,0,0,0.5)' }}>
+            <h1 style={{ fontFamily: DISP, fontSize: 'clamp(44px,8vw,76px)', color: '#fff', letterSpacing: 1, lineHeight: 0.95, marginBottom: 20, textShadow: '0 4px 32px rgba(0,0,0,0.5)', fontWeight: 400 }}>
               YOUR GAME.<br /><span style={{ color: ORG }}>YOUR PROFILE.</span><br />YOUR RANKING.
-            </div>
+            </h1>
             <div style={{ fontFamily: SANS, fontSize: 15, color: 'rgba(255,255,255,0.75)', lineHeight: 1.75, maxWidth: 500, margin: '0 auto 32px' }}>
               Register free and get your own profile page, a unique URL, a live world ranking, and a complete record of every drive you've ever hit on a compatible simulator.
             </div>

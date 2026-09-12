@@ -67,9 +67,9 @@ export default function Championship2027Page() {
                 4 Tournaments · 13 Weeks Each
               </div>
             </div>
-            <div style={{fontFamily:DISP,fontSize:'clamp(48px,8vw,80px)',color:'#fff',letterSpacing:1,lineHeight:.95,marginBottom:20,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
+            <h1 style={{fontFamily:DISP,fontSize:'clamp(48px,8vw,80px)',color:'#fff',letterSpacing:1,lineHeight:.95,marginBottom:20,textShadow:'0 4px 32px rgba(0,0,0,0.5)',fontWeight:400}}>
               THE WORLD'S BIGGEST<br/><span style={{color:ORG}}>GOLF SIMULATOR</span><br/>LEAGUE
-            </div>
+            </h1>
             <div style={{fontFamily:SANS,fontSize:15,color:'rgba(255,255,255,0.75)',lineHeight:1.75,maxWidth:500,margin:'0 auto 32px'}}>
               Six categories. Four 13-week tournaments. One drive per week. The Ripping Bombs 2027 Golf Simulator League could be the largest competitive sim golf community on the planet.
             </div>
