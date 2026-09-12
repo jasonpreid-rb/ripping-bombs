@@ -1078,6 +1078,72 @@ function TvDisplayPromo({ club, onManageClick, onStartTrial }) {
   );
 }
 
+function VenueBadgeCard({ club }) {
+  const [copied, setCopied] = useState(false);
+
+  const slug = club?.customSlug || nameToSlug(club?.courseName);
+  if (!slug) return null;
+
+  const badgeImgUrl = `https://www.rippingbombs.com/api/badge/${slug}`;
+  const clubPageUrl = `https://www.rippingbombs.com/clubs/${slug}`;
+  const embedCode = `<a href="${clubPageUrl}" target="_blank" rel="noopener">\n  <img src="${badgeImgUrl}" alt="${(club?.courseName || 'Our venue')} Long Drive Leaderboard — Ripping Bombs" width="300" height="120" />\n</a>`;
+
+  const handleCopy = async () => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(embedCode);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = embedCode;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch (err) {
+      console.error('Copy failed:', err);
+    }
+  };
+
+  return (
+    <div style={{ background: `linear-gradient(135deg, ${BG2}, ${BG3})`, border: `1px solid ${ORG}`, borderRadius: 10, padding: '1.25rem 1.5rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 18 }}>
+      <div style={{ flex: '0 0 auto' }}>
+        <img
+          src={badgeImgUrl}
+          alt={`${club?.courseName || 'Your venue'} leaderboard badge preview`}
+          width={300}
+          height={120}
+          style={{ display: 'block', borderRadius: 8, border: `1px solid ${BDR}` }}
+        />
+      </div>
+      <div style={{ flex: '1 1 280px', minWidth: 240 }}>
+        <div style={{ fontSize: '0.95rem', fontWeight: 800, marginBottom: 4 }}>
+          Embed Your Leaderboard Badge
+        </div>
+        <p style={{ margin: '0 0 12px', fontSize: '0.82rem', color: MUT, lineHeight: 1.5, maxWidth: 480 }}>
+          Add this to your website — it shows your venue's current top drive and links back to your live leaderboard page. Updates automatically, no maintenance needed.
+        </p>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, flexWrap: 'wrap' }}>
+          <pre style={{ margin: 0, fontSize: '0.72rem', color: TXT, background: 'rgba(255,255,255,0.06)', padding: '8px 10px', borderRadius: 5, whiteSpace: 'pre-wrap', wordBreak: 'break-all', maxWidth: 420, fontFamily: 'monospace' }}>
+            {embedCode}
+          </pre>
+          <button
+            onClick={handleCopy}
+            style={{ background: copied ? 'rgba(255,0,144,0.15)' : 'transparent', border: `1px solid ${copied ? ORG : BDR}`, color: copied ? ORG : MUT, padding: '4px 10px', borderRadius: 5, fontSize: '0.72rem', cursor: 'pointer', minWidth: 56, transition: 'all 0.15s ease', whiteSpace: 'nowrap' }}
+          >
+            {copied ? 'Copied!' : 'Copy Code'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ShareProfileCard({ club, rank, percentile }) {
   const [copied, setCopied] = useState(false);
   const [canNativeShare, setCanNativeShare] = useState(false);
@@ -1979,6 +2045,13 @@ export default function DashboardPage() {
         {/* Custom Events & Competitions — club accounts only, bundled into TV Display */}
         {club?.accountType === 'club' && (
           <VenueEventsSection venueId={club.id} initialEvents={venueEvents} />
+        )}
+
+        {/* Embeddable leaderboard badge — club accounts only. A real backlink
+            to the venue's own leaderboard page, plus live content (current
+            top drive) that gives the venue a reason to actually add it. */}
+        {club?.accountType === 'club' && (
+          <VenueBadgeCard club={club} />
         )}
 
         {/* TV Display & Sponsors promo — club accounts only */}
