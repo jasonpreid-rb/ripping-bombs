@@ -1,7 +1,8 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP } from '../lib/constants';
+import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP, nameToSlug } from '../lib/constants';
 import { fmtDate } from '../lib/constants';
 import EmailSignup from '../components/EmailSignup';
 import { countryFlag } from '../components/UI';
@@ -649,6 +650,46 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           );
         })()}
 
+        {/* REGISTERED VENUES */}
+        {(() => {
+          const clubOrgs = orgs.filter(o => o.accountType === 'club' && o.courseName);
+          const entryCountByOrg = {};
+          entries.forEach(e => { entryCountByOrg[e.orgId] = (entryCountByOrg[e.orgId] || 0) + 1; });
+          const featured = [...clubOrgs]
+            .sort((a, b) => (entryCountByOrg[b.id] || 0) - (entryCountByOrg[a.id] || 0))
+            .slice(0, 6);
+          if (!featured.length) return null;
+          return (
+            <div style={{background:'#111',borderBottom:`1px solid ${BDR}`,padding:'48px 18px'}}>
+              <div style={{maxWidth:1000,margin:'0 auto'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
+                  <div>
+                    <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:MUT,textTransform:'uppercase',marginBottom:6}}>On The Registry</div>
+                    <h2 style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5,fontWeight:400}}>Registered Clubs &amp; Venues</h2>
+                  </div>
+                  <Link href="/clubs" style={{textDecoration:'none',background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>View All Clubs &amp; Events →</Link>
+                </div>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:12}}>
+                  {featured.map(org => (
+                    <Link key={org.id} href={`/clubs/${org.customSlug || nameToSlug(org.courseName)}`} style={{textDecoration:'none',display:'flex',alignItems:'center',gap:10,padding:'14px 16px',background:BG2,border:`1px solid ${BDR}`,transition:'border-color .15s'}}
+                      onMouseEnter={e=>e.currentTarget.style.borderColor=ORG}
+                      onMouseLeave={e=>e.currentTarget.style.borderColor=BDR}>
+                      {org.avatarUrl
+                        ? <img src={org.avatarUrl} alt={org.courseName} style={{width:36,height:36,objectFit:'cover',flexShrink:0}}/>
+                        : <div style={{width:36,height:36,background:BDR,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:DISP,fontSize:16,color:MUT}}>{org.courseName[0]}</div>
+                      }
+                      <div style={{minWidth:0}}>
+                        <div style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{org.courseName}</div>
+                        <div style={{fontFamily:SANS,fontSize:11,color:MUT,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{org.location}{org.country && ' '}{org.country && countryFlag(org.country)}</div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
         {/* 2027 CHAMPIONSHIP PROMO */}
         <div style={{background:'#120009',borderTop:'1px solid rgba(255,0,144,0.15)',borderBottom:'1px solid rgba(255,0,144,0.15)',padding:'56px 18px'}}>
           <div style={{maxWidth:1000,margin:'0 auto',display:'flex',flexWrap:'wrap',alignItems:'center',gap:32}}>
@@ -829,7 +870,7 @@ export async function getStaticProps() {
 
     const { data: orgs } = await supabase
       .from('clubs')
-      .select('id, courseName, fullName, avatarUrl, country, status, badge, accountType')
+      .select('id, courseName, fullName, avatarUrl, country, location, status, badge, accountType, customSlug')
       .eq('status', 'approved');
 
     return {

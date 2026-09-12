@@ -1,22 +1,14 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { useState } from 'react';
-import { useRouter } from 'next/router';
 import { supabase } from '../../lib/supabaseClient';
-import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP } from '../../lib/constants';
+import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP, nameToSlug } from '../../lib/constants';
 import { BadgePill, countryFlag } from '../../components/UI';
-
-function toSlug(name) {
-  return name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
-}
-
-function nameToSlug(name) {
-  return name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
-}
 
 export async function getServerSideProps() {
   const { data: orgs } = await supabase
     .from('clubs')
-    .select('id, courseName, fullName, location, country, logo, badge, accountType, status, is_founding_member')
+    .select('id, courseName, fullName, location, country, logo, badge, accountType, status, is_founding_member, customSlug')
     .eq('status', 'approved')
     .order('courseName', { ascending: true });
 
@@ -48,14 +40,6 @@ export default function ClubsDirectoryPage({ orgs, entries }) {
 
   const letters = Object.keys(grouped).sort();
 
-  function handleClick(org) {
-    if (org.accountType === 'simulator' && org.fullName) {
-      router.push(`/profile/${nameToSlug(org.fullName)}`);
-    } else {
-      router.push(`/clubs/${toSlug(org.courseName)}`);
-    }
-  }
-
   return (
     <>
       <Head>
@@ -81,10 +65,10 @@ export default function ClubsDirectoryPage({ orgs, entries }) {
                 const clubEntries = entries.filter(e => e.orgId === org.id);
                 const best = clubEntries.length ? Math.max(...clubEntries.map(e => Number(e.dist))) : null;
                 return (
-                  <div
+                  <Link
                     key={org.id}
-                    onClick={() => handleClick(org)}
-                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px', background: BG2, border: `1px solid ${BDR}`, cursor: 'pointer', transition: 'all .15s', gap: 12, flexWrap: 'wrap' }}
+                    href={`/clubs/${org.customSlug || nameToSlug(org.courseName)}`}
+                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px', background: BG2, border: `1px solid ${BDR}`, cursor: 'pointer', transition: 'all .15s', gap: 12, flexWrap: 'wrap', textDecoration: 'none' }}
                     onMouseEnter={e => e.currentTarget.style.borderColor = ORG}
                     onMouseLeave={e => e.currentTarget.style.borderColor = BDR}
                   >
@@ -101,7 +85,7 @@ export default function ClubsDirectoryPage({ orgs, entries }) {
                       <span style={{ fontFamily: SANS, fontSize: 11, color: MUT }}>{clubEntries.length} drive{clubEntries.length !== 1 ? 's' : ''}</span>
                       <span style={{ color: ORG, fontSize: 14 }}>›</span>
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>

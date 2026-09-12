@@ -146,6 +146,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           <NavBtn href="/how-it-works" label="How It Works"/>
           <NavBtn href="/leaderboard" label="Leaderboard"/>
           <NavBtn href="/hall-of-fame" label="Hall of Fame"/>
+          <NavBtn href="/for-venues" label="For Venues"/>
           <NavBtn href="/contact" label="Contact"/>
           {loggedOrg
             ? <><NavBtn href="/dashboard" label="Dashboard"/><NavBtn href="/submit" label="Submit Drive"/><button onClick={onLogout} style={{ background: 'none', border: '1px solid rgba(220,80,80,0.3)', color: '#f87171', fontFamily: SANS, fontWeight: 600, fontSize: 12, padding: '7px 14px', cursor: 'pointer', borderRadius: 0 }}>Log Out</button></>
@@ -174,7 +175,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
 
       {menuOpen && (
         <nav aria-label="Mobile menu" className="more-panel" style={{ position: 'fixed', left: 0, right: 0, background: 'rgba(14,14,14,0.98)', borderBottom: '1px solid rgba(255,255,255,0.08)', zIndex: 99, padding: '16px 22px 20px', display: 'flex', flexDirection: 'column', gap: 10, animation: 'slideDown .2s ease' }}>
-          {[['Leaderboard','/leaderboard'],['Hall of Fame','/hall-of-fame'],['Contact','/contact'],['Login','/login'],['Register','/register']].map(([label,href]) => (
+          {[['Leaderboard','/leaderboard'],['Hall of Fame','/hall-of-fame'],['For Venues','/for-venues'],['Contact','/contact'],['Login','/login'],['Register','/register']].map(([label,href]) => (
             <Link key={href} href={href} onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none', background: isActive(href) ? ORG : 'transparent', border: isActive(href) ? 'none' : '1px solid rgba(255,255,255,0.12)', color: isActive(href) ? '#111' : 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>{label}</Link>
           ))}
           {loggedOrg && <>
