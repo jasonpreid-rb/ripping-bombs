@@ -4,6 +4,12 @@
 // request host is the dev subdomain, and the normal production policy
 // everywhere else. Delete public/robots.txt so this route is the only one
 // serving /robots.txt (Next.js will otherwise prefer the static file).
+//
+// NOTE: this lives under pages/ (not pages/api/), so it must use
+// getServerSideProps to get a real `res` object and to force server-side
+// rendering. An API-route-style `export default function handler(req, res)`
+// here gets treated as a React page component and statically prerendered at
+// build time with no real request, crashing on req.headers.host.
 
 const PRODUCTION_ROBOTS = `User-agent: *
 Allow: /
@@ -69,16 +75,23 @@ const DEV_ROBOTS = `User-agent: *
 Disallow: /
 `;
 
-export default function handler(req, res) {
+export async function getServerSideProps({ req, res }) {
   const hostname = (req.headers.host || '').toLowerCase();
   const isDev = hostname.startsWith('dev.');
 
   res.setHeader('Content-Type', 'text/plain');
 
-  // Belt-and-suspenders: also send X-Robots-Tag on this route itself for dev.
   if (isDev) {
     res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   }
 
-  res.status(200).send(isDev ? DEV_ROBOTS : PRODUCTION_ROBOTS);
+  res.write(isDev ? DEV_ROBOTS : PRODUCTION_ROBOTS);
+  res.end();
+
+  return { props: {} };
+}
+
+// Never actually rendered — getServerSideProps ends the response first.
+export default function Robots() {
+  return null;
 }
