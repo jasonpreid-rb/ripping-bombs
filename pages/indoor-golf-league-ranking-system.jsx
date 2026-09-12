@@ -297,7 +297,7 @@ export default function RbrNumberPage({
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
         <Link href="/where-do-i-rank-globally" style={linkStyle}>Where Do I Rank Globally?</Link>{' | '}
-        <Link href="/simulator-golf-competition" style={linkStyle}>Simulator Golf Competition</Link>{' | '}
+        <Link href="/golf-longest-drive-competition" style={linkStyle}>Golf Longest Drive Competition</Link>{' | '}
         <Link href="/leaderboard" style={linkStyle}>Global Drives Leaderboard</Link>{' | '}
         <Link href="/venue-rankings" style={linkStyle}>Venue Rankings</Link>
       </SeoP>

@@ -31,6 +31,15 @@ const nextConfig = {
       { source: '/indoor-golf-league', destination: '/indoor-golf-league-ranking-system', permanent: true },
       { source: '/simulator-golf-league', destination: '/indoor-golf-league-ranking-system', permanent: true },
       { source: '/golf-simulator-leaderboard', destination: '/indoor-golf-league-ranking-system', permanent: true },
+      // Cluster 3 (running a longest-drive event) — merged into
+      // golf-longest-drive-competition, the broadest/most-searched phrasing.
+      // how-to-host-a-golf-simulator-event's working "Request an Event" form
+      // and venue-booking content were carried over, not just discarded.
+      { source: '/longest-drive-challenge', destination: '/golf-longest-drive-competition', permanent: true },
+      { source: '/golf-club-longest-drive-competition-ideas', destination: '/golf-longest-drive-competition', permanent: true },
+      { source: '/how-to-host-a-golf-simulator-event', destination: '/golf-longest-drive-competition', permanent: true },
+      { source: '/how-to-promote-your-golf-event', destination: '/golf-longest-drive-competition', permanent: true },
+      { source: '/simulator-golf-competition', destination: '/golf-longest-drive-competition', permanent: true },
     ]
   },
 }

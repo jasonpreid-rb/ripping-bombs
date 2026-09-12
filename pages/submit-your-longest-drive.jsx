@@ -111,7 +111,7 @@ export default function SubmitYourLongestDrive() {
               { href: "/register", label: "Register" },
               { href: "/online-golf-long-drive-leaderboard", label: "View Leaderboard" },
               { href: "/golf-longest-drive-competition", label: "Run a Competition" },
-              { href: "/simulator-golf-competition", label: "Simulator Competitions" },
+              { href: "/golf-longest-drive-competition", label: "Golf Longest Drive Competition" },
               { href: "/trackman-long-drive", label: "Trackman Long Drive" },
               { href: "/how-to-register", label: "Registration Guide" },
             ].map(({ href, label }) => (

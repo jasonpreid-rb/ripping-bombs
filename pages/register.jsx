@@ -107,7 +107,7 @@ function TierPreview({ isSimulator }) {
           ))}
           {!isSimulator && (
             <div style={{ fontFamily: SANS, fontSize: 11, marginBottom: 5 }}>
-              <Link href="/how-to-host-a-golf-simulator-event" style={{ color: ORG, textDecoration: 'underline' }}>
+              <Link href="/golf-longest-drive-competition" style={{ color: ORG, textDecoration: 'underline' }}>
                 See how venues run these events →
               </Link>
             </div>

@@ -258,7 +258,7 @@ export default function AverageGolfDriveDistanceByAge() {
             {[
               { href: "/how-it-works", label: "How It Works" },
               { href: "/enjoy-golf-when-you-cant-break-par", label: "Can't Break Par? Read This" },
-              { href: "/simulator-golf-competition", label: "Simulator Golf Competition" },
+              { href: "/golf-longest-drive-competition", label: "Golf Longest Drive Competition" },
               { href: "/trackman-long-drive", label: "Trackman Long Drive" },
               { href: "/online-golf-long-drive-leaderboard", label: "Online Leaderboard" },
               { href: "/golf-longest-drive-competition", label: "Run a Competition" },

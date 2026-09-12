@@ -282,7 +282,7 @@ function SiteFooter() {
           <div>
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 1.5, color: DIM, marginBottom: 12, textTransform: 'uppercase' }}>Golf Guides</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginBottom: 20 }}>
-              {[['Average Drive Distance','/average-golf-drive-distance-by-age'],['Longest Drives This Week','/longest-drives-this-week'],['How To Hit Farther','/how-to-hit-a-golf-ball-farther'],['Longest Drive Ever','/longest-golf-drive-ever'],['What Is A Good Drive?','/what-is-a-good-drive-in-golf'],['Club Competition Ideas','/golf-club-longest-drive-competition-ideas'],['Long Drive Equipment','/long-drive-golf-equipment'],['Promote Your Event','/how-to-promote-your-golf-event'],['Supported Simulators','/supported-simulators']].map(([l,h]) => (
+              {[['Average Drive Distance','/average-golf-drive-distance-by-age'],['Longest Drives This Week','/longest-drives-this-week'],['How To Hit Farther','/how-to-hit-a-golf-ball-farther'],['Longest Drive Ever','/longest-golf-drive-ever'],['What Is A Good Drive?','/what-is-a-good-drive-in-golf'],['Long Drive Competition Guide','/golf-longest-drive-competition'],['Long Drive Equipment','/long-drive-golf-equipment'],['Supported Simulators','/supported-simulators']].map(([l,h]) => (
                 <Link key={h} href={h} style={{ display: 'block', fontFamily: SANS, fontSize: 11, color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.4)'}>{l}</Link>
               ))}
             </div>

@@ -104,7 +104,7 @@ export default function ForVenues() {
               <div className="proof-title">Run your own events</div>
               <div className="proof-body">
                 Create a branded competition to fill your quiet bay hours.{' '}
-                <Link href="/how-to-host-a-golf-simulator-event" className="proof-link">
+                <Link href="/golf-longest-drive-competition" className="proof-link">
                   See how it works →
                 </Link>
               </div>

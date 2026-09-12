@@ -71,7 +71,7 @@ export default function OnlineGolfLongDriveLeaderboard() {
             {[
               { href: "/leaderboard", label: "Live Leaderboard" },
               { href: "/golf-longest-drive-competition", label: "Run a Long Drive Comp" },
-              { href: "/simulator-golf-competition", label: "Simulator Competitions" },
+              { href: "/golf-longest-drive-competition", label: "Golf Longest Drive Competition" },
               { href: "/longest-drive-uk", label: "Longest Drive UK" },
               { href: "/longest-drive-australia", label: "Longest Drive Australia" },
             ].map(({ href, label }) => (

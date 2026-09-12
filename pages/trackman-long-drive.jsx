@@ -88,7 +88,7 @@ export default function TrackmanLongDrive() {
           <p style={{ fontFamily: DISP, fontWeight: 700, color: MUT, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Related Reading</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
             {[
-              { href: "/simulator-golf-competition", label: "Simulator Competitions" },
+              { href: "/golf-longest-drive-competition", label: "Golf Longest Drive Competition" },
               { href: "/online-golf-long-drive-leaderboard", label: "Online Leaderboard" },
               { href: "/average-golf-drive-distance-by-age", label: "Distance by Age & Handicap" },
               { href: "/long-drive-golf-equipment", label: "Long Drive Equipment" },
