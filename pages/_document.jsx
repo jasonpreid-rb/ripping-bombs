@@ -1,9 +1,8 @@
 import { Html, Head, Main, NextScript } from 'next/document';
-import { inter, bebasNeue } from '../lib/fonts';
 
 export default function Document() {
   return (
-    <Html lang="en" className={`${inter.variable} ${bebasNeue.variable}`}>
+    <Html lang="en">
       <Head>
         <link rel="icon" href="/favicon.ico"/>
         <link rel="icon" type="image/png" href="/favicon.png"/>

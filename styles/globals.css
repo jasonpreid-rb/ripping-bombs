@@ -1,3 +1,12 @@
+/* Font variables — previously supplied by next/font/google's `.variable`
+   className on <Html> in _document.jsx. Now that fonts are self-hosted via
+   @fontsource (see pages/_app.jsx), nothing sets these automatically
+   anymore, so they're declared explicitly here. */
+:root {
+  --font-inter: 'Inter', 'Helvetica Neue', sans-serif;
+  --font-bebas: 'Bebas Neue', 'Arial Black', sans-serif;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;

@@ -1,3 +1,20 @@
+// Self-hosted via @fontsource (npm packages containing the actual font
+// files) rather than next/font/google. next/font/google fetches fonts
+// from fonts.googleapis.com/fonts.gstatic.com at *build time*, and
+// Turbopack has a known, currently-open bug where that fetch can fail —
+// sometimes as a hard build error, sometimes as a build *warning* that
+// lets the build succeed anyway with the font silently missing (see
+// https://github.com/vercel/next.js/issues/91653 and similar). That
+// silent-failure mode is almost certainly what happened here: the build
+// kept succeeding, but Inter/Bebas Neue quietly stopped being included,
+// and the site fell back to the browser default (Times New Roman).
+// @fontsource packages install from the npm registry like any other
+// dependency, so there's no Google Fonts network fetch left to fail.
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+import '@fontsource/bebas-neue';
 import '../styles/globals.css';
 import Head from 'next/head';
 import { useState, useEffect } from 'react';
