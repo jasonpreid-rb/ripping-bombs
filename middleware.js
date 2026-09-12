@@ -14,6 +14,7 @@ const BLOCKED_AGENTS = [
   'google-extended',
   'ccbot',
   'facebookbot',
+  'meta-externalagent',
   'omgilibot',
   'diffbot',
   'bytespider',
