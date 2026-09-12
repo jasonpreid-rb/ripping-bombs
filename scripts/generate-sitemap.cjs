@@ -138,7 +138,9 @@ async function getDynamicData() {
       // stays out of the sitemap the same way an empty one does. Covers
       // both the newer `demo_`-prefixed rows and the older o1-o16/e01-e31
       // seed rows from initData().
-      const isSample = e.id?.startsWith('demo_') || /^[oe]\d+$/.test(e.id || '');
+      // Keep in sync with isSampleId() in lib/data.js — both need to
+      // recognize every demo-seeding id convention in use.
+      const isSample = e.id?.startsWith('demo_') || e.id?.startsWith('sim_demo_') || /^simdemo\d+_/i.test(e.id || '') || /^[oe]\d+$/.test(e.id || '');
       if (!isSample) {
         entryCountByOrg[id] = (entryCountByOrg[id] || 0) + 1;
       }
