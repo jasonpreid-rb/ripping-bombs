@@ -194,7 +194,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           { href: '/', label: 'Home', icon: '⌂' },
           { href: '/leaderboard', label: 'Ranks', icon: '☰' },
         ].map(t => (
-          <Link key={t.href} href={t.href} onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none', flex: 1, color: isActive(t.href) ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
+          <Link key={t.href} href={t.href} onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none', flex: 1, color: isActive(t.href) ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '11px 0 8px', cursor: 'pointer' }}>
             <span style={{ fontSize: 18, lineHeight: 1 }}>{t.icon}</span>
             <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600 }}>{t.label}</span>
           </Link>
@@ -205,12 +205,12 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
           <span style={{ width: 50, height: 50, borderRadius: '50%', background: ORG, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: '#111', boxShadow: '0 4px 16px rgba(255,0,144,0.45)', border: '3px solid #1a1a1a' }}>＋</span>
         </Link>
 
-        <Link href={loggedOrg ? '/dashboard' : '/login'} onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none', flex: 1, color: isActive('/dashboard') ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
+        <Link href={loggedOrg ? '/dashboard' : '/login'} onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none', flex: 1, color: isActive('/dashboard') ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '11px 0 8px', cursor: 'pointer' }}>
           <span style={{ fontSize: 18, lineHeight: 1 }}>☻</span>
           <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600 }}>{loggedOrg ? 'Dashboard' : 'Login'}</span>
         </Link>
 
-        <button onClick={() => setMenuOpen(m => !m)} style={{ flex: 1, background: 'none', border: 'none', color: menuOpen ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '6px 0 2px', cursor: 'pointer' }}>
+        <button onClick={() => setMenuOpen(m => !m)} style={{ flex: 1, background: 'none', border: 'none', color: menuOpen ? ORG : 'rgba(255,255,255,0.55)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '11px 0 8px', cursor: 'pointer' }}>
           <span style={{ fontSize: 18, lineHeight: 1 }}>⋯</span>
           <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600 }}>More</span>
         </button>

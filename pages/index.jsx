@@ -442,7 +442,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                   </div>
                 </div>
                 <div style={{display:'flex',alignItems:'center',gap:5,paddingLeft:19}}>
-                  <img src={org?.avatarUrl||''} onError={e=>e.target.style.display='none'} style={{width:18,height:18,borderRadius:'50%',objectFit:'cover',flexShrink:0,display:org?.avatarUrl?'block':'none'}}/>
+                  {org?.avatarUrl && <img src={org.avatarUrl} alt={org.courseName || ''} onError={e=>e.target.style.display='none'} style={{width:18,height:18,borderRadius:'50%',objectFit:'cover',flexShrink:0}}/>}
                   {org?.country && <span style={{fontSize:12,flexShrink:0}}>{countryFlag(org.country)}</span>}
                   <span style={{fontFamily:SANS,fontSize:10,color:DIM,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
                     {e.is_simulator ? <span style={{color:'rgba(255,0,144,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
@@ -490,7 +490,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                   </div>
                 </div>
                 <div style={{display:'flex',alignItems:'center',gap:5,paddingLeft:19}}>
-                  <img src={org?.avatarUrl||''} onError={e=>e.target.style.display='none'} style={{width:18,height:18,borderRadius:'50%',objectFit:'cover',flexShrink:0,display:org?.avatarUrl?'block':'none'}}/>
+                  {org?.avatarUrl && <img src={org.avatarUrl} alt={org.courseName || ''} onError={e=>e.target.style.display='none'} style={{width:18,height:18,borderRadius:'50%',objectFit:'cover',flexShrink:0}}/>}
                   {org?.country && <span style={{fontSize:12,flexShrink:0}}>{countryFlag(org.country)}</span>}
                   <span style={{fontFamily:SANS,fontSize:10,color:DIM,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
                     {e.is_simulator ? <span style={{color:'rgba(255,0,144,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
@@ -509,7 +509,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
       <Head>
         <title>Ripping Bombs | Longest Drive Leaderboard for Simulator Golf</title>
         <meta name="description" content="Compare your longest golf drives on the free global leaderboard for simulator golf and clubs. Submit your drive and track rankings."/>
-        <link rel="canonical" href="https://www.rippingbombs.com/"/>
+        <link key="canonical" rel="canonical" href="https://www.rippingbombs.com/"/>
 
         <meta property="og:title" content="Ripping Bombs | Longest Drive Leaderboard for Simulator Golf"/>
         <meta property="og:description" content="The global home of longest drive competition. Free to join, free to submit — compete across simulator venues and clubs worldwide."/>

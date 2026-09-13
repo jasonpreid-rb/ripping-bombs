@@ -314,7 +314,7 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
         <title>{`${org.courseName} Longest Drive Leaderboard | Ripping Bombs`}</title>
         <meta name="description" content={metaDesc} />
         {(isEmpty || isDemoOnly) && <meta name="robots" content="noindex, follow" />}
-        <link rel="canonical" href={canonicalUrl} />
+        <link key="canonical" rel="canonical" href={canonicalUrl} />
         <meta property="og:title" content={`${org.courseName} | Ripping Bombs`} />
         <meta property="og:description" content={metaDesc} />
         <meta property="og:url" content={canonicalUrl} />

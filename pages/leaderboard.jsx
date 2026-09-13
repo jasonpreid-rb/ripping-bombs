@@ -300,12 +300,12 @@ export default function LeaderboardPage(props) {
         {/* Week nav */}
         <div style={{background:allTime?BG2:'linear-gradient(135deg,rgba(255,0,144,0.14),rgba(255,0,144,0.03))',border:`1px solid ${allTime?BDR:'rgba(255,0,144,0.3)'}`,padding:'16px 20px',marginBottom:20,display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:14}}>
           <div style={{display:'flex',alignItems:'center',gap:14,flexWrap:'wrap'}}>
-            <button onClick={()=>setWeek(prevWeek(currentWeek))} disabled={allTime} style={{background:'transparent',border:`1px solid ${BDR}`,color:allTime?DIM:MUT,fontFamily:SANS,fontSize:14,padding:'8px 13px',cursor:allTime?'default':'pointer',opacity:allTime?0.4:1}}>‹</button>
+            <button onClick={()=>setWeek(prevWeek(currentWeek))} disabled={allTime} style={{background:'transparent',border:`1px solid ${BDR}`,color:allTime?DIM:MUT,fontFamily:SANS,fontSize:14,padding:'15px 16px',cursor:allTime?'default':'pointer',opacity:allTime?0.4:1}}>‹</button>
             <div>
               <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:allTime?DIM:ORG,textTransform:'uppercase',marginBottom:3}}>🏆 Weekly Championship</div>
               <h2 style={{fontFamily:DISP,fontSize:22,color:allTime?MUT:TXT,letterSpacing:.5,fontWeight:400}}>{allTime?'All-Time Leaderboard':weekLabel(currentWeek)}</h2>
             </div>
-            <button onClick={()=>setWeek(nextWeek(currentWeek))} disabled={allTime} style={{background:'transparent',border:`1px solid ${BDR}`,color:allTime?DIM:MUT,fontFamily:SANS,fontSize:14,padding:'8px 13px',cursor:allTime?'default':'pointer',opacity:allTime?0.4:1}}>›</button>
+            <button onClick={()=>setWeek(nextWeek(currentWeek))} disabled={allTime} style={{background:'transparent',border:`1px solid ${BDR}`,color:allTime?DIM:MUT,fontFamily:SANS,fontSize:14,padding:'15px 16px',cursor:allTime?'default':'pointer',opacity:allTime?0.4:1}}>›</button>
           </div>
           <button onClick={()=>setAllTime(v=>!v)} style={{background:allTime?ORG:'transparent',border:`1px solid ${allTime?ORG:BDR}`,color:allTime?'#111':MUT,fontFamily:SANS,fontWeight:600,fontSize:12,padding:'8px 16px',cursor:'pointer',whiteSpace:'nowrap'}}>{allTime?'All Time ✓':'View All-Time →'}</button>
         </div>

@@ -46,6 +46,7 @@ const nextConfig = {
       { source: '/how-to-hit-a-golf-ball-farther', destination: '/how-far-do-i-drive-compared-to-others', permanent: true },
       { source: '/how-to-increase-swing-speed-for-more-distance', destination: '/how-far-do-i-drive-compared-to-others', permanent: true },
       { source: '/how-far-should-i-hit-driver', destination: '/how-far-do-i-drive-compared-to-others', permanent: true },
+      { source: '/longest-drive-over-50', destination: '/longest-drive-seniors', permanent: true },
     ]
   },
 }

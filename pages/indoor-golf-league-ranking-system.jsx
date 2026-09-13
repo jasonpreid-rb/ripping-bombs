@@ -23,7 +23,7 @@ const CATEGORIES = [
   { key: 'male_high_hcp', label: 'Men High Handicap', links: [{ name: 'High Handicap Leaderboard', slug: 'longest-drive-high-handicap' }] },
   { key: 'female_open', label: 'Women (Open)', links: [{ name: "Women's Leaderboard", slug: 'longest-womens-drive' }] },
   { key: 'female_high_hcp', label: 'Women High Handicap', links: [{ name: 'High Handicap Leaderboard', slug: 'longest-drive-high-handicap' }] },
-  { key: 'senior', label: 'Seniors', links: [{ name: 'Seniors Leaderboard', slug: 'longest-drive-seniors' }, { name: 'Over 50 Leaderboard', slug: 'longest-drive-over-50' }] },
+  { key: 'senior', label: 'Seniors', links: [{ name: 'Seniors Leaderboard', slug: 'longest-drive-seniors' }] },
   { key: 'youth', label: 'Youth', links: [{ name: 'U12 Leaderboard', slug: 'longest-drive-juniors-u12' }, { name: '13–16 Leaderboard', slug: 'longest-drive-juniors-13-16' }, { name: '17–18 Leaderboard', slug: 'longest-drive-juniors-17-18' }] },
 ];
 

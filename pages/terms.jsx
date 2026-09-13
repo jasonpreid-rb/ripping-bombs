@@ -11,7 +11,7 @@ export default function Terms() {
           name="description"
           content="Ripping Bombs terms of service: the rules for using our global longest-drive leaderboard platform."
         />
-        <link rel="canonical" href="https://www.rippingbombs.com/terms" />
+        <link key="canonical" rel="canonical" href="https://www.rippingbombs.com/terms" />
       </Head>
 
       <main style={{ maxWidth: '760px', margin: '0 auto', padding: '48px 20px', lineHeight: 1.6 }}>

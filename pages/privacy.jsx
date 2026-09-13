@@ -11,7 +11,7 @@ export default function Privacy() {
           name="description"
           content="Ripping Bombs privacy policy: what data we collect, why, and how you control it."
         />
-        <link rel="canonical" href="https://www.rippingbombs.com/privacy" />
+        <link key="canonical" rel="canonical" href="https://www.rippingbombs.com/privacy" />
       </Head>
 
       <main style={{ maxWidth: '760px', margin: '0 auto', padding: '48px 20px', lineHeight: 1.6 }}>
