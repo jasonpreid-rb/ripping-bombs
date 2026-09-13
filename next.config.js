@@ -40,6 +40,12 @@ const nextConfig = {
       { source: '/how-to-host-a-golf-simulator-event', destination: '/golf-longest-drive-competition', permanent: true },
       { source: '/how-to-promote-your-golf-event', destination: '/golf-longest-drive-competition', permanent: true },
       { source: '/simulator-golf-competition', destination: '/golf-longest-drive-competition', permanent: true },
+      // Cluster 4 (hitting it farther) — merged into how-far-do-i-drive-
+      // compared-to-others, which had the more developed content (the live
+      // percentile calculator + embeddable widget, vs static template pages).
+      { source: '/how-to-hit-a-golf-ball-farther', destination: '/how-far-do-i-drive-compared-to-others', permanent: true },
+      { source: '/how-to-increase-swing-speed-for-more-distance', destination: '/how-far-do-i-drive-compared-to-others', permanent: true },
+      { source: '/how-far-should-i-hit-driver', destination: '/how-far-do-i-drive-compared-to-others', permanent: true },
     ]
   },
 }

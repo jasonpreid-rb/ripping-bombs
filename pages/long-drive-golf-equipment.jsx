@@ -19,7 +19,7 @@ export default function Page({ entries=[] }) {
       
       <SeoH2>Explore Related Pages</SeoH2>
       <SeoP>
-        <Link href="/how-to-hit-a-golf-ball-farther" style={linkStyle}>How To Hit A Golf Ball Farther</Link>{' | '}
+        <Link href="/how-far-do-i-drive-compared-to-others" style={linkStyle}>How Far Do I Drive Compared To Others?</Link>{' | '}
         <Link href="/recommended-range-finders" style={linkStyle}>Recommended Range Finders</Link>{' | '}
         <Link href="/sim-distance-real-or-fake" style={linkStyle}>Is Your Sim Distance Real Or Fake</Link>{' | '}
         <Link href="/supported-simulators" style={linkStyle}>Supported Simulators</Link>{' | '}

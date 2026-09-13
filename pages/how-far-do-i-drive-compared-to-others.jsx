@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { SeoPage, SeoH1, SeoH2, SeoP } from '../components/SeoPageLayout';
+import { SeoPage, SeoH1, SeoH2, SeoP, SeoTable } from '../components/SeoPageLayout';
 import { Card, Field, Btn } from '../components/UI';
 import { ORG, TXT, MUT, DIM, BG3, BDR, SANS, DISP } from '../lib/constants';
 
@@ -41,6 +41,45 @@ function percentileFromZ(z) {
   let p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
   p = z > 0 ? 1 - p : p;
   return Math.round(p * 100);
+}
+
+const SPEED_TABLE = [
+  { level: 'Scratch / Low Handicap (0–5)', speed: '108–113 mph', carry: '~260–280 yds', avgSpeed: 110 },
+  { level: 'Mid Handicap (6–15)', speed: '93–100 mph', carry: '~210–230 yds', avgSpeed: 96 },
+  { level: 'High Handicap (16–28)', speed: '80–90 mph', carry: '~180–205 yds', avgSpeed: 85 },
+  { level: 'Beginner / Slower Swing', speed: '70–80 mph', carry: '~150–180 yds', avgSpeed: 75 },
+];
+
+const METHODS = [
+  { name: 'Overspeed Training', blurb: "Systems like SuperSpeed and the Stack System have you swing an underweighted club faster than your normal max, training your nervous system to move quicker before your regular driver ever leaves the bag. Structured protocols show average gains of roughly 5% in swing speed over a few weeks — for a 90 mph swing, that's typically 10–12 extra yards of carry." },
+  { name: 'Strength & Mobility Training', blurb: 'Rotational power — hips, core, and shoulders working together — matters more for clubhead speed than raw arm strength. Med-ball rotational throws, hip mobility work, and general lower-body strength training all show up in launch monitor numbers over time, and the gains tend to stick.' },
+  { name: 'Swing Sequencing & Attack Angle', blurb: "Two golfers with identical swing speed can produce very different distances depending on strike quality and attack angle. Hitting up on the ball even slightly rather than down into it can add real carry distance without changing your speed at all." },
+  { name: 'Equipment & Shaft Fitting', blurb: "The wrong shaft weight or flex can cap your swing speed without you realizing it. A proper fitting session matched to your actual swing speed routinely unlocks speed that was already there." },
+];
+
+function SwingSpeedBarChart() {
+  const maxSpeed = 120;
+  const chartW = 640;
+  const chartH = SPEED_TABLE.length * 54;
+  const labelW = 190;
+  const barAreaW = chartW - labelW - 60;
+
+  return (
+    <svg viewBox={`0 0 ${chartW} ${chartH}`} width="100%" style={{ display: 'block', overflow: 'visible' }}>
+      {SPEED_TABLE.map((row, i) => {
+        const barW = (row.avgSpeed / maxSpeed) * barAreaW;
+        const y = i * 54;
+        return (
+          <g key={row.level}>
+            <text x={0} y={y + 22} fill={TXT} fontFamily={SANS} fontSize="12">{row.level}</text>
+            <rect x={labelW} y={y + 10} width={barAreaW} height={20} fill="rgba(255,255,255,0.06)" />
+            <rect x={labelW} y={y + 10} width={barW} height={20} fill={ORG} />
+            <text x={labelW + barW + 10} y={y + 25} fill={ORG} fontFamily={SANS} fontWeight="700" fontSize="12">{row.avgSpeed} mph</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
 }
 
 function getVerdict(topPct) {
@@ -197,7 +236,7 @@ function EmbedCodeSection() {
   );
 }
 
-export default function PercentileCalculator() {
+export default function PercentileCalculator({ entries = [] }) {
   const router = useRouter();
   const [distance, setDistance] = useState('');
   const [hcp, setHcp] = useState('');
@@ -321,6 +360,59 @@ export default function PercentileCalculator() {
         Driving distance is influenced by swing speed, launch angle, ball speed, spin rate, equipment, physical fitness, and technique. Club head speed is the single biggest factor — faster swings produce longer drives. Optimising your launch conditions (higher launch, lower spin for most amateurs) can add significant distance without changing your swing. Equipment upgrades, fitness improvements, and lessons focused on impact efficiency are the most reliable ways to add yards.
       </SeoP>
 
+      <SeoH2>Driver Distance By Swing Speed</SeoH2>
+      <SeoTable
+        headers={['Swing Speed (mph)', 'Expected Carry (yards)', 'Total Distance (yards)']}
+        rows={[
+          ['70', '155–170', '175–195'], ['75', '170–185', '195–215'], ['80', '185–200', '210–230'],
+          ['85', '200–215', '225–245'], ['90', '215–235', '240–260'], ['95', '235–255', '260–280'],
+          ['100', '255–270', '280–300'], ['105', '270–285', '300–320'], ['110+', '285–305', '315–340'],
+        ]}
+      />
+      <SeoP>These carry distances assume a reasonably efficient strike — centred contact, a launch angle of around 12–15 degrees, and spin in the 2,400–2,800 rpm range. Off-centre hits can reduce carry by 10–25 yards even at the same swing speed.</SeoP>
+
+      <SeoH2>How To Actually Increase Your Distance</SeoH2>
+      <SeoP>
+        Every additional 1 mph of swing speed adds roughly 2 to 2.5 yards of carry, assuming launch and spin stay
+        efficient — so taking a 95 mph swing to 105 mph could realistically add 20–25 yards. Here's what the data,
+        and the game's biggest hitters, say actually moves the needle:
+      </SeoP>
+      <Card style={{ marginBottom: 28 }}>
+        <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, color: MUT, textTransform: 'uppercase', marginBottom: 18 }}>Average Swing Speed by Skill Level</div>
+        <SwingSpeedBarChart />
+      </Card>
+      <div style={{ display: 'grid', gap: 14, marginBottom: 20 }}>
+        {METHODS.map((m) => (
+          <Card key={m.name}>
+            <div style={{ fontFamily: DISP, fontSize: 20, color: TXT, letterSpacing: 0.5, marginBottom: 8 }}>{m.name}</div>
+            <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, lineHeight: 1.6 }}>{m.blurb}</div>
+          </Card>
+        ))}
+      </div>
+      <SeoP>
+        Beyond training, three free technique changes help most amateurs: teeing the ball higher and forward in your
+        stance to hit up on it (even 3–4° can add 20+ yards by reducing spin), centring your strike on the clubface
+        (off-centre hits lose real ball speed even with a fast swing), and getting fit for the right driver loft and
+        shaft rather than assuming a stock setup suits your swing.
+      </SeoP>
+      <SeoP>
+        Speed training protocols typically show measurable gains within the first month; expect your first
+        noticeable jump within 4–6 weeks of consistent, focused work. Speed without control just means missing
+        fairways further away though — pair any speed work with strike-quality practice.
+      </SeoP>
+
+      {(() => {
+        const approved = entries.filter(e => e.dist > 0 && e.club);
+        const brands = Object.entries(approved.reduce((acc, e) => { const b = e.club.split(' ')[0]; acc[b] = (acc[b] || 0) + 1; return acc; }, {})).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        if (!brands.length) return null;
+        return (
+          <>
+            <SeoH2>Popular Drivers Among Big Hitters</SeoH2>
+            <SeoTable headers={['Driver Brand', 'Appearances In Top Drives']} rows={brands.map(([brand, count]) => [brand, count])} />
+          </>
+        );
+      })()}
+
       <SeoH2>Want a Live Global Rank Instead of an Estimate?</SeoH2>
       <SeoP>
         This calculator uses benchmark averages to give you a quick, general estimate. If you'd rather see how you
@@ -338,7 +430,7 @@ export default function PercentileCalculator() {
       <SeoP>
         <Link href="/where-do-i-rank-globally" style={linkStyle}>Where Do I Rank Globally?</Link>{' | '}
         <Link href="/average-golf-drive-distance-by-age" style={linkStyle}>Average Drive Distance By Age &amp; Handicap</Link>{' | '}
-        <Link href="/how-to-hit-a-golf-ball-farther" style={linkStyle}>How To Hit A Golf Ball Farther</Link>{' | '}
+        <Link href="/best-golf-drivers-for-distance-2026" style={linkStyle}>Best Golf Drivers for Distance</Link>{' | '}
         <Link href="/what-is-a-good-drive-in-golf" style={linkStyle}>What Is A Good Drive In Golf</Link>
       </SeoP>
     </SeoPage>

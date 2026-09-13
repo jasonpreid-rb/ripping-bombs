@@ -135,7 +135,7 @@ export default function SimDistanceRealOrFake() {
 
         <SeoH2>Explore Related Pages</SeoH2>
         <SeoP>
-          <Link href="/how-to-hit-a-golf-ball-farther" style={linkStyle}>How To Hit A Golf Ball Farther</Link>{' | '}
+          <Link href="/how-far-do-i-drive-compared-to-others" style={linkStyle}>How Far Do I Drive Compared To Others?</Link>{' | '}
           <Link href="/long-drive-golf-equipment" style={linkStyle}>Long Drive Golf Equipment</Link>{' | '}
           <Link href="/indoor-golf-league-ranking-system" style={linkStyle}>Indoor Golf League Ranking System</Link>{' | '}
           <Link href="/supported-simulators" style={linkStyle}>Supported Simulators</Link>{' | '}
