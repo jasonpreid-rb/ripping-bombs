@@ -1,22 +1,27 @@
 // pages/api/badge/[slug].js
 //
-// Dynamic "Powered by Ripping Bombs" embeddable badge for venue websites,
-// rendered via @vercel/og — same rendering approach as the weekly social
-// cards / QR posters. Shows the club's current top drive so the badge is
-// live content for the venue, not just a static logo.
+// Embeddable venue leaderboard badge for venue websites, rendered via
+// @vercel/og. Redesigned from the original stat-plaque version: the score
+// is now the visual hero, framed as a challenge ("Beat this? ->") rather
+// than a passive stat, with a LIVE indicator and the brand icon instead of
+// a full wordmark.
 //
-// Embed snippet to hand out to venues (also worth putting on their
-// dashboard with a copy button):
+// Embed snippet to hand out to venues (put on their dashboard with a copy
+// button, next to where they already get their QR poster):
 //
 // <a href="https://www.rippingbombs.com/clubs/{slug}" target="_blank" rel="noopener">
 //   <img src="https://www.rippingbombs.com/api/badge/{slug}"
 //        alt="{Club Name} Long Drive Leaderboard — Ripping Bombs"
-//        width="300" height="120" />
+//        width="300" height="130" />
 // </a>
 //
 // SEO note: the <a> tag is what carries backlink value. Don't let this
 // become a bare <img> with no wrapping link, and don't let rel="nofollow"
-// sneak in — nofollow would defeat the entire point of this feature.
+// sneak in.
+//
+// Requires public/badge-icon-pink.png to exist (the brand icon, recolored
+// neon pink #FF0090) — referenced below by absolute URL since Satori reads
+// remote image URLs fine but has no access to the local filesystem.
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -39,10 +44,14 @@ function toSlug(str) {
     .replace(/\s+/g, '-');
 }
 
-// Mirrors the sample/demo exclusion in generate-sitemap.cjs so the badge
-// never shows a demo row as if it were a real club record.
+// Mirrors the sample/demo exclusion in generate-sitemap.cjs and
+// lib/data.js's isSampleId() so the badge never shows a demo row as if it
+// were a real club record.
 function isSampleId(id) {
-  return Boolean(id) && (id.startsWith('demo_') || /^[oe]\d+$/.test(id));
+  return (
+    Boolean(id) &&
+    (/^(demo_|sim_demo_|simdemo\d+_)/i.test(id) || /^[oe]\d+$/.test(id))
+  );
 }
 
 export default async function handler(req) {
@@ -54,7 +63,7 @@ export default async function handler(req) {
 
   const { data: clubs } = await supabase
     .from('clubs')
-    .select('id, customSlug, courseName, location, status, accountType')
+    .select('id, customSlug, courseName, status, accountType')
     .eq('accountType', 'club')
     .eq('status', 'approved');
 
@@ -70,12 +79,12 @@ export default async function handler(req) {
   // pages/clubs/[slug].jsx.
   const { data: ownEntries } = await supabase
     .from('entries')
-    .select('id, dist, player, date')
+    .select('id, dist, player')
     .eq('orgId', org.id);
 
   const { data: venueEntries } = await supabase
     .from('entries')
-    .select('id, dist, player, date')
+    .select('id, dist, player')
     .eq('venueId', org.id);
 
   const seen = new Set();
@@ -97,34 +106,59 @@ export default async function handler(req) {
       <div
         style={{
           width: '300px',
-          height: '120px',
+          height: '130px',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
-          padding: '16px',
-          background: '#0A0A0A',
+          justifyContent: 'space-between',
+          padding: '14px 16px',
+          backgroundImage: 'linear-gradient(135deg, #0A0A0A, #241018)',
           border: '2px solid #FF0090',
-          borderRadius: '8px',
-          fontFamily: 'Inter',
-          color: 'white',
+          borderRadius: '10px',
         }}
       >
-        <div style={{ fontSize: 12, color: '#FF0090', letterSpacing: 1 }}>
-          RIPPING BOMBS LEADERBOARD
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <img
+            src="https://www.rippingbombs.com/badge-icon-pink.png"
+            width={22}
+            height={22}
+          />
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+              background: 'rgba(255,0,144,0.15)',
+              borderRadius: 20,
+              padding: '3px 8px',
+            }}
+          >
+            <div style={{ width: 6, height: 6, borderRadius: 3, background: '#FF0090' }} />
+            <span style={{ fontSize: 10, color: '#FF0090', fontWeight: 700, letterSpacing: 0.5 }}>
+              LIVE
+            </span>
+          </div>
         </div>
-        <div style={{ fontSize: 18, fontWeight: 700, marginTop: 4 }}>
-          {org.courseName}
-        </div>
-        <div style={{ fontSize: 14, marginTop: 6, color: '#CCCCCC' }}>
-          {best
-            ? `Top drive: ${best.dist}yds — ${best.player}`
-            : 'Be the first on the board'}
-        </div>
+
+        <div style={{ fontSize: 15, color: '#cccccc' }}>{org.courseName}</div>
+
+        {best ? (
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+            <span style={{ fontSize: 36, fontWeight: 700, color: '#FF0090', lineHeight: 1 }}>
+              {best.dist}
+            </span>
+            <span style={{ fontSize: 14, color: '#FF0090' }}>yds</span>
+            <span style={{ fontSize: 12, color: '#888888', marginLeft: 4 }}>
+              — {best.player}
+            </span>
+          </div>
+        ) : (
+          <div style={{ fontSize: 14, color: '#cccccc' }}>Be the first on the board</div>
+        )}
       </div>
     ),
     {
       width: 300,
-      height: 120,
+      height: 130,
     }
   );
 }
