@@ -106,7 +106,7 @@ export default function GolfLongestDriveCompetition() {
             <div key={name} style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 8, padding: "12px 14px", color: TXT, fontFamily: SANS, fontSize: 13 }}>{name}</div>
           ))}
         </div>
-        <SeoP>A simulator/individual account is auto-approved instantly and limited to one submission per week — ideal for home setups and indoor venues. A club account requires admin approval but allows unlimited submissions for multiple named players, and is the better fit for clubs running organised competitions.</SeoP>
+        <SeoP>A simulator/individual account is approved instantly and limited to one submission per week — ideal for home setups and indoor venues. A club account is also approved instantly but allows unlimited submissions for multiple named players, and is the better fit for clubs running organised competitions.</SeoP>
 
         <SeoH2>More Ideas To Make It Memorable</SeoH2>
         <SeoP>Run a seasonal leaderboard tracking longest drives at your club all year, and crown an annual champion — Ripping Bombs handles the ranking automatically. Or try a club record board: a permanent page showing your all-time longest drives, linkable from your own club website. A junior-vs-senior shootout is always a popular head-to-head format too.</SeoP>

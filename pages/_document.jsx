@@ -1,8 +1,9 @@
 import { Html, Head, Main, NextScript } from 'next/document';
+import { inter, bebasNeue } from '../lib/fonts';
 
 export default function Document() {
   return (
-    <Html lang="en">
+    <Html lang="en" className={`${inter.variable} ${bebasNeue.variable}`}>
       <Head>
         <link rel="icon" href="/favicon.ico"/>
         <link rel="icon" type="image/png" href="/favicon.png"/>
@@ -14,6 +15,8 @@ export default function Document() {
           name: 'Ripping Bombs',
           url: 'https://www.rippingbombs.com/',
           logo: 'https://www.rippingbombs.com/favicon.png',
+          founder: { '@type': 'Person', name: 'Jason Reid' },
+          contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', url: 'https://www.rippingbombs.com/contact' },
           sameAs: [
             'https://www.instagram.com/rippingbombs/',
             'https://www.facebook.com/rippingbombs/',
