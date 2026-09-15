@@ -1403,6 +1403,12 @@ function TierComparison() {
         <div style={{ ...cell, borderTop: `1px solid ${BDR}` }}>
           {check(ORG)}Add a sponsor's logo to your screen — charge them to help cover the cost
         </div>
+        <div style={{ ...cell, borderRight: `1px solid ${BDR}`, borderTop: `1px solid ${BDR}` }}>
+          {check(MUT)}View &amp; share any events your venue has already created
+        </div>
+        <div style={{ ...cell, borderTop: `1px solid ${BDR}` }}>
+          {check(ORG)}Set up your own custom long drive competitions &amp; events
+        </div>
         <div style={{ ...cell, borderRight: `1px solid ${BDR}`, borderTop: `1px solid ${BDR}`, color: MUT }}>
           {check(MUT)}Free, always
         </div>
