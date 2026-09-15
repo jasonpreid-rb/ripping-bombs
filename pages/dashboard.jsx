@@ -44,6 +44,16 @@ const avg = (arr) => arr.length ? Math.round(arr.reduce((s, v) => s + v, 0) / ar
 const fmt = (n) => n == null ? '—' : `${n} yds`;
 const fmtDate = (str) => str ? new Date(str).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
 
+// Paid/trial gate for scheduling a custom event — same logic TvDisplayPromo
+// uses to decide subscribed-vs-trial-vs-expired, kept in sync with it.
+const TV_TRIAL_DAYS = 90;
+function isVenuePaid(club) {
+  if (club?.display_subscribed) return true;
+  if (!club?.display_trial_started_at) return false;
+  const daysLeft = TV_TRIAL_DAYS - Math.floor((Date.now() - new Date(club.display_trial_started_at).getTime()) / 86400000);
+  return daysLeft > 0;
+}
+
 function getCategory(entry) {
   const age = Number(entry.age);
   const hcp = Number(entry.hcp);
@@ -2042,9 +2052,12 @@ export default function DashboardPage() {
           isClub={club?.accountType === 'club'}
         />
 
-        {/* Custom Events & Competitions — club accounts only, bundled into TV Display */}
+        {/* Custom Events & Competitions — club accounts only. Scheduling a new
+            event is gated to paid/trial TV Display & Sponsors; the section
+            itself (viewing/sharing existing events) stays open to all club
+            accounts so nothing already created disappears if a trial lapses. */}
         {club?.accountType === 'club' && (
-          <VenueEventsSection venueId={club.id} initialEvents={venueEvents} />
+          <VenueEventsSection venueId={club.id} initialEvents={venueEvents} isPaid={isVenuePaid(club)} onUpgradeClick={handleStartTrial} />
         )}
 
         {/* Embeddable leaderboard badge — club accounts only. A real backlink

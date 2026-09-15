@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { TXT, MUT, ORG, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { tier, todayStr, toB64 } from '../lib/constants';
 import { Card, Field, PhotoField, Btn } from '../components/UI';
-import { getEventBySlug, checkEligibility, joinEvent } from '../lib/events';
+import { getEventBySlug, checkEligibility, joinEvent, getEventStatus } from '../lib/events';
 
 // Mirrors nameToSlug() in pages/profile/[slug].jsx — keep in sync
 function nameToSlug(name) {
@@ -92,10 +92,12 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
 
   // Event eligibility — only relevant when arriving via an /e/[slug] "Join" link.
   const eventEligibility = eventData ? checkEligibility(eventData.event, loggedOrg) : null;
+  const eventStatus = eventData ? getEventStatus(eventData.event) : null;
 
   // Best-effort auto-join: someone may land here with the link shared directly
   // rather than via the "Join" button on the event page. Silent — ineligible
-  // players are already blocked below before this would matter.
+  // players (and, via the server-side check in /api/events/join, players
+  // outside the event window) are already blocked below before this matters.
   useEffect(() => {
     if (eventData && eventEligibility?.eligible) {
       joinEvent(eventData.event.id, loggedOrg).catch(() => {});
@@ -128,6 +130,22 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
       <div style={{ padding: '80px 18px', textAlign: 'center' }}>
         <div style={{ fontFamily: DISP, fontSize: 26, color: TXT, marginBottom: 10 }}>Event Not Found</div>
         <div style={{ fontFamily: SANS, fontSize: 13, color: MUT }}>{eventError}</div>
+      </div>
+    );
+  }
+
+  if (eventData && eventStatus && eventStatus !== 'active') {
+    return (
+      <div style={{ padding: '80px 18px', textAlign: 'center' }}>
+        <div style={{ fontFamily: DISP, fontSize: 26, color: TXT, marginBottom: 10 }}>
+          {eventStatus === 'upcoming' ? 'Not Open Yet' : 'Event Ended'}
+        </div>
+        <div style={{ fontFamily: SANS, fontSize: 13, color: MUT, marginBottom: 20 }}>
+          {eventStatus === 'upcoming'
+            ? `Entries open ${new Date(eventData.event.startAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}.`
+            : 'This event is no longer accepting entries.'}
+        </div>
+        <Btn onClick={() => router.push(`/e/${router.query.event}`)}>Back to Event →</Btn>
       </div>
     );
   }

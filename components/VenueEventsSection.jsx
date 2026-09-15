@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
 import { supabase } from '../lib/supabaseClient';
-import { createEvent, updateEvent, inviteParticipants, searchPlayers, invitePlayerById } from '../lib/events';
+import { createEvent, updateEvent, inviteParticipants, searchPlayers, invitePlayerById, getEventStatus } from '../lib/events';
 
 const ORG = '#FF0090';
 const TXT = '#f0f0f0';
@@ -177,6 +177,7 @@ function EventShareCard({ event }) {
 }
 
 function EventRow({ event, onSelect, isSelected }) {
+  const liveStatus = getEventStatus(event);
   return (
     <div
       onClick={onSelect}
@@ -186,7 +187,7 @@ function EventRow({ event, onSelect, isSelected }) {
         <div style={{ fontSize: '0.88rem', fontWeight: 700, color: TXT }}>{event.name}</div>
         <div style={{ fontSize: '0.72rem', color: MUT, marginTop: 2 }}>{fmtDate(event.startAt)} – {fmtDate(event.endAt)}</div>
       </div>
-      <StatusBadge status={event.status} />
+      <StatusBadge status={event.status === 'cancelled' ? 'cancelled' : liveStatus === 'upcoming' ? 'draft' : liveStatus} />
     </div>
   );
 }
@@ -203,6 +204,7 @@ function CreateEventForm({ venueId, onCreated, onCancel }) {
 
   const handleCreate = async () => {
     if (!form.name || !form.startAt || !form.endAt) { setError('Name, start date and end date are required.'); return; }
+    if (new Date(form.endAt) <= new Date(form.startAt)) { setError('End must be after start.'); return; }
     setSaving(true);
     setError('');
     try {
@@ -242,6 +244,9 @@ function CreateEventForm({ venueId, onCreated, onCancel }) {
           <label style={labelStyle}>End Date & Time</label>
           <input style={inputStyle} type="datetime-local" value={form.endAt} onChange={e => set('endAt', e.target.value)} />
         </div>
+      </div>
+      <div style={{ fontSize: '0.7rem', color: DIM, marginTop: 4 }}>
+        Set this to a few hours for a same-day comp, or span multiple days for a longer event.
       </div>
 
       <div style={{ fontSize: '0.72rem', fontWeight: 700, color: ORG, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 16 }}>Entry Criteria (optional)</div>
@@ -283,8 +288,9 @@ function CreateEventForm({ venueId, onCreated, onCancel }) {
 }
 
 // Top-level section — rendered on the venue dashboard, club accounts only.
-// Props: venueId, initialEvents ({ current, previous }) fetched by the parent.
-export default function VenueEventsSection({ venueId, initialEvents }) {
+// Props: venueId, initialEvents ({ current, previous }) fetched by the parent,
+// isPaid (TV Display & Sponsors subscribed or trial-active), onUpgradeClick.
+export default function VenueEventsSection({ venueId, initialEvents, isPaid, onUpgradeClick }) {
   const [events, setEvents] = useState(initialEvents || { current: [], previous: [] });
   const [showCreate, setShowCreate] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -305,15 +311,31 @@ export default function VenueEventsSection({ venueId, initialEvents }) {
           <h2 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: TXT }}>Your Events & Competitions</h2>
           <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: MUT }}>Included in your TV Display & Sponsors subscription</p>
         </div>
-        <button
-          onClick={() => setShowCreate(s => !s)}
-          style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, padding: '0.5rem 1rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.82rem', fontWeight: 700 }}
-        >
-          {showCreate ? 'Cancel' : '+ New Event'}
-        </button>
+        {isPaid && (
+          <button
+            onClick={() => setShowCreate(s => !s)}
+            style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, padding: '0.5rem 1rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.82rem', fontWeight: 700 }}
+          >
+            {showCreate ? 'Cancel' : '+ New Event'}
+          </button>
+        )}
       </div>
 
-      {showCreate && (
+      {!isPaid && (
+        <div style={{ background: BG2, border: `1px solid ${ORG}`, borderRadius: 8, padding: '0.9rem 1rem', marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+          <span style={{ fontSize: '0.82rem', color: MUT, lineHeight: 1.5 }}>
+            Scheduling your own long-drive comp is part of TV Display & Sponsors — free for your first 3 months.
+          </span>
+          <button
+            onClick={onUpgradeClick}
+            style={{ background: ORG, color: '#000', fontWeight: 700, border: 'none', padding: '0.5rem 1rem', borderRadius: 7, cursor: 'pointer', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+          >
+            Start Free Trial
+          </button>
+        </div>
+      )}
+
+      {isPaid && showCreate && (
         <CreateEventForm venueId={venueId} onCreated={handleCreated} onCancel={() => setShowCreate(false)} />
       )}
 

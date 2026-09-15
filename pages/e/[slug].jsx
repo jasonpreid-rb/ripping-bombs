@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { TXT, MUT, ORG, BG3, BDR, DIM, SANS, DISP } from '../../lib/constants';
 import { Card, Btn } from '../../components/UI';
-import { getEventBySlug, checkEligibility, joinEvent } from '../../lib/events';
+import { getEventBySlug, checkEligibility, joinEvent, getEventStatus } from '../../lib/events';
 
 const fmtDateTime = (str) => str
   ? new Date(str).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -23,6 +23,16 @@ function CriteriaBadges({ event }) {
       {badges.map(b => (
         <span key={b} style={{ background: 'rgba(255,0,144,0.12)', color: ORG, border: `1px solid ${ORG}`, borderRadius: 20, padding: '3px 10px', fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: .3 }}>{b}</span>
       ))}
+    </div>
+  );
+}
+
+function StatusLine({ status, event }) {
+  const label = status === 'upcoming' ? `Opens ${fmtDateTime(event.startAt)}` : status === 'ended' ? 'This event has ended' : 'Live now';
+  const color = status === 'active' ? ORG : MUT;
+  return (
+    <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color, textAlign: 'center', marginTop: 6, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+      {label}
     </div>
   );
 }
@@ -62,6 +72,7 @@ export default function EventPage() {
 
   if (!state) return null;
   const { event, venue, participants, entries } = state;
+  const status = getEventStatus(event);
 
   const handleJoin = async () => {
     const org = getLoggedOrg();
@@ -109,6 +120,7 @@ export default function EventPage() {
         <div style={{ fontFamily: SANS, fontSize: 12, color: DIM, textAlign: 'center', marginTop: 6 }}>
           {fmtDateTime(event.startAt)} — {fmtDateTime(event.endAt)}
         </div>
+        <StatusLine status={status} event={event} />
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <CriteriaBadges event={event} />
         </div>
@@ -118,10 +130,18 @@ export default function EventPage() {
         )}
 
         <div style={{ margin: '22px 0' }}>
-          <Btn full onClick={handleJoin}>
-            {joining ? 'Joining…' : 'Join & Submit Your Drive →'}
-          </Btn>
-          {joinMsg && <div style={{ fontFamily: SANS, fontSize: 12, color: '#f87171', textAlign: 'center', marginTop: 8 }}>{joinMsg}</div>}
+          {status === 'active' ? (
+            <>
+              <Btn full onClick={handleJoin}>
+                {joining ? 'Joining…' : 'Join & Submit Your Drive →'}
+              </Btn>
+              {joinMsg && <div style={{ fontFamily: SANS, fontSize: 12, color: '#f87171', textAlign: 'center', marginTop: 8 }}>{joinMsg}</div>}
+            </>
+          ) : (
+            <div style={{ border: `1px solid ${BDR}`, borderRadius: 8, padding: '14px', textAlign: 'center', fontFamily: SANS, fontSize: 13, color: DIM }}>
+              {status === 'upcoming' ? `Entries open ${fmtDateTime(event.startAt)}` : 'Entries are closed — this event has ended.'}
+            </div>
+          )}
         </div>
 
         <div style={{ display: 'flex', gap: 8, marginBottom: 14, borderBottom: `1px solid ${BDR}` }}>
