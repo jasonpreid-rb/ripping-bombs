@@ -619,8 +619,58 @@ function VenueRankStrip({ rank, totalVenues, scorePercentile, categoriesCounted 
   );
 }
 
+// A–Z strip for jumping to players by first letter of name.
+const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+function AlphabetFilter({ active, availableLetters, onSelect }) {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: '0.75rem 1.25rem', borderBottom: `1px solid ${BDR}`, background: BG3 }}>
+      <button
+        onClick={() => onSelect(null)}
+        style={{
+          background: active === null ? ORG : 'transparent',
+          color: active === null ? '#000' : MUT,
+          border: `1px solid ${active === null ? ORG : BDR}`,
+          borderRadius: 6,
+          padding: '2px 8px',
+          fontSize: '0.72rem',
+          fontWeight: 700,
+          cursor: 'pointer',
+        }}>
+        All
+      </button>
+      {ALPHABET.map((letter) => {
+        const has = availableLetters.has(letter);
+        const isActive = active === letter;
+        return (
+          <button
+            key={letter}
+            onClick={() => has && onSelect(letter)}
+            disabled={!has}
+            style={{
+              background: isActive ? ORG : 'transparent',
+              color: isActive ? '#000' : has ? TXT : DIM,
+              border: `1px solid ${isActive ? ORG : BDR}`,
+              borderRadius: 6,
+              width: 26,
+              height: 26,
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              cursor: has ? 'pointer' : 'not-allowed',
+              opacity: has ? 1 : 0.4,
+            }}>
+            {letter}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 // Per-player breakdown table (for club accounts)
 function PlayerBreakdown({ entries }) {
+  const [activeLetter, setActiveLetter] = useState(null);
+
   const players = {};
   entries.forEach((e) => {
     if (!players[e.player]) players[e.player] = [];
@@ -633,46 +683,66 @@ function PlayerBreakdown({ entries }) {
   if (rows.length === 0) return null;
   const topBest = rows[0].best;
 
+  const availableLetters = new Set(
+    rows.map((r) => (r.name || '').trim().charAt(0).toUpperCase()).filter((l) => ALPHABET.includes(l))
+  );
+  const visibleRows = activeLetter
+    ? rows.filter((r) => (r.name || '').trim().charAt(0).toUpperCase() === activeLetter)
+    : rows;
+
   return (
     <div style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, overflow: 'hidden' }}>
       <div style={{ padding: '1rem 1.25rem', borderBottom: `1px solid ${BDR}` }}>
         <h2 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>Player Breakdown</h2>
       </div>
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 480 }}>
-          <thead>
-            <tr style={{ background: BG3, borderBottom: `1px solid ${BDR}` }}>
-              {['Player', 'Best Drive', 'Avg Drive', 'Submissions', ''].map((h) => (
-                <th key={h} style={{ padding: '0.6rem 1.1rem', textAlign: 'left', fontSize: '0.68rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r, i) => {
-              const barPct = Math.round((r.best / topBest) * 100);
-              return (
-                <tr key={r.name} style={{ borderBottom: `1px solid ${BDR}` }}>
-                  <td style={{ padding: '0.85rem 1.1rem', fontWeight: 600, fontSize: '0.88rem', color: TXT }}>{r.name}</td>
-                  <td style={{ padding: '0.85rem 1.1rem', fontWeight: 700, color: i === 0 ? ORG : TXT, fontSize: '0.9rem' }}>{r.best} yds</td>
-                  <td style={{ padding: '0.85rem 1.1rem', color: MUT, fontSize: '0.85rem' }}>{r.avg} yds</td>
-                  <td style={{ padding: '0.85rem 1.1rem', color: MUT, fontSize: '0.85rem' }}>{r.count}</td>
-                  <td style={{ padding: '0.85rem 1.1rem', minWidth: 120 }}>
-                    <div style={{ background: BG3, borderRadius: 3, height: 6, overflow: 'hidden' }}>
-                      <div style={{ width: `${barPct}%`, height: '100%', background: i === 0 ? ORG : BDR, borderRadius: 3 }} />
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      {rows.length > 10 && (
+        <AlphabetFilter active={activeLetter} availableLetters={availableLetters} onSelect={setActiveLetter} />
+      )}
+      {visibleRows.length === 0 ? (
+        <div style={{ padding: '2rem', textAlign: 'center', color: MUT, fontSize: '0.85rem' }}>
+          No players starting with "{activeLetter}".
+        </div>
+      ) : (
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 480 }}>
+            <thead>
+              <tr style={{ background: BG3, borderBottom: `1px solid ${BDR}` }}>
+                {['Player', 'Best Drive', 'Avg Drive', 'Submissions', ''].map((h) => (
+                  <th key={h} style={{ padding: '0.6rem 1.1rem', textAlign: 'left', fontSize: '0.68rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {visibleRows.map((r) => {
+                const barPct = Math.round((r.best / topBest) * 100);
+                const isTop = r.best === topBest;
+                return (
+                  <tr key={r.name} style={{ borderBottom: `1px solid ${BDR}` }}>
+                    <td style={{ padding: '0.85rem 1.1rem', fontWeight: 600, fontSize: '0.88rem', color: TXT }}>{r.name}</td>
+                    <td style={{ padding: '0.85rem 1.1rem', fontWeight: 700, color: isTop ? ORG : TXT, fontSize: '0.9rem' }}>{r.best} yds</td>
+                    <td style={{ padding: '0.85rem 1.1rem', color: MUT, fontSize: '0.85rem' }}>{r.avg} yds</td>
+                    <td style={{ padding: '0.85rem 1.1rem', color: MUT, fontSize: '0.85rem' }}>{r.count}</td>
+                    <td style={{ padding: '0.85rem 1.1rem', minWidth: 120 }}>
+                      <div style={{ background: BG3, borderRadius: 3, height: 6, overflow: 'hidden' }}>
+                        <div style={{ width: `${barPct}%`, height: '100%', background: isTop ? ORG : BDR, borderRadius: 3 }} />
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
 
 // Recent drives table
+const DRIVES_PAGE_SIZE = 20;
+
 function DriveHistory({ entries, lastDriveDate, limitToFree, isClub }) {
+  const [page, setPage] = useState(0);
   const daysSince = lastDriveDate ? Math.floor((Date.now() - new Date(lastDriveDate)) / 86400000) : null;
   const nudge = daysSince === null
     ? (isClub ? "No drives submitted yet — log your first player's drive!" : "You haven't submitted a drive yet — get on the board!")
@@ -681,8 +751,24 @@ function DriveHistory({ entries, lastDriveDate, limitToFree, isClub }) {
     : null;
   const FREE_LIMIT = 3;
   const isLimited = limitToFree && entries.length > FREE_LIMIT;
-  const visibleEntries = isLimited ? entries.slice(0, FREE_LIMIT) : entries;
-  const hiddenCount = entries.length - visibleEntries.length;
+
+  // Club/venue accounts (and any non-free-limited view) paginate instead of
+  // truncating, since the free-account cap above already handles the
+  // limited case and these lists can otherwise get massive.
+  const usePagination = !isLimited && entries.length > DRIVES_PAGE_SIZE;
+  const pageCount = usePagination ? Math.ceil(entries.length / DRIVES_PAGE_SIZE) : 1;
+  const currentPage = Math.min(page, pageCount - 1);
+
+  useEffect(() => {
+    setPage(0);
+  }, [entries.length]);
+
+  const visibleEntries = isLimited
+    ? entries.slice(0, FREE_LIMIT)
+    : usePagination
+    ? entries.slice(currentPage * DRIVES_PAGE_SIZE, currentPage * DRIVES_PAGE_SIZE + DRIVES_PAGE_SIZE)
+    : entries;
+  const hiddenCount = entries.length - (isLimited ? visibleEntries.length : entries.length);
   return (
     <div style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', borderBottom: `1px solid ${BDR}`, flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -711,12 +797,14 @@ function DriveHistory({ entries, lastDriveDate, limitToFree, isClub }) {
               </tr>
             </thead>
             <tbody>
-              {visibleEntries.map((e, i) => (
+              {visibleEntries.map((e, i) => {
+                const rowNumber = (usePagination ? currentPage * DRIVES_PAGE_SIZE : 0) + i + 1;
+                return (
                 <tr key={e.id} style={{ borderBottom: i < visibleEntries.length - 1 ? `1px solid ${BDR}` : 'none' }}
                   onMouseEnter={(el) => el.currentTarget.style.background = 'rgba(163,230,53,0.03)'}
                   onMouseLeave={(el) => el.currentTarget.style.background = 'transparent'}>
-                  <td style={{ padding: '0.8rem 1rem', color: DIM, fontSize: '0.78rem' }}>#{i + 1}</td>
-                  <td style={{ padding: '0.8rem 1rem', fontWeight: 700, color: i === 0 ? ORG : TXT, fontSize: '0.9rem' }}>{Number(e.dist)} yds</td>
+                  <td style={{ padding: '0.8rem 1rem', color: DIM, fontSize: '0.78rem' }}>#{rowNumber}</td>
+                  <td style={{ padding: '0.8rem 1rem', fontWeight: 700, color: rowNumber === 1 ? ORG : TXT, fontSize: '0.9rem' }}>{Number(e.dist)} yds</td>
                   <td style={{ padding: '0.8rem 1rem', color: MUT, fontSize: '0.85rem' }}>{e.player}</td>
                   <td style={{ padding: '0.8rem 1rem', color: MUT, fontSize: '0.82rem' }}>{e.club || '—'}</td>
                   <td style={{ padding: '0.8rem 1rem', color: MUT, fontSize: '0.82rem' }}>{e.hcp ?? '—'}</td>
@@ -727,7 +815,8 @@ function DriveHistory({ entries, lastDriveDate, limitToFree, isClub }) {
                     </span>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
           {isLimited && (
@@ -736,6 +825,28 @@ function DriveHistory({ entries, lastDriveDate, limitToFree, isClub }) {
                 <strong style={{ color: ORG }}>{hiddenCount} more drive{hiddenCount === 1 ? '' : 's'}</strong> hidden — free accounts show your best {FREE_LIMIT}.
               </div>
               <span style={{ fontSize: '0.76rem', color: MUT }}>Upgrade to Premium to see your full history →</span>
+            </div>
+          )}
+          {usePagination && (
+            <div style={{ padding: '0.85rem 1.25rem', borderTop: `1px solid ${BDR}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+              <span style={{ fontSize: '0.78rem', color: MUT }}>
+                Showing {currentPage * DRIVES_PAGE_SIZE + 1}–{Math.min((currentPage + 1) * DRIVES_PAGE_SIZE, entries.length)} of {entries.length}
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <button
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  disabled={currentPage === 0}
+                  style={{ background: 'transparent', border: `1px solid ${BDR}`, color: currentPage === 0 ? DIM : TXT, padding: '0.35rem 0.8rem', borderRadius: 6, fontSize: '0.78rem', cursor: currentPage === 0 ? 'not-allowed' : 'pointer' }}>
+                  ← Prev
+                </button>
+                <span style={{ fontSize: '0.78rem', color: MUT }}>Page {currentPage + 1} of {pageCount}</span>
+                <button
+                  onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+                  disabled={currentPage >= pageCount - 1}
+                  style={{ background: 'transparent', border: `1px solid ${BDR}`, color: currentPage >= pageCount - 1 ? DIM : TXT, padding: '0.35rem 0.8rem', borderRadius: 6, fontSize: '0.78rem', cursor: currentPage >= pageCount - 1 ? 'not-allowed' : 'pointer' }}>
+                  Next →
+                </button>
+              </div>
             </div>
           )}
         </div>
