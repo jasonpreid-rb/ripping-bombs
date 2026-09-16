@@ -196,6 +196,7 @@ function CreateEventForm({ venueId, onCreated, onCancel }) {
   const [form, setForm] = useState({
     name: '', description: '', startAt: '', endAt: '',
     minAge: '', maxAge: '', gender: 'any',
+    maxEntriesPerPlayer: '',
     sponsorName: '', sponsorLogoUrl: '', brandColor: '',
   });
   const [saving, setSaving] = useState(false);
@@ -216,6 +217,7 @@ function CreateEventForm({ venueId, onCreated, onCancel }) {
         minAge: form.minAge ? Number(form.minAge) : null,
         maxAge: form.maxAge ? Number(form.maxAge) : null,
         gender: form.gender,
+        maxEntriesPerPlayer: form.maxEntriesPerPlayer ? Number(form.maxEntriesPerPlayer) : null,
         sponsorName: form.sponsorName || null,
         sponsorLogoUrl: form.sponsorLogoUrl || null,
         brandColor: form.brandColor || null,
@@ -247,6 +249,12 @@ function CreateEventForm({ venueId, onCreated, onCancel }) {
       </div>
       <div style={{ fontSize: '0.7rem', color: DIM, marginTop: 4 }}>
         Set this to a few hours for a same-day comp, or span multiple days for a longer event.
+      </div>
+
+      <label style={labelStyle}>Max Attempts Per Player</label>
+      <input style={inputStyle} type="number" min="1" value={form.maxEntriesPerPlayer} onChange={e => set('maxEntriesPerPlayer', e.target.value)} placeholder="Leave blank for unlimited" />
+      <div style={{ fontSize: '0.7rem', color: DIM, marginTop: 4 }}>
+        How many drives each player can submit to this event — e.g. 3 swings each on comp night. This replaces the usual weekly submission limit for this event only.
       </div>
 
       <div style={{ fontSize: '0.72rem', fontWeight: 700, color: ORG, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 16 }}>Entry Criteria (optional)</div>

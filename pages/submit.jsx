@@ -125,6 +125,16 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
     return existingThisWeek || null;
   })();
 
+  // Event attempts — replaces the weekly cap entirely while inside an event's
+  // window, so a player who already used their weekly slot elsewhere isn't
+  // shut out of a comp night, and can take multiple swings if the venue
+  // allowed more than one. maxEntriesPerPlayer of null means unlimited.
+  const eventEntryCount = eventData
+    ? entries.filter(e => e.eventId === eventData.event.id && e.orgId === loggedOrg.id).length
+    : 0;
+  const eventAttemptsBlock = eventData && eventData.event.maxEntriesPerPlayer != null && eventEntryCount >= eventData.event.maxEntriesPerPlayer;
+  const submissionBlocked = eventData ? eventAttemptsBlock : (isSimulator && simulatorWeeklyBlock);
+
   if (eventError) {
     return (
       <div style={{ padding: '80px 18px', textAlign: 'center' }}>
@@ -219,13 +229,22 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
           </div>
         )}
 
-        {/* Weekly limit block for simulator accounts */}
-        {isSimulator && simulatorWeeklyBlock && (
+        {/* Weekly limit block for simulator accounts — doesn't apply during an event; see eventAttemptsBlock instead */}
+        {!eventData && isSimulator && simulatorWeeklyBlock && (
           <div style={{ background:'rgba(248,113,113,0.06)', border:'1px solid rgba(248,113,113,0.3)', padding:'20px 20px', marginBottom:20, fontFamily:SANS }}>
             <div style={{ fontSize:14, fontWeight:700, color:'#f87171', marginBottom:6 }}>⏱ Weekly Submission Limit Reached</div>
             <div style={{ fontSize:12, color:MUT, lineHeight:1.7 }}>
               You've already submitted a drive this week (<span style={{ color:TXT, fontWeight:600 }}>{simulatorWeeklyBlock.dist} yds on {simulatorWeeklyBlock.date}</span>). Simulator accounts are limited to one submission per week. Come back next Monday!
             </div>
+          </div>
+        )}
+
+        {/* Event attempt count — shown whenever the venue set a per-event cap */}
+        {eventData && eventData.event.maxEntriesPerPlayer != null && (
+          <div style={{ background: eventAttemptsBlock ? 'rgba(248,113,113,0.06)' : 'rgba(255,0,144,0.06)', border: `1px solid ${eventAttemptsBlock ? 'rgba(248,113,113,0.3)' : 'rgba(255,0,144,0.2)'}`, padding:'14px 18px', marginBottom:20, fontFamily:SANS, fontSize:12, color: eventAttemptsBlock ? '#f87171' : MUT, lineHeight:1.6 }}>
+            {eventAttemptsBlock
+              ? <>⏱ <span style={{ fontWeight:700 }}>All {eventData.event.maxEntriesPerPlayer} attempts used</span> for this event.</>
+              : <>You've used <span style={{ color:TXT, fontWeight:600 }}>{eventEntryCount} of {eventData.event.maxEntriesPerPlayer}</span> attempts for this event.</>}
           </div>
         )}
 
@@ -414,7 +433,12 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
             full
             onClick={async () => {
               setFormError('');
-              if (isSimulator && simulatorWeeklyBlock) { setFormError('You have already submitted a drive this week. Simulator accounts are limited to one submission per week.'); return; }
+              if (submissionBlocked) {
+                setFormError(eventData
+                  ? `You've used all ${eventData.event.maxEntriesPerPlayer} attempts for this event.`
+                  : 'You have already submitted a drive this week. Simulator accounts are limited to one submission per week.');
+                return;
+              }
               if (!isSimulator && !form.playerEmail) { setFormError("Please enter the player's email so we can notify them."); return; }
               if (isSimulator && !loggedOrg.dob) { setFormError('Please add your date of birth in your profile before submitting — use the "Complete Profile" button above.'); return; }
               if (!consent) { setFormError(isSimulator ? 'Please confirm your consent before submitting.' : 'Please confirm player consent before submitting.'); return; }
@@ -427,7 +451,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
                 setRankResult(result);
               }
             }}
-            style={{ opacity:(consent && !(isSimulator && simulatorWeeklyBlock))?1:0.5 }}
+            style={{ opacity:(consent && !submissionBlocked)?1:0.5 }}
           >
             Submit to World Registry →
           </Btn>

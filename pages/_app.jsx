@@ -18,7 +18,7 @@ import { supabase } from '../lib/supabaseClient';
 import { ORGS_KEY, ENT_KEY, SANS, ORG, MUT, BG2, BDR, TXT, DIM, DISP } from '../lib/constants';
 import { todayStr } from '../lib/constants';
 import { sendRegistrationNotification, sendPlayerSubmissionNotice } from '../lib/email';
-import { getEventStatusById } from '../lib/events';
+import { getEventSubmissionInfo } from '../lib/events';
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
@@ -224,17 +224,28 @@ export default function App({ Component, pageProps }) {
     if (!form.player || !form.dist || !form.club || !form.hcp || !form.age) { toast('Fill all required fields'); return false; }
     if (!form.photo) { toast('Photo evidence required'); return false; }
 
-    // Re-check the event window right before writing the entry — the UI
-    // already blocks this in submit.jsx, but that check runs when the page
-    // loads, and someone could sit on the form past the event's end time
-    // before hitting Submit. Fails open (allows the submit) if the event
-    // can't be looked up, since a lookup glitch shouldn't block genuine
-    // non-event submissions or ones for since-deleted events.
+    // Re-check the event window — and, for event submissions, the per-event
+    // attempt cap instead of the usual weekly limit — right before writing
+    // the entry. The UI already blocks both in submit.jsx, but that check
+    // runs when the page loads, and someone could sit on the form past the
+    // event's end time, or across multiple tabs, before hitting Submit.
+    // Fails open (allows the submit) if the event can't be looked up, since
+    // a lookup glitch shouldn't block genuine non-event submissions or ones
+    // for since-deleted events.
     if (form.eventId) {
-      const status = await getEventStatusById(form.eventId);
-      if (status && status !== 'active') {
-        toast(status === 'upcoming' ? 'This event has not started yet.' : 'This event has ended — entries are closed.');
-        return false;
+      const info = await getEventSubmissionInfo(form.eventId);
+      if (info) {
+        if (info.status !== 'active') {
+          toast(info.status === 'upcoming' ? 'This event has not started yet.' : 'This event has ended — entries are closed.');
+          return false;
+        }
+        if (info.maxEntriesPerPlayer != null) {
+          const attemptsUsed = entries.filter(e => e.eventId === form.eventId && e.orgId === loggedOrg.id).length;
+          if (attemptsUsed >= info.maxEntriesPerPlayer) {
+            toast(`You've used all ${info.maxEntriesPerPlayer} attempts for this event.`);
+            return false;
+          }
+        }
       }
     }
 
