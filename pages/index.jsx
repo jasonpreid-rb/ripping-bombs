@@ -7,157 +7,9 @@ import { fmtDate } from '../lib/constants';
 import EmailSignup from '../components/EmailSignup';
 import { countryFlag } from '../components/UI';
 import PlayerAvatar from '../components/PlayerAvatar';
+import InstantRankWidget from '../components/InstantRankWidget';
 
-// ── Inline percentile calculator (embedded on homepage) ──────────────────────
-
-const CALC_BENCHMARKS = {
-  male:   { youth:{scratch:250,low:235,mid:215,high:190}, adult:{scratch:285,low:260,mid:235,high:205}, senior:{scratch:255,low:235,mid:215,high:190} },
-  female: { youth:{scratch:195,low:180,mid:165,high:145}, adult:{scratch:225,low:205,mid:185,high:160}, senior:{scratch:200,low:185,mid:170,high:150} },
-};
-const CALC_SPREAD = 28;
-function calcAgeGroup(age) { if(age<18)return'youth'; if(age>=55)return'senior'; return'adult'; }
-function calcHcpBand(hcp)  { if(hcp<=4)return'scratch'; if(hcp<=12)return'low'; if(hcp<=20)return'mid'; return'high'; }
-function calcPercentile(z) {
-  const t=1/(1+0.2316419*Math.abs(z)),d=0.3989423*Math.exp((-z*z)/2);
-  let p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));
-  return z>0?1-p:p;
-}
-function calcVerdict(topPct) {
-  if(topPct<=5)  return{label:'💥 ELITE BOMBER',  color:'#ff9900'};
-  if(topPct<=15) return{label:'🔥 BIG HITTER',    color:'#a3e635'};
-  if(topPct<=35) return{label:'💪 ABOVE AVERAGE', color:'#a3e635'};
-  if(topPct<=65) return{label:'⛳ RIGHT IN THE MIX',color:'#e8e8e8'};
-  return               {label:'📈 ROOM TO GROW',  color:'#666'};
-}
-
-function AnimatedCalcResult({ result, hcp, gender }) {
-  const topPct = 100 - result.pct;
-  const verdict = calcVerdict(topPct);
-  const [displayPct, setDisplayPct] = useState(0);
-  const [barWidth, setBarWidth] = useState(0);
-  const [visible, setVisible] = useState(false);
-  const rafRef = useRef(null);
-
-  useEffect(() => {
-    setDisplayPct(0); setBarWidth(0); setVisible(false);
-    const t = setTimeout(() => {
-      setVisible(true);
-      const duration = 1400, start = performance.now();
-      function tick(now) {
-        const progress = Math.min((now - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        setDisplayPct(Math.round(eased * topPct));
-        setBarWidth(eased * result.pct);
-        if (progress < 1) rafRef.current = requestAnimationFrame(tick);
-      }
-      rafRef.current = requestAnimationFrame(tick);
-    }, 80);
-    return () => { clearTimeout(t); if(rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [result]);
-
-  return (
-    <div style={{marginTop:28,paddingTop:28,borderTop:'1px solid rgba(255,255,255,0.1)',opacity:visible?1:0,transform:visible?'translateY(0)':'translateY(12px)',transition:'opacity 0.4s ease,transform 0.4s ease'}}>
-      <div style={{textAlign:'center',marginBottom:20}}>
-        <div style={{display:'inline-block',fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:2,color:verdict.color,border:`1px solid ${verdict.color}`,padding:'5px 14px',textTransform:'uppercase',marginBottom:16}}>
-          {verdict.label}
-        </div>
-        <div style={{fontFamily:DISP,fontSize:'clamp(52px,10vw,88px)',color:ORG,letterSpacing:1,lineHeight:1}}>
-          TOP {displayPct}%
-        </div>
-        <div style={{fontFamily:SANS,fontSize:13,color:MUT,marginTop:8,marginBottom:24}}>
-          You out-drive roughly <strong style={{color:TXT}}>{result.pct}%</strong> of similar golfers
-          {' '}({result.ag==='youth'?'under 18':result.ag==='senior'?'55+':'18–54'}, hcp {hcp}, {gender==='male'?'men':'women'}).
-        </div>
-      </div>
-      <div style={{marginBottom:8}}>
-        <div style={{display:'flex',justifyContent:'space-between',fontFamily:SANS,fontSize:10,color:DIM,marginBottom:6,letterSpacing:1}}>
-          <span>SHORT HITTERS</span><span>LONG HITTERS</span>
-        </div>
-        <div style={{height:10,background:'rgba(255,255,255,0.06)',position:'relative',overflow:'hidden'}}>
-          <div style={{position:'absolute',left:0,top:0,bottom:0,width:`${barWidth}%`,background:'linear-gradient(90deg,rgba(255,0,144,0.3),#a3e635)'}}/>
-          <div style={{position:'absolute',top:-2,bottom:-2,left:`${barWidth}%`,width:3,background:'#fff',boxShadow:'0 0 8px rgba(255,255,255,0.8)'}}/>
-        </div>
-        <div style={{fontFamily:SANS,fontSize:11,color:DIM,marginTop:6,textAlign:'center'}}>
-          Estimated average for your group: ~{result.avg} yds
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function InlineCalculator({ router }) {
-  const [dist,setDist]     = useState('');
-  const [hcp,setHcp]       = useState('');
-  const [age,setAge]       = useState('');
-  const [gender,setGender] = useState('male');
-  const [result,setResult] = useState(null);
-
-  function calculate() {
-    const d=Number(dist),h=Number(hcp),a=Number(age);
-    if(!d||isNaN(h)||!a) return;
-    const ag=calcAgeGroup(a),hb=calcHcpBand(h);
-    const avg=CALC_BENCHMARKS[gender][ag][hb];
-    const z=(d-avg)/CALC_SPREAD;
-    const pct=Math.max(1,Math.min(99,Math.round(calcPercentile(z)*100)));
-    setResult({pct,avg,ag});
-    if(typeof window!=='undefined'&&window.gtag)
-      window.gtag('event','homepage_percentile_calculated',{event_category:'engagement',distance:d,handicap:h,age_group:ag,gender,percentile:pct});
-  }
-
-  const inp = {width:'100%',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.15)',padding:'11px 14px',color:'#fff',fontFamily:SANS,fontSize:14,outline:'none',boxSizing:'border-box',borderRadius:0};
-  const lbl = {display:'block',fontFamily:SANS,fontSize:10,fontWeight:700,color:'rgba(255,255,255,0.5)',marginBottom:5,textTransform:'uppercase',letterSpacing:1};
-
-  return (
-    <div className="rb-calc" style={{position:'relative',zIndex:1,maxWidth:700,margin:'0 auto',width:'100%'}}>
-      <div className="rb-calc-grid" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))',gap:'0 12px',marginBottom:14}}>
-        <div style={{marginBottom:12}}>
-          <label style={lbl}>Distance (yds)<span style={{color:ORG,marginLeft:2}}>*</span></label>
-          <input type="number" value={dist} onChange={e=>setDist(e.target.value)} placeholder="e.g. 240" min={50} max={400} style={inp}/>
-        </div>
-        <div style={{marginBottom:12}}>
-          <label style={lbl}>Handicap<span style={{color:ORG,marginLeft:2}}>*</span></label>
-          <input type="number" value={hcp} onChange={e=>setHcp(e.target.value)} placeholder="e.g. 14" min={0} max={54} style={inp}/>
-        </div>
-        <div style={{marginBottom:12}}>
-          <label style={lbl}>Age<span style={{color:ORG,marginLeft:2}}>*</span></label>
-          <input type="number" value={age} onChange={e=>setAge(e.target.value)} placeholder="e.g. 35" min={5} max={99} style={inp}/>
-        </div>
-        <div style={{marginBottom:12}}>
-          <label style={lbl}>Gender<span style={{color:ORG,marginLeft:2}}>*</span></label>
-          <select value={gender} onChange={e=>setGender(e.target.value)} style={inp}>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </div>
-      </div>
-      <div className="rb-calc-buttons" style={{display:'flex',gap:10}}>
-        <button className="rb-calc-btn" onClick={calculate} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'13px 28px',border:'none',cursor:'pointer',letterSpacing:.5}}>
-          CALCULATE MY RANK →
-        </button>
-        {result && (
-          <button onClick={()=>{setDist('');setHcp('');setAge('');setGender('male');setResult(null);}}
-            style={{background:'transparent',border:'1px solid rgba(255,255,255,0.2)',color:'rgba(255,255,255,0.6)',fontFamily:SANS,fontWeight:600,fontSize:13,padding:'13px 20px',cursor:'pointer'}}>
-            RESET
-          </button>
-        )}
-      </div>
-      {result && (
-        <>
-          <AnimatedCalcResult result={result} hcp={hcp} gender={gender}/>
-          <div style={{marginTop:20,textAlign:'center'}}>
-            <button onClick={()=>{
-              if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_calc_register_click',{event_category:'engagement',location:'post_calc_cta'});
-              router.push('/register');
-            }} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:13,padding:'11px 26px',cursor:'pointer',letterSpacing:.5}}>
-              SUBMIT YOUR REAL DRIVE →
-            </button>
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
+// ── Instant rank widget lives in components/InstantRankWidget.jsx (replaced the old percentile calculator that was here) ──────────
 // ── Infinite-loop horizontal scroll row (category cards) ─────────────────────
 // Renders `items` 3x back-to-back, starts scrolled into the middle copy, and
 // silently snaps scrollLeft back by one set-width whenever it nears either
@@ -570,13 +422,16 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
               LONG DRIVE LEADERBOARD
             </h1>
             <p className="rb-hero-sub" style={{fontFamily:SANS,fontSize:14,color:'rgba(255,255,255,0.65)',maxWidth:440,margin:'0 auto 36px',lineHeight:1.6,letterSpacing:.3}}>
-              <span>See where your drive ranks against golfers your age, handicap &amp; gender — instantly.{' '}</span>
+              <span>See where your drive ranks against golfers worldwide — instantly.{' '}</span>
               <a href="/sim-distance-real-or-fake" className="rb-hero-sub-link" onClick={()=>{if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_sim_link_click',{event_category:'engagement'});}} style={{color:ORG,textDecoration:'underline'}}>
                 Think your sim number might be inflated?
               </a>
             </p>
-            {/* Calculator sits inside the hero */}
-            <InlineCalculator router={router}/>
+            {/* Instant rank widget sits inside the hero — computed live against
+                real entries/orgs (already loaded via getStaticProps below), not
+                a modeled estimate. Registering from here carries the visitor's
+                answers through to the real submission form. */}
+            <InstantRankWidget entries={entries} orgs={orgs}/>
           </div>
         </div>
 
@@ -794,31 +649,6 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           }
           .rb-hero-sub-link {
             display: none !important;
-          }
-
-          /* Calculator: tighter fields and buttons */
-          .rb-calc-grid {
-            gap: 0 8px !important;
-            margin-bottom: 6px !important;
-          }
-          .rb-calc-grid > div {
-            margin-bottom: 8px !important;
-          }
-          .rb-calc-buttons {
-            gap: 6px !important;
-            flex-direction: column !important;
-          }
-          .rb-calc-btn {
-            padding: 10px 18px !important;
-            font-size: 12px !important;
-            width: 100% !important;
-          }
-          .rb-calc-buttons > button {
-            width: 100% !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            text-align: center !important;
           }
 
           /* Weekly leaderboard: pulled tighter so it lands near the fold */

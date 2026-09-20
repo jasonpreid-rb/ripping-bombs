@@ -57,7 +57,7 @@ export default function App({ Component, pageProps }) {
   const [detEnt, setDetEnt] = useState(null);
 
   // Form state
-  const [reg, setReg] = useState({ type:'simulator', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
+  const [reg, setReg] = useState({ type:'simulator', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'', gender:'', dob:'' });
   const [lgn, setLgn] = useState({ email:'', pw:'' });
   const [form, setForm] = useState({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male', venueId:'', facility:'', playerEmail:'', eventId:'' });
 
@@ -158,7 +158,6 @@ export default function App({ Component, pageProps }) {
 
     // Validation
     if (!reg.fullName || !reg.email || !reg.pw) { toast('Fill all required fields'); return; }
-    if (isSimulator && !reg.simulator) { toast('Please select your simulator brand'); return; }
     if (!isSimulator && (!reg.position || !reg.courseName || !reg.location || !reg.country)) { toast('Fill all required fields'); return; }
     if (orgs.find(o => o.email === reg.email)) { toast('Email already registered'); return; }
 
@@ -166,7 +165,7 @@ export default function App({ Component, pageProps }) {
       id: Date.now().toString(),
       fullName: reg.fullName,
       position: isSimulator ? 'Individual / Simulator' : reg.position,
-      courseName: isSimulator ? `${reg.simulator} — ${reg.fullName}` : reg.courseName,
+      courseName: isSimulator ? `${reg.simulator || 'Simulator'} — ${reg.fullName}` : reg.courseName,
       location: reg.location || '',
       country: reg.country || '',
       email: reg.email,
@@ -176,6 +175,8 @@ export default function App({ Component, pageProps }) {
       badge: isSimulator ? 'simulator' : null,
       accountType: reg.type,
       simulator: reg.simulator || '',
+      gender: reg.gender || '',
+      dob: reg.dob || '',
     };
 
     const ok = await db.insertOrg(newOrg);
@@ -183,7 +184,7 @@ export default function App({ Component, pageProps }) {
 
     setOrgs(prev => [...prev, newOrg]);
     await sendRegistrationNotification(newOrg);
-    setReg({ type:'simulator', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'' });
+    setReg({ type:'simulator', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'', gender:'', dob:'' });
 
     // Every account is auto-approved now — log them straight in and send to the dashboard
     setLoggedOrg(newOrg);

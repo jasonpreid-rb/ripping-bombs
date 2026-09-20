@@ -68,6 +68,20 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
     }
   }, [router.isReady, router.query.venue, approvedOrgs]);
 
+  // Instant-rank widget flow: the homepage teaser sends the visitor to
+  // /register?redirect=/submit?dist=<value>&..., and after registering
+  // they land back here with that same dist still in the URL. Carry it
+  // into the real form so the distance they already saw doesn't need
+  // retyping — they still have to add photo/date/club/handicap and
+  // actually submit for it to go live.
+  useEffect(() => {
+    if (!router.isReady) return;
+    const distParam = router.query.dist;
+    if (typeof distParam === 'string' && !form.dist) {
+      setForm(f => ({ ...f, dist: distParam }));
+    }
+  }, [router.isReady, router.query.dist]);
+
   if (!loggedOrg) {
     const venueParam = router.query.venue;
     const currentPath = venueParam ? `/submit?venue=${venueParam}` : '/submit';

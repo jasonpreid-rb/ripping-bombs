@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -224,6 +224,29 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
   // the user actually picked something.
   const [step, setStep] = useState('choose');
   const [showTiers, setShowTiers] = useState(false);
+
+  // Arriving from the homepage instant-rank widget: it always sends a
+  // `dist` query param alongside name/country/gender, which we use here
+  // only as the "came from the widget" signal (the value itself is
+  // re-read on /submit after registering, via the `redirect` param).
+  // Individual players are the only ones that widget targets, so this
+  // also skips the "individual vs venue" choice screen — they already
+  // told us implicitly by using the widget.
+  const prefilledRef = useRef(false);
+  useEffect(() => {
+    if (!router.isReady || prefilledRef.current) return;
+    const { name, country, gender, dist } = router.query;
+    if (typeof dist !== 'string') return;
+    prefilledRef.current = true;
+    setReg(r => ({
+      ...r,
+      type: 'simulator',
+      fullName: typeof name === 'string' ? name : r.fullName,
+      country: typeof country === 'string' ? country : r.country,
+      gender: typeof gender === 'string' ? gender : r.gender,
+    }));
+    setStep('form');
+  }, [router.isReady, router.query]);
 
   const CountrySelect = () => (
     <div style={{ marginBottom: 14 }}>
