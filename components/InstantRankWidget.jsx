@@ -1,14 +1,14 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { COUNTRIES, ORG, TXT, MUT, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
-import { Card, Field, Btn } from './UI';
+import { COUNTRIES, ORG, SANS, DISP } from '../lib/constants';
 
 // Rank is computed against real, currently-live entries — the same
 // `entries`/`orgs` arrays already loaded app-wide (see initData() in
-// lib/data.js), so this needs no API call and writes nothing to the DB.
-// Split by gender only (no age/handicap band, unlike the six homepage
-// categories) to keep the teaser to 4 fields — this is intentionally an
-// approximation, not the exact category rank shown post-registration.
+// lib/data.js / getStaticProps in index.jsx), so this needs no API call
+// and writes nothing to the DB. Split by gender only (no age/handicap
+// band, unlike the six homepage categories) to keep the teaser to 4
+// fields — intentionally an approximation, not the exact category rank
+// shown post-registration.
 function getOrgCountry(orgId, orgs) {
   const org = orgs.find(o => String(o.id) === String(orgId));
   return org?.country || null;
@@ -29,6 +29,43 @@ function computeRank(dist, gender, country, entries, orgs) {
   };
 }
 
+// Verdict badge — same tiers/energy as the percentile calculator this
+// widget replaced, but driven by a real rank instead of a modeled stat.
+function getVerdict(rank, total) {
+  const topPct = (rank / total) * 100;
+  if (topPct <= 5)  return { label: '💥 ELITE BOMBER',   color: '#ff9900' };
+  if (topPct <= 15) return { label: '🔥 BIG HITTER',      color: '#a3e635' };
+  if (topPct <= 35) return { label: '💪 ABOVE AVERAGE',   color: '#a3e635' };
+  if (topPct <= 65) return { label: '⛳ RIGHT IN THE MIX', color: '#e8e8e8' };
+  return                    { label: '📈 ROOM TO GROW',    color: '#999' };
+}
+
+function AnimatedNumber({ value }) {
+  const [display, setDisplay] = useState(0);
+  const rafRef = useRef(null);
+  useEffect(() => {
+    setDisplay(0);
+    const start = performance.now();
+    const duration = 850;
+    function tick(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.round(eased * value));
+      if (progress < 1) rafRef.current = requestAnimationFrame(tick);
+    }
+    rafRef.current = requestAnimationFrame(tick);
+    return () => rafRef.current && cancelAnimationFrame(rafRef.current);
+  }, [value]);
+  return <>{display}</>;
+}
+
+// Styled to sit directly over the hero video (translucent white fields,
+// not an opaque Card) — matches the old InlineCalculator this replaced.
+// If this widget is ever reused somewhere off the hero, swap `inp`/`lbl`
+// for the BG3/BDR tokens the rest of the site's forms use.
+const inp = { width:'100%', background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.15)', padding:'10px 12px', color:'#fff', fontFamily:SANS, fontSize:13, outline:'none', boxSizing:'border-box', borderRadius:0 };
+const lbl = { display:'block', fontFamily:SANS, fontSize:9.5, fontWeight:700, color:'rgba(255,255,255,0.5)', marginBottom:4, textTransform:'uppercase', letterSpacing:1 };
+
 export default function InstantRankWidget({ entries = [], orgs = [] }) {
   const router = useRouter();
   const [name, setName] = useState('');
@@ -37,144 +74,122 @@ export default function InstantRankWidget({ entries = [], orgs = [] }) {
   const [dist, setDist] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const [visible, setVisible] = useState(false);
 
   const canReveal = name.trim() && country && gender && dist && Number(dist) > 0;
 
   const handleReveal = () => {
     setError('');
-    if (!canReveal) {
-      setError('Fill in your name, gender, country and distance to see your rank.');
-      return;
-    }
+    if (!canReveal) { setError('Fill in your name, gender, country and distance.'); return; }
     setResult(computeRank(dist, gender, country, entries, orgs));
+    setVisible(false);
+    requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'homepage_instant_rank_revealed', { event_category: 'engagement', distance: Number(dist), gender, country });
+    }
   };
 
   // Sends the visitor into the existing individual-registration flow with
-  // their answers pre-filled, then (via the existing `redirect` query
-  // mechanism register.jsx already supports) back to /submit with the
-  // distance carried over too — so nothing they already typed here needs
-  // retyping. They still have to complete the real submission (photo,
-  // date, club, handicap) for the entry to actually go live, same as any
-  // other submission.
+  // their answers pre-filled, then (via the `redirect` query mechanism
+  // register.jsx supports) back to /submit with the distance carried
+  // over too. They still complete the real submission (photo, date,
+  // club, handicap) for the entry to actually go live.
   const handleRegister = () => {
     const redirectPath = `/submit?dist=${encodeURIComponent(dist)}`;
-    const qs = new URLSearchParams({
-      redirect: redirectPath,
-      name: name.trim(),
-      country,
-      gender,
-      dist: String(dist),
-    }).toString();
+    const qs = new URLSearchParams({ redirect: redirectPath, name: name.trim(), country, gender, dist: String(dist) }).toString();
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'homepage_instant_rank_register_click', { event_category: 'engagement' });
+    }
     router.push(`/register?${qs}`);
   };
 
-  return (
-    <Card>
-      <div style={{ fontFamily: DISP, fontSize: 22, color: TXT, letterSpacing: 0.5, marginBottom: 6 }}>
-        Where Do You Rank?
-      </div>
-      <div style={{ fontFamily: SANS, fontSize: 12.5, color: MUT, marginBottom: 18, lineHeight: 1.5 }}>
-        Enter your longest drive to see your rank instantly — no account needed to check.
-      </div>
+  const verdict = result ? getVerdict(result.globalRank, result.globalTotal) : null;
 
+  return (
+    <div className="rb-rank-widget" style={{ position:'relative', zIndex:1, maxWidth:720, margin:'0 auto', width:'100%' }}>
       {!result ? (
         <>
-          <Field
-            label="Your Name"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            placeholder="e.g. James Hargreaves"
-          />
-
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: 'block', fontFamily: SANS, fontSize: 11, fontWeight: 600, color: MUT, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.8 }}>
-              Gender <span style={{ color: ORG }}>*</span>
-            </label>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {['male', 'female'].map(g => (
-                <button
-                  key={g}
-                  type="button"
-                  onClick={() => setGender(g)}
-                  style={{ flex: 1, padding: '10px', background: gender === g ? 'transparent' : BG3, border: `1px solid ${gender === g ? ORG : BDR}`, color: gender === g ? ORG : MUT, fontFamily: SANS, fontWeight: 600, fontSize: 12, cursor: 'pointer', textTransform: 'capitalize', letterSpacing: 0.5 }}
-                >
-                  {g === 'male' ? '♂ Male' : '♀ Female'}
-                </button>
-              ))}
+          <div className="rb-rank-grid" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))', gap:'0 10px', marginBottom:10 }}>
+            <div style={{ marginBottom:10 }}>
+              <label style={lbl}>Name<span style={{ color:ORG, marginLeft:2 }}>*</span></label>
+              <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your name" style={inp}/>
             </div>
-          </div>
-
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: 'block', fontFamily: SANS, fontSize: 11, fontWeight: 600, color: MUT, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.8 }}>
-              Country <span style={{ color: ORG }}>*</span>
-            </label>
-            <div style={{ position: 'relative' }}>
-              <select
-                value={country}
-                onChange={e => setCountry(e.target.value)}
-                style={{ width: '100%', background: BG3, border: `1px solid ${BDR}`, padding: '10px 36px 10px 14px', color: country ? TXT : DIM, fontFamily: SANS, fontSize: 14, outline: 'none', appearance: 'none', boxSizing: 'border-box' }}
-              >
-                <option value="">Select country...</option>
+            <div style={{ marginBottom:10 }}>
+              <label style={lbl}>Gender<span style={{ color:ORG, marginLeft:2 }}>*</span></label>
+              <div style={{ display:'flex', gap:6 }}>
+                {['male', 'female'].map(g => (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => setGender(g)}
+                    style={{ flex:1, padding:'10px 6px', background: gender===g ? ORG : 'rgba(255,255,255,0.08)', border:`1px solid ${gender===g ? ORG : 'rgba(255,255,255,0.15)'}`, color: gender===g ? '#000' : 'rgba(255,255,255,0.7)', fontFamily:SANS, fontWeight:700, fontSize:13, cursor:'pointer' }}
+                  >
+                    {g === 'male' ? '♂' : '♀'}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div style={{ marginBottom:10 }}>
+              <label style={lbl}>Country<span style={{ color:ORG, marginLeft:2 }}>*</span></label>
+              <select value={country} onChange={e=>setCountry(e.target.value)} style={inp}>
+                <option value="">Select...</option>
                 {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
               </select>
-              <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: DIM, fontSize: 10 }}>▾</span>
+            </div>
+            <div style={{ marginBottom:10 }}>
+              <label style={lbl}>Distance (yds)<span style={{ color:ORG, marginLeft:2 }}>*</span></label>
+              <input type="number" value={dist} onChange={e=>setDist(e.target.value)} placeholder="e.g. 245" min="50" max="600" style={inp}/>
             </div>
           </div>
-
-          <Field
-            label="Longest Drive (yards)"
-            type="number"
-            value={dist}
-            onChange={e => setDist(e.target.value)}
-            placeholder="245"
-            min="50"
-            max="600"
-          />
 
           {error && (
-            <div style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.4)', padding: '10px 14px', marginBottom: 14, fontFamily: SANS, fontSize: 12, color: '#f87171', lineHeight: 1.5 }}>
-              {error}
-            </div>
+            <div style={{ fontFamily:SANS, fontSize:11.5, color:'#f87171', marginBottom:10 }}>{error}</div>
           )}
 
-          <Btn full onClick={handleReveal}>Reveal My Rank →</Btn>
+          <button onClick={handleReveal} className="rb-rank-cta" style={{ width:'100%', background:ORG, color:'#000', fontFamily:SANS, fontWeight:800, fontSize:14, padding:'13px 24px', border:'none', cursor:'pointer', letterSpacing:.5, boxShadow:'0 0 24px rgba(255,0,144,0.45)' }}>
+            REVEAL MY RANK →
+          </button>
         </>
       ) : (
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontFamily: SANS, fontSize: 12, color: MUT, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.6 }}>
-            Global Rank
-          </div>
-          <div style={{ fontFamily: DISP, fontSize: 40, color: ORG, letterSpacing: 1, marginBottom: 4 }}>
-            #{result.globalRank}
-          </div>
-          <div style={{ fontFamily: SANS, fontSize: 11.5, color: DIM, marginBottom: 20 }}>
-            of {result.globalTotal} {gender === 'female' ? 'women' : 'men'} worldwide
+        <div style={{ textAlign:'center', opacity: visible?1:0, transform: visible ? 'translateY(0) scale(1)' : 'translateY(10px) scale(0.98)', transition:'opacity .4s ease, transform .4s ease' }}>
+          <div style={{ display:'inline-block', fontFamily:SANS, fontSize:11, fontWeight:800, letterSpacing:2, color:verdict.color, border:`1px solid ${verdict.color}`, borderRadius:20, padding:'4px 14px', textTransform:'uppercase', marginBottom:10 }}>
+            {verdict.label}
           </div>
 
-          <div style={{ fontFamily: SANS, fontSize: 12, color: MUT, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.6 }}>
-            National Rank
-          </div>
-          <div style={{ fontFamily: DISP, fontSize: 28, color: TXT, letterSpacing: 1, marginBottom: 4 }}>
-            #{result.nationalRank}
-          </div>
-          <div style={{ fontFamily: SANS, fontSize: 11.5, color: DIM, marginBottom: 24 }}>
-            of {result.nationalTotal} {gender === 'female' ? 'women' : 'men'} in {COUNTRIES.find(c => c.code === country)?.name || country}
+          <div className="rb-rank-numbers" style={{ display:'flex', gap:24, justifyContent:'center', alignItems:'center', marginBottom:10 }}>
+            <div>
+              <div style={{ fontFamily:DISP, fontSize:'clamp(44px,7vw,64px)', color:ORG, letterSpacing:1, lineHeight:1, textShadow:'0 0 30px rgba(255,0,144,0.6)' }}>
+                #<AnimatedNumber value={result.globalRank}/>
+              </div>
+              <div style={{ fontFamily:SANS, fontSize:10.5, color:'rgba(255,255,255,0.55)', textTransform:'uppercase', letterSpacing:1 }}>
+                Global · of {result.globalTotal}
+              </div>
+            </div>
+            <div className="rb-rank-divider" style={{ width:1, alignSelf:'stretch', background:'rgba(255,255,255,0.15)' }}/>
+            <div>
+              <div style={{ fontFamily:DISP, fontSize:'clamp(32px,5vw,44px)', color:'#fff', letterSpacing:1, lineHeight:1 }}>
+                #<AnimatedNumber value={result.nationalRank}/>
+              </div>
+              <div style={{ fontFamily:SANS, fontSize:10.5, color:'rgba(255,255,255,0.55)', textTransform:'uppercase', letterSpacing:1 }}>
+                National · of {result.nationalTotal}
+              </div>
+            </div>
           </div>
 
-          <div style={{ fontFamily: SANS, fontSize: 12, color: MUT, marginBottom: 16, lineHeight: 1.6 }}>
-            This rank is real, but it's only yours once you register and submit your drive — otherwise it won't stick.
+          <div style={{ fontFamily:SANS, fontSize:11.5, color:'rgba(255,255,255,0.5)', marginBottom:14 }}>
+            This rank is real — but it's only yours once you register and submit.
           </div>
 
-          <Btn full onClick={handleRegister}>Register to Claim This Rank →</Btn>
-          <button
-            type="button"
-            onClick={() => setResult(null)}
-            style={{ background: 'none', border: 'none', color: DIM, fontFamily: SANS, fontSize: 11, marginTop: 10, cursor: 'pointer', textDecoration: 'underline' }}
-          >
-            Check a different distance
-          </button>
+          <div style={{ display:'flex', gap:10, justifyContent:'center', flexWrap:'wrap' }}>
+            <button onClick={handleRegister} style={{ background:ORG, color:'#000', fontFamily:SANS, fontWeight:800, fontSize:13, padding:'12px 26px', border:'none', cursor:'pointer', letterSpacing:.5, boxShadow:'0 0 24px rgba(255,0,144,0.45)' }}>
+              CLAIM THIS RANK →
+            </button>
+            <button onClick={() => setResult(null)} style={{ background:'transparent', border:'1px solid rgba(255,255,255,0.2)', color:'rgba(255,255,255,0.6)', fontFamily:SANS, fontWeight:600, fontSize:12, padding:'12px 18px', cursor:'pointer' }}>
+              TRY AGAIN
+            </button>
+          </div>
         </div>
       )}
-    </Card>
+    </div>
   );
 }

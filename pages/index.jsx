@@ -413,15 +413,15 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             </video>
           )}
           <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(0,0,0,0.2),rgba(0,0,0,0.7))'}}/>
-          <div className="rb-hero-content" style={{position:'relative',zIndex:1,padding:'clamp(40px,8vw,72px) 20px clamp(48px,8vw,72px)',display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center'}}>
+          <div className="rb-hero-content" style={{position:'relative',zIndex:1,padding:'clamp(28px,5vw,44px) 20px clamp(24px,4vw,36px)',display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center'}}>
             {/* Condensed brand header */}
-            <div className="rb-hero-badge" style={{fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:4,color:ORG,textTransform:'uppercase',marginBottom:12,background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
+            <div className="rb-hero-badge" style={{fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:4,color:ORG,textTransform:'uppercase',marginBottom:10,background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
               Live Global Simulator Database 
             </div>
-            <h1 className="rb-hero-title" style={{fontFamily:DISP,fontSize:'clamp(42px,8vw,72px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:8,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
+            <h1 className="rb-hero-title" style={{fontFamily:DISP,fontSize:'clamp(36px,6vw,56px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:6,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
               LONG DRIVE LEADERBOARD
             </h1>
-            <p className="rb-hero-sub" style={{fontFamily:SANS,fontSize:14,color:'rgba(255,255,255,0.65)',maxWidth:440,margin:'0 auto 36px',lineHeight:1.6,letterSpacing:.3}}>
+            <p className="rb-hero-sub" style={{fontFamily:SANS,fontSize:14,color:'rgba(255,255,255,0.65)',maxWidth:440,margin:'0 auto 18px',lineHeight:1.6,letterSpacing:.3}}>
               <span>See where your drive ranks against golfers worldwide — instantly.{' '}</span>
               <a href="/sim-distance-real-or-fake" className="rb-hero-sub-link" onClick={()=>{if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_sim_link_click',{event_category:'engagement'});}} style={{color:ORG,textDecoration:'underline'}}>
                 Think your sim number might be inflated?
@@ -436,7 +436,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
         </div>
 
         {/* WEEKLY LEADERS */}
-        <div className="rb-weekly-section" style={{background:'#0e0e0e',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'40px 0 40px'}}>
+        <div className="rb-weekly-section" style={{background:'#0e0e0e',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'28px 0 40px'}}>
           <div style={{maxWidth:1200,margin:'0 auto',padding:'0 18px'}}>
             <div className="rb-weekly-header" style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
               <div>
@@ -648,6 +648,25 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             font-size: 12px !important;
           }
           .rb-hero-sub-link {
+            display: none !important;
+          }
+
+          /* Instant rank widget: tighter fields, stacked result numbers */
+          .rb-rank-grid {
+            gap: 0 8px !important;
+            margin-bottom: 6px !important;
+          }
+          .rb-rank-grid > div {
+            margin-bottom: 8px !important;
+          }
+          .rb-rank-cta {
+            padding: 11px 18px !important;
+            font-size: 13px !important;
+          }
+          .rb-rank-numbers {
+            gap: 14px !important;
+          }
+          .rb-rank-divider {
             display: none !important;
           }
 
