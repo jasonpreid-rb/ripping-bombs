@@ -132,8 +132,8 @@ export default function InstantRankWidget({ entries = [], orgs = [] }) {
             <div style={{ marginBottom:10 }}>
               <label style={lbl}>Country<span style={{ color:ORG, marginLeft:2 }}>*</span></label>
               <select value={country} onChange={e=>setCountry(e.target.value)} style={inp}>
-                <option value="">Select...</option>
-                {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                <option value="" style={{ background:'#1a1a1a', color:'#fff' }}>Select...</option>
+                {COUNTRIES.map(c => <option key={c.code} value={c.code} style={{ background:'#1a1a1a', color:'#fff' }}>{c.name}</option>)}
               </select>
             </div>
             <div style={{ marginBottom:10 }}>
