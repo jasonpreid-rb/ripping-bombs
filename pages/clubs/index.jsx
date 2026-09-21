@@ -20,7 +20,6 @@ export async function getServerSideProps() {
 }
 
 export default function ClubsDirectoryPage({ orgs, entries }) {
-  const router = useRouter();
   const [search, setSearch] = useState('');
 
   // Only show clubs in this directory — simulators have their own profile pages
