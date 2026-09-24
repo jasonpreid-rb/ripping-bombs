@@ -435,25 +435,8 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           </div>
         </div>
 
-        {/* WEEKLY LEADERS */}
-        <div className="rb-weekly-section" style={{background:'#0e0e0e',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'28px 0 40px'}}>
-          <div style={{maxWidth:1200,margin:'0 auto',padding:'0 18px'}}>
-            <div className="rb-weekly-header" style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
-              <div>
-                <div className="rb-weekly-eyebrow" style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:6}}>Live from the Registry</div>
-                <h2 className="rb-weekly-title" style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5,fontWeight:400}}>{currentWeekLabel} — Category Leaders</h2>
-              </div>
-              <button onClick={()=>{
-                if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_full_leaderboard_click',{event_category:'engagement',section:'weekly'});
-                router.push('/leaderboard');
-              }} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
-            </div>
-            <InfiniteScrollRow items={weeklyLeaders} bg="#0e0e0e" renderItem={cat => <WeeklyCard cat={cat}/>}/>
-          </div>
-        </div>
-
         {/* ALL-TIME LEADERS */}
-        <div style={{background:'#111',borderBottom:`1px solid ${BDR}`,padding:'40px 0 40px'}}>
+        <div style={{background:'#111',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'40px 0 40px'}}>
           <div style={{maxWidth:1200,margin:'0 auto',padding:'0 18px'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
               <div>
@@ -466,6 +449,23 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
               }} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
             </div>
             <InfiniteScrollRow items={allTimeLeaders} bg="#111" renderItem={cat => <AllTimeCard cat={cat}/>}/>
+          </div>
+        </div>
+
+        {/* WEEKLY LEADERS */}
+        <div className="rb-weekly-section" style={{background:'#0e0e0e',borderBottom:`1px solid ${BDR}`,padding:'28px 0 40px'}}>
+          <div style={{maxWidth:1200,margin:'0 auto',padding:'0 18px'}}>
+            <div className="rb-weekly-header" style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
+              <div>
+                <div className="rb-weekly-eyebrow" style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:6}}>Live from the Registry</div>
+                <h2 className="rb-weekly-title" style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5,fontWeight:400}}>{currentWeekLabel} — Category Leaders</h2>
+              </div>
+              <button onClick={()=>{
+                if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_full_leaderboard_click',{event_category:'engagement',section:'weekly'});
+                router.push('/leaderboard');
+              }} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
+            </div>
+            <InfiniteScrollRow items={weeklyLeaders} bg="#0e0e0e" renderItem={cat => <WeeklyCard cat={cat}/>}/>
           </div>
         </div>
 
