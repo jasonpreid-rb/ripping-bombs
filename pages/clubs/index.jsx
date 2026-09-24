@@ -6,15 +6,19 @@ import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP, nameToSlug } from '../../lib/
 import { BadgePill, countryFlag } from '../../components/UI';
 
 export async function getServerSideProps() {
-  const { data: orgs } = await supabase
+  const { data: orgs, error: orgsError } = await supabase
     .from('clubs')
     .select('id, courseName, fullName, location, country, logo, badge, accountType, status, is_founding_member, customSlug')
     .eq('status', 'approved')
     .order('courseName', { ascending: true });
 
-  const { data: entries } = await supabase
+  if (orgsError) console.error('clubs query error:', orgsError);
+
+  const { data: entries, error: entriesError } = await supabase
     .from('entries')
     .select('id, orgId, dist');
+
+  if (entriesError) console.error('entries query error:', entriesError);
 
   return { props: { orgs: orgs || [], entries: entries || [] } };
 }
