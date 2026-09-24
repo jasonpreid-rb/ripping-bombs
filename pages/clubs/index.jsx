@@ -62,7 +62,7 @@ export default function ClubsDirectoryPage({ orgs, entries }) {
 
         {letters.map(letter => (
           <div key={letter} style={{ marginBottom: 28 }}>
-            <div style={{ fontFamily: DISP, fontSize: 22, color: ORG, letterSpacing: 1, marginBottom: 10, borderBottom: `2px solid rgba(163,230,53,0.15)`, paddingBottom: 6 }}>{letter}</div>
+            <div style={{ fontFamily: DISP, fontSize: 22, color: ORG, letterSpacing: 1, marginBottom: 10, borderBottom: `2px solid rgba(255,0,144,0.15)`, paddingBottom: 6 }}>{letter}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {grouped[letter].map(org => {
                 const clubEntries = entries.filter(e => e.orgId === org.id);
@@ -96,7 +96,24 @@ export default function ClubsDirectoryPage({ orgs, entries }) {
         ))}
 
         {approved.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '48px 0', fontFamily: SANS, fontSize: 14, color: DIM }}>No clubs found</div>
+          <div style={{ textAlign: 'center', padding: '64px 24px', border: `1px dashed ${BDR}`, background: BG2 }}>
+            <div style={{ fontFamily: DISP, fontSize: 22, color: ORG, letterSpacing: 1, marginBottom: 10 }}>
+              {search ? 'No clubs match your search' : 'No clubs registered yet'}
+            </div>
+            <div style={{ fontFamily: SANS, fontSize: 14, color: MUT, maxWidth: 420, margin: '0 auto 24px', lineHeight: 1.6 }}>
+              {search
+                ? 'Try a different name or location.'
+                : "Be the first golf club to join the global longest drive leaderboard — it's free to set up."}
+            </div>
+            {!search && (
+              <Link
+                href="/for-venues"
+                style={{ display: 'inline-block', fontFamily: SANS, fontWeight: 700, fontSize: 14, color: '#000', background: ORG, padding: '12px 28px', textDecoration: 'none' }}
+              >
+                Register Your Club
+              </Link>
+            )}
+          </div>
         )}
       </div>
     </>
