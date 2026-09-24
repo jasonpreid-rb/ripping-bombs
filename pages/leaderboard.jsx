@@ -115,7 +115,7 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
               <tr key={e.id} onClick={()=>onView(e)} style={{cursor:'pointer',borderBottom:`1px solid ${BDR}`}}
                 onMouseEnter={el=>{
                   el.currentTarget.style.background='rgba(255,0,144,0.04)';
-                  [...el.currentTarget.querySelectorAll('td[data-sticky]')].forEach(td=>td.style.background='#1c201a');
+                  [...el.currentTarget.querySelectorAll('td[data-sticky]')].forEach(td=>td.style.background='#1c1418');
                 }}
                 onMouseLeave={el=>{
                   el.currentTarget.style.background='transparent';

@@ -801,7 +801,7 @@ function DriveHistory({ entries, lastDriveDate, limitToFree, isClub }) {
                 const rowNumber = (usePagination ? currentPage * DRIVES_PAGE_SIZE : 0) + i + 1;
                 return (
                 <tr key={e.id} style={{ borderBottom: i < visibleEntries.length - 1 ? `1px solid ${BDR}` : 'none' }}
-                  onMouseEnter={(el) => el.currentTarget.style.background = 'rgba(163,230,53,0.03)'}
+                  onMouseEnter={(el) => el.currentTarget.style.background = 'rgba(255,0,144,0.03)'}
                   onMouseLeave={(el) => el.currentTarget.style.background = 'transparent'}>
                   <td style={{ padding: '0.8rem 1rem', color: DIM, fontSize: '0.78rem' }}>#{rowNumber}</td>
                   <td style={{ padding: '0.8rem 1rem', fontWeight: 700, color: rowNumber === 1 ? ORG : TXT, fontSize: '0.9rem' }}>{Number(e.dist)} yds</td>
