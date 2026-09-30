@@ -144,6 +144,9 @@ function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 })
   );
 }
 
+// Temporarily hide the weekly category leaders section on the homepage.
+const SHOW_WEEKLY_LEADERS = false;
+
 export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], setDetEnt, cvt, unitLbl, staticEntries=[], staticOrgs=[] }) {
   const entries = staticEntries.length ? staticEntries : propEntries;
   const orgs = staticOrgs.length ? staticOrgs : propOrgs;
@@ -452,7 +455,8 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           </div>
         </div>
 
-        {/* WEEKLY LEADERS */}
+        {/* WEEKLY LEADERS — temporarily hidden; flip SHOW_WEEKLY_LEADERS to true to restore */}
+        {SHOW_WEEKLY_LEADERS && (
         <div className="rb-weekly-section" style={{background:'#0e0e0e',borderBottom:`1px solid ${BDR}`,padding:'28px 0 40px'}}>
           <div style={{maxWidth:1200,margin:'0 auto',padding:'0 18px'}}>
             <div className="rb-weekly-header" style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
@@ -468,6 +472,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
             <InfiniteScrollRow items={weeklyLeaders} bg="#0e0e0e" renderItem={cat => <WeeklyCard cat={cat}/>}/>
           </div>
         </div>
+        )}
 
         {/* LIVE STATS TICKER */}
         {(() => {
