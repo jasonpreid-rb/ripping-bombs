@@ -44,16 +44,11 @@ function safeDate(date) {
   return date <= TODAY ? date : null;
 }
 
-// One-time fallback lastmod for evergreen pages that don't have their own
-// explicit `lastmod` and aren't driven by live entry data (see
-// dynamicChangefreqs below). Deliberately a fixed string, not `new Date()`
-// — using the build date here would bump every static page's lastmod on
-// every single deploy, which is a false freshness signal search engines
-// can penalize trust for. Represents the date these pages were last
-// content-audited as a whole; update a page's own `lastmod` (in
-// corePages below, or on its entry in lib/seoPages.js) when you actually
-// edit its copy, and that takes priority over this fallback.
-const FALLBACK_LASTMOD = '2026-09-10';
+// No shared fallback lastmod. A single identical date on every evergreen URL
+// is a weak/false freshness signal, so pages without their own `lastmod`
+// (corePages below, or an entry in lib/seoPages.js) or live entry data simply
+// get no <lastmod> tag at all.
+const FALLBACK_LASTMOD = null;
 
 // Core, hand-maintained app pages. Update this list if you add/remove
 // a top-level app page (not an SEO content page — those go in seoPages.js).
@@ -88,7 +83,8 @@ function toSlug(str) {
 
 function urlEntry(loc, changefreq, priority, lastmod) {
   const lastmodTag = lastmod ? `<lastmod>${lastmod}</lastmod>` : '';
-  return `  <url><loc>${SITE_URL}${loc}</loc>${lastmodTag}<changefreq>${changefreq}</changefreq><priority>${priority}</priority></url>`;
+  // changefreq/priority are ignored by Google, so they're no longer emitted.
+  return `  <url><loc>${SITE_URL}${loc}</loc>${lastmodTag}</url>`;
 }
 
 async function getDynamicData() {
@@ -198,6 +194,30 @@ async function getDynamicData() {
   return { clubUrls, profileUrls, siteWideLatest };
 }
 
+// Per-country leaderboard pages (/longest-drive-<country>) are kept out of
+// the sitemap until they have real verified drives — with sample data gone
+// they're empty/thin (and noindexed). Category pages that share the
+// `longest-drive-` prefix are allow-listed here. To bring a country back
+// once it has real drives, add its slug (e.g. 'longest-drive-uk') to
+// INCLUDED_COUNTRY_SLUGS.
+const CATEGORY_SLUGS = new Set([
+  'longest-drive-scratch-golfer',
+  'longest-drive-low-handicap',
+  'longest-drive-mid-handicap',
+  'longest-drive-high-handicap',
+  'longest-drive-amateur',
+  'longest-drive-seniors',
+  'longest-drive-juniors-u12',
+  'longest-drive-juniors-13-16',
+  'longest-drive-juniors-17-18',
+]);
+const INCLUDED_COUNTRY_SLUGS = new Set([]);
+function isExcludedCountryPage(slug) {
+  if (!slug.startsWith('longest-drive-')) return false;
+  if (CATEGORY_SLUGS.has(slug) || INCLUDED_COUNTRY_SLUGS.has(slug)) return false;
+  return true;
+}
+
 async function generate() {
   const { clubUrls, profileUrls, siteWideLatest } = await getDynamicData();
 
@@ -213,7 +233,7 @@ async function generate() {
     urlEntry(`/${p.slug}`.replace(/\/$/, '') || '/', p.changefreq, p.priority, p.lastmod || (dynamicChangefreqs.has(p.changefreq) ? siteWideLatest : null) || FALLBACK_LASTMOD)
   );
 
-  const seo = seoPages.map((p) =>
+  const seo = seoPages.filter((p) => !isExcludedCountryPage(p.slug)).map((p) =>
     urlEntry(`/${p.slug}`, p.changefreq, p.priority, safeDate(p.lastmod) || (dynamicChangefreqs.has(p.changefreq) ? siteWideLatest : null) || FALLBACK_LASTMOD)
   );
 
