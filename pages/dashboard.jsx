@@ -2059,9 +2059,9 @@ export default function DashboardPage() {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-            <a href="/leaderboard" className="db-leaderboard-link" style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.5rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none' }}>View Leaderboard</a>
+            <a href="/leaderboard" target="_blank" rel="noopener noreferrer" className="db-leaderboard-link" style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.5rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none' }}>Global Leaderboard</a>
             {club?.accountType === 'club' && (club?.customSlug || club?.courseName) && (
-              <a href={`/clubs/${club.customSlug || nameToSlug(club.courseName)}`} style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.5rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none' }}>My Venue Leaderboard</a>
+              <a href={`/clubs/${club.customSlug || nameToSlug(club.courseName)}`} target="_blank" rel="noopener noreferrer" title={`${club.courseName || 'Venue'} Leaderboard`} style={{ background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.5rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none', maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{club.courseName || 'Venue'} Leaderboard</a>
             )}
             {club?.accountType === 'club' && (
               <a href="/venue-qr" style={{ background: 'transparent', border: `1px solid ${ORG}`, color: ORG, padding: '0.5rem 1rem', borderRadius: 7, fontSize: '0.82rem', textDecoration: 'none', fontWeight: 700 }}>Get QR Poster</a>
