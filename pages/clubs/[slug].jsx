@@ -16,11 +16,11 @@ function toSlug(name) {
 // pasted profile URL, and only ever builds https links on the platform's own
 // domain, so odd input can't turn into a javascript: or off-site link.
 const SOCIALS = [
-  { key: 'facebook',  label: 'Facebook',  icon: '\uD83D\uDCD8', hosts: ['facebook.com', 'fb.com'], base: 'https://www.facebook.com/' },
-  { key: 'instagram', label: 'Instagram', icon: '\uD83D\uDCF8', hosts: ['instagram.com'], base: 'https://www.instagram.com/' },
-  { key: 'tiktok',    label: 'TikTok',    icon: '\uD83C\uDFB5', hosts: ['tiktok.com'],    base: 'https://www.tiktok.com/@' },
-  { key: 'twitter',   label: 'X',         icon: '\uD835\uDD4F', hosts: ['x.com', 'twitter.com'], base: 'https://x.com/' },
-  { key: 'youtube',   label: 'YouTube',   icon: '\u25B6',       hosts: ['youtube.com'],   base: 'https://www.youtube.com/@' },
+  { key: 'facebook',  label: 'Facebook',  hosts: ['facebook.com', 'fb.com'], base: 'https://www.facebook.com/' },
+  { key: 'instagram', label: 'Instagram', hosts: ['instagram.com'], base: 'https://www.instagram.com/' },
+  { key: 'tiktok',    label: 'TikTok',    hosts: ['tiktok.com'],    base: 'https://www.tiktok.com/@' },
+  { key: 'twitter',   label: 'X',         hosts: ['x.com', 'twitter.com'], base: 'https://x.com/' },
+  { key: 'youtube',   label: 'YouTube',   hosts: ['youtube.com'],   base: 'https://www.youtube.com/@' },
 ];
 
 // A venue's own site. Accepts "yourvenue.com" or a full URL; https only, must
@@ -51,6 +51,22 @@ function socialUrl(social, raw) {
   }
   const handle = v.replace(/^@/, '').replace(/[^A-Za-z0-9._-]/g, '');
   return handle ? social.base + handle : null;
+}
+
+// Line-art icons (stroke only, inherit colour) — deliberately unlike the filled
+// brand-colour glyphs used by the share buttons, so "visit us" and "share this
+// page" don't read as the same thing.
+function SocialIcon({ name }) {
+  const props = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true, focusable: 'false' };
+  switch (name) {
+    case 'website': return (<svg {...props}><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>);
+    case 'facebook': return (<svg {...props}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg>);
+    case 'instagram': return (<svg {...props}><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg>);
+    case 'tiktok': return (<svg {...props}><path d="M21 7.917v4.034a9.948 9.948 0 0 1-5-1.951v4.5a6.5 6.5 0 1 1-8-6.326v4.326a2.5 2.5 0 1 0 4 2v-11.5h4.083a6.005 6.005 0 0 0 4.917 4.917z" /></svg>);
+    case 'twitter': return (<svg {...props}><path d="M4 4l11.733 16h4.267l-11.733-16z" /><path d="M4 20l6.768-6.768m2.46-2.46l6.772-6.772" /></svg>);
+    case 'youtube': return (<svg {...props}><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z" /><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" /></svg>);
+    default: return null;
+  }
 }
 
 export async function getServerSideProps({ params }) {
@@ -319,7 +335,7 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
   const ul = 'yds';
   const canonicalUrl = `https://www.rippingbombs.com/clubs/${toSlug(org.courseName)}`;
   const socialLinks = [
-    { key: 'website', label: 'Website', icon: '\uD83C\uDF10', url: websiteUrl(org.website) },
+    { key: 'website', label: 'Website', url: websiteUrl(org.website) },
     ...SOCIALS.map(sc => ({ ...sc, url: socialUrl(sc, org[sc.key]) })),
   ].filter(sc => sc.url);
   const metaDesc = `Longest drive leaderboard for ${org.courseName}, ${org.location}. ${clubEntries.length} drives recorded on Ripping Bombs.`;
@@ -389,12 +405,22 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
             </div>
           </div>
           {socialLinks.length > 0 && (
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
-              {socialLinks.map(l => (
-                <a key={l.key} href={l.url} target="_blank" rel="noopener noreferrer nofollow" style={{ fontFamily: SANS, fontSize: 12, color: TXT, background: BG3, border: `1px solid ${BDR}`, padding: '4px 11px', textDecoration: 'none' }}>
-                  {l.icon} {l.label}
-                </a>
-              ))}
+            <div style={{ marginTop: 18 }}>
+              <style dangerouslySetInnerHTML={{ __html: `
+                .rb-social { transition: color .15s, border-color .15s, background .15s; }
+                .rb-social:hover, .rb-social:focus-visible { color: ${ORG} !important; border-color: ${ORG} !important; background: rgba(255,0,144,0.06) !important; outline: none; }
+              ` }} />
+              <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 2, color: MUT, textTransform: 'uppercase', marginBottom: 10 }}>
+                Check out our socials
+              </div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {socialLinks.map(l => (
+                  <a key={l.key} className="rb-social" href={l.url} target="_blank" rel="noopener noreferrer nofollow" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: SANS, fontSize: 12, fontWeight: 600, letterSpacing: .4, color: TXT, background: 'transparent', border: `1px solid ${BDR}`, padding: '8px 14px', textDecoration: 'none' }}>
+                    <SocialIcon name={l.key} />
+                    <span>{l.label}</span>
+                  </a>
+                ))}
+              </div>
             </div>
           )}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
