@@ -82,6 +82,22 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
     }
   }, [router.isReady, router.query.dist]);
 
+  // Hooks must run on every render, so the event eligibility check and the
+  // auto-join effect live ABOVE the `!loggedOrg` early return. Previously the
+  // effect sat below it, so when loggedOrg arrived a moment after first render
+  // React saw a different hook count and threw a client-side exception.
+  const eventEligibility = eventData && loggedOrg ? checkEligibility(eventData.event, loggedOrg) : null;
+
+  // Best-effort auto-join: someone may land here with the link shared directly
+  // rather than via the "Join" button on the event page. Silent — ineligible
+  // players (and, via the server-side check in /api/events/join, players
+  // outside the event window) are already blocked below before this matters.
+  useEffect(() => {
+    if (loggedOrg && eventData && eventEligibility?.eligible) {
+      joinEvent(eventData.event.id, loggedOrg).catch(() => {});
+    }
+  }, [eventData?.event?.id, eventEligibility?.eligible, loggedOrg?.id]);
+
   if (!loggedOrg) {
     const venueParam = router.query.venue;
     const currentPath = venueParam ? `/submit?venue=${venueParam}` : '/submit';
@@ -105,18 +121,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
   const isSimulator = loggedOrg.accountType === 'simulator';
 
   // Event eligibility — only relevant when arriving via an /e/[slug] "Join" link.
-  const eventEligibility = eventData ? checkEligibility(eventData.event, loggedOrg) : null;
   const eventStatus = eventData ? getEventStatus(eventData.event) : null;
-
-  // Best-effort auto-join: someone may land here with the link shared directly
-  // rather than via the "Join" button on the event page. Silent — ineligible
-  // players (and, via the server-side check in /api/events/join, players
-  // outside the event window) are already blocked below before this matters.
-  useEffect(() => {
-    if (eventData && eventEligibility?.eligible) {
-      joinEvent(eventData.event.id, loggedOrg).catch(() => {});
-    }
-  }, [eventData?.event?.id, eventEligibility?.eligible]);
 
   // Once-per-week check for simulator accounts
   const simulatorWeeklyBlock = (() => {
