@@ -12,6 +12,47 @@ function toSlug(name) {
   return name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
 }
 
+// Social links a venue enters on its dashboard. Accepts a handle ("@name") or a
+// pasted profile URL, and only ever builds https links on the platform's own
+// domain, so odd input can't turn into a javascript: or off-site link.
+const SOCIALS = [
+  { key: 'facebook',  label: 'Facebook',  icon: '\uD83D\uDCD8', hosts: ['facebook.com', 'fb.com'], base: 'https://www.facebook.com/' },
+  { key: 'instagram', label: 'Instagram', icon: '\uD83D\uDCF8', hosts: ['instagram.com'], base: 'https://www.instagram.com/' },
+  { key: 'tiktok',    label: 'TikTok',    icon: '\uD83C\uDFB5', hosts: ['tiktok.com'],    base: 'https://www.tiktok.com/@' },
+  { key: 'twitter',   label: 'X',         icon: '\uD835\uDD4F', hosts: ['x.com', 'twitter.com'], base: 'https://x.com/' },
+  { key: 'youtube',   label: 'YouTube',   icon: '\u25B6',       hosts: ['youtube.com'],   base: 'https://www.youtube.com/@' },
+];
+
+// A venue's own site. Accepts "yourvenue.com" or a full URL; https only, must
+// look like a real hostname, and no embedded credentials.
+function websiteUrl(raw) {
+  let v = (raw || '').trim();
+  if (!v) return null;
+  if (!/^https?:\/\//i.test(v)) v = 'https://' + v;
+  try {
+    const u = new URL(v);
+    if (!u.hostname.includes('.') || u.username || u.password) return null;
+    u.protocol = 'https:';
+    return u.toString();
+  } catch (e) { return null; }
+}
+
+function socialUrl(social, raw) {
+  const v = (raw || '').trim();
+  if (!v) return null;
+  if (/^https?:\/\//i.test(v)) {
+    try {
+      const u = new URL(v);
+      const ok = social.hosts.some(h => u.hostname === h || u.hostname.endsWith('.' + h));
+      if (!ok) return null;
+      u.protocol = 'https:';
+      return u.toString();
+    } catch (e) { return null; }
+  }
+  const handle = v.replace(/^@/, '').replace(/[^A-Za-z0-9._-]/g, '');
+  return handle ? social.base + handle : null;
+}
+
 export async function getServerSideProps({ params }) {
   const { slug } = params;
 
@@ -53,7 +94,10 @@ export async function getServerSideProps({ params }) {
     simOrgs = data || [];
   }
 
-  return { props: { org, clubEntries: entries, simOrgs } };
+  // The page never uses these, and props are embedded in the public HTML.
+  const { pw, email, ...publicOrg } = org;
+
+  return { props: { org: publicOrg, clubEntries: entries, simOrgs } };
 }
 
 function drawRBLogo(ctx, x, y, w) {
@@ -274,6 +318,10 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
 
   const ul = 'yds';
   const canonicalUrl = `https://www.rippingbombs.com/clubs/${toSlug(org.courseName)}`;
+  const socialLinks = [
+    { key: 'website', label: 'Website', icon: '\uD83C\uDF10', url: websiteUrl(org.website) },
+    ...SOCIALS.map(sc => ({ ...sc, url: socialUrl(sc, org[sc.key]) })),
+  ].filter(sc => sc.url);
   const metaDesc = `Longest drive leaderboard for ${org.courseName}, ${org.location}. ${clubEntries.length} drives recorded on Ripping Bombs.`;
   const simOrgMap = Object.fromEntries((simOrgs || []).map(o => [o.id, o]));
 
@@ -294,6 +342,7 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
     description: metaDesc,
     ...(org.location && { location: { '@type': 'Place', name: `${org.location}${org.country ? ', ' + org.country.toUpperCase() : ''}` } }),
     sport: 'Golf',
+    ...(socialLinks.length > 0 && { sameAs: socialLinks.map(l => l.url) }),
   };
 
   const breadcrumbSchema = {
@@ -339,6 +388,15 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
               <div style={{ fontFamily: SANS, fontSize: 13, color: MUT }}>{org.location}</div>
             </div>
           </div>
+          {socialLinks.length > 0 && (
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+              {socialLinks.map(l => (
+                <a key={l.key} href={l.url} target="_blank" rel="noopener noreferrer nofollow" style={{ fontFamily: SANS, fontSize: 12, color: TXT, background: BG3, border: `1px solid ${BDR}`, padding: '4px 11px', textDecoration: 'none' }}>
+                  {l.icon} {l.label}
+                </a>
+              ))}
+            </div>
+          )}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
             {org.badge && <BadgePill badge={org.badge} />}
             {org.is_founding_member && (

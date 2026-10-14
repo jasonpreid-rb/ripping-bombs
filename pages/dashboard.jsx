@@ -187,6 +187,8 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded, onSponsorLogoUp
     tiktok: club?.tiktok || '',
     twitter: club?.twitter || '',
     youtube: club?.youtube || '',
+    facebook: club?.facebook || '',
+    website: club?.website || '',
     customSlug: club?.customSlug || '',
     sponsorName: club?.sponsorName || '',
     sponsorLink: club?.sponsorLink || '',
@@ -282,11 +284,19 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded, onSponsorLogoUp
             <input type="date" style={inputStyle} value={form.dob} onChange={(e) => set('dob', e.target.value)} />
           </>
         )}
-        {isSimulator && (
+        {(isSimulator || isClub) && (
           <>
             <div style={{ borderTop: `1px solid ${BDR}`, marginTop: 8, paddingTop: 12 }}>
-              <div style={{ fontSize: '0.7rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Social Media <span style={{ color: DIM, fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional — shown on your public profile)</span></div>
+              <div style={{ fontSize: '0.7rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{isClub ? 'Website & Social Media' : 'Social Media'} <span style={{ color: DIM, fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional — shown on your {isClub ? 'venue page' : 'public profile'})</span></div>
             </div>
+            {isClub && (
+              <>
+                <label style={labelStyle}>🌐 Website</label>
+                <input style={inputStyle} value={form.website} onChange={(e) => set('website', e.target.value)} placeholder="yourvenue.com" />
+                <label style={labelStyle}>📘 Facebook</label>
+                <input style={inputStyle} value={form.facebook} onChange={(e) => set('facebook', e.target.value)} placeholder="@yourpage or facebook.com/yourpage" />
+              </>
+            )}
             <label style={labelStyle}>📸 Instagram</label>
             <input style={inputStyle} value={form.instagram} onChange={(e) => set('instagram', e.target.value)} placeholder="@yourusername" />
             <label style={labelStyle}>🎵 TikTok</label>
@@ -1955,6 +1965,10 @@ export default function DashboardPage() {
       tiktok: form.tiktok || null,
       twitter: form.twitter || null,
       youtube: form.youtube || null,
+      ...(club?.accountType === 'club' && {
+        facebook: form.facebook || null,
+        website: form.website || null,
+      }),
       ...(wantsSlug && { customSlug }),
       ...(club?.accountType !== 'simulator' && {
         sponsorName: form.sponsorName || null,
