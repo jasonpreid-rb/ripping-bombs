@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { isSampleId } from '../../lib/data';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP, profileSlugFor } from '../../lib/constants';
 import { fmtDate, tier, nowWeek, weekLabel, prevWeek, nextWeek, sameWeek } from '../../lib/constants';
-import { BadgePill, countryFlag } from '../../components/UI';
+import { BadgePill } from '../../components/UI';
 import PlayerAvatar from '../../components/PlayerAvatar';
 
 function toSlug(name) {
@@ -399,7 +399,16 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
             {org.logo && <img src={org.logo} alt={org.courseName} style={{ width: 56, height: 56, objectFit: 'cover', border: `1px solid ${BDR}` }} />}
             <div>
               <h1 style={{ fontFamily: DISP, fontSize: 'clamp(26px,5vw,40px)', color: TXT, letterSpacing: 1, lineHeight: 1.1, margin: '0 0 6px' }}>
-                {org.courseName} {org.country && countryFlag(org.country)}
+                {org.courseName}
+                {/* Flag sized in em so it tracks the heading's clamp() size: bottom sits on the
+                    text baseline, top lines up with the capital letters (0.7em ≈ cap height). */}
+                {/^[a-z]{2}$/i.test((org.country || '').trim()) && (
+                  <img
+                    src={`https://flagcdn.com/w160/${org.country.trim().toLowerCase()}.png`}
+                    alt={org.country.trim().toUpperCase()}
+                    style={{ height: '0.7em', width: 'auto', marginLeft: '0.3em', verticalAlign: 'baseline', boxShadow: '0 0 0 1px rgba(255,255,255,0.15)' }}
+                  />
+                )}
               </h1>
               <div style={{ fontFamily: SANS, fontSize: 13, color: MUT }}>{org.location}</div>
             </div>
