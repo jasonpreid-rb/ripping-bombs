@@ -8,6 +8,7 @@ import Head from 'next/head';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import Layout from '../components/Layout';
 import AdminPanel from '../components/AdminPanel';
 import LaunchModal from '../components/LaunchModal';
@@ -344,6 +345,7 @@ export default function App({ Component, pageProps }) {
         </Head>
         <Component {...pageProps} {...sharedProps} />
         <Analytics />
+        <SpeedInsights />
       </>
     );
   }
@@ -406,6 +408,7 @@ export default function App({ Component, pageProps }) {
       <CookieConsent />
       <GoogleAnalytics />
       <Analytics />
+      <SpeedInsights />
     </>
   );
 }
