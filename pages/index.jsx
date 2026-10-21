@@ -144,6 +144,26 @@ function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 })
   );
 }
 
+// ── Empty-category state: turns "nobody yet" into a challenge ────────────────
+// Shown in a category card when it has no entries. `weekly` swaps the copy
+// so the weekly and all-time cards don't read identically side by side.
+function EmptySlot({ weekly }) {
+  return (
+    <div className="rb-empty-slot" style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',gap:6,padding:'18px 10px',border:'1px dashed rgba(255,0,144,0.35)',background:'radial-gradient(circle at 50% 0%, rgba(255,0,144,0.10), transparent 70%)'}}>
+      <span aria-hidden style={{fontSize:26,lineHeight:1,animation:'rbEmptyBounce 2.2s ease-in-out infinite'}}>🏆</span>
+      <div style={{fontFamily:DISP,fontSize:20,color:TXT,letterSpacing:.8,lineHeight:1.1}}>
+        {weekly ? 'THE TEE IS YOURS' : 'THE THRONE IS EMPTY'}
+      </div>
+      <div style={{fontFamily:SANS,fontSize:11,color:MUT,lineHeight:1.5}}>
+        {weekly ? 'No drives posted this week.' : 'Nobody owns #1 here yet.'}
+      </div>
+      <div style={{fontFamily:SANS,fontSize:11,fontWeight:700,color:ORG,letterSpacing:1,textTransform:'uppercase',marginTop:4}}>
+        Claim the top spot →
+      </div>
+    </div>
+  );
+}
+
 // Temporarily hide the weekly category leaders section on the homepage.
 const SHOW_WEEKLY_LEADERS = false;
 
@@ -279,7 +299,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
         <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.label}</span>
         <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:top3.length===0?'center':'flex-start'}}>
         {top3.length === 0 ? (
-          <div style={{fontFamily:SANS,fontSize:12,color:DIM,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
+          <EmptySlot weekly />
         ) : (
           top3.map((e, i) => {
             const org = orgFor(e.orgId);
@@ -327,7 +347,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
         <span style={{fontFamily:SANS,fontSize:10,color:MUT,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.label}</span>
         <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:top3.length===0?'center':'flex-start'}}>
         {top3.length === 0 ? (
-          <div style={{fontFamily:SANS,fontSize:12,color:DIM,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
+          <EmptySlot />
         ) : (
           top3.map((e, i) => {
             const org = orgFor(e.orgId);
@@ -631,6 +651,15 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
         </div>
         <EmailSignup/>
       </div>
+      <style jsx global>{`
+        @keyframes rbEmptyBounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .rb-empty-slot span { animation: none !important; }
+        }
+      `}</style>
       <style jsx>{`
         @media (max-width: 640px) {
           /* Hero: less vertical padding, tighter title, shorter subtitle */
