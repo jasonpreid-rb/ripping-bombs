@@ -34,12 +34,14 @@ export default function DrivePage({ staticEntry, staticOrg, entries, orgs, cvt, 
   const { id } = router.query;
   const [shareOpen, setShareOpen] = useState(false);
   const [photo, setPhoto] = useState(null);
+  const [photoOpen, setPhotoOpen] = useState(false); // full-size lightbox
 
   const entry = entries?.find(e => e.id === id) || staticEntry;
   const org = orgs?.find(o => o.id === entry?.orgId) || staticOrg;
 
   useEffect(() => {
     setPhoto(null);
+    setPhotoOpen(false);
     if (!entry?.id) return;
 
     let cancelled = false;
@@ -55,6 +57,18 @@ export default function DrivePage({ staticEntry, staticOrg, entries, orgs, cvt, 
 
     return () => { cancelled = true; };
   }, [entry?.id]);
+
+  useEffect(() => {
+    if (!photoOpen) return;
+    const onKey = (e) => { if (e.key === 'Escape') setPhotoOpen(false); };
+    window.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [photoOpen]);
 
   if (!entry) return (
     <div style={{ padding:'80px 18px', textAlign:'center' }}>
@@ -108,7 +122,13 @@ export default function DrivePage({ staticEntry, staticOrg, entries, orgs, cvt, 
           </div>
 
           {org?.badge && <div style={{ marginBottom:16 }}><BadgePill badge={org.badge}/></div>}
-          {photo && <img src={photo} alt="Drive evidence" style={{ width:'100%', maxHeight:240, objectFit:'cover', marginBottom:16 }}/>}
+          {photo && (
+            <button type="button" onClick={()=>setPhotoOpen(true)} aria-label="View full photo"
+              style={{ position:'relative', display:'block', width:'100%', padding:0, border:'none', background:'none', cursor:'zoom-in', marginBottom:16 }}>
+              <img src={photo} alt="Drive evidence" style={{ width:'100%', maxHeight:240, objectFit:'cover', display:'block' }}/>
+              <span style={{ position:'absolute', right:8, bottom:8, background:'rgba(0,0,0,0.7)', color:'#fff', fontFamily:SANS, fontSize:11, fontWeight:700, letterSpacing:.5, padding:'5px 10px' }}>⤢ VIEW FULL PHOTO</span>
+            </button>
+          )}
 
           <button onClick={()=>setShareOpen(true)}
             style={{ background:`linear-gradient(135deg,#FF0090,#ff66c4)`, border:'none', color:'#fff', fontFamily:SANS, fontWeight:700, fontSize:13, padding:'14px 24px', cursor:'pointer', letterSpacing:.5, width:'100%' }}>
@@ -135,6 +155,15 @@ export default function DrivePage({ staticEntry, staticOrg, entries, orgs, cvt, 
           </button>
         </div>
       </div>
+
+      {photoOpen && photo && (
+        <div role="dialog" aria-modal="true" aria-label="Drive evidence photo" onClick={()=>setPhotoOpen(false)}
+          style={{ position:'fixed', inset:0, zIndex:1000, background:'rgba(0,0,0,0.92)', display:'flex', alignItems:'center', justifyContent:'center', padding:16, cursor:'zoom-out' }}>
+          <button type="button" onClick={()=>setPhotoOpen(false)} aria-label="Close photo"
+            style={{ position:'absolute', top:14, right:14, width:40, height:40, borderRadius:'50%', background:'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.25)', color:'#fff', fontSize:18, cursor:'pointer', lineHeight:1 }}>✕</button>
+          <img src={photo} alt="Drive evidence (full size)" style={{ maxWidth:'100%', maxHeight:'100%', objectFit:'contain', display:'block' }}/>
+        </div>
+      )}
 
       {shareOpen && <ShareModal entry={{ ...entry, photo }} org={org} cvt={cvt||(d=>d)} unitLbl={unit} onClose={()=>setShareOpen(false)}/>}
     </>
