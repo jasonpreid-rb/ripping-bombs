@@ -1495,12 +1495,12 @@ function IndividualPremiumPromo({ isPremium }) {
 // logic all derive from it.
 const CLUB_GROUPS = [
   {
-    label: 'Driver & Hybrids',
+    label: 'Driver, Woods & Hybrid',
     clubs: [
       { key: 'driver', label: 'Driver' },
-      { key: 'hybrid3', label: '3 Hybrid' },
-      { key: 'hybrid4', label: '4 Hybrid' },
-      { key: 'hybrid5', label: '5 Hybrid' },
+      { key: 'wood3', label: '3 Wood' },
+      { key: 'wood5', label: '5 Wood' },
+      { key: 'hybrid', label: 'Hybrid' },
     ],
   },
   {
@@ -1551,6 +1551,55 @@ function ClubDistancesCard({ club, onSave }) {
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState(''); // '' | 'saved'
   const [error, setError] = useState('');
+  const [showShortcut, setShowShortcut] = useState(false);
+  const [platform, setPlatform] = useState('desktop'); // 'ios' | 'android' | 'desktop'
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const SHORTCUT_HASH = 'club-distances';
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const ua = navigator.userAgent || '';
+    const isIos = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    setPlatform(isIos ? 'ios' : /Android/i.test(ua) ? 'android' : 'desktop');
+
+    // Opened via a saved shortcut (/dashboard#club-distances) — the card
+    // only mounts after the dashboard has loaded, so the browser's own
+    // hash-scroll has already missed it. Scroll to it manually.
+    if (window.location.hash === `#${SHORTCUT_HASH}`) {
+      requestAnimationFrame(() => document.getElementById(SHORTCUT_HASH)?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    }
+  }, []);
+
+  const toggleShortcut = () => {
+    const next = !showShortcut;
+    setShowShortcut(next);
+    // Put the hash in the address bar so "Add to Home Screen" saves a link
+    // straight to this card rather than the top of the dashboard.
+    if (next && typeof window !== 'undefined') {
+      window.history.replaceState(null, '', `${window.location.pathname}#${SHORTCUT_HASH}`);
+    }
+  };
+
+  const copyShortcutLink = async () => {
+    const url = `${window.location.origin}/dashboard#${SHORTCUT_HASH}`;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch { /* non-critical */ }
+  };
 
   // Re-sync when the saved value changes (after a save or a fresh load).
   useEffect(() => {
@@ -1619,7 +1668,7 @@ function ClubDistancesCard({ club, onSave }) {
   };
 
   return (
-    <div style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, padding: '1.25rem 1.5rem' }}>
+    <div id={SHORTCUT_HASH} style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, padding: '1.25rem 1.5rem', scrollMarginTop: 80 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 4 }}>
         <h2 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700, color: TXT }}>My Club Distances</h2>
         <div role="group" aria-label="Distance unit" style={{ display: 'inline-flex', border: `1px solid ${BDR}`, borderRadius: 6, overflow: 'hidden' }}>
@@ -1686,6 +1735,53 @@ function ClubDistancesCard({ club, onSave }) {
           </button>
         )}
         {status === 'saved' && !dirty && <span style={{ fontSize: '0.8rem', color: '#4ade80' }}>✓ Saved</span>}
+        <a
+          href="/submit"
+          style={{ marginLeft: 'auto', background: 'transparent', border: `1px solid ${ORG}`, color: ORG, fontWeight: 700, padding: '0.5rem 1.1rem', borderRadius: 6, textDecoration: 'none', fontSize: '0.82rem', whiteSpace: 'nowrap' }}>
+          Submit a drive →
+        </a>
+      </div>
+
+      {/* Shortcut — lets players jump straight back here to update distances */}
+      <div style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${BDR}` }}>
+        <button
+          onClick={toggleShortcut}
+          aria-expanded={showShortcut}
+          style={{ background: 'transparent', border: 'none', padding: 0, color: ORG, fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
+          {showShortcut ? '− Hide shortcut' : '+ Save a shortcut to update these quickly'}
+        </button>
+
+        {showShortcut && (
+          <div style={{ marginTop: 12, background: BG3, border: `1px solid ${BDR}`, borderRadius: 8, padding: '0.9rem 1rem', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+            <img src="/apple-touch-icon.png" alt="" width={44} height={44} style={{ borderRadius: 10, flexShrink: 0, background: BG2 }} />
+            <div style={{ fontSize: '0.8rem', color: MUT, lineHeight: 1.6 }}>
+              {platform === 'ios' && (
+                <ol style={{ margin: 0, paddingLeft: '1.1rem' }}>
+                  <li>In Safari, tap the <strong style={{ color: TXT }}>Share</strong> button.</li>
+                  <li>Choose <strong style={{ color: TXT }}>Add to Home Screen</strong>.</li>
+                  <li>Tap <strong style={{ color: TXT }}>Add</strong> — it&apos;ll appear with the RB icon.</li>
+                </ol>
+              )}
+              {platform === 'android' && (
+                <ol style={{ margin: 0, paddingLeft: '1.1rem' }}>
+                  <li>In Chrome, tap the <strong style={{ color: TXT }}>⋮</strong> menu.</li>
+                  <li>Choose <strong style={{ color: TXT }}>Add to Home screen</strong>.</li>
+                  <li>Confirm — it&apos;ll appear with the RB icon.</li>
+                </ol>
+              )}
+              {platform === 'desktop' && (
+                <p style={{ margin: 0 }}>
+                  Bookmark this page (<strong style={{ color: TXT }}>Ctrl/Cmd + D</strong>), or copy the link and open it on your phone to add it to your home screen.
+                </p>
+              )}
+              <button
+                onClick={copyShortcutLink}
+                style={{ marginTop: 10, background: 'transparent', border: `1px solid ${BDR}`, color: TXT, padding: '0.35rem 0.8rem', borderRadius: 6, cursor: 'pointer', fontSize: '0.75rem' }}>
+                {linkCopied ? 'Copied!' : 'Copy link'}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -2243,6 +2339,11 @@ export default function DashboardPage() {
     <>
       <Head>
         <title>{(club?.accountType === 'club' ? club?.courseName : club?.fullName) || 'Dashboard'} — Ripping Bombs</title>
+        {/* Home-screen shortcut: icon + label when saved from this page */}
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="apple-mobile-web-app-title" content="RB Distances" />
+        <meta name="theme-color" content="#FF0090" />
       </Head>
 
       {/* Mobile-only tightening: the flag now sits inline next to the name at
