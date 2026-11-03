@@ -1487,6 +1487,210 @@ function IndividualPremiumPromo({ isPremium }) {
 
 // ——— Main Page ———
 
+// ——— Club distances (individual/simulator accounts) ———
+// Stored on the clubs row (jsonb) as the numbers the player entered plus the
+// unit they entered them in, e.g. { unit: 'm', driver: 230, iron7: 140 }.
+// A missing club key means "not set"; a missing unit means yards.
+// To add or rename a club, edit CLUB_GROUPS — the form, bars and save
+// logic all derive from it.
+const CLUB_GROUPS = [
+  {
+    label: 'Driver & Hybrids',
+    clubs: [
+      { key: 'driver', label: 'Driver' },
+      { key: 'hybrid3', label: '3 Hybrid' },
+      { key: 'hybrid4', label: '4 Hybrid' },
+      { key: 'hybrid5', label: '5 Hybrid' },
+    ],
+  },
+  {
+    label: 'Irons & Wedges',
+    clubs: [
+      { key: 'iron4', label: '4 Iron' },
+      { key: 'iron5', label: '5 Iron' },
+      { key: 'iron6', label: '6 Iron' },
+      { key: 'iron7', label: '7 Iron' },
+      { key: 'iron8', label: '8 Iron' },
+      { key: 'iron9', label: '9 Iron' },
+      { key: 'pw', label: 'PW' },
+      { key: 'sw', label: 'SW' },
+    ],
+  },
+];
+const ALL_CLUBS = CLUB_GROUPS.flatMap((g) => g.clubs);
+const YDS_PER_M = 1.09361;
+// ~450 yds upper bound, expressed in each unit
+const MAX_CLUB_DISTANCE = { yds: 450, m: 411 };
+const UNIT_LABEL = { yds: 'Yards', m: 'Meters' };
+
+// Column may come back as a parsed object (jsonb) or a JSON string (text).
+function parseClubDistances(raw) {
+  if (!raw) return {};
+  if (typeof raw === 'string') {
+    try { return JSON.parse(raw) || {}; } catch { return {}; }
+  }
+  return typeof raw === 'object' ? raw : {};
+}
+
+function convertDistance(n, from, to) {
+  if (from === to) return n;
+  const out = from === 'yds' ? n / YDS_PER_M : n * YDS_PER_M;
+  return Math.max(1, Math.round(out));
+}
+
+function ClubDistancesCard({ club, onSave }) {
+  const saved = parseClubDistances(club?.clubDistances);
+  const savedUnit = saved.unit === 'm' ? 'm' : 'yds';
+  const toForm = (d) => Object.fromEntries(ALL_CLUBS.map((c) => [c.key, d[c.key] != null ? String(d[c.key]) : '']));
+  const savedForm = toForm(saved);
+  const savedKey = JSON.stringify(saved);
+
+  const [unit, setUnit] = useState(savedUnit);
+  const [form, setForm] = useState(savedForm);
+  const [touched, setTouched] = useState(false); // any manual edit since last sync
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState(''); // '' | 'saved'
+  const [error, setError] = useState('');
+
+  // Re-sync when the saved value changes (after a save or a fresh load).
+  useEffect(() => {
+    const d = parseClubDistances(club?.clubDistances);
+    setUnit(d.unit === 'm' ? 'm' : 'yds');
+    setForm(toForm(d));
+    setTouched(false);
+  }, [savedKey]);
+
+  const dirty = unit !== savedUnit || ALL_CLUBS.some((c) => (form[c.key] || '') !== (savedForm[c.key] || ''));
+  const filled = ALL_CLUBS.filter((c) => form[c.key] !== '').length;
+  const maxDist = Math.max(0, ...ALL_CLUBS.map((c) => Number(form[c.key]) || 0));
+  const unitShort = unit === 'm' ? 'm' : 'yds';
+
+  const handleChange = (key, raw) => {
+    const digits = raw.replace(/\D/g, '').slice(0, 3);
+    setForm((f) => ({ ...f, [key]: digits }));
+    setTouched(true);
+    setStatus('');
+    setError('');
+  };
+
+  const handleUnitChange = (next) => {
+    if (next === unit) return;
+    setError('');
+    setStatus('');
+    // Flipping back to the saved unit with no edits in between: restore the
+    // exact saved numbers instead of round-tripping through conversion.
+    if (next === savedUnit && !touched) {
+      setForm(savedForm);
+    } else {
+      setForm((f) => Object.fromEntries(ALL_CLUBS.map((c) => {
+        const n = Number(f[c.key]);
+        return [c.key, f[c.key] === '' || !n ? '' : String(convertDistance(n, unit, next))];
+      })));
+    }
+    setUnit(next);
+  };
+
+  const handleSave = async () => {
+    const out = { unit };
+    for (const c of ALL_CLUBS) {
+      const v = form[c.key];
+      if (v === '') continue;
+      const n = Number(v);
+      if (!Number.isFinite(n) || n <= 0 || n > MAX_CLUB_DISTANCE[unit]) {
+        setError(`${c.label}: enter a distance between 1 and ${MAX_CLUB_DISTANCE[unit]} ${unitShort}.`);
+        return;
+      }
+      out[c.key] = Math.round(n);
+    }
+    setSaving(true);
+    setError('');
+    const err = await onSave(out);
+    setSaving(false);
+    if (err) setError(err);
+    else { setStatus('saved'); setTouched(false); }
+  };
+
+  const handleReset = () => {
+    setUnit(savedUnit);
+    setForm(savedForm);
+    setTouched(false);
+    setStatus('');
+    setError('');
+  };
+
+  return (
+    <div style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 10, padding: '1.25rem 1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 4 }}>
+        <h2 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700, color: TXT }}>My Club Distances</h2>
+        <div role="group" aria-label="Distance unit" style={{ display: 'inline-flex', border: `1px solid ${BDR}`, borderRadius: 6, overflow: 'hidden' }}>
+          {['yds', 'm'].map((u) => (
+            <button
+              key={u}
+              onClick={() => handleUnitChange(u)}
+              aria-pressed={unit === u}
+              style={{ background: unit === u ? ORG : 'transparent', color: unit === u ? '#fff' : MUT, border: 'none', padding: '0.3rem 0.8rem', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
+              {UNIT_LABEL[u]}
+            </button>
+          ))}
+        </div>
+      </div>
+      <p style={{ margin: '0 0 6px', fontSize: '0.82rem', color: MUT, lineHeight: 1.6 }}>
+        Your typical distance with each club, in {UNIT_LABEL[unit].toLowerCase()}. Leave any club blank if you don&apos;t carry it. Switching units converts the numbers below.
+      </p>
+      <p style={{ margin: '0 0 16px', fontSize: '0.72rem', color: DIM }}>{filled} of {ALL_CLUBS.length} clubs set</p>
+
+      {CLUB_GROUPS.map((group) => (
+        <div key={group.label} style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: '0.68rem', color: MUT, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>{group.label}</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: '0.65rem' }}>
+            {group.clubs.map((c) => {
+              const n = Number(form[c.key]) || 0;
+              const pct = maxDist > 0 ? Math.round((n / maxDist) * 100) : 0;
+              return (
+                <label key={c.key} style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                  <span style={{ fontSize: '0.75rem', color: TXT, fontWeight: 600 }}>{c.label}</span>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={form[c.key]}
+                      onChange={(e) => handleChange(c.key, e.target.value)}
+                      placeholder="—"
+                      aria-label={`${c.label} distance in ${UNIT_LABEL[unit].toLowerCase()}`}
+                      style={{ width: '100%', boxSizing: 'border-box', background: BG3, border: `1px solid ${BDR}`, borderRadius: 6, padding: '0.5rem 2.2rem 0.5rem 0.7rem', color: TXT, fontSize: '0.9rem', outline: 'none' }}
+                    />
+                    <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', fontSize: '0.68rem', color: DIM, pointerEvents: 'none' }}>{unitShort}</span>
+                  </div>
+                  <div style={{ height: 3, background: BG3, borderRadius: 2, overflow: 'hidden' }}>
+                    <div style={{ width: `${pct}%`, height: '100%', background: ORG, transition: 'width 0.2s ease' }} />
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
+      {error && <p style={{ margin: '4px 0 10px', fontSize: '0.8rem', color: '#f87171' }}>{error}</p>}
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <button
+          onClick={handleSave}
+          disabled={!dirty || saving}
+          style={{ background: dirty ? ORG : BG3, color: dirty ? '#fff' : DIM, border: 'none', fontWeight: 700, padding: '0.5rem 1.1rem', borderRadius: 6, cursor: dirty && !saving ? 'pointer' : 'default', fontSize: '0.82rem' }}>
+          {saving ? 'Saving…' : 'Save Distances'}
+        </button>
+        {dirty && !saving && (
+          <button onClick={handleReset} style={{ background: 'transparent', border: `1px solid ${BDR}`, color: MUT, padding: '0.5rem 1rem', borderRadius: 6, cursor: 'pointer', fontSize: '0.82rem' }}>
+            Discard changes
+          </button>
+        )}
+        {status === 'saved' && !dirty && <span style={{ fontSize: '0.8rem', color: '#4ade80' }}>✓ Saved</span>}
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [club, setClub] = useState(null);
@@ -1999,6 +2203,17 @@ export default function DashboardPage() {
     localStorage.setItem('rb_club', JSON.stringify(updated));
   };
 
+  const handleClubDistancesSave = async (clubDistances) => {
+    // Routed through db.updateOrg — see handleProfileSave note above.
+    // Returns an error string on failure (same contract as handleProfileSave).
+    const ok = await db.updateOrg(club.id, { clubDistances });
+    if (!ok) return 'Something went wrong saving your distances. Please try again.';
+    const updated = { ...club, clubDistances };
+    setClub(updated);
+    localStorage.setItem('rb_club', JSON.stringify(updated));
+    return null;
+  };
+
   const distances = entries.map((e) => Number(e.dist));
   const longest = distances[0] ?? null;
   const average = avg(distances);
@@ -2185,6 +2400,11 @@ export default function DashboardPage() {
           limitToFree={club?.accountType === 'simulator' && !club?.isPremium}
           isClub={club?.accountType === 'club'}
         />
+
+        {/* Club distances — individual/simulator accounts only */}
+        {club?.accountType === 'simulator' && (
+          <ClubDistancesCard club={club} onSave={handleClubDistancesSave} />
+        )}
 
         {/* Custom Events & Competitions — club accounts only. Scheduling a new
             event is gated to paid/trial TV Display & Sponsors; the section
