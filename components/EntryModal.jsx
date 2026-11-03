@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/router';
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP, profileSlugFor } from '../lib/constants';
 import { fmtDate, tier } from '../lib/constants';
@@ -8,9 +9,11 @@ import { supabase } from '../lib/supabaseClient';
 export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl }) {
   const router = useRouter();
   const [photo, setPhoto] = useState(null);
+  const [photoOpen, setPhotoOpen] = useState(false); // full-size lightbox
 
   useEffect(() => {
     setPhoto(null);
+    setPhotoOpen(false);
     if (!entry?.id) return;
 
     let cancelled = false;
@@ -26,6 +29,20 @@ export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl 
 
     return () => { cancelled = true; };
   }, [entry?.id]);
+
+  useEffect(() => {
+    if (!photoOpen) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') { e.stopPropagation(); setPhotoOpen(false); }
+    };
+    window.addEventListener('keydown', onKey, true);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey, true);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [photoOpen]);
 
   if (!entry) return null;
 
@@ -68,7 +85,25 @@ export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl 
       </div>
 
       {photo && (
-        <img src={photo} alt="Drive evidence" style={{ width:'100%', maxHeight:180, objectFit:'cover', marginBottom:14 }}/>
+        <button type="button" onClick={()=>setPhotoOpen(true)} aria-label="View full photo"
+          style={{ position:'relative', display:'block', width:'100%', padding:0, border:'none', background:'none', cursor:'zoom-in', marginBottom:14 }}>
+          <img src={photo} alt="Drive evidence" style={{ width:'100%', maxHeight:180, objectFit:'cover', display:'block' }}/>
+          <span style={{ position:'absolute', right:8, bottom:8, background:'rgba(0,0,0,0.7)', color:'#fff', fontFamily:SANS, fontSize:11, fontWeight:700, letterSpacing:.5, padding:'5px 10px' }}>⤢ VIEW FULL PHOTO</span>
+        </button>
+      )}
+
+      {/* Full-size photo. Portalled to <body> so it can't be clipped or offset by
+          the popup's own container, and clicks are stopped so closing the photo
+          doesn't also close the popup underneath. */}
+      {photoOpen && photo && typeof document !== 'undefined' && createPortal(
+        <div role="dialog" aria-modal="true" aria-label="Drive evidence photo"
+          onClick={(e)=>{ e.stopPropagation(); setPhotoOpen(false); }}
+          style={{ position:'fixed', inset:0, zIndex:2000, background:'rgba(0,0,0,0.92)', display:'flex', alignItems:'center', justifyContent:'center', padding:16, cursor:'zoom-out' }}>
+          <button type="button" onClick={(e)=>{ e.stopPropagation(); setPhotoOpen(false); }} aria-label="Close photo"
+            style={{ position:'absolute', top:14, right:14, width:40, height:40, borderRadius:'50%', background:'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.25)', color:'#fff', fontSize:18, cursor:'pointer', lineHeight:1 }}>✕</button>
+          <img src={photo} alt="Drive evidence (full size)" style={{ maxWidth:'100%', maxHeight:'100%', objectFit:'contain', display:'block' }}/>
+        </div>,
+        document.body
       )}
 
       <div style={{ marginTop:18, display:'flex', flexDirection:'column', gap:8 }}>
