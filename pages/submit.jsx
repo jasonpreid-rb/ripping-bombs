@@ -270,12 +270,15 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
         <Card>
           <div className="submit-grid" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
 
-            {/* Event name — locked to "Simulator" for simulator accounts */}
+            {/* Event name — locked to "Simulator" for simulator accounts.
+                Hidden when the venue came from a QR code (no event involved); tournament is still saved as 'Simulator'. */}
             {isSimulator ? (
+              (venueLocked && form.venueId && !eventData) ? null : (
               <div style={{ gridColumn:'1/-1' }}>
                 <label style={{ display:'block', fontFamily:SANS, fontSize:11, fontWeight:600, color:MUT, marginBottom:5, textTransform:'uppercase', letterSpacing:.8 }}>Event</label>
                 <div style={{ background:BG3, border:`1px solid ${BDR}`, padding:'10px 14px', fontFamily:SANS, fontSize:14, color:DIM }}>{eventData ? eventData.event.name : 'Simulator'}</div>
               </div>
+              )
             ) : (
               <div style={{ gridColumn:'1/-1' }}>
                 <Field label="Tournament / Event Name (optional)" value={form.tournament} onChange={e=>setForm({...form,tournament:e.target.value})} placeholder="e.g. Club Championship 2026 — leave blank for a casual round"/>
@@ -284,7 +287,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
 
             {/* Venue name — only for simulator accounts, and only for venues not registered on RB.
                 Club/venue accounts don't need this: they ARE the venue, so it'd just duplicate their own org. */}
-            {isSimulator && (
+            {isSimulator && !(venueLocked && form.venueId) && (
               <div style={{ gridColumn:'1/-1' }}>
                 <Field label="Venue Name (optional)" value={form.facility||''} onChange={e=>setForm({...form,facility:e.target.value})} placeholder="e.g. TopGolf Manchester, GolfZon World, The Range Dubai"/>
                 <div style={{ fontFamily:SANS, fontSize:11, color:DIM, marginTop:5 }}>
