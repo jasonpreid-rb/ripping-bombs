@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, cloneElement } from 'react';
 
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP, profileSlugFor } from '../lib/constants';
 import { fmtDate, tier, nowWeek, weekLabel, prevWeek, nextWeek, sameWeek } from '../lib/constants';
@@ -141,7 +141,7 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
                       ) : (
                         <span style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>{e.player}</span>
                       ); })()}
-                      {org?.country&&countryFlag(org.country)}
+                      {org?.country&&<span title={org.country} style={{display:'block',lineHeight:0,marginTop:4}}>{cloneElement(countryFlag(org.country),{style:{width:20,height:14,objectFit:'cover',borderRadius:2,display:'block'}})}</span>}
                     </div>
                   </div>
                 </td>

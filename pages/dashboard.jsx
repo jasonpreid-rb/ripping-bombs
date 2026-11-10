@@ -1093,7 +1093,7 @@ function WeeklyCategoryCard({ cat, meId }) {
                   {e.org?.avatarUrl && (
                     <img src={e.org.avatarUrl} onError={(ev) => { ev.target.style.display = 'none'; }} style={{ width: 16, height: 16, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                   )}
-                  {e.org?.country && <span style={{ fontSize: 11, flexShrink: 0 }}>{countryFlag(e.org.country)}</span>}
+                  {e.org?.country && <span title={e.org.country} style={{ flexShrink: 0, lineHeight: 0 }}>{cloneElement(countryFlag(e.org.country), { style: { width: 16, height: 11, objectFit: 'cover', borderRadius: 2, display: 'block' } })}</span>}
                   <span style={{ fontSize: '0.66rem', color: DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {e.org?.courseName || e.org?.fullName || '—'}
                   </span>
@@ -2126,8 +2126,18 @@ export default function DashboardPage() {
       const categoryLeaders = CATEGORY_KEYS.map((key) => ({
         key,
         label: getCategoryLabel(key),
-        top3: (weeklyAllEntries || [])
-          .filter((e) => getCategory(e) === key)
+        // One row per player (best drive that week), so the same player
+        // can't fill two of the three places. A venue logs drives for many
+        // players under one orgId, so the key is orgId + player name.
+        top3: Object.values(
+          (weeklyAllEntries || [])
+            .filter((e) => getCategory(e) === key)
+            .reduce((best, e) => {
+              const k = `${e.orgId}|${String(e.player || '').trim().toLowerCase()}`;
+              if (!best[k] || Number(e.dist) > Number(best[k].dist)) best[k] = e;
+              return best;
+            }, {})
+        )
           .sort((a, b) => Number(b.dist) - Number(a.dist))
           .slice(0, 3)
           .map((e) => ({ ...e, org: weeklyOrgMap.get(e.orgId) })),
