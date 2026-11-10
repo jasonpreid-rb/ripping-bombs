@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabaseClient';
 import { SeoPage, SeoH1, SeoH2, SeoP, SeoCTA } from '../components/SeoPageLayout';
 import { Card, Field, Btn } from '../components/UI';
 import { ORG, TXT, MUT, DIM, BG2, BG3, BDR, SANS, DISP } from '../lib/constants';
+import { HIGH_HCP_THRESHOLD } from '../lib/categories';
 
 const linkStyle = { color: ORG };
 
@@ -18,8 +19,8 @@ function getCategory(entry) {
   const gender = (entry.gender || '').toLowerCase();
   if (age < 16) return 'youth';
   if (age >= 55) return 'senior';
-  if (gender === 'female') return hcp >= 20 ? 'female_high_hcp' : 'female_open';
-  return hcp >= 20 ? 'male_high_hcp' : 'male_open';
+  if (gender === 'female') return hcp >= HIGH_HCP_THRESHOLD ? 'female_high_hcp' : 'female_open';
+  return hcp >= HIGH_HCP_THRESHOLD ? 'male_high_hcp' : 'male_open';
 }
 
 function getCategoryLabel(cat) {

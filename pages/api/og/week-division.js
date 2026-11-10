@@ -19,6 +19,7 @@
 import { ImageResponse } from '@vercel/og';
 import { createClient } from '@supabase/supabase-js';
 import { BDR, TXT, MUT, DIM, ORG, nowWeek, prevWeek, weekLabel } from '../../../lib/constants';
+import { HIGH_HCP_THRESHOLD } from '../../../lib/categories';
 
 export const config = { runtime: 'edge' };
 
@@ -94,7 +95,7 @@ function computeDivision({ gender, hcp, age }) {
     if (numAge >= 55) return 'Seniors';
   }
 
-  const isLowHandicap = !Number.isNaN(numHcp) && numHcp < 20;
+  const isLowHandicap = !Number.isNaN(numHcp) && numHcp < HIGH_HCP_THRESHOLD;
   const isMale = (gender || '').toLowerCase() === 'male';
 
   if (isMale) {

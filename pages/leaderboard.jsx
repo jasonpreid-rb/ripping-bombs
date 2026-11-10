@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP, profileSlugFor } from '../lib/constants';
 import { fmtDate, tier, nowWeek, weekLabel, prevWeek, nextWeek, sameWeek } from '../lib/constants';
+import { HIGH_HCP_THRESHOLD } from '../lib/categories';
 import { countryFlag, BadgePill } from '../components/UI';
 import EntryModal from '../components/EntryModal';
 import ShareModal from '../components/ShareModal';
@@ -224,14 +225,15 @@ export default function LeaderboardPage(props) {
   // Reset to page 1 whenever any filter or view changes
   useEffect(() => { setPage(1); }, [fCountry, fHcp, fAge, fClub, fPlayer, fGender, fSimulator, sortBy, allTime, week]);
 
-  // 'u20'/'o20' and 'u16' aren't exposed in the filter dropdowns — they exist so
+  // 'u15'/'o15' and 'u16' aren't exposed in the filter dropdowns — they exist so
   // homepage category cards (e.g. "Men High Handicap", "Youth") can deep-link
-  // into an exact pre-filtered view via the URL query, below.
-  const hcpIn=(hcp,b)=>{if(!b)return true;if(b==='scratch')return hcp<=0;if(b==='low')return hcp>0&&hcp<=5;if(b==='mid')return hcp>5&&hcp<=14;if(b==='high')return hcp>14&&hcp<=28;if(b==='beginner')return hcp>28;if(b==='u20')return hcp<20;if(b==='o20')return hcp>=20;return true;};
+  // into an exact pre-filtered view via the URL query, below. The old
+  // 'u20'/'o20' values still work as aliases so previously shared links don't break.
+  const hcpIn=(hcp,b)=>{if(!b)return true;if(b==='scratch')return hcp<=0;if(b==='low')return hcp>0&&hcp<=5;if(b==='mid')return hcp>5&&hcp<=14;if(b==='high')return hcp>14&&hcp<=28;if(b==='beginner')return hcp>28;if(b==='u15'||b==='u20')return hcp<HIGH_HCP_THRESHOLD;if(b==='o15'||b==='o20')return hcp>=HIGH_HCP_THRESHOLD;return true;};
   const ageIn=(age,b)=>{if(!b)return true;if(b==='u25')return age<25;if(b==='25-40')return age>=25&&age<40;if(b==='40-55')return age>=40&&age<55;if(b==='55+')return age>=55;if(b==='u16')return age<16;return true;};
 
   // Apply filters from the URL query on load (e.g. arriving from a homepage
-  // category card: /leaderboard?gender=male&hcp=o20). Only runs once the
+  // category card: /leaderboard?gender=male&hcp=o15). Only runs once the
   // router has hydrated, and only sets a filter if a value was actually passed.
   const router = useRouter();
   useEffect(() => {

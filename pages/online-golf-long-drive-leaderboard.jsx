@@ -35,7 +35,7 @@ export default function OnlineGolfLongDriveLeaderboard() {
         <SeoH2>Leaderboard Categories</SeoH2>
         <SeoP>Drives are automatically sorted into the following categories based on the data submitted:</SeoP>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10, marginBottom: 24 }}>
-          {["Men (age 16–54, hcp < 20)", "Men High Handicap (hcp ≥ 20)", "Women (age 16–54, hcp < 20)", "Women High Handicap", "Youth (under 16)", "Seniors (55+)"].map((cat) => (
+          {["Men (age 16–54, hcp < 15)", "Men High Handicap (hcp ≥ 15)", "Women (age 16–54, hcp < 15)", "Women High Handicap", "Youth (under 16)", "Seniors (55+)"].map((cat) => (
             <div key={cat} style={{ background: BG2, border: `1px solid ${BDR}`, borderRadius: 8, padding: "12px 16px", color: TXT, fontFamily: SANS, fontSize: 13, lineHeight: 1.5 }}>{cat}</div>
           ))}
         </div>

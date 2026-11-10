@@ -11,6 +11,7 @@ import PlayerEventInvites from '../components/PlayerEventInvites';
 import { getVenueEvents } from '../lib/events';
 import { countryFlag } from '../components/UI';
 import { DISP } from '../lib/constants';
+import { HIGH_HCP_THRESHOLD } from '../lib/categories';
 
 const ORG = '#FF0090';
 const TXT = '#f0f0f0';
@@ -60,8 +61,8 @@ function getCategory(entry) {
   const gender = (entry.gender || '').toLowerCase();
   if (age < 16) return 'youth';
   if (age >= 55) return 'senior';
-  if (gender === 'female') return hcp >= 20 ? 'female_high_hcp' : 'female_open';
-  return hcp >= 20 ? 'male_high_hcp' : 'male_open';
+  if (gender === 'female') return hcp >= HIGH_HCP_THRESHOLD ? 'female_high_hcp' : 'female_open';
+  return hcp >= HIGH_HCP_THRESHOLD ? 'male_high_hcp' : 'male_open';
 }
 
 function getCategoryLabel(cat) {

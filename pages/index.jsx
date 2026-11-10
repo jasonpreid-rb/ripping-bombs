@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP, nameToSlug } from '../lib/constants';
 import { fmtDate } from '../lib/constants';
+import { HIGH_HCP_THRESHOLD } from '../lib/categories';
 import EmailSignup from '../components/EmailSignup';
 import { countryFlag } from '../components/UI';
 import PlayerAvatar from '../components/PlayerAvatar';
@@ -214,10 +215,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
   const approved = entries.filter(e => approvedOrgs.find(o => o.id === e.orgId));
 
   const CATEGORIES = [
-    { key:'mens',       label:'Men',                  icon:'♂',  filter: e => e.gender==='male'   && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)<20  },
-    { key:'mens_hcp',   label:'Men High Handicap',    icon:'♂',  filter: e => e.gender==='male'   && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)>=20 },
-    { key:'womens',     label:'Women',                icon:'♀',  filter: e => e.gender==='female' && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)<20  },
-    { key:'womens_hcp', label:'Women High Handicap',  icon:'♀',  filter: e => e.gender==='female' && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)>=20 },
+    { key:'mens',       label:'Men',                  icon:'♂',  filter: e => e.gender==='male'   && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)<HIGH_HCP_THRESHOLD  },
+    { key:'mens_hcp',   label:'Men High Handicap',    icon:'♂',  filter: e => e.gender==='male'   && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)>=HIGH_HCP_THRESHOLD },
+    { key:'womens',     label:'Women',                icon:'♀',  filter: e => e.gender==='female' && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)<HIGH_HCP_THRESHOLD  },
+    { key:'womens_hcp', label:'Women High Handicap',  icon:'♀',  filter: e => e.gender==='female' && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)>=HIGH_HCP_THRESHOLD },
     { key:'youth',      label:'Youth (Under 16)',     icon:'🌱', filter: e => Number(e.age) < 16 },
     { key:'senior',     label:'Senior (55+)',         icon:'⭐', filter: e => Number(e.age) >= 55 },
   ];
@@ -273,10 +274,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
   const categoryHref = (key, allTime) => {
     const params = new URLSearchParams();
     if (allTime) params.set('allTime', '1');
-    if (key === 'mens')       { params.set('gender','male');   params.set('hcp','u20'); }
-    else if (key === 'mens_hcp')   { params.set('gender','male');   params.set('hcp','o20'); }
-    else if (key === 'womens')     { params.set('gender','female'); params.set('hcp','u20'); }
-    else if (key === 'womens_hcp') { params.set('gender','female'); params.set('hcp','o20'); }
+    if (key === 'mens')       { params.set('gender','male');   params.set('hcp','u15'); }
+    else if (key === 'mens_hcp')   { params.set('gender','male');   params.set('hcp','o15'); }
+    else if (key === 'womens')     { params.set('gender','female'); params.set('hcp','u15'); }
+    else if (key === 'womens_hcp') { params.set('gender','female'); params.set('hcp','o15'); }
     else if (key === 'youth')      { params.set('age','u16'); }
     else if (key === 'senior')     { params.set('age','55+'); }
     const qs = params.toString();

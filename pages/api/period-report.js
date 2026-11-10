@@ -10,6 +10,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { HIGH_HCP_THRESHOLD } from '../../lib/categories';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -89,18 +90,18 @@ function getPeriodInfo(now = new Date()) {
 // --- Division logic -----------------------------------------------------
 //
 // There's no stored division column — it's computed from gender, hcp, age.
-// This matches the category definitions in PROJECT_BRAIN.md (the live
-// homepage category logic), which supersedes the earlier hcp-15 / "Women Low
-// Handicap" spec — confirmed as the source of truth going forward.
+// Mirrors the live homepage category logic. The High Handicap cutoff lives in
+// lib/categories.js (HIGH_HCP_THRESHOLD) — it was 20 until Nov 2026, when it
+// moved to 15. The comments below assume the current value of 15.
 //
 // Priority: age brackets (Youth, Seniors) override gender/handicap brackets.
 //
 //   age < 16                -> Youth
 //   age >= 55                -> Seniors
-//   gender=male,   hcp < 20  -> Men
-//   gender=male,   hcp >= 20 -> Men High Handicap
-//   gender=female, hcp < 20  -> Women
-//   gender=female, hcp >= 20 -> Women High Handicap
+//   gender=male,   hcp < 15  -> Men
+//   gender=male,   hcp >= 15 -> Men High Handicap
+//   gender=female, hcp < 15  -> Women
+//   gender=female, hcp >= 15 -> Women High Handicap
 
 function computeDivision({ gender, hcp, age }) {
   const numAge = Number(age);
@@ -111,7 +112,7 @@ function computeDivision({ gender, hcp, age }) {
     if (numAge >= 55) return 'Seniors';
   }
 
-  const isLowHandicap = !Number.isNaN(numHcp) && numHcp < 20;
+  const isLowHandicap = !Number.isNaN(numHcp) && numHcp < HIGH_HCP_THRESHOLD;
   const isMale = (gender || '').toLowerCase() === 'male';
 
   if (isMale) {

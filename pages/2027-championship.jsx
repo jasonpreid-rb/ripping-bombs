@@ -14,10 +14,10 @@ const POINTS = [
 ]
 
 const CATEGORIES = [
-  { icon: '♂',  label: 'Men',                 desc: 'Age 16–54, handicap under 20' },
-  { icon: '♂',  label: 'Men High Handicap',   desc: 'Age 16–54, handicap 20 and above' },
-  { icon: '♀',  label: 'Women',               desc: 'Age 16–54, handicap under 20' },
-  { icon: '♀',  label: 'Women High Handicap', desc: 'Age 16–54, handicap 20 and above' },
+  { icon: '♂',  label: 'Men',                 desc: 'Age 16–54, handicap under 15' },
+  { icon: '♂',  label: 'Men High Handicap',   desc: 'Age 16–54, handicap 15 and above' },
+  { icon: '♀',  label: 'Women',               desc: 'Age 16–54, handicap under 15' },
+  { icon: '♀',  label: 'Women High Handicap', desc: 'Age 16–54, handicap 15 and above' },
   { icon: '🌱', label: 'Youth',               desc: 'Under 16' },
   { icon: '⭐', label: 'Senior',              desc: 'Age 55 and above' },
 ]
