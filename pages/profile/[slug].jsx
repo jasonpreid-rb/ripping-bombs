@@ -1,4 +1,4 @@
-import { cloneElement } from 'react';
+import { cloneElement, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
@@ -6,6 +6,7 @@ import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP, nameToSlug } from '../..
 import { fmtDate, tier } from '../../lib/constants';
 import { countryFlag, BadgePill } from '../../components/UI';
 import PlayerAvatar from '../../components/PlayerAvatar';
+import EntryModal from '../../components/EntryModal';
 
 // Category thresholds: Youth <16, Senior 55+, High Handicap 15+.
 // Age/Senior checks take priority so a 15-year-old is always Youth,
@@ -75,12 +76,12 @@ export async function getServerSideProps({ params }) {
   // is embedded in the page's HTML for anyone to read — so only pass the
   // fields the profile page actually displays (never email, dob, password
   // hash, etc.). Missing values become null because Next can't serialise undefined.
-  const PUBLIC_ORG_FIELDS = ['id', 'fullName', 'customSlug', 'avatarUrl', 'country', 'location', 'badge', 'is_founding_member', 'instagram', 'tiktok', 'twitter', 'youtube', 'simulator', 'accountType'];
+  const PUBLIC_ORG_FIELDS = ['id', 'fullName', 'customSlug', 'avatarUrl', 'country', 'location', 'courseName', 'badge', 'is_founding_member', 'instagram', 'tiktok', 'twitter', 'youtube', 'simulator', 'accountType'];
   const publicOrg = Object.fromEntries(PUBLIC_ORG_FIELDS.map((k) => [k, org[k] ?? null]));
 
   const { data: entries } = await supabase
     .from('entries')
-    .select('id, orgId, player, dist, club, hcp, age, gender, is_simulator, date, tournament')
+    .select('id, orgId, player, dist, club, hcp, age, gender, is_simulator, date, tournament, facility')
     .eq('orgId', org.id)
     .eq('is_simulator', true)
     .order('date', { ascending: false });
@@ -313,6 +314,9 @@ function SocialHandle({ handle, href, icon }) {
 }
 
 export default function PlayerProfile({ org, playerEntries, globalRank, globalTotal, category, categoryRank, categoryTotal, ageGroupRank, ageGroupTotal, ageGroupLabel, hcpGroupRank, hcpGroupTotal, hcpGroupLabel }) {
+  // Which drive's detail popup (with the evidence photo) is open. The photo is
+  // fetched by the popup itself when it opens, so it isn't part of the page data.
+  const [openEntry, setOpenEntry] = useState(null);
   const sorted = [...playerEntries].sort((a, b) => Number(b.dist) - Number(a.dist));
   const best = sorted[0];
   const avgDist = playerEntries.length
@@ -469,7 +473,7 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
                 </thead>
                 <tbody>
                   {sorted.map((e, i) => (
-                    <tr key={e.id} style={{ borderBottom: `1px solid ${BDR}` }}>
+                    <tr key={e.id} onClick={() => setOpenEntry(e)} title="View drive details" style={{ borderBottom: `1px solid ${BDR}`, cursor: 'pointer' }}>
                       <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: DIM }}>{fmtDate(e.date)}</td>
                       <td style={{ padding: '11px 14px' }}>
                         <span style={{ fontFamily: DISP, fontSize: 18, color: i === 0 ? ORG : TXT }}>{e.dist}</span>
@@ -488,6 +492,10 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
             </div>
           )}
         </div>
+
+        {openEntry && (
+          <EntryModal entry={openEntry} org={org} onClose={() => setOpenEntry(null)} cvt={(d) => d} unitLbl="yds" hideProfileLink />
+        )}
 
         <div style={{ marginTop: 40, borderTop: `1px solid ${BDR}`, paddingTop: 28, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start' }}>
           <div style={{ fontFamily: SANS, fontSize: 12, color: DIM }}>Want your drives on the global leaderboard?</div>

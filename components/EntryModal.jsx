@@ -6,7 +6,7 @@ import { fmtDate, tier } from '../lib/constants';
 import { Overlay, BadgePill, countryFlag } from './UI';
 import { supabase } from '../lib/supabaseClient';
 
-export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl }) {
+export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl, hideProfileLink = false }) {
   const router = useRouter();
   const [photo, setPhoto] = useState(null);
   const [photoOpen, setPhotoOpen] = useState(false); // full-size lightbox
@@ -51,7 +51,7 @@ export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl 
 
   if (!entry) return null;
 
-  const profileSlug = profileSlugFor(org);
+  const profileSlug = hideProfileLink ? null : profileSlugFor(org);
 
   return (
     <Overlay onClose={onClose}>
