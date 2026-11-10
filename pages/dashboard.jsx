@@ -10,7 +10,7 @@ import VenueEventsSection from '../components/VenueEventsSection';
 import PlayerEventInvites from '../components/PlayerEventInvites';
 import { getVenueEvents } from '../lib/events';
 import { countryFlag } from '../components/UI';
-import { DISP } from '../lib/constants';
+import { DISP, COUNTRIES } from '../lib/constants';
 import { HIGH_HCP_THRESHOLD } from '../lib/categories';
 
 const ORG = '#FF0090';
@@ -181,6 +181,7 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded, onSponsorLogoUp
     fullName: club?.fullName || '',
     email: club?.email || '',
     location: club?.location || '',
+    country: (club?.country || '').toUpperCase(),
     position: club?.position || '',
     gender: club?.gender || '',
     dob: club?.dob || '',
@@ -230,6 +231,16 @@ function ProfileModal({ club, onSave, onClose, onAvatarUploaded, onSponsorLogoUp
         </div>
         <label style={labelStyle}>Location</label>
         <input style={inputStyle} value={form.location} onChange={(e) => set('location', e.target.value)} placeholder="City, Country" />
+        <label style={labelStyle}>Country</label>
+        <select style={inputStyle} value={form.country} onChange={(e) => set('country', e.target.value)}>
+          <option value="">Select your country…</option>
+          {(COUNTRIES || []).map((c) => (
+            <option key={c.code} value={String(c.code).toUpperCase()}>{c.name}</option>
+          ))}
+        </select>
+        <div style={{ fontSize: '0.72rem', color: DIM, marginTop: -4, marginBottom: 4 }}>
+          Shows your flag next to your name on the leaderboard and your profile, and sets your country rank.
+        </div>
         <label style={labelStyle}>Position / Role</label>
         <input style={inputStyle} value={form.position} onChange={(e) => set('position', e.target.value)} placeholder="e.g. Club Manager" />
         {isClub && (
@@ -2259,6 +2270,7 @@ export default function DashboardPage() {
       fullName: form.fullName,
       email: newEmail || club.email,
       location: form.location,
+      country: form.country ? form.country.toUpperCase() : null,
       position: form.position,
       gender: form.gender || null,
       dob: form.dob || null,
