@@ -113,13 +113,15 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
             const medal=ri===0?'🥇':ri===1?'🥈':ri===2?'🥉':null;
             const tdSticky = (left) => ({...STICKY, left, background:BG2, borderRight:`1px solid ${BDR}`});
             return (
-              <tr key={e.id} onClick={()=>onView(e)} style={{cursor:'pointer',borderBottom:`1px solid ${BDR}`}}
+              <tr key={e.id} onClick={()=>onView(e)} style={{cursor:'pointer',borderBottom:`1px solid ${BDR}`,transition:'background .12s ease, box-shadow .12s ease'}}
                 onMouseEnter={el=>{
-                  el.currentTarget.style.background='rgba(255,0,144,0.04)';
-                  [...el.currentTarget.querySelectorAll('td[data-sticky]')].forEach(td=>td.style.background='#1c1418');
+                  el.currentTarget.style.background='rgba(255,0,144,0.12)';
+                  el.currentTarget.style.boxShadow=`inset 3px 0 0 ${ORG}`;
+                  [...el.currentTarget.querySelectorAll('td[data-sticky]')].forEach(td=>td.style.background='#2a1220');
                 }}
                 onMouseLeave={el=>{
                   el.currentTarget.style.background='transparent';
+                  el.currentTarget.style.boxShadow='none';
                   [...el.currentTarget.querySelectorAll('td[data-sticky]')].forEach(td=>td.style.background=BG2);
                 }}>
                 <td data-sticky="1" style={{...tdSticky(0),padding:'12px 14px',fontFamily:SANS,fontSize:12,color:DIM,minWidth:RANK_W}}>

@@ -812,7 +812,7 @@ function DriveHistory({ entries, lastDriveDate, limitToFree, isClub }) {
                 const rowNumber = (usePagination ? currentPage * DRIVES_PAGE_SIZE : 0) + i + 1;
                 return (
                 <tr key={e.id} style={{ borderBottom: i < visibleEntries.length - 1 ? `1px solid ${BDR}` : 'none' }}
-                  onMouseEnter={(el) => el.currentTarget.style.background = 'rgba(255,0,144,0.03)'}
+                  onMouseEnter={(el) => el.currentTarget.style.background = 'rgba(255,0,144,0.08)'}
                   onMouseLeave={(el) => el.currentTarget.style.background = 'transparent'}>
                   <td style={{ padding: '0.8rem 1rem', color: DIM, fontSize: '0.78rem' }}>#{rowNumber}</td>
                   <td style={{ padding: '0.8rem 1rem', fontWeight: 700, color: rowNumber === 1 ? ORG : TXT, fontSize: '0.9rem' }}>{Number(e.dist)} yds</td>
@@ -2336,6 +2336,15 @@ export default function DashboardPage() {
     );
   }
 
+  // Header facts for individual/simulator accounts: handicap comes from the
+  // most recent drive (it's per-entry, not a profile field); age comes from
+  // the profile dob, falling back to the most recent drive's age.
+  const latestEntry = (entries || []).slice().sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+  const headerHcp = latestEntry && latestEntry.hcp !== null && latestEntry.hcp !== undefined && latestEntry.hcp !== '' ? Number(latestEntry.hcp) : null;
+  const dobAge = club?.dob ? Math.floor((Date.now() - new Date(club.dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null;
+  const headerAge = dobAge !== null && !Number.isNaN(dobAge) && dobAge > 0 ? dobAge : (latestEntry && latestEntry.age ? Number(latestEntry.age) : null);
+  const factChip = { background: BG3, border: `1px solid ${BDR}`, borderRadius: 20, padding: '2px 10px', fontSize: '0.72rem', color: MUT, fontWeight: 600, whiteSpace: 'nowrap' };
+
   return (
     <>
       <Head>
@@ -2375,6 +2384,12 @@ export default function DashboardPage() {
                   <span title={club.country} style={{ display: 'inline-block', lineHeight: 0 }}>
                     {cloneElement(countryFlag(club.country), { style: { width: 20, height: 14, objectFit: 'cover', borderRadius: 2, display: 'block' } })}
                   </span>
+                )}
+                {club?.accountType !== 'club' && headerHcp !== null && !Number.isNaN(headerHcp) && (
+                  <span style={factChip}>HCP {headerHcp}</span>
+                )}
+                {club?.accountType !== 'club' && headerAge !== null && !Number.isNaN(headerAge) && (
+                  <span style={factChip}>Age {headerAge}</span>
                 )}
                 {club?.is_founding_member && <FoundingBadge />}
                 {club?.badge === 'simulator' && (
