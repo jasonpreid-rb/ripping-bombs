@@ -323,6 +323,12 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
     ? Math.round(playerEntries.reduce((sum, e) => sum + Number(e.dist), 0) / playerEntries.length)
     : null;
 
+  // Header facts come from the most recent drive (hcp/age are stored per drive).
+  const latestDrive = [...playerEntries].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+  const hdrHcp = latestDrive && latestDrive.hcp !== null && latestDrive.hcp !== undefined && latestDrive.hcp !== '' ? Number(latestDrive.hcp) : null;
+  const hdrAge = latestDrive && latestDrive.age ? Number(latestDrive.age) : null;
+  const factChip = { background: BG3, border: `1px solid ${BDR}`, padding: '3px 10px', fontFamily: SANS, fontSize: 12, fontWeight: 600, color: MUT, whiteSpace: 'nowrap' };
+
   const profileName = org.fullName;
   const metaDesc = `${profileName}'s golf drive stats on Ripping Bombs. Personal best: ${best ? best.dist + ' yds' : 'N/A'}. ${playerEntries.length} recorded drives.`;
   const hasSocials = org.instagram || org.tiktok || org.twitter || org.youtube;
@@ -415,6 +421,12 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
                 <p style={{ margin: 0, fontFamily: SANS, fontSize: 13, color: MUT }}>
                   {[org.location, org.simulator].filter(Boolean).join(' · ')}
                 </p>
+              )}
+              {((hdrHcp !== null && !Number.isNaN(hdrHcp)) || (hdrAge !== null && !Number.isNaN(hdrAge))) && (
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+                  {hdrHcp !== null && !Number.isNaN(hdrHcp) && <span style={factChip}>HCP {hdrHcp}</span>}
+                  {hdrAge !== null && !Number.isNaN(hdrAge) && <span style={factChip}>Age {hdrAge}</span>}
+                </div>
               )}
             </div>
           </div>
