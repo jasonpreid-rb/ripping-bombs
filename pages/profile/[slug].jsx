@@ -71,9 +71,16 @@ export async function getServerSideProps({ params }) {
 
   if (!org) return { notFound: true };
 
+  // The lookup above needs the whole clubs row, but whatever goes into props
+  // is embedded in the page's HTML for anyone to read — so only pass the
+  // fields the profile page actually displays (never email, dob, password
+  // hash, etc.). Missing values become null because Next can't serialise undefined.
+  const PUBLIC_ORG_FIELDS = ['id', 'fullName', 'customSlug', 'avatarUrl', 'country', 'location', 'badge', 'is_founding_member', 'instagram', 'tiktok', 'twitter', 'youtube', 'simulator', 'accountType'];
+  const publicOrg = Object.fromEntries(PUBLIC_ORG_FIELDS.map((k) => [k, org[k] ?? null]));
+
   const { data: entries } = await supabase
     .from('entries')
-    .select('*')
+    .select('id, orgId, player, dist, club, hcp, age, gender, is_simulator, date, tournament')
     .eq('orgId', org.id)
     .eq('is_simulator', true)
     .order('date', { ascending: false });
@@ -158,7 +165,7 @@ export async function getServerSideProps({ params }) {
 
   return {
     props: {
-      org,
+      org: publicOrg,
       playerEntries,
       slug,
       globalRank,
