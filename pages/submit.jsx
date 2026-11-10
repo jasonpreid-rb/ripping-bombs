@@ -2,7 +2,8 @@ import Head from 'next/head';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { TXT, MUT, ORG, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
-import { tier, todayStr, toB64 } from '../lib/constants';
+import { tier, todayStr } from '../lib/constants';
+import { toCompressedB64 } from '../lib/image';
 import { Card, Field, PhotoField, Btn } from '../components/UI';
 import { getEventBySlug, checkEligibility, joinEvent, getEventStatus } from '../lib/events';
 
@@ -421,7 +422,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
           <PhotoField
             label={isSimulator ? "Simulator Screenshot (required)" : "Photo Evidence (required)"}
             value={form.photo}
-            onChange={async e=>{ if(e.target.files[0]) setForm({...form,photo:await toB64(e.target.files[0])}); }}
+            onChange={async e=>{ if(e.target.files[0]) setForm({...form,photo:await toCompressedB64(e.target.files[0])}); }}
             required
           />
 
@@ -464,11 +465,14 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
               if (!isSimulator && !form.playerEmail) { setFormError("Please enter the player's email so we can notify them."); return; }
               if (isSimulator && !loggedOrg.dob) { setFormError('Please add your date of birth in your profile before submitting — use the "Complete Profile" button above.'); return; }
               if (!consent) { setFormError(isSimulator ? 'Please confirm your consent before submitting.' : 'Please confirm player consent before submitting.'); return; }
-              // For simulator accounts, pre-fill player name, gender, and age from account
-              if (isSimulator) {
-                setForm(f => ({ ...f, player: loggedOrg.fullName, tournament: 'Simulator', gender: loggedOrg.gender || 'male', age: calcAge(loggedOrg.dob, f.date) }));
-              }
-              const result = await doSubmit();
+              // For simulator accounts, take player name, gender, and age straight from the
+              // account. Handed to doSubmit directly — a setForm() here wouldn't take effect
+              // until the next render, so doSubmit would still see the old, empty values.
+              // (If the drive belongs to an event, keep the event's name rather than 'Simulator'.)
+              const overrides = isSimulator
+                ? { player: loggedOrg.fullName, tournament: form.eventId ? form.tournament : 'Simulator', gender: loggedOrg.gender || 'male', age: calcAge(loggedOrg.dob, form.date) }
+                : {};
+              const result = await doSubmit(overrides);
               if (result && result.ok) {
                 setRankResult(result);
               }

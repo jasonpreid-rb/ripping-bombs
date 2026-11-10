@@ -10,11 +10,14 @@ export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl 
   const router = useRouter();
   const [photo, setPhoto] = useState(null);
   const [photoOpen, setPhotoOpen] = useState(false); // full-size lightbox
+  const [photoLoading, setPhotoLoading] = useState(false);
 
   useEffect(() => {
     setPhoto(null);
     setPhotoOpen(false);
+    setPhotoLoading(false);
     if (!entry?.id) return;
+    setPhotoLoading(true);
 
     let cancelled = false;
     supabase
@@ -24,8 +27,10 @@ export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl 
       .single()
       .then(({ data, error }) => {
         if (cancelled) return;
+        setPhotoLoading(false);
         if (!error && data?.photo) setPhoto(data.photo);
-      });
+      })
+      .catch(() => { if (!cancelled) setPhotoLoading(false); });
 
     return () => { cancelled = true; };
   }, [entry?.id]);
@@ -83,6 +88,12 @@ export default function EntryModal({ entry, org, onClose, onShare, cvt, unitLbl 
           </div>
         ))}
       </div>
+
+      {photoLoading && !photo && (
+        <div style={{ background:BG3, padding:'28px 14px', marginBottom:14, textAlign:'center', fontFamily:SANS, fontSize:11, fontWeight:700, letterSpacing:1, color:DIM, textTransform:'uppercase' }}>
+          Loading photo…
+        </div>
+      )}
 
       {photo && (
         <button type="button" onClick={()=>setPhotoOpen(true)} aria-label="View full photo"

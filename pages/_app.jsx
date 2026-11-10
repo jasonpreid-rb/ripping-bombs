@@ -220,10 +220,15 @@ export default function App({ Component, pageProps }) {
     router.push(redirectTo || '/dashboard');
   }
 
-  async function doSubmit() {
+  // `overrides` lets the caller hand in field values it has just worked out
+  // (e.g. a simulator account's name/age/gender) — calling setForm() right
+  // before doSubmit() doesn't work, since this function would still read the
+  // old `form` from the render it was created in.
+  async function doSubmit(overrides = {}) {
+    const f = { ...form, ...(overrides && !overrides.nativeEvent ? overrides : {}) };
     if (!loggedOrg) { toast('Not logged in'); return false; }
-    if (!form.player || !form.dist || !form.club || !form.hcp || !form.age) { toast('Fill all required fields'); return false; }
-    if (!form.photo) { toast('Photo evidence required'); return false; }
+    if (!f.player || !f.dist || !f.club || !f.hcp || !f.age) { toast('Fill all required fields'); return false; }
+    if (!f.photo) { toast('Photo evidence required'); return false; }
 
     // Re-check the event window — and, for event submissions, the per-event
     // attempt cap instead of the usual weekly limit — right before writing
@@ -233,15 +238,15 @@ export default function App({ Component, pageProps }) {
     // Fails open (allows the submit) if the event can't be looked up, since
     // a lookup glitch shouldn't block genuine non-event submissions or ones
     // for since-deleted events.
-    if (form.eventId) {
-      const info = await getEventSubmissionInfo(form.eventId);
+    if (f.eventId) {
+      const info = await getEventSubmissionInfo(f.eventId);
       if (info) {
         if (info.status !== 'active') {
           toast(info.status === 'upcoming' ? 'This event has not started yet.' : 'This event has ended — entries are closed.');
           return false;
         }
         if (info.maxEntriesPerPlayer != null) {
-          const attemptsUsed = entries.filter(e => e.eventId === form.eventId && e.orgId === loggedOrg.id).length;
+          const attemptsUsed = entries.filter(e => e.eventId === f.eventId && e.orgId === loggedOrg.id).length;
           if (attemptsUsed >= info.maxEntriesPerPlayer) {
             toast(`You've used all ${info.maxEntriesPerPlayer} attempts for this event.`);
             return false;
@@ -255,20 +260,20 @@ export default function App({ Component, pageProps }) {
     const e = {
       id: Date.now().toString(),
       orgId: loggedOrg.id,
-      player: form.player,
-      dist: Number(form.dist),
-      club: form.club,
-      hcp: Number(form.hcp),
-      age: Number(form.age),
-      photo: form.photo,
-      date: form.date,
-      tournament: form.tournament,
-      gender: form.gender,
+      player: f.player,
+      dist: Number(f.dist),
+      club: f.club,
+      hcp: Number(f.hcp),
+      age: Number(f.age),
+      photo: f.photo,
+      date: f.date,
+      tournament: f.tournament,
+      gender: f.gender,
       is_simulator: isSimulator,
-      venueId: form.venueId || null,
-      facility: form.facility || null,
-      player_email: form.playerEmail || null,
-      eventId: form.eventId || null,
+      venueId: f.venueId || null,
+      facility: f.facility || null,
+      player_email: f.playerEmail || null,
+      eventId: f.eventId || null,
     };
 
     const ok = await db.insertEntry(e);
