@@ -135,14 +135,14 @@ export async function getServerSideProps({ params }) {
           const b = getBand(e.age, AGE_BANDS);
           return b && b.label === myAgeBand.label;
         });
+        // Always record the band and its size, so the page can say "not enough
+        // players yet" instead of wrongly claiming there is no age on file.
+        ageGroupLabel = myAgeBand.label;
+        ageGroupTotal = inBand.length;
         if (inBand.length >= MIN_BAND_SIZE) {
           const sortedBand = [...inBand].sort((a, b) => Number(b.dist) - Number(a.dist));
           const idx = sortedBand.findIndex(e => e.orgId === org.id);
-          if (idx !== -1) {
-            ageGroupRank = idx + 1;
-            ageGroupTotal = sortedBand.length;
-            ageGroupLabel = myAgeBand.label;
-          }
+          if (idx !== -1) ageGroupRank = idx + 1;
         }
       }
 
@@ -151,14 +151,12 @@ export async function getServerSideProps({ params }) {
           const b = getBand(e.hcp, HCP_BANDS);
           return b && b.label === myHcpBand.label;
         });
+        hcpGroupLabel = myHcpBand.label;
+        hcpGroupTotal = inBand.length;
         if (inBand.length >= MIN_BAND_SIZE) {
           const sortedBand = [...inBand].sort((a, b) => Number(b.dist) - Number(a.dist));
           const idx = sortedBand.findIndex(e => e.orgId === org.id);
-          if (idx !== -1) {
-            hcpGroupRank = idx + 1;
-            hcpGroupTotal = sortedBand.length;
-            hcpGroupLabel = myHcpBand.label;
-          }
+          if (idx !== -1) hcpGroupRank = idx + 1;
         }
       }
     }
@@ -262,8 +260,16 @@ function PeerGroupRankStrip({ show, ageGroupRank, ageGroupTotal, ageGroupLabel, 
       gap: 24,
       marginBottom: 32,
     }}>
-      <PeerGroupColumn label="Age Group Rank" rank={ageGroupRank} total={ageGroupTotal} tag={ageGroupLabel && `Age ${ageGroupLabel}`} muted="No age on file" />
-      <PeerGroupColumn label="Handicap Group Rank" rank={hcpGroupRank} total={hcpGroupTotal} tag={hcpGroupLabel && `${hcpGroupLabel} Handicap`} muted="No handicap on file" />
+      <PeerGroupColumn
+        label="Age Group Rank" rank={ageGroupRank} total={ageGroupTotal} tag={ageGroupLabel && `Age ${ageGroupLabel}`}
+        muted={ageGroupLabel && ageGroupTotal < MIN_BAND_SIZE
+          ? `Ranking starts at ${MIN_BAND_SIZE} players aged ${ageGroupLabel} — ${ageGroupTotal} so far`
+          : 'No age on file'} />
+      <PeerGroupColumn
+        label="Handicap Group Rank" rank={hcpGroupRank} total={hcpGroupTotal} tag={hcpGroupLabel && `${hcpGroupLabel} Handicap`}
+        muted={hcpGroupLabel && hcpGroupTotal < MIN_BAND_SIZE
+          ? `Ranking starts at ${MIN_BAND_SIZE} players with a ${hcpGroupLabel} handicap — ${hcpGroupTotal} so far`
+          : 'No handicap on file'} />
     </div>
   );
 }
