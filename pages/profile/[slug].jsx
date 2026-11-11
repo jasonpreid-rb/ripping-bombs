@@ -468,15 +468,20 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
         </div>
 
         <div>
-          <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 2, color: DIM, textTransform: 'uppercase', marginBottom: 12 }}>Drive History</div>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
+            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: 2, color: DIM, textTransform: 'uppercase' }}>Drive History</div>
+            {playerEntries.length > 0 && (
+              <div style={{ fontFamily: SANS, fontSize: 12, color: MUT }}>Tap a drive to see its details and proof photo</div>
+            )}
+          </div>
           {playerEntries.length === 0 ? (
             <div style={{ fontFamily: SANS, fontSize: 13, color: DIM, padding: '32px 0' }}>No drives recorded yet.</div>
           ) : (
             <div style={{ border: `1px solid ${BDR}`, background: BG2, overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 520 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
                 <thead>
                   <tr>
-                    {['Date', 'Distance', 'Club', 'HCP', 'Age', 'Gender', 'Event', 'Tier'].map(col => (
+                    {['Date', 'Distance', 'Club', 'HCP', 'Age', 'Gender', 'Event', 'Tier', ''].map(col => (
                       <th key={col} style={{ padding: '10px 14px', fontFamily: SANS, fontSize: 9, fontWeight: 700, color: DIM, letterSpacing: 1.2, textTransform: 'uppercase', textAlign: 'left', borderBottom: `2px solid ${BDR}` }}>
                         {col}
                       </th>
@@ -485,7 +490,16 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
                 </thead>
                 <tbody>
                   {sorted.map((e, i) => (
-                    <tr key={e.id} onClick={() => setOpenEntry(e)} title="View drive details" style={{ borderBottom: `1px solid ${BDR}`, cursor: 'pointer' }}>
+                    <tr
+                      key={e.id}
+                      onClick={() => setOpenEntry(e)}
+                      onKeyDown={(ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); setOpenEntry(e); } }}
+                      tabIndex={0}
+                      role="button"
+                      title="View drive details and proof photo"
+                      onMouseEnter={(ev) => { ev.currentTarget.style.background = 'rgba(255,0,144,0.10)'; }}
+                      onMouseLeave={(ev) => { ev.currentTarget.style.background = 'transparent'; }}
+                      style={{ borderBottom: `1px solid ${BDR}`, cursor: 'pointer', transition: 'background .12s ease' }}>
                       <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: DIM }}>{fmtDate(e.date)}</td>
                       <td style={{ padding: '11px 14px' }}>
                         <span style={{ fontFamily: DISP, fontSize: 18, color: i === 0 ? ORG : TXT }}>{e.dist}</span>
@@ -497,6 +511,7 @@ export default function PlayerProfile({ org, playerEntries, globalRank, globalTo
                       <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: MUT }}>{e.gender === 'female' ? 'Female' : 'Male'}</td>
                       <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: DIM }}>{e.tournament || '-'}</td>
                       <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 10, fontWeight: 600, color: ORG }}>{tier(e.dist)}</td>
+                      <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 11, fontWeight: 700, color: ORG, whiteSpace: 'nowrap', textAlign: 'right' }}>View proof →</td>
                     </tr>
                   ))}
                 </tbody>
