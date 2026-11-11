@@ -1,234 +1,42 @@
 import Head from 'next/head';
-import Link from 'next/link';
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP, nameToSlug } from '../lib/constants';
+import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { fmtDate } from '../lib/constants';
-import { HIGH_HCP_THRESHOLD } from '../lib/categories';
 import EmailSignup from '../components/EmailSignup';
 import { countryFlag } from '../components/UI';
-import PlayerAvatar from '../components/PlayerAvatar';
-import InstantRankWidget from '../components/InstantRankWidget';
 
-// ── Instant rank widget lives in components/InstantRankWidget.jsx (replaced the old percentile calculator that was here) ──────────
-// ── Infinite-loop horizontal scroll row (category cards) ─────────────────────
-// Renders `items` 3x back-to-back, starts scrolled into the middle copy, and
-// silently snaps scrollLeft back by one set-width whenever it nears either
-// end — so continuous scrolling in either direction loops forever. Native
-// scrollbar is hidden; a fading arrow hint on the right edge prompts the
-// user to scroll and disappears on their first interaction. Touch/trackpad
-// keeps native momentum scrolling; mouse users get click-and-drag panning,
-// since hiding the scrollbar removes their only other way to scroll.
-// The first and third copies exist purely so the loop has room to scroll
-// into — they're marked aria-hidden and removed from tab order so crawlers
-// and screen readers only ever see the single real (middle) copy, instead
-// of the same leaderboard content 3x.
-function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 }) {
-  const scrollRef = useRef(null);
-  const [showHint, setShowHint] = useState(true);
-  const loopItems = [0, 1, 2].flatMap(set => items.map(item => ({ ...item, __set: set })));
-  const drag = useRef({ isDown:false, startX:0, startScrollLeft:0, moved:false });
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const setWidth = el.scrollWidth / 3;
-    el.scrollLeft = setWidth; // start in the middle copy
-  }, [items]);
-
-  // Loop-reset only — hint visibility is handled separately by real user
-  // interaction, since this programmatic scrollLeft assignment above also
-  // fires 'scroll' events and would otherwise hide the hint before it's seen.
-  function handleScroll() {
-    const el = scrollRef.current;
-    if (!el) return;
-    const setWidth = el.scrollWidth / 3;
-    if (el.scrollLeft < setWidth * 0.5) {
-      el.scrollLeft += setWidth;
-    } else if (el.scrollLeft > setWidth * 1.5) {
-      el.scrollLeft -= setWidth;
-    }
-  }
-
-  function dismissHint() {
-    setShowHint(false);
-  }
-
-  function handlePointerDown(e) {
-    if (e.pointerType !== 'mouse') { dismissHint(); return; } // touch: native scroll handles it
-    const el = scrollRef.current;
-    drag.current = { isDown:true, startX:e.clientX, startScrollLeft: el.scrollLeft, moved:false, pointerId:e.pointerId };
-    el.style.cursor = 'grabbing';
-    // Deliberately NOT calling setPointerCapture here. Capturing on every
-    // mousedown — even a plain click — makes the browser retarget the click
-    // event to this container instead of the card underneath, so the card's
-    // own onClick never fires. Capture is applied lazily in handlePointerMove
-    // only once real dragging is detected.
-  }
-
-  function handlePointerMove(e) {
-    if (e.pointerType !== 'mouse' || !drag.current.isDown) return;
-    const el = scrollRef.current;
-    const dx = e.clientX - drag.current.startX;
-    if (Math.abs(dx) > 3 && !drag.current.moved) {
-      drag.current.moved = true;
-      el.setPointerCapture?.(e.pointerId); // now it's a real drag — capture so it tracks outside the row too
-    }
-    if (drag.current.moved) el.scrollLeft = drag.current.startScrollLeft - dx;
-    dismissHint();
-  }
-
-  function endDrag(e) {
-    if (e.pointerType && e.pointerType !== 'mouse') return;
-    drag.current.isDown = false;
-    const el = scrollRef.current;
-    if (el) {
-      el.style.cursor = 'grab';
-      if (e.pointerId != null && el.hasPointerCapture?.(e.pointerId)) el.releasePointerCapture(e.pointerId);
-    }
-  }
-
-  function handleClickCapture(e) {
-    // Suppress the click that follows a drag so cards don't get navigated to
-    // when the user was just panning the row.
-    if (drag.current.moved) {
-      e.preventDefault();
-      e.stopPropagation();
-      drag.current.moved = false;
-    }
-  }
-
-  return (
-    <div style={{position:'relative'}}>
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={endDrag}
-        onPointerLeave={endDrag}
-        onPointerCancel={endDrag}
-        onClickCapture={handleClickCapture}
-        onTouchStart={dismissHint}
-        className="rb-scroll-row"
-        style={{overflowX:'auto',WebkitOverflowScrolling:'touch',marginLeft:-18,marginRight:-18,paddingLeft:18,paddingRight:18,cursor:'grab',touchAction:'pan-x pan-y'}}
-      >
-        <div style={{display:'flex',alignItems:'stretch',gap}}>
-          {loopItems.map((item,i)=>(
-            <div key={`${item.key}-${i}`} aria-hidden={item.__set!==1} tabIndex={item.__set!==1?-1:undefined} style={{flex:`0 0 ${cardWidth}px`,minWidth:0,display:'flex'}}>
-              {renderItem(item)}
-            </div>
-          ))}
-          {showHint && (
-            // position:sticky *inside* the scrolling row anchors this to the
-            // true visible right edge of the scroll viewport itself, so it
-            // can't drift out of alignment the way a plain absolutely-
-            // positioned sibling (measured against a differently-sized
-            // outer wrapper) could.
-            <div aria-hidden style={{position:'sticky',right:0,alignSelf:'stretch',width:0,flexShrink:0,zIndex:2,pointerEvents:'none'}}>
-              <div style={{position:'absolute',top:'50%',right:14,transform:'translateY(-50%)',width:44,height:44,borderRadius:'50%',background:'rgba(20,20,20,0.55)',border:'1px solid rgba(255,255,255,0.25)',backdropFilter:'blur(4px)',WebkitBackdropFilter:'blur(4px)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 14px rgba(0,0,0,0.45)',animation:'rbArrowPulse 1.6s ease-in-out infinite'}}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.95)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-      <style jsx>{`
-        .rb-scroll-row::-webkit-scrollbar { display: none; }
-        .rb-scroll-row { scrollbar-width: none; -ms-overflow-style: none; }
-        @keyframes rbArrowPulse {
-          0%, 100% { opacity: 0.55; transform: translate(0,-50%); }
-          50% { opacity: 1; transform: translate(4px,-50%); }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-// ── Empty-category state: turns "nobody yet" into a challenge ────────────────
-// Shown in a category card when it has no entries. `weekly` swaps the copy
-// so the weekly and all-time cards don't read identically side by side.
-function EmptySlot({ weekly }) {
-  return (
-    <div className="rb-empty-slot" style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',gap:6,padding:'18px 10px',border:'1px dashed rgba(255,0,144,0.35)',background:'radial-gradient(circle at 50% 0%, rgba(255,0,144,0.10), transparent 70%)'}}>
-      <span aria-hidden style={{fontSize:26,lineHeight:1,animation:'rbEmptyBounce 2.2s ease-in-out infinite'}}>🏆</span>
-      <div style={{fontFamily:DISP,fontSize:20,color:TXT,letterSpacing:.8,lineHeight:1.1}}>
-        {weekly ? 'THE TEE IS YOURS' : 'THE THRONE IS EMPTY'}
-      </div>
-      <div style={{fontFamily:SANS,fontSize:11,color:MUT,lineHeight:1.5}}>
-        {weekly ? 'No drives posted this week.' : 'Nobody owns #1 here yet.'}
-      </div>
-      <div style={{fontFamily:SANS,fontSize:11,fontWeight:700,color:ORG,letterSpacing:1,textTransform:'uppercase',marginTop:4}}>
-        Claim the top spot →
-      </div>
-    </div>
-  );
-}
-
-// Temporarily hide the weekly category leaders section on the homepage.
-const SHOW_WEEKLY_LEADERS = false;
-
-export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], setDetEnt, cvt, unitLbl, staticEntries=[], staticOrgs=[] }) {
-  const entries = staticEntries.length ? staticEntries : propEntries;
-  const orgs = staticOrgs.length ? staticOrgs : propOrgs;
+export default function HomePage({ entries=[], orgs=[] }) {
   const router = useRouter();
   const approvedOrgs = orgs.filter(o=>o.status==='approved');
   const [openFaq, setOpenFaq] = useState(null);
 
-  // Hero video: desktop/tablet only (≥768px) — on mobile it never even
-  // mounts, so there's no video request, decode, or battery/data cost at
-  // all, just the (much lighter) poster image as a CSS background. Starts
-  // false so SSR/first paint never renders the <video> tag, then syncs to
-  // the real viewport on mount.
-  const [showHeroVideo, setShowHeroVideo] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)');
-    setShowHeroVideo(mq.matches);
-    const onChange = e => setShowHeroVideo(e.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, []);
-
   const orgFor = id => orgs.find(o=>o.id===id);
 
-  // Monday-start week boundary — must match the dashboard's getWeekStart/getWeekEnd
-  // exactly, or entries near the week edge will show on one page and not the other.
-  const getWeekStart = (date = new Date()) => {
-    const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-    const day = d.getDay(); // 0=Sun, 1=Mon, ...
-    const diff = (day === 0 ? -6 : 1) - day;
-    d.setDate(d.getDate() + diff);
-    return d;
-  };
-  const getWeekEnd = (weekStart) => {
-    const d = new Date(weekStart);
-    d.setDate(d.getDate() + 7);
-    return d;
+  // Week number helper
+  const getWeekNumber = (dateStr) => {
+    const d = new Date(dateStr);
+    const jan1 = new Date(d.getFullYear(), 0, 1);
+    return Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
   };
 
   const now = new Date();
-  const weekStart = getWeekStart(now);
-  const weekEnd = getWeekEnd(weekStart);
-  // Display label, e.g. "Week of 10 Aug" — replaces the old arbitrary week-number scheme
-  const currentWeekLabel = `Week of ${weekStart.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`;
+  const currentWeek = getWeekNumber(now.toISOString().slice(0,10));
+  const currentYear = now.getFullYear();
   const approved = entries.filter(e => approvedOrgs.find(o => o.id === e.orgId));
 
   const CATEGORIES = [
-    { key:'mens',       label:'Men',                  icon:'♂',  filter: e => e.gender==='male'   && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)<HIGH_HCP_THRESHOLD  },
-    { key:'mens_hcp',   label:'Men High Handicap',    icon:'♂',  filter: e => e.gender==='male'   && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)>=HIGH_HCP_THRESHOLD },
-    { key:'womens',     label:'Women',                icon:'♀',  filter: e => e.gender==='female' && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)<HIGH_HCP_THRESHOLD  },
-    { key:'womens_hcp', label:'Women High Handicap',  icon:'♀',  filter: e => e.gender==='female' && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)>=HIGH_HCP_THRESHOLD },
+    { key:'mens',       label:'Men',                  icon:'♂',  filter: e => e.gender==='male'   && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)<20  },
+    { key:'mens_hcp',   label:'Men High Handicap',    icon:'♂',  filter: e => e.gender==='male'   && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)>=20 },
+    { key:'womens',     label:'Women',                icon:'♀',  filter: e => e.gender==='female' && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)<20  },
+    { key:'womens_hcp', label:'Women High Handicap',  icon:'♀',  filter: e => e.gender==='female' && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)>=20 },
     { key:'youth',      label:'Youth (Under 16)',     icon:'🌱', filter: e => Number(e.age) < 16 },
     { key:'senior',     label:'Senior (55+)',         icon:'⭐', filter: e => Number(e.age) >= 55 },
   ];
 
   const weeklyLeaders = CATEGORIES.map(cat => {
     const top3 = approved
-      .filter(e => {
-        const d = new Date(e.date);
-        return d >= weekStart && d < weekEnd;
-      })
+      .filter(e => getWeekNumber(e.date) === currentWeek && new Date(e.date).getFullYear() === currentYear)
       .filter(cat.filter)
       .sort((a,b) => Number(b.dist) - Number(a.dist)).slice(0,3);
     return { ...cat, top3 };
@@ -252,83 +60,36 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
 
   const MEDALS = ['🥇','🥈','🥉'];
 
-  const faqSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map(({ q, a }) => ({
-      '@type': 'Question',
-      name: q,
-      acceptedAnswer: { '@type': 'Answer', text: a },
-    })),
-  };
-
-  // Note: previously had an ItemList schema here for all-time category
-  // leaders. Removed — its `position` values reset to 1/2/3 for every
-  // category instead of being unique across the whole list (a real Rich
-  // Results Test error), and a generic 'Thing'-typed ItemList doesn't
-  // qualify for any Google rich result feature regardless, so fixing the
-  // numbering would've added a passing-but-still-useless schema block.
-
-  // Maps a homepage category to the exact filter query the /leaderboard page
-  // understands (see the matching useEffect there that reads router.query).
-  const categoryHref = (key, allTime) => {
-    const params = new URLSearchParams();
-    if (allTime) params.set('allTime', '1');
-    if (key === 'mens')       { params.set('gender','male');   params.set('hcp','u15'); }
-    else if (key === 'mens_hcp')   { params.set('gender','male');   params.set('hcp','o15'); }
-    else if (key === 'womens')     { params.set('gender','female'); params.set('hcp','u15'); }
-    else if (key === 'womens_hcp') { params.set('gender','female'); params.set('hcp','o15'); }
-    else if (key === 'youth')      { params.set('age','u16'); }
-    else if (key === 'senior')     { params.set('age','55+'); }
-    const qs = params.toString();
-    return qs ? `/leaderboard?${qs}` : '/leaderboard';
-  };
-
   // Weekly card — single best entry
   const WeeklyCard = ({ cat }) => {
     const { top3 } = cat;
     return (
-      <div
-        onClick={()=>{
-          if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_category_card_click',{event_category:'engagement',section:'weekly',category:cat.key});
-          router.push(categoryHref(cat.key, false));
-        }}
-        style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,width:'100%',minWidth:0,minHeight:220,cursor:'pointer',transition:'border-color .15s'}}
-        className="rb-weekly-card"
-        onMouseEnter={ev=>{ev.currentTarget.style.borderColor='rgba(255,0,144,0.5)';}}
-        onMouseLeave={ev=>{ev.currentTarget.style.borderColor=top3.length?'rgba(255,0,144,0.2)':BDR;}}>
-        <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.label}</span>
-        <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:top3.length===0?'center':'flex-start'}}>
+      <div style={{background:BG2,border:`1px solid ${top3.length?'rgba(163,230,53,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0}}>
+        <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.icon} {cat.label}</span>
         {top3.length === 0 ? (
-          <EmptySlot weekly />
+          <div style={{fontFamily:SANS,fontSize:12,color:DIM,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
         ) : (
           top3.map((e, i) => {
             const org = orgFor(e.orgId);
             return (
-              <div key={e.id}
-                style={{display:'flex',flexDirection:'column',gap:3,padding:'10px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',transition:'opacity .15s'}}>
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
-                  <div style={{display:'flex',alignItems:'center',gap:5,minWidth:0,flex:1,overflow:'hidden'}}>
-                    <span style={{fontSize:13,flexShrink:0}}>{MEDALS[i]}</span>
-                    <span style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{e.player}</span>
+              <div key={e.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none'}}>
+                <span style={{fontSize:16,width:22,flexShrink:0,textAlign:'center'}}>{MEDALS[i]}</span>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,display:'flex',alignItems:'center',gap:4,flexWrap:'wrap'}}>
+                    {e.player}{org?.country && countryFlag(org.country)}
                   </div>
-                  <div style={{flexShrink:0}}>
-                    <span style={{fontFamily:DISP,fontSize:20,color:i===0?ORG:MUT,letterSpacing:.5}}>{cvt(e.dist)}</span>
-                    <span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:2}}>{unitLbl}</span>
+                  <div style={{fontFamily:SANS,fontSize:10,color:DIM,marginTop:1}}>
+                    {e.is_simulator ? <span style={{color:'rgba(163,230,53,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
                   </div>
                 </div>
-                <div style={{display:'flex',alignItems:'center',gap:5,paddingLeft:19}}>
-                  {org?.avatarUrl && <img src={org.avatarUrl} alt={org.courseName || ''} onError={e=>e.target.style.display='none'} style={{width:18,height:18,borderRadius:'50%',objectFit:'cover',flexShrink:0}}/>}
-                  {org?.country && <span style={{fontSize:12,flexShrink:0}}>{countryFlag(org.country)}</span>}
-                  <span style={{fontFamily:SANS,fontSize:10,color:DIM,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
-                    {e.is_simulator ? <span style={{color:'rgba(255,0,144,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
-                  </span>
+                <div style={{textAlign:'right',flexShrink:0}}>
+                  <span style={{fontFamily:DISP,fontSize:22,color:i===0?ORG:MUT,letterSpacing:.5}}>{Number(e.dist)}</span>
+                  <span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:3}}>yds</span>
                 </div>
               </div>
             );
           })
         )}
-        </div>
       </div>
     );
   };
@@ -337,260 +98,100 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
   const AllTimeCard = ({ cat }) => {
     const { top3 } = cat;
     return (
-      <div
-        onClick={()=>{
-          if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_category_card_click',{event_category:'engagement',section:'all_time',category:cat.key});
-          router.push(categoryHref(cat.key, true));
-        }}
-        style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.15)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,width:'100%',minWidth:0,minHeight:220,cursor:'pointer',transition:'border-color .15s'}}
-        onMouseEnter={ev=>{ev.currentTarget.style.borderColor='rgba(255,0,144,0.4)';}}
-        onMouseLeave={ev=>{ev.currentTarget.style.borderColor=top3.length?'rgba(255,0,144,0.15)':BDR;}}>
-        <span style={{fontFamily:SANS,fontSize:10,color:MUT,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.label}</span>
-        <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:top3.length===0?'center':'flex-start'}}>
+      <div style={{background:BG2,border:`1px solid ${top3.length?'rgba(163,230,53,0.15)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,minWidth:0}}>
+        <span style={{fontFamily:SANS,fontSize:10,color:MUT,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.icon} {cat.label}</span>
         {top3.length === 0 ? (
-          <EmptySlot />
+          <div style={{fontFamily:SANS,fontSize:12,color:DIM,lineHeight:1.6}}>No entry yet —<br/>be the first!</div>
         ) : (
           top3.map((e, i) => {
             const org = orgFor(e.orgId);
             return (
-              <div key={e.id}
-                style={{display:'flex',flexDirection:'column',gap:3,padding:'10px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',transition:'opacity .15s'}}>
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
-                  <div style={{display:'flex',alignItems:'center',gap:5,minWidth:0,flex:1,overflow:'hidden'}}>
-                    <span style={{fontSize:13,flexShrink:0}}>{MEDALS[i]}</span>
-                    <span style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{e.player}</span>
+              <div key={e.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none'}}>
+                <span style={{fontSize:16,width:22,flexShrink:0,textAlign:'center'}}>{MEDALS[i]}</span>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,display:'flex',alignItems:'center',gap:4,flexWrap:'wrap'}}>
+                    {e.player}{org?.country && countryFlag(org.country)}
                   </div>
-                  <div style={{flexShrink:0}}>
-                    <span style={{fontFamily:DISP,fontSize:20,color:i===0?ORG:MUT,letterSpacing:.5}}>{cvt(e.dist)}</span>
-                    <span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:2}}>{unitLbl}</span>
+                  <div style={{fontFamily:SANS,fontSize:10,color:DIM,marginTop:1}}>
+                    {e.is_simulator ? <span style={{color:'rgba(163,230,53,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
                   </div>
                 </div>
-                <div style={{display:'flex',alignItems:'center',gap:5,paddingLeft:19}}>
-                  {org?.avatarUrl && <img src={org.avatarUrl} alt={org.courseName || ''} onError={e=>e.target.style.display='none'} style={{width:18,height:18,borderRadius:'50%',objectFit:'cover',flexShrink:0}}/>}
-                  {org?.country && <span style={{fontSize:12,flexShrink:0}}>{countryFlag(org.country)}</span>}
-                  <span style={{fontFamily:SANS,fontSize:10,color:DIM,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
-                    {e.is_simulator ? <span style={{color:'rgba(255,0,144,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
-                  </span>
+                <div style={{textAlign:'right',flexShrink:0}}>
+                  <span style={{fontFamily:DISP,fontSize:22,color:i===0?ORG:MUT,letterSpacing:.5}}>{Number(e.dist)}</span>
+                  <span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:3}}>yds</span>
                 </div>
               </div>
             );
           })
         )}
-        </div>
       </div>
     );
   };
+
   return (
     <>
       <Head>
-        <title>Ripping Bombs | Longest Drive Leaderboard for Simulator Golf</title>
-        <meta name="description" content="Compare your longest golf drives on the free global leaderboard for simulator golf and clubs. Submit your drive and track rankings."/>
-        <link key="canonical" rel="canonical" href="https://www.rippingbombs.com/"/>
-
-        <meta property="og:title" content="Ripping Bombs | Longest Drive Leaderboard for Simulator Golf"/>
-        <meta property="og:description" content="The global home of longest drive competition. Free to join, free to submit — compete across simulator venues and clubs worldwide."/>
-        <meta property="og:image" content="https://www.rippingbombs.com/og-image.jpg"/>
-        <meta property="og:image:width" content="1200"/>
-        <meta property="og:image:height" content="630"/>
-        <meta property="og:url" content="https://www.rippingbombs.com/"/>
+        <title>Ripping Bombs | Global Longest Golf Drive Database</title>
+        <meta name="description" content="Track and compare the longest golf drives from tournaments worldwide. Ripping Bombs is the global leaderboard for longest drive competitions."/>
+        <meta property="og:title" content="Ripping Bombs | Global Longest Golf Drive Database"/>
+        <meta property="og:description" content="The global home of competition longest drives. Free to join, free to submit."/>
+        <meta property="og:url" content="https://www.rippingbombs.com"/>
         <meta property="og:type" content="website"/>
-        <meta property="og:site_name" content="Ripping Bombs"/>
-
-        <meta name="twitter:card" content="summary_large_image"/>
-        <meta name="twitter:title" content="Ripping Bombs | Longest Drive Leaderboard for Simulator Golf"/>
-        <meta name="twitter:description" content="The global home of longest drive competition. Free to join, free to submit — compete across simulator venues and clubs worldwide."/>
-        <meta name="twitter:image" content="https://www.rippingbombs.com/og-image.jpg"/>
-
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'WebSite',
-          name: 'Ripping Bombs',
-          url: 'https://www.rippingbombs.com/',
-          description: 'The free global leaderboard for longest golf drives — simulator venues and clubs submitting verified drives, ranked by category.',
-        }) }}/>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}/>
       </Head>
       <div style={{animation:'fi .4s ease'}}>
 
-        {/* HERO — video bg + condensed header + calculator
-            Video is still hotlinked from Pexels — swap for a self-hosted,
-            compressed file before this is fully done:
-              1. Download the source clip and compress it under 1.5MB, e.g.:
-                   ffmpeg -i source.mp4 -vf scale=1280:-1 -an -c:v libx264 \
-                     -crf 30 -preset slow -movflags +faststart hero-drive.mp4
-                 (silent/no-audio like the how-it-works clip — the video is
-                 muted anyway, so there's no reason to ship an audio track)
-              2. Drop the result at /public/hero/hero-drive.mp4
-              3. Update the <source> src below from the Pexels URL to
-                 /hero/hero-drive.mp4
-            Same pattern as /public/how-it-works/rip-drive.mp4 — see that
-            page's file-header comment for the precedent. */}
-        <div id="distance-calculator" className="rb-hero" style={{position:'relative',overflow:'hidden',backgroundImage:'url(https://images.pexels.com/videos/33511561/tee-shot-33511561.jpeg?auto=compress&cs=tinysrgb&h=627&fit=crop&w=1200)',backgroundSize:'cover',backgroundPosition:'center'}}>
-          {showHeroVideo && (
-            <video autoPlay muted loop playsInline preload="none" poster="https://images.pexels.com/videos/33511561/tee-shot-33511561.jpeg?auto=compress&cs=tinysrgb&h=627&fit=crop&w=1200"
-              className="rb-hero-video"
-              style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block',filter:'brightness(0.35)'}}>
-              {/* TODO: self-hosted, compressed replacement — see comment above the
-                  component for exact steps. Once /public/hero/hero-drive.mp4 exists,
-                  swap the src below from the hotlinked Pexels file to it. */}
-              <source src="https://videos.pexels.com/video-files/33511561/14252773_2560_1440_60fps.mp4" type="video/mp4"/>
-            </video>
-          )}
-          <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(0,0,0,0.2),rgba(0,0,0,0.7))'}}/>
-          <div className="rb-hero-content" style={{position:'relative',zIndex:1,padding:'clamp(28px,5vw,44px) 20px clamp(24px,4vw,36px)',display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center'}}>
-            {/* Condensed brand header */}
-            <div className="rb-hero-badge" style={{fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:4,color:ORG,textTransform:'uppercase',marginBottom:10,background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
-              Live Global Simulator Database 
+        {/* HERO */}
+        <div style={{position:'relative',overflow:'hidden'}}>
+          <video autoPlay muted loop playsInline poster="https://images.pexels.com/videos/33511561/tee-shot-33511561.jpeg?auto=compress&cs=tinysrgb&h=627&fit=crop&w=1200"
+            style={{width:'100%',height:'clamp(520px,60vw,620px)',objectFit:'cover',display:'block',filter:'brightness(0.45)'}}>
+            <source src="https://videos.pexels.com/video-files/33511561/14252773_2560_1440_60fps.mp4" type="video/mp4"/>
+          </video>
+          <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(0,0,0,0.1),rgba(0,0,0,0.55))'}}/>
+          <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'clamp(60px,12vw,80px) 20px',textAlign:'center'}}>
+            <div style={{fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:4,color:ORG,textTransform:'uppercase',marginBottom:16,background:'rgba(163,230,53,0.15)',border:'1px solid rgba(163,230,53,0.4)',padding:'5px 16px',display:'inline-block'}}>
+              The Global Home of Competition Longest Drives
             </div>
-            <h1 className="rb-hero-title" style={{fontFamily:DISP,fontSize:'clamp(36px,6vw,56px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:6,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
-              LONG DRIVE LEADERBOARD
+            <h1 style={{fontFamily:DISP,fontSize:'clamp(56px,10vw,110px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:20,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
+              COMPETE LOCALLY.<br/>RANK GLOBALLY.
             </h1>
-            <p className="rb-hero-sub" style={{fontFamily:SANS,fontSize:14,color:'rgba(255,255,255,0.65)',maxWidth:440,margin:'0 auto 18px',lineHeight:1.6,letterSpacing:.3}}>
-              <span>See where your drive ranks against golfers worldwide — instantly.{' '}</span>
-              <a href="/sim-distance-real-or-fake" className="rb-hero-sub-link" onClick={()=>{if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_sim_link_click',{event_category:'engagement'});}} style={{color:ORG,textDecoration:'underline'}}>
-                Think your sim number might be inflated?
-              </a>
+            <p style={{fontFamily:SANS,fontSize:16,color:'rgba(255,255,255,0.85)',maxWidth:520,margin:'0 auto 32px',lineHeight:1.7}}>
+              Submit your longest drives from simulators, events, or qualifying locations worldwide.
             </p>
-            {/* Instant rank widget sits inside the hero — computed live against
-                real entries/orgs (already loaded via getStaticProps below), not
-                a modeled estimate. Registering from here carries the visitor's
-                answers through to the real submission form. */}
-            <InstantRankWidget entries={entries} orgs={orgs}/>
+            <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
+              <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 32px',borderRadius:0,cursor:'pointer',letterSpacing:.5}}>REGISTER NOW FREE →</button>
+              <button onClick={()=>router.push('/leaderboard')} style={{background:'rgba(255,255,255,0.12)',border:'1px solid rgba(255,255,255,0.3)',color:'#fff',fontFamily:SANS,fontWeight:600,fontSize:14,padding:'14px 28px',borderRadius:0,cursor:'pointer',letterSpacing:.5}}>View Leaderboard</button>
+            </div>
+          </div>
+        </div>
+
+        {/* WEEKLY LEADERS */}
+        <div style={{background:'#0e0e0e',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'40px 18px'}}>
+          <div style={{maxWidth:1000,margin:'0 auto'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
+              <div>
+                <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:6}}>Live from the Registry</div>
+                <div style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>Week {currentWeek}, {currentYear} — Category Leaders</div>
+              </div>
+              <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10}}>
+              {weeklyLeaders.map(cat => <WeeklyCard key={cat.key} cat={cat}/>)}
+            </div>
           </div>
         </div>
 
         {/* ALL-TIME LEADERS */}
-        <div style={{background:'#111',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'40px 0 40px'}}>
-          <div style={{maxWidth:1200,margin:'0 auto',padding:'0 18px'}}>
+        <div style={{background:'#111',borderBottom:`1px solid ${BDR}`,padding:'40px 18px'}}>
+          <div style={{maxWidth:1000,margin:'0 auto'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
               <div>
                 <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:MUT,textTransform:'uppercase',marginBottom:6}}>Hall of Records</div>
-                <h2 style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5,fontWeight:400}}>All-Time Category Leaders</h2>
+                <div style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5}}>All-Time Category Leaders</div>
               </div>
-              <button onClick={()=>{
-                if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_full_leaderboard_click',{event_category:'engagement',section:'all_time'});
-                router.push('/leaderboard');
-              }} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
+              <button onClick={()=>router.push('/leaderboard')} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
             </div>
-            <InfiniteScrollRow items={allTimeLeaders} bg="#111" renderItem={cat => <AllTimeCard cat={cat}/>}/>
-          </div>
-        </div>
-
-        {/* WEEKLY LEADERS — temporarily hidden; flip SHOW_WEEKLY_LEADERS to true to restore */}
-        {SHOW_WEEKLY_LEADERS && (
-        <div className="rb-weekly-section" style={{background:'#0e0e0e',borderBottom:`1px solid ${BDR}`,padding:'28px 0 40px'}}>
-          <div style={{maxWidth:1200,margin:'0 auto',padding:'0 18px'}}>
-            <div className="rb-weekly-header" style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
-              <div>
-                <div className="rb-weekly-eyebrow" style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:6}}>Live from the Registry</div>
-                <h2 className="rb-weekly-title" style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5,fontWeight:400}}>{currentWeekLabel} — Category Leaders</h2>
-              </div>
-              <button onClick={()=>{
-                if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_full_leaderboard_click',{event_category:'engagement',section:'weekly'});
-                router.push('/leaderboard');
-              }} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
-            </div>
-            <InfiniteScrollRow items={weeklyLeaders} bg="#0e0e0e" renderItem={cat => <WeeklyCard cat={cat}/>}/>
-          </div>
-        </div>
-        )}
-
-        {/* LIVE STATS TICKER */}
-        {(() => {
-          const totalDrives = approved.length;
-          const countries = [...new Set(approvedOrgs.map(o=>o.country).filter(Boolean))].length;
-          const clubs = approvedOrgs.filter(o=>o.accountType==='club').length;
-          const stats = [
-            { value: totalDrives, label: 'Drives Submitted' },
-            { value: countries,   label: 'Countries' },
-            { value: clubs,       label: 'Registered Clubs' },
-          ];
-          return (
-            <div style={{background:'#0a0a0a',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'28px 18px'}}>
-              <div style={{maxWidth:1000,margin:'0 auto',display:'flex',justifyContent:'center',flexWrap:'wrap'}}>
-                {stats.map(({value,label},i)=>(
-                  <div key={label} style={{flex:'1 1 160px',textAlign:'center',padding:'12px 24px',borderRight:i<stats.length-1?`1px solid ${BDR}`:'none'}}>
-                    <div style={{fontFamily:DISP,fontSize:'clamp(36px,6vw,56px)',color:ORG,letterSpacing:1,lineHeight:1}}>{value}</div>
-                    <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,color:MUT,letterSpacing:2,textTransform:'uppercase',marginTop:6}}>{label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* REGISTERED VENUES */}
-        {(() => {
-          const clubOrgs = orgs.filter(o => o.accountType === 'club' && o.courseName);
-          const entryCountByOrg = {};
-          entries.forEach(e => { entryCountByOrg[e.orgId] = (entryCountByOrg[e.orgId] || 0) + 1; });
-          const featured = [...clubOrgs]
-            .sort((a, b) => (entryCountByOrg[b.id] || 0) - (entryCountByOrg[a.id] || 0))
-            .slice(0, 6);
-          if (!featured.length) return null;
-          return (
-            <div style={{background:'#111',borderBottom:`1px solid ${BDR}`,padding:'48px 18px'}}>
-              <div style={{maxWidth:1000,margin:'0 auto'}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
-                  <div>
-                    <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:MUT,textTransform:'uppercase',marginBottom:6}}>On The Registry</div>
-                    <h2 style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5,fontWeight:400}}>Registered Clubs &amp; Venues</h2>
-                  </div>
-                  <Link href="/clubs" style={{textDecoration:'none',background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>View All Clubs &amp; Events →</Link>
-                </div>
-                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:12}}>
-                  {featured.map(org => (
-                    <Link key={org.id} href={`/clubs/${org.customSlug || nameToSlug(org.courseName)}`} style={{textDecoration:'none',display:'flex',alignItems:'center',gap:10,padding:'14px 16px',background:BG2,border:`1px solid ${BDR}`,transition:'border-color .15s'}}
-                      onMouseEnter={e=>e.currentTarget.style.borderColor=ORG}
-                      onMouseLeave={e=>e.currentTarget.style.borderColor=BDR}>
-                      {org.avatarUrl
-                        ? <img src={org.avatarUrl} alt={org.courseName} style={{width:36,height:36,objectFit:'cover',flexShrink:0}}/>
-                        : <div style={{width:36,height:36,background:BDR,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:DISP,fontSize:16,color:MUT}}>{org.courseName[0]}</div>
-                      }
-                      <div style={{minWidth:0}}>
-                        <div style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{org.courseName}</div>
-                        <div style={{fontFamily:SANS,fontSize:11,color:MUT,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{org.location}{org.country && ' '}{org.country && countryFlag(org.country)}</div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* 2027 CHAMPIONSHIP PROMO */}
-        <div style={{background:'#120009',borderTop:'1px solid rgba(255,0,144,0.15)',borderBottom:'1px solid rgba(255,0,144,0.15)',padding:'56px 18px'}}>
-          <div style={{maxWidth:1000,margin:'0 auto',display:'flex',flexWrap:'wrap',alignItems:'center',gap:32}}>
-            <div style={{flex:'1 1 280px',minWidth:0}}>
-              <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:12}}>Launching January 2027</div>
-              <h2 style={{fontFamily:DISP,fontSize:'clamp(28px,4vw,48px)',color:TXT,letterSpacing:1,lineHeight:1,marginBottom:14,fontWeight:400}}>
-                THE WORLD'S BIGGEST<br/><span style={{color:ORG}}>DRIVE COMPETITION</span>
-              </h2>
-              <div style={{fontFamily:SANS,fontSize:14,color:MUT,lineHeight:1.8,maxWidth:560,marginBottom:20}}>
-                The Ripping Bombs 2027 Simulator Championship — six categories, one drive per week, points accumulating all season. Open to any registered simulator user, anywhere in the world, completely free. This could be the largest amateur golf competition ever run.
-              </div>
-              <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
-                {['🥇 100pts','🥈 70pts','🥉 50pts','4th 40pts','5th 30pts','6th 20pts','Any entry 10pts'].map((label,i)=>(
-                  <div key={i} style={{fontFamily:SANS,fontSize:11,fontWeight:700,color:i===0?ORG:MUT,background:'rgba(255,255,255,0.04)',border:`1px solid ${i===0?'rgba(255,0,144,0.3)':'rgba(255,255,255,0.08)'}`,padding:'5px 10px',letterSpacing:.3}}>
-                    {label}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div style={{display:'flex',flexDirection:'column',gap:10,flexShrink:0,width:'100%',maxWidth:260}}>
-              <button onClick={()=>{
-                if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_2027_find_out_more_click',{event_category:'engagement'});
-                router.push('/2027-championship');
-              }} style={{background:ORG,color:'#000',fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 28px',border:'none',cursor:'pointer',letterSpacing:.5}}>
-                FIND OUT MORE →
-              </button>
-              <button onClick={()=>{
-                if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_register_click',{event_category:'engagement',location:'2027_promo'});
-                router.push('/register');
-              }} style={{background:'transparent',border:`1px solid rgba(255,0,144,0.3)`,color:ORG,fontFamily:SANS,fontWeight:600,fontSize:13,padding:'12px 28px',cursor:'pointer',letterSpacing:.5}}>
-                Register Free
-              </button>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10}}>
+              {allTimeLeaders.map(cat => <AllTimeCard key={cat.key} cat={cat}/>)}
             </div>
           </div>
         </div>
@@ -598,7 +199,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
         <div style={{padding:'0 18px'}}>
 
           {/* FEATURE CARDS */}
-          <div style={{maxWidth:1000,margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',gap:16,marginBottom:60,marginTop:60}}>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',gap:16,marginBottom:60,marginTop:60}}>
             {[
               {img:'https://images.pexels.com/photos/10463463/pexels-photo-10463463.jpeg?auto=compress&cs=tinysrgb&w=600',title:'Global Long Drive Standings',body:'Compare verified drives from clubs, tournaments, and simulator sessions worldwide on one unified leaderboard.'},
               {img:'https://images.pexels.com/photos/12642295/pexels-photo-12642295.jpeg?auto=compress&cs=tinysrgb&w=600',title:'Free for Clubs, Events & Individuals',body:'Golf clubs, tournament organisers, driving ranges, and individual simulator golfers can all register and submit for free.'},
@@ -617,33 +218,23 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           </div>
 
           {/* CTA STRIP */}
-          <div style={{maxWidth:1000,margin:'0 auto',background:'rgba(255,0,144,0.05)',border:'1px solid rgba(255,0,144,0.2)',padding:'40px 32px',textAlign:'center',marginBottom:60}}>
-            <h2 style={{fontFamily:DISP,fontSize:'clamp(24px,5vw,40px)',color:TXT,letterSpacing:1,marginBottom:10,fontWeight:400}}>FREE TO JOIN. FREE TO SUBMIT.</h2>
+          <div style={{background:'rgba(163,230,53,0.05)',border:'1px solid rgba(163,230,53,0.2)',padding:'40px 32px',textAlign:'center',marginBottom:60}}>
+            <div style={{fontFamily:DISP,fontSize:'clamp(24px,5vw,40px)',color:TXT,letterSpacing:1,marginBottom:10}}>FREE TO JOIN. FREE TO SUBMIT.</div>
             <div style={{fontFamily:SANS,fontSize:14,color:MUT,marginBottom:28}}>Built for golfers who love sending it.</div>
-            <button onClick={()=>{
-              if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_register_click',{event_category:'engagement',location:'bottom_cta_strip'});
-              router.push('/register');
-            }} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 36px',borderRadius:0,cursor:'pointer'}}>REGISTER NOW FREE →</button>
+            <button onClick={()=>router.push('/register')} style={{background:'transparent',border:`1px solid ${ORG}`,color:ORG,fontFamily:SANS,fontWeight:700,fontSize:14,padding:'14px 36px',borderRadius:0,cursor:'pointer'}}>REGISTER NOW FREE →</button>
           </div>
 
           {/* FAQ */}
-          <div style={{maxWidth:1000,margin:'0 auto',marginBottom:60}}>
-            <h2 style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:20,fontWeight:400}}>FAQ</h2>
+          <div style={{marginBottom:60}}>
+            <div style={{fontFamily:DISP,fontSize:28,color:TXT,letterSpacing:.5,marginBottom:20}}>FAQ</div>
             <div style={{display:'flex',flexDirection:'column',gap:8}}>
               {faqs.map(({q,a},i)=>(
-                <div key={i} style={{background:BG2,border:`1px solid ${openFaq===i?'rgba(255,0,144,0.25)':BDR}`,overflow:'hidden'}}>
-                  <button onClick={()=>{
-                    if(openFaq!==i && typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_faq_open',{event_category:'engagement',question:q});
-                    setOpenFaq(openFaq===i?null:i);
-                  }} aria-expanded={openFaq===i} style={{width:'100%',background:'none',border:'none',padding:'16px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer',gap:16}}>
+                <div key={i} style={{background:BG2,border:`1px solid ${openFaq===i?'rgba(163,230,53,0.25)':BDR}`,overflow:'hidden'}}>
+                  <button onClick={()=>setOpenFaq(openFaq===i?null:i)} style={{width:'100%',background:'none',border:'none',padding:'16px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer',gap:16}}>
                     <span style={{fontFamily:SANS,fontSize:14,fontWeight:600,color:TXT,textAlign:'left'}}>{q}</span>
                     <span style={{fontFamily:SANS,fontSize:18,color:ORG,flexShrink:0,transform:openFaq===i?'rotate(45deg)':'none',transition:'transform .2s'}}>+</span>
                   </button>
-                  <div style={{display:'grid',gridTemplateRows:openFaq===i?'1fr':'0fr',transition:'grid-template-rows .2s ease'}}>
-                    <div style={{overflow:'hidden'}}>
-                      <div style={{padding:'0 20px 18px',fontFamily:SANS,fontSize:13,color:MUT,lineHeight:1.75}}>{a}</div>
-                    </div>
-                  </div>
+                  {openFaq===i&&<div style={{padding:'0 20px 18px',fontFamily:SANS,fontSize:13,color:MUT,lineHeight:1.75}}>{a}</div>}
                 </div>
               ))}
             </div>
@@ -652,110 +243,6 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
         </div>
         <EmailSignup/>
       </div>
-      <style jsx global>{`
-        @keyframes rbEmptyBounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-4px); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .rb-empty-slot span { animation: none !important; }
-        }
-      `}</style>
-      <style jsx>{`
-        @media (max-width: 640px) {
-          /* Hero: less vertical padding, tighter title, shorter subtitle */
-          .rb-hero-content {
-            padding: 20px 18px 24px !important;
-          }
-          .rb-hero-badge {
-            font-size: 9px !important;
-            letter-spacing: 2px !important;
-            padding: 4px 12px !important;
-            margin-bottom: 8px !important;
-          }
-          .rb-hero-title {
-            font-size: clamp(30px, 9vw, 40px) !important;
-            letter-spacing: 1px !important;
-            margin-bottom: 4px !important;
-          }
-          .rb-hero-sub {
-            margin: 0 auto 16px !important;
-            font-size: 12px !important;
-          }
-          .rb-hero-sub-link {
-            display: none !important;
-          }
-
-          /* Instant rank widget: tighter fields, stacked result numbers */
-          .rb-rank-grid {
-            gap: 0 8px !important;
-            margin-bottom: 6px !important;
-          }
-          .rb-rank-grid > div {
-            margin-bottom: 8px !important;
-          }
-          .rb-rank-cta {
-            padding: 11px 18px !important;
-            font-size: 13px !important;
-          }
-          .rb-rank-numbers {
-            gap: 14px !important;
-          }
-          .rb-rank-divider {
-            display: none !important;
-          }
-
-          /* Weekly leaderboard: pulled tighter so it lands near the fold */
-          .rb-weekly-section {
-            padding: 16px 0 20px !important;
-          }
-          .rb-weekly-header {
-            margin-bottom: 10px !important;
-          }
-          .rb-weekly-eyebrow {
-            display: none !important;
-          }
-          .rb-weekly-title {
-            font-size: 18px !important;
-          }
-          .rb-weekly-card {
-            min-height: 150px !important;
-            padding: 12px 14px !important;
-          }
-        }
-      `}</style>
     </>
   );
-}
-
-export async function getStaticProps() {
-  try {
-    const { supabase } = await import('../lib/supabaseClient');
-
-    // Same cap and reasoning as pages/leaderboard.jsx — see the comment
-    // there for the full explanation.
-    const { data: entries } = await supabase
-      .from('entries')
-      .select('id, orgId, player, dist, club, hcp, age, gender, is_simulator, date, tournament')
-      .order('dist', { ascending: false })
-      .limit(1000);
-
-    const { data: orgs } = await supabase
-      .from('clubs')
-      .select('id, courseName, fullName, avatarUrl, country, location, status, badge, accountType, customSlug')
-      .eq('status', 'approved');
-
-    return {
-      props: {
-        staticEntries: entries || [],
-        staticOrgs: orgs || [],
-      },
-      revalidate: 600, // rebuild every 10 minutes
-    };
-  } catch {
-    return {
-      props: { staticEntries: [], staticOrgs: [] },
-      revalidate: 60,
-    };
-  }
 }

@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { TXT, MUT, ORG, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 import { tier, todayStr } from '../lib/constants';
@@ -37,7 +37,26 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
   const [eventData, setEventData] = useState(null); // { event, venue }
   const [eventError, setEventError] = useState('');
   const [formError, setFormError] = useState('');
+  const [hcpConfirm, setHcpConfirm] = useState(null); // { from, to } while the confirm prompt is open
+  const hcpConfirmedRef = useRef(false);
+  const prefilledRef = useRef(false);
   const router = useRouter();
+
+  // The handicap on this player's most recent drive. Used to pre-fill the
+  // field and to ask for confirmation if the new value is different.
+  const lastHcp = (() => {
+    if (!loggedOrg || loggedOrg.accountType !== 'simulator') return null;
+    const mine = entries
+      .filter(e => e.orgId === loggedOrg.id && e.hcp !== null && e.hcp !== undefined && e.hcp !== '')
+      .sort((a, b) => (new Date(b.date) - new Date(a.date)) || (Number(b.id) - Number(a.id)));
+    return mine.length ? Number(mine[0].hcp) : null;
+  })();
+
+  useEffect(() => {
+    if (prefilledRef.current || lastHcp === null || Number.isNaN(lastHcp)) return;
+    prefilledRef.current = true;
+    setForm(f => (f.hcp === '' || f.hcp === null || f.hcp === undefined) ? { ...f, hcp: String(lastHcp) } : f);
+  }, [lastHcp]);
 
   // Event flow: a "Join & Submit" link from /e/[slug] arrives as
   // /submit?event=<slug>. Load the event, lock the venue to the one
@@ -154,6 +173,36 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
     : 0;
   const eventAttemptsBlock = eventData && eventData.event.maxEntriesPerPlayer != null && eventEntryCount >= eventData.event.maxEntriesPerPlayer;
   const submissionBlocked = eventData ? eventAttemptsBlock : (isSimulator && simulatorWeeklyBlock);
+
+  const handleSubmit = async () => {
+              setFormError('');
+              if (submissionBlocked) {
+                setFormError(eventData
+                  ? `You've used all ${eventData.event.maxEntriesPerPlayer} attempts for this event.`
+                  : 'You have already submitted a drive this week. Simulator accounts are limited to one submission per week.');
+                return;
+              }
+              if (!isSimulator && !form.playerEmail) { setFormError("Please enter the player's email so we can notify them."); return; }
+              if (isSimulator && !loggedOrg.dob) { setFormError('Please add your date of birth in your profile before submitting — use the "Complete Profile" button above.'); return; }
+              if (!consent) { setFormError(isSimulator ? 'Please confirm your consent before submitting.' : 'Please confirm player consent before submitting.'); return; }
+              // Handicap changed since the last drive: ask the player to confirm it first.
+              if (isSimulator && lastHcp !== null && !hcpConfirmedRef.current && Number(form.hcp) !== lastHcp) {
+                setHcpConfirm({ from: lastHcp, to: Number(form.hcp) });
+                return;
+              }
+              hcpConfirmedRef.current = false;
+              // For simulator accounts, take player name, gender, and age straight from the
+              // account. Handed to doSubmit directly — a setForm() here wouldn't take effect
+              // until the next render, so doSubmit would still see the old, empty values.
+              // (If the drive belongs to an event, keep the event's name rather than 'Simulator'.)
+              const overrides = isSimulator
+                ? { player: loggedOrg.fullName, tournament: form.eventId ? form.tournament : 'Simulator', gender: loggedOrg.gender || 'male', age: calcAge(loggedOrg.dob, form.date) }
+                : {};
+              const result = await doSubmit(overrides);
+              if (result && result.ok) {
+                setRankResult(result);
+              }
+  };
 
   if (eventError) {
     return (
@@ -454,35 +503,32 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
 
           <Btn
             full
-            onClick={async () => {
-              setFormError('');
-              if (submissionBlocked) {
-                setFormError(eventData
-                  ? `You've used all ${eventData.event.maxEntriesPerPlayer} attempts for this event.`
-                  : 'You have already submitted a drive this week. Simulator accounts are limited to one submission per week.');
-                return;
-              }
-              if (!isSimulator && !form.playerEmail) { setFormError("Please enter the player's email so we can notify them."); return; }
-              if (isSimulator && !loggedOrg.dob) { setFormError('Please add your date of birth in your profile before submitting — use the "Complete Profile" button above.'); return; }
-              if (!consent) { setFormError(isSimulator ? 'Please confirm your consent before submitting.' : 'Please confirm player consent before submitting.'); return; }
-              // For simulator accounts, take player name, gender, and age straight from the
-              // account. Handed to doSubmit directly — a setForm() here wouldn't take effect
-              // until the next render, so doSubmit would still see the old, empty values.
-              // (If the drive belongs to an event, keep the event's name rather than 'Simulator'.)
-              const overrides = isSimulator
-                ? { player: loggedOrg.fullName, tournament: form.eventId ? form.tournament : 'Simulator', gender: loggedOrg.gender || 'male', age: calcAge(loggedOrg.dob, form.date) }
-                : {};
-              const result = await doSubmit(overrides);
-              if (result && result.ok) {
-                setRankResult(result);
-              }
-            }}
+            onClick={handleSubmit}
             style={{ opacity:(consent && !submissionBlocked)?1:0.5 }}
           >
             Submit to World Registry →
           </Btn>
         </Card>
       </div>
+
+      {/* Handicap confirmation — shown when the handicap differs from the player's last drive */}
+      {hcpConfirm && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.8)', zIndex:700, display:'flex', alignItems:'center', justifyContent:'center', padding:20, backdropFilter:'blur(4px)' }}>
+          <div style={{ background:BG3, border:`1px solid ${BDR}`, width:'100%', maxWidth:420, padding:28, textAlign:'center' }}>
+            <div style={{ fontFamily:DISP, fontSize:22, color:TXT, letterSpacing:.5, marginBottom:12 }}>Confirm your handicap</div>
+            <p style={{ fontFamily:SANS, fontSize:14, color:MUT, lineHeight:1.6, margin:'0 0 8px' }}>
+              Your handicap has changed from <strong style={{ color:TXT }}>{hcpConfirm.from}</strong> to <strong style={{ color:TXT }}>{hcpConfirm.to}</strong>.
+            </p>
+            <p style={{ fontFamily:SANS, fontSize:12, color:DIM, lineHeight:1.6, margin:'0 0 20px' }}>
+              Handicap decides which leaderboard category you're ranked in, so please check it's correct before you submit.
+            </p>
+            <div style={{ display:'flex', gap:10 }}>
+              <Btn full onClick={() => setHcpConfirm(null)} style={{ background:'transparent', border:`1px solid ${BDR}`, color:MUT }}>Go back</Btn>
+              <Btn full onClick={() => { hcpConfirmedRef.current = true; setHcpConfirm(null); handleSubmit(); }}>Confirm &amp; submit</Btn>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Rank reveal — shown immediately after a successful submission */}
       {rankResult && (
