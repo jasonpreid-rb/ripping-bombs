@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, cloneElement } from 'react';
 import { useRouter } from 'next/router';
 import { ORG, MUT, TXT, BG2, BDR, DIM, SANS, DISP, nameToSlug } from '../lib/constants';
 import { fmtDate } from '../lib/constants';
@@ -214,6 +214,18 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
   const currentWeekLabel = `Week of ${weekStart.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`;
   const approved = entries.filter(e => approvedOrgs.find(o => o.id === e.orgId));
 
+  // One row per player (their best drive), so the same player can't fill two
+  // of the top three places. Key is orgId + player name, matching the
+  // leaderboard's own de-duplication.
+  const bestPerPlayer = (list) => {
+    const best = {};
+    list.forEach(e => {
+      const k = `${e.orgId}|${String(e.player || '').trim().toLowerCase()}`;
+      if (!best[k] || Number(e.dist) > Number(best[k].dist)) best[k] = e;
+    });
+    return Object.values(best);
+  };
+
   const CATEGORIES = [
     { key:'mens',       label:'Men',                  icon:'♂',  filter: e => e.gender==='male'   && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)<HIGH_HCP_THRESHOLD  },
     { key:'mens_hcp',   label:'Men High Handicap',    icon:'♂',  filter: e => e.gender==='male'   && Number(e.age)>=16 && Number(e.age)<=54 && Number(e.hcp)>=HIGH_HCP_THRESHOLD },
@@ -224,18 +236,19 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
   ];
 
   const weeklyLeaders = CATEGORIES.map(cat => {
-    const top3 = approved
-      .filter(e => {
-        const d = new Date(e.date);
-        return d >= weekStart && d < weekEnd;
-      })
-      .filter(cat.filter)
-      .sort((a,b) => Number(b.dist) - Number(a.dist)).slice(0,3);
+    const top3 = bestPerPlayer(
+      approved
+        .filter(e => {
+          const d = new Date(e.date);
+          return d >= weekStart && d < weekEnd;
+        })
+        .filter(cat.filter)
+    ).sort((a,b) => Number(b.dist) - Number(a.dist)).slice(0,3);
     return { ...cat, top3 };
   });
 
   const allTimeLeaders = CATEGORIES.map(cat => {
-    const top3 = approved.filter(cat.filter).sort((a,b) => Number(b.dist) - Number(a.dist)).slice(0,3);
+    const top3 = bestPerPlayer(approved.filter(cat.filter)).sort((a,b) => Number(b.dist) - Number(a.dist)).slice(0,3);
     return { ...cat, top3 };
   });
 
@@ -319,7 +332,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                 </div>
                 <div style={{display:'flex',alignItems:'center',gap:5,paddingLeft:19}}>
                   {org?.avatarUrl && <img src={org.avatarUrl} alt={org.courseName || ''} onError={e=>e.target.style.display='none'} style={{width:18,height:18,borderRadius:'50%',objectFit:'cover',flexShrink:0}}/>}
-                  {org?.country && <span style={{fontSize:12,flexShrink:0}}>{countryFlag(org.country)}</span>}
+                  {org?.country && <span title={org.country} style={{flexShrink:0,lineHeight:0}}>{cloneElement(countryFlag(org.country),{style:{width:18,height:13,objectFit:'cover',borderRadius:2,display:'block'}})}</span>}
                   <span style={{fontFamily:SANS,fontSize:10,color:DIM,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
                     {e.is_simulator ? <span style={{color:'rgba(255,0,144,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
                   </span>
@@ -367,7 +380,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                 </div>
                 <div style={{display:'flex',alignItems:'center',gap:5,paddingLeft:19}}>
                   {org?.avatarUrl && <img src={org.avatarUrl} alt={org.courseName || ''} onError={e=>e.target.style.display='none'} style={{width:18,height:18,borderRadius:'50%',objectFit:'cover',flexShrink:0}}/>}
-                  {org?.country && <span style={{fontSize:12,flexShrink:0}}>{countryFlag(org.country)}</span>}
+                  {org?.country && <span title={org.country} style={{flexShrink:0,lineHeight:0}}>{cloneElement(countryFlag(org.country),{style:{width:18,height:13,objectFit:'cover',borderRadius:2,display:'block'}})}</span>}
                   <span style={{fontFamily:SANS,fontSize:10,color:DIM,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
                     {e.is_simulator ? <span style={{color:'rgba(255,0,144,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
                   </span>
@@ -549,7 +562,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                       }
                       <div style={{minWidth:0}}>
                         <div style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{org.courseName}</div>
-                        <div style={{fontFamily:SANS,fontSize:11,color:MUT,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{org.location}{org.country && ' '}{org.country && countryFlag(org.country)}</div>
+                        <div style={{fontFamily:SANS,fontSize:11,color:MUT,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{org.location}{org.country && ' '}{org.country && <span style={{display:'inline-block',verticalAlign:'middle',lineHeight:0}}>{cloneElement(countryFlag(org.country),{style:{width:18,height:13,objectFit:'cover',borderRadius:2,display:'block'}})}</span>}</div>
                       </div>
                     </Link>
                   ))}
