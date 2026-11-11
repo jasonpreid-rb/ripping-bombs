@@ -210,7 +210,10 @@ function SimulatorBadge() {
 // Standalone hero strip for global rank — mirrors the dashboard's RankStrip
 function RankStrip({ rank, total, category }) {
   if (!rank) return null;
-  const percentile = total ? Math.round((rank / total) * 100) : null;
+  // A "Top X%" badge only means something with a reasonable number of players;
+  // with a handful it reads oddly (e.g. "Top 100%" for last of 4).
+  const MIN_PLAYERS_FOR_PERCENTILE = 10;
+  const percentile = total >= MIN_PLAYERS_FOR_PERCENTILE ? Math.round((rank / total) * 100) : null;
   return (
     <div style={{
       background: 'linear-gradient(135deg, rgba(255,0,144,0.14), rgba(255,0,144,0.03))',
