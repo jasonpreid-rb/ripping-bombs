@@ -1,15 +1,18 @@
 // pages/golf-drive-distance-tracker.jsx
 //
 // SEO landing page for the free GPS drive tracker at /track.
-// Fully static: all content is in the HTML, no client-side gating, so
-// crawlers see everything. The canonical tag is set globally in _app.jsx.
+// All copy is in the HTML on first render (the FAQ answers are in the DOM even
+// when collapsed, and mirrored in the FAQPage structured data), so crawlers see
+// everything. The canonical tag is set globally in _app.jsx.
 //
-// SCREENSHOTS: each step below renders a built-in phone mockup. To use a real
-// screenshot instead, drop the image in /public/images/ and set the step's
-// `image` field (e.g. '/images/track-step-1.jpg'). Suggested size: 440x800.
+// SCREENSHOTS: each step renders a built-in phone mockup that mirrors the live
+// tracker UI. To use a real screenshot instead, drop the image in /public/images/
+// and set the step's `image` field (e.g. '/images/track-step-1.jpg').
+// Suggested size: 440x800.
 
 import Head from 'next/head';
 import Link from 'next/link';
+import { useState, useEffect, useRef } from 'react';
 import { TXT, MUT, ORG, BG3, BDR, DIM, SANS, DISP } from '../lib/constants';
 
 const SITE = 'https://www.rippingbombs.com';
@@ -80,47 +83,208 @@ const JSON_LD = {
   ],
 };
 
-// ---- Phone mockups ---------------------------------------------------------
+// ---- Small hooks ---------------------------------------------------------------
 
-const mockTitle = { fontFamily: DISP, fontSize: 24, color: TXT, lineHeight: 1, margin: '0 0 8px' };
-const mockText = { fontFamily: SANS, fontSize: 10.5, color: MUT, lineHeight: 1.5, margin: '0 0 10px' };
-const mockPanel = { background: '#17171c', border: `1px solid ${BDR}`, borderRadius: 8, padding: 10, margin: '8px 0' };
+const reducedMotion = () =>
+  typeof window !== 'undefined' &&
+  !!window.matchMedia &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Eases 0 -> 1 when `enabled` turns on. Resolves to 1 immediately when disabled
+// or when the visitor prefers reduced motion.
+function useCountUp(enabled, duration = 1200) {
+  const [p, setP] = useState(enabled ? 0 : 1);
+  useEffect(() => {
+    if (!enabled || reducedMotion()) {
+      setP(1);
+      return undefined;
+    }
+    setP(0);
+    let raf;
+    const t0 = performance.now();
+    const tick = (now) => {
+      const t = Math.min(1, (now - t0) / duration);
+      setP(1 - Math.pow(1 - t, 4));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [enabled, duration]);
+  return p;
+}
+
+// True once the element has scrolled into view. Content is never hidden before
+// that; only decoration (bands, lines) waits for it.
+function useSeen(threshold = 0.4) {
+  const ref = useRef(null);
+  const [seen, setSeen] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || seen) return undefined;
+    if (typeof IntersectionObserver === 'undefined' || reducedMotion()) {
+      setSeen(true);
+      return undefined;
+    }
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setSeen(true);
+          io.disconnect();
+        }
+      },
+      { threshold }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [seen, threshold]);
+  return [ref, seen];
+}
+
+// ---- Phone mockups (these mirror the live /track screens) --------------------
+
+const TICKS = Array.from({ length: 72 }, (_, i) => {
+  const a = ((i * 5 - 90) * Math.PI) / 180;
+  const long = i % 6 === 0;
+  const r1 = long ? 99 : 103;
+  return {
+    x1: (120 + r1 * Math.cos(a)).toFixed(1),
+    y1: (120 + r1 * Math.sin(a)).toFixed(1),
+    x2: (120 + 108 * Math.cos(a)).toFixed(1),
+    y2: (120 + 108 * Math.sin(a)).toFixed(1),
+    long,
+  };
+});
+
+const mockTitle = { fontFamily: DISP, fontSize: 22, color: TXT, lineHeight: 1, margin: '0 0 8px' };
+const mockH2 = { fontFamily: DISP, fontSize: 17, color: TXT, lineHeight: 1.1, margin: '8px 0 4px' };
+const mockText = { fontFamily: SANS, fontSize: 10, color: MUT, lineHeight: 1.5, margin: '0 0 8px' };
+const mockPanel = { background: '#17171c', border: `1px solid ${BDR}`, borderRadius: 8, padding: 9, margin: '8px 0' };
 const mockBtn = {
   background: ORG,
   color: '#fff',
   fontFamily: SANS,
   fontWeight: 700,
-  fontSize: 12,
+  fontSize: 11.5,
   borderRadius: 8,
-  padding: '11px 0',
+  padding: '10px 0',
   textAlign: 'center',
-  marginTop: 10,
+  marginTop: 8,
 };
 const mockGhost = {
   fontFamily: SANS,
   fontWeight: 600,
-  fontSize: 11,
+  fontSize: 10.5,
   color: MUT,
   border: `1px solid ${BDR}`,
   borderRadius: 8,
-  padding: '9px 0',
+  padding: '8px 0',
   textAlign: 'center',
-  marginTop: 8,
+  marginTop: 6,
 };
 
-function MockGps({ label }) {
+function MockStatus() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: SANS, fontSize: 10, color: MUT, marginBottom: 10 }}>
-      <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#3ddc84', flex: 'none' }} />
+    <div className="gdt-status" aria-hidden="true">
+      <span>9:41</span>
+      <span className="gdt-batt" />
+    </div>
+  );
+}
+
+function MockSteps({ idx }) {
+  return (
+    <div className="gdt-msteps" aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <span key={i} className={i <= idx ? 'on' : ''} />
+      ))}
+    </div>
+  );
+}
+
+function MockGps({ label, level = 4 }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: SANS, fontSize: 9.5, color: MUT, marginBottom: 6 }}>
+      <span className="gdt-mbars">
+        {[1, 2, 3, 4].map((i) => (
+          <i key={i} className={i <= level ? 'on' : ''} style={{ height: 3 + i * 2.5 }} />
+        ))}
+      </span>
       {label}
     </div>
   );
 }
 
-function ScreenStart() {
+function MockReticle({ size = 120, acc, idle, live }) {
+  const k = idle ? 1 : Math.min(1, Math.max(0.2, 0.2 + (acc / 50) * 0.8));
+  return (
+    <div className="gdt-mret" style={{ width: size, height: size }}>
+      <svg viewBox="0 0 240 240" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id={`gdtSweep${size}${idle ? 'i' : 'a'}`} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#3ddc84" stopOpacity="0" />
+            <stop offset="1" stopColor="#3ddc84" stopOpacity="0.5" />
+          </linearGradient>
+        </defs>
+        {TICKS.map((t, i) => (
+          <line key={i} x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} stroke={t.long ? '#a0a0ad' : '#363636'} strokeWidth={t.long ? 2 : 1.4} />
+        ))}
+        <circle cx="120" cy="120" r="96" fill="none" stroke="#363636" strokeWidth="1.5" />
+        {!idle && (
+          <circle
+            cx="120"
+            cy="120"
+            r="96"
+            fill="rgba(61,220,132,0.14)"
+            stroke="#3ddc84"
+            strokeWidth="1.5"
+            strokeDasharray="4 4"
+            style={{ transform: `scale(${k})`, transformOrigin: '120px 120px' }}
+          />
+        )}
+        <g className={live ? 'gdt-sweep' : undefined} style={{ transformOrigin: '120px 120px', color: '#3ddc84' }}>
+          <path d="M120 120 L120 24 A96 96 0 0 0 52 52 Z" fill={`url(#gdtSweep${size}${idle ? 'i' : 'a'})`} opacity={idle ? 0.35 : 1} />
+          <line x1="120" y1="120" x2="120" y2="24" stroke="#3ddc84" strokeWidth="1.5" opacity="0.8" />
+        </g>
+        <circle cx="120" cy="120" r="2.5" fill="#3ddc84" />
+      </svg>
+      <div className="gdt-mret-read">
+        <div style={{ fontFamily: DISP, fontSize: idle ? size * 0.2 : size * 0.26, color: TXT, lineHeight: 1 }}>
+          {idle ? 'Ready' : `±${acc}`}
+        </div>
+        <div style={{ fontFamily: SANS, fontSize: 7.5, color: MUT, marginTop: 2 }}>
+          {idle ? 'GPS starts when you tap' : 'meters accuracy'}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MockTrace({ live }) {
+  // 247 yd drive, about ±6 yd of error, drawn to scale.
+  return (
+    <svg className={`gdt-mtrace${live ? ' live' : ''}`} viewBox="0 0 344 64" aria-hidden="true" focusable="false">
+      <line x1="28" y1="30" x2="316" y2="30" stroke="#363636" strokeWidth="3" strokeLinecap="round" />
+      {Array.from({ length: 11 }, (_, i) => (
+        <line key={i} x1={28 + 28.8 * i} y1={i % 5 === 0 ? 22 : 25} x2={28 + 28.8 * i} y2={i % 5 === 0 ? 38 : 35} stroke="#a0a0ad" strokeWidth="1.2" opacity="0.6" />
+      ))}
+      <rect className="band" x="299" y="17" width="34" height="26" rx="3" fill="rgba(255,0,144,0.16)" stroke={ORG} strokeDasharray="3 3" />
+      <line className="draw" x1="28" y1="30" x2="316" y2="30" stroke={ORG} strokeWidth="3" strokeLinecap="round" strokeDasharray="288" />
+      <circle cx="28" cy="30" r="6" fill={TXT} />
+      <circle className="ball" cx="316" cy="30" r="7" fill={ORG} />
+      <text x="28" y="58" textAnchor="middle" fill="#a0a0ad" fontSize="11" fontFamily={SANS}>Tee</text>
+      <text x="316" y="58" textAnchor="middle" fill="#a0a0ad" fontSize="11" fontFamily={SANS}>Ball</text>
+    </svg>
+  );
+}
+
+function ScreenStart({ live }) {
   return (
     <>
+      <MockStatus />
       <div style={mockTitle}>Track a drive</div>
+      <div className="gdt-mstage">
+        <MockReticle size={112} idle live={live} />
+      </div>
       <p style={mockText}>
         Hit a ball, walk to it, and your phone measures the distance with GPS. No account needed to try it.
       </p>
@@ -134,48 +298,67 @@ function ScreenStart() {
   );
 }
 
-function ScreenTee() {
+function ScreenTee({ live }) {
   return (
     <>
+      <MockStatus />
       <div style={mockTitle}>Track a drive</div>
+      <MockSteps idx={0} />
       <MockGps label="Strong GPS signal (±4 m)" />
-      <div style={{ ...mockTitle, fontSize: 18 }}>Mark where you hit from</div>
+      <div className="gdt-mstage good">
+        <MockReticle size={116} acc={4} live={live} />
+      </div>
+      <div style={mockH2}>Mark where you hit from</div>
       <p style={mockText}>Stand at your tee spot and hold the phone still.</p>
       <div style={mockBtn}>Mark tee spot</div>
     </>
   );
 }
 
-function ScreenBall() {
+function ScreenBall({ live }) {
   return (
     <>
+      <MockStatus />
       <div style={mockTitle}>Track a drive</div>
+      <MockSteps idx={1} />
       <MockGps label="Strong GPS signal (±3 m)" />
-      <div style={{ ...mockTitle, fontSize: 18 }}>Walk to your ball</div>
-      <p style={mockText}>Stop right next to it, hold still, then mark its position.</p>
+      <div className="gdt-mstage good">
+        <MockReticle size={104} acc={3} live={live} />
+      </div>
+      <div style={{ ...mockH2, marginTop: 6 }}>Walk to your ball</div>
+      <p style={{ ...mockText, marginBottom: 4 }}>Stop right next to it, hold still, then mark its position.</p>
       <div style={mockBtn}>Mark ball position</div>
       <div style={mockGhost}>Start over</div>
     </>
   );
 }
 
-function ScreenResult() {
+function ScreenResult({ live }) {
+  const p = useCountUp(live, 1100);
   return (
     <>
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, marginBottom: 4 }}>
-        <div style={{ fontFamily: DISP, fontSize: 92, lineHeight: 0.85, color: ORG }}>247</div>
-        <div style={{ fontFamily: SANS, fontSize: 10, color: MUT, paddingBottom: 4, lineHeight: 1.4 }}>
-          yards
-          <br />
-          ±6 yds
+      <MockStatus />
+      <div style={mockTitle}>Track a drive</div>
+      <MockSteps idx={2} />
+      <div className="gdt-mstage">
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
+          <div style={{ fontFamily: DISP, fontSize: 78, lineHeight: 0.85, color: ORG, fontVariantNumeric: 'tabular-nums' }}>
+            {Math.round(247 * p)}
+          </div>
+          <div style={{ fontFamily: SANS, fontSize: 9.5, color: MUT, paddingBottom: 3, lineHeight: 1.4 }}>
+            yards
+            <br />
+            ±6 yds
+          </div>
         </div>
+        <MockTrace live={live} />
       </div>
       <div style={mockPanel}>
-        <div style={{ fontFamily: DISP, fontSize: 16, color: TXT, marginBottom: 6 }}>Where did you hit?</div>
-        <div style={{ fontFamily: SANS, fontSize: 10.5, color: TXT, marginBottom: 4 }}>
+        <div style={{ fontFamily: DISP, fontSize: 15, color: TXT, marginBottom: 5 }}>Where did you hit?</div>
+        <div style={{ fontFamily: SANS, fontSize: 10, color: TXT, marginBottom: 3 }}>
           <span style={{ color: ORG }}>●</span> Example Driving Range <span style={{ color: MUT }}>(range)</span>
         </div>
-        <div style={{ fontFamily: SANS, fontSize: 10.5, color: MUT }}>○ Somewhere else</div>
+        <div style={{ fontFamily: SANS, fontSize: 10, color: MUT }}>○ Somewhere else</div>
       </div>
       <div style={mockBtn}>Submit to leaderboard</div>
     </>
@@ -213,28 +396,149 @@ const STEPS = [
   },
 ];
 
-function Phone({ step }) {
+function Phone({ step, live = false }) {
   const { image, alt, Screen } = step;
   if (image) {
     return (
       <img
         src={image}
         alt={alt}
-        width={220}
+        width={240}
         loading="lazy"
-        style={{ display: 'block', width: 220, maxWidth: '100%', height: 'auto', margin: '0 auto', borderRadius: 24, border: `1px solid ${BDR}` }}
+        style={{ display: 'block', width: 240, maxWidth: '100%', height: 'auto', margin: '0 auto', borderRadius: 30, border: `1px solid ${BDR}` }}
       />
     );
   }
   return (
-    <div
-      role="img"
-      aria-label={alt}
-      style={{ width: 220, maxWidth: '100%', margin: '0 auto', background: '#000', border: `2px solid ${BDR}`, borderRadius: 28, padding: 8, boxSizing: 'border-box' }}
-    >
-      <div style={{ background: '#0d0d10', borderRadius: 20, height: 390, padding: 14, boxSizing: 'border-box', overflow: 'hidden' }}>
-        <Screen />
+    <div role="img" aria-label={alt} className="gdt-phone">
+      <div className="gdt-screen">
+        <span className="gdt-island" aria-hidden="true" />
+        <Screen live={live} />
       </div>
+    </div>
+  );
+}
+
+// The hero phone walks through the four screens on its own. It pauses while the
+// visitor hovers or focuses it, and stays still for reduced-motion visitors.
+function HeroPhone() {
+  const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [still, setStill] = useState(true);
+
+  useEffect(() => {
+    setStill(reducedMotion());
+  }, []);
+
+  useEffect(() => {
+    if (paused || still) return undefined;
+    const t = setTimeout(() => setI((n) => (n + 1) % STEPS.length), i === STEPS.length - 1 ? 5600 : 3400);
+    return () => clearTimeout(t);
+  }, [i, paused, still]);
+
+  const step = STEPS[i];
+  return (
+    <div
+      className="gdt-hero-phone"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+    >
+      <div className="gdt-rings" aria-hidden="true" />
+      <div key={i} className="gdt-swap">
+        <Phone step={step} live={!still} />
+      </div>
+      <div className="gdt-dots" role="group" aria-label="Tracker walkthrough">
+        {STEPS.map((s, n) => (
+          <button
+            key={s.title}
+            type="button"
+            className={n === i ? 'on' : ''}
+            aria-pressed={n === i}
+            aria-label={`Show step ${n + 1}: ${s.title}`}
+            onClick={() => setI(n)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ---- Accuracy visual -----------------------------------------------------------
+// Two drives 20 yards apart, each drawn with a typical open-sky error of about
+// 5 meters (5.5 yards). The bands do not touch.
+
+function AccuracyViz() {
+  const [ref, seen] = useSeen();
+  const x = (yd) => 40 + ((yd - 220) / 60) * 640;
+  const half = (5.5 / 60) * 640;
+  const marks = [240, 260];
+  return (
+    <figure ref={ref} className={`gdt-acc${seen ? ' seen' : ''}`} style={{ margin: '28px 0 0', maxWidth: 720 }}>
+      <svg viewBox="0 0 720 150" role="img" aria-label="Two drives, 240 and 260 yards, each shown with a plus or minus 5 meter GPS error band. The bands do not overlap." style={{ display: 'block', width: '100%', height: 'auto' }}>
+        <line x1="40" y1="108" x2="680" y2="108" stroke={BDR} strokeWidth="2" />
+        {Array.from({ length: 13 }, (_, n) => 220 + n * 5).map((yd) => (
+          <g key={yd}>
+            <line x1={x(yd)} y1="104" x2={x(yd)} y2={yd % 10 === 0 ? 118 : 113} stroke={DIM} strokeWidth="1.2" />
+            {yd % 10 === 0 && (
+              <text x={x(yd)} y="136" textAnchor="middle" fill={MUT} fontSize="13" fontFamily={SANS}>
+                {yd}
+              </text>
+            )}
+          </g>
+        ))}
+        {marks.map((yd, n) => (
+          <g key={yd}>
+            <rect className="band" x={x(yd) - half} y="44" width={half * 2} height="40" rx="4" fill="rgba(255,0,144,0.16)" stroke={ORG} strokeDasharray="4 4" style={{ transitionDelay: `${n * 0.25}s` }} />
+            <circle className="pip" cx={x(yd)} cy="64" r="7" fill={ORG} style={{ transitionDelay: `${n * 0.25 + 0.2}s` }} />
+            <text x={x(yd)} y="30" textAnchor="middle" fill={TXT} fontSize="18" fontFamily={DISP} letterSpacing="0.5">
+              {yd} yards
+            </text>
+          </g>
+        ))}
+        <text x={x(250)} y="70" textAnchor="middle" fill={MUT} fontSize="12" fontFamily={SANS}>
+          20 yards apart
+        </text>
+      </svg>
+      <figcaption style={{ fontFamily: SANS, fontSize: 13, color: DIM, lineHeight: 1.6, marginTop: 10 }}>
+        Each dashed band is a typical open-sky GPS error of about 5 meters (5.5 yards). Real accuracy varies, and the tracker shows the figure for every reading.
+      </figcaption>
+    </figure>
+  );
+}
+
+// ---- FAQ accordion -------------------------------------------------------------
+// Every answer is in the DOM at all times; closed answers are only collapsed with CSS.
+
+function FaqList() {
+  const [open, setOpen] = useState(0);
+  return (
+    <div className="gdt-faq">
+      {FAQ.map((f, n) => {
+        const isOpen = open === n;
+        return (
+          <div key={f.q} className={`gdt-faq-item${isOpen ? ' open' : ''}`}>
+            <h3>
+              <button
+                type="button"
+                id={`faq-q-${n}`}
+                aria-expanded={isOpen}
+                aria-controls={`faq-a-${n}`}
+                onClick={() => setOpen(isOpen ? -1 : n)}
+              >
+                <span>{f.q}</span>
+                <span className="gdt-faq-icon" aria-hidden="true" />
+              </button>
+            </h3>
+            <div className="gdt-faq-a" id={`faq-a-${n}`} role="region" aria-labelledby={`faq-q-${n}`}>
+              <div>
+                <p>{f.a}</p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -243,7 +547,7 @@ function Phone({ step }) {
 
 const h2 = { fontFamily: DISP, fontSize: 34, color: TXT, letterSpacing: 0.5, lineHeight: 1.1, margin: '0 0 16px', fontWeight: 400 };
 const body = { fontFamily: SANS, fontSize: 16, color: MUT, lineHeight: 1.75, margin: '0 0 16px', maxWidth: 660 };
-const section = { marginTop: 72 };
+const section = { marginTop: 80 };
 const primaryCta = {
   display: 'inline-block',
   background: ORG,
@@ -283,28 +587,34 @@ export default function GolfDriveDistanceTrackerPage() {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       </Head>
 
-      <div style={{ maxWidth: 980, margin: '0 auto', padding: '48px 18px 96px' }}>
+      <div
+        className="gdt"
+        style={{ maxWidth: 980, margin: '0 auto', padding: '48px 18px 96px', '--org': ORG, '--txt': TXT, '--mut': MUT, '--bdr': BDR, '--dim': DIM, '--bg3': BG3, '--sans': SANS, '--disp': DISP }}
+      >
         {/* Hero */}
-        <header>
-          <h1 style={{ fontFamily: DISP, fontSize: 'clamp(40px, 8vw, 68px)', color: TXT, letterSpacing: 0.5, lineHeight: 1.02, margin: '0 0 20px', fontWeight: 400, maxWidth: 780 }}>
-            Free golf distance tracker: find out how far you really hit it
-          </h1>
-          <p style={{ ...body, fontSize: 18, color: TXT }}>
-            Guessing your yardage is easy. Knowing it is better. The Ripping Bombs tracker measures any drive with your
-            phone’s GPS. No app to download, no launch monitor to buy, nothing to pay. Use it at any range or course,
-            anywhere in the world.
-          </p>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 24 }}>
-            <Link href="/track" style={primaryCta}>
-              Track a drive now
-            </Link>
-            <a href="#how-it-works" style={secondaryCta}>
-              See how it works
-            </a>
+        <header className="gdt-hero">
+          <div>
+            <h1 style={{ fontFamily: DISP, fontSize: 'clamp(40px, 8vw, 68px)', color: TXT, letterSpacing: 0.5, lineHeight: 1.02, margin: '0 0 20px', fontWeight: 400, maxWidth: 780 }}>
+              Free golf distance tracker: find out how far you really hit it
+            </h1>
+            <p style={{ ...body, fontSize: 18, color: TXT }}>
+              Guessing your yardage is easy. Knowing it is better. The Ripping Bombs tracker measures any drive with your
+              phone’s GPS. No app to download, no launch monitor to buy, nothing to pay. Use it at any range or course,
+              anywhere in the world.
+            </p>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 24 }}>
+              <Link href="/track" className="gdt-cta" style={primaryCta}>
+                Track a drive now
+              </Link>
+              <a href="#how-it-works" className="gdt-cta gdt-cta-2" style={secondaryCta}>
+                See how it works
+              </a>
+            </div>
+            <p style={{ fontFamily: SANS, fontSize: 13, color: DIM, margin: '18px 0 0' }}>
+              Completely free. No account needed to measure. Works in yards or meters.
+            </p>
           </div>
-          <p style={{ fontFamily: SANS, fontSize: 13, color: DIM, margin: '18px 0 0' }}>
-            Completely free. No account needed to measure. Works in yards or meters.
-          </p>
+          <HeroPhone />
         </header>
 
         {/* How it works */}
@@ -313,11 +623,11 @@ export default function GolfDriveDistanceTrackerPage() {
           <p style={body}>
             It takes about a minute per drive and works on any modern iPhone or Android browser.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 36, marginTop: 32 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 40, marginTop: 36 }}>
             {STEPS.map((step, i) => (
               <figure key={step.title} style={{ margin: 0 }}>
                 <Phone step={step} />
-                <figcaption style={{ maxWidth: 240, margin: '18px auto 0' }}>
+                <figcaption style={{ maxWidth: 250, margin: '20px auto 0' }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 6 }}>
                     <span style={{ fontFamily: DISP, fontSize: 34, color: ORG, lineHeight: 1 }}>{i + 1}</span>
                     <h3 style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: TXT, lineHeight: 1.3, margin: 0 }}>
@@ -329,8 +639,8 @@ export default function GolfDriveDistanceTrackerPage() {
               </figure>
             ))}
           </div>
-          <div style={{ marginTop: 40 }}>
-            <Link href="/track" style={primaryCta}>
+          <div style={{ marginTop: 44 }}>
+            <Link href="/track" className="gdt-cta" style={primaryCta}>
               Open the free tracker
             </Link>
           </div>
@@ -343,7 +653,8 @@ export default function GolfDriveDistanceTrackerPage() {
             In open sky, smartphone GPS is typically accurate to within about 5 meters (16 feet). That is close enough
             to tell a 240-yard drive from a 260-yard one, which is what most golfers actually want to know.
           </p>
-          <p style={body}>
+          <AccuracyViz />
+          <p style={{ ...body, marginTop: 28 }}>
             The tracker shows the accuracy of every reading, listens for a few seconds to find the best signal when you
             mark a spot, and refuses readings that are too weak. For the most reliable result, measure in the open,
             away from tall buildings and dense trees, and hold the phone still while it locks on.
@@ -389,33 +700,453 @@ export default function GolfDriveDistanceTrackerPage() {
         {/* FAQ */}
         <section style={section}>
           <h2 style={h2}>Frequently asked questions</h2>
-          <div style={{ maxWidth: 720 }}>
-            {FAQ.map((f) => (
-              <div key={f.q} style={{ borderTop: `1px solid ${BDR}`, padding: '20px 0' }}>
-                <h3 style={{ fontFamily: SANS, fontSize: 17, fontWeight: 700, color: TXT, margin: '0 0 8px', lineHeight: 1.4 }}>
-                  {f.q}
-                </h3>
-                <p style={{ fontFamily: SANS, fontSize: 15, color: MUT, lineHeight: 1.7, margin: 0 }}>{f.a}</p>
-              </div>
-            ))}
-          </div>
+          <FaqList />
         </section>
 
         {/* Closing CTA */}
-        <section style={{ ...section, background: BG3, border: `1px solid ${BDR}`, borderTop: `2px solid ${ORG}`, padding: '32px 24px' }}>
+        <section className="gdt-close" style={{ ...section, background: BG3, border: `1px solid ${BDR}`, borderTop: `2px solid ${ORG}`, padding: '36px 28px' }}>
           <h2 style={{ ...h2, marginBottom: 10 }}>Ready to find out how far you really hit it?</h2>
           <p style={{ ...body, marginBottom: 20 }}>
             It is free, it takes a minute, and you will know your number.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <Link href="/track" style={primaryCta}>
+            <Link href="/track" className="gdt-cta" style={primaryCta}>
               Track a drive now
             </Link>
-            <Link href="/leaderboard" style={secondaryCta}>
+            <Link href="/leaderboard" className="gdt-cta gdt-cta-2" style={secondaryCta}>
               See the leaderboard
             </Link>
           </div>
         </section>
+
+        <style jsx global>{`
+          /* ---- Hero ---- */
+          .gdt-hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 48px;
+            align-items: center;
+          }
+          @media (min-width: 880px) {
+            .gdt-hero {
+              grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+              gap: 32px;
+            }
+          }
+          .gdt-hero-phone {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0 4px;
+          }
+          .gdt-rings {
+            position: absolute;
+            top: 46%;
+            left: 50%;
+            width: 440px;
+            height: 440px;
+            max-width: 130%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            background: repeating-radial-gradient(
+              circle at center,
+              transparent 0 46px,
+              rgba(255, 255, 255, 0.07) 46px 47px
+            );
+            -webkit-mask-image: radial-gradient(circle, #000 35%, transparent 70%);
+            mask-image: radial-gradient(circle, #000 35%, transparent 70%);
+          }
+          .gdt-swap {
+            position: relative;
+            animation: gdtSwap 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+          }
+          .gdt-dots {
+            position: relative;
+            display: flex;
+            gap: 4px;
+            margin-top: 18px;
+          }
+          .gdt-dots button {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+          }
+          .gdt-dots button::after {
+            content: '';
+            position: absolute;
+            left: 8px;
+            right: 8px;
+            top: 21px;
+            height: 3px;
+            border-radius: 2px;
+            background: var(--bdr);
+            transition: background 0.25s ease, left 0.25s ease, right 0.25s ease;
+          }
+          .gdt-dots button.on::after {
+            background: var(--org);
+            left: 4px;
+            right: 4px;
+          }
+          .gdt-dots button:focus-visible,
+          .gdt-faq-item button:focus-visible,
+          .gdt-cta:focus-visible {
+            outline: 3px solid #fff;
+            outline-offset: 3px;
+          }
+
+          /* ---- Buttons ---- */
+          .gdt-cta {
+            transition: filter 0.15s ease, background 0.15s ease, transform 0.12s ease;
+          }
+          .gdt-cta:hover {
+            filter: brightness(1.12);
+          }
+          .gdt-cta-2:hover {
+            background: rgba(255, 0, 144, 0.1);
+            filter: none;
+          }
+          .gdt-cta:active {
+            transform: translateY(1px);
+          }
+
+          /* ---- Phone ---- */
+          .gdt-phone {
+            width: 240px;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 8px;
+            box-sizing: border-box;
+            background: #000;
+            border: 2px solid var(--bdr);
+            border-radius: 36px;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+          }
+          .gdt-screen {
+            position: relative;
+            height: 452px;
+            padding: 12px 14px 14px;
+            box-sizing: border-box;
+            overflow: hidden;
+            background: #0d0d10;
+            border-radius: 28px;
+          }
+          .gdt-island {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            width: 58px;
+            height: 15px;
+            margin-left: -29px;
+            border-radius: 10px;
+            background: #000;
+            z-index: 2;
+          }
+          .gdt-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 6px 10px;
+            font-family: var(--sans);
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--txt);
+          }
+          .gdt-batt {
+            width: 16px;
+            height: 8px;
+            border-radius: 2.5px;
+            background: var(--txt);
+            opacity: 0.85;
+          }
+          .gdt-msteps {
+            display: flex;
+            gap: 4px;
+            margin: 0 0 8px;
+          }
+          .gdt-msteps span {
+            flex: 1;
+            height: 3px;
+            border-radius: 2px;
+            background: #2b2b34;
+          }
+          .gdt-msteps span.on {
+            background: var(--org);
+          }
+          .gdt-mbars {
+            display: inline-flex;
+            align-items: flex-end;
+            gap: 1.5px;
+          }
+          .gdt-mbars i {
+            display: block;
+            width: 3px;
+            border-radius: 1px;
+            background: #363636;
+          }
+          .gdt-mbars i.on {
+            background: #3ddc84;
+          }
+          .gdt-mstage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 6px;
+            margin: 0 0 6px;
+            border: 1px solid #2b2b34;
+            border-radius: 10px;
+            background-color: #121216;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+            background-size: 12px 12px;
+          }
+          .gdt-mstage.good {
+            border-color: rgba(61, 220, 132, 0.4);
+          }
+          .gdt-mret {
+            position: relative;
+          }
+          .gdt-mret svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+          }
+          .gdt-mret-read {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          }
+          .gdt-sweep {
+            animation: gdtSweep 5s linear infinite;
+          }
+          .gdt-mtrace {
+            display: block;
+            width: 100%;
+            height: auto;
+            margin-top: 2px;
+          }
+          .gdt-mtrace.live .draw {
+            animation: gdtDraw 1.2s cubic-bezier(0.25, 0.7, 0.2, 1) 0.1s both;
+          }
+          .gdt-mtrace.live .ball {
+            animation: gdtFly 1.2s cubic-bezier(0.25, 0.7, 0.2, 1) 0.1s both;
+          }
+          .gdt-mtrace.live .band {
+            animation: gdtFade 0.4s ease-out 1.2s both;
+          }
+
+          /* ---- Accuracy visual ---- */
+          .gdt-acc .band {
+            transform-box: fill-box;
+            transform-origin: center;
+            transform: scaleX(0);
+            transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+          }
+          .gdt-acc .pip {
+            transform-box: fill-box;
+            transform-origin: center;
+            transform: scale(0);
+            transition: transform 0.4s cubic-bezier(0.3, 1.5, 0.5, 1);
+          }
+          .gdt-acc.seen .band,
+          .gdt-acc.seen .pip {
+            transform: none;
+          }
+
+          /* ---- FAQ ---- */
+          .gdt-faq {
+            max-width: 740px;
+            border-bottom: 1px solid var(--bdr);
+          }
+          .gdt-faq-item {
+            position: relative;
+            border-top: 1px solid var(--bdr);
+          }
+          .gdt-faq-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: -1px;
+            bottom: -1px;
+            width: 3px;
+            background: var(--org);
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+          }
+          .gdt-faq-item.open::before {
+            transform: scaleY(1);
+          }
+          .gdt-faq-item h3 {
+            margin: 0;
+          }
+          .gdt-faq-item button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            width: 100%;
+            min-height: 64px;
+            padding: 18px 8px 18px 20px;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            text-align: left;
+            font-family: var(--sans);
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1.4;
+            color: var(--mut);
+            transition: color 0.2s ease, background 0.2s ease;
+          }
+          .gdt-faq-item button:hover {
+            color: var(--txt);
+            background: rgba(255, 255, 255, 0.03);
+          }
+          .gdt-faq-item.open button {
+            color: var(--txt);
+          }
+          .gdt-faq-icon {
+            position: relative;
+            flex: none;
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--bdr);
+            border-radius: 50%;
+            transition: border-color 0.2s ease, background 0.2s ease, transform 0.3s ease;
+          }
+          .gdt-faq-icon::before,
+          .gdt-faq-icon::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 12px;
+            height: 2px;
+            margin: -1px 0 0 -6px;
+            border-radius: 1px;
+            background: currentColor;
+            transition: transform 0.3s ease;
+          }
+          .gdt-faq-icon::after {
+            transform: rotate(90deg);
+          }
+          .gdt-faq-item.open .gdt-faq-icon {
+            border-color: var(--org);
+            background: var(--org);
+            color: #000;
+            transform: rotate(180deg);
+          }
+          .gdt-faq-item.open .gdt-faq-icon::after {
+            transform: rotate(0deg);
+          }
+          .gdt-faq-a {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+          }
+          .gdt-faq-item.open .gdt-faq-a {
+            grid-template-rows: 1fr;
+          }
+          .gdt-faq-a > div {
+            min-height: 0;
+            overflow: hidden;
+          }
+          .gdt-faq-a p {
+            margin: 0;
+            padding: 0 56px 22px 20px;
+            max-width: 660px;
+            font-family: var(--sans);
+            font-size: 15px;
+            line-height: 1.75;
+            color: var(--mut);
+          }
+
+          /* ---- Closing panel ---- */
+          .gdt-close {
+            position: relative;
+            overflow: hidden;
+          }
+          .gdt-close::after {
+            content: '';
+            position: absolute;
+            right: -120px;
+            top: 50%;
+            width: 360px;
+            height: 360px;
+            transform: translateY(-50%);
+            border-radius: 50%;
+            pointer-events: none;
+            background: repeating-radial-gradient(
+              circle at center,
+              transparent 0 40px,
+              rgba(255, 0, 144, 0.14) 40px 41px
+            );
+          }
+          .gdt-close > * {
+            position: relative;
+            z-index: 1;
+          }
+
+          /* ---- Motion ---- */
+          @keyframes gdtSweep {
+            to {
+              transform: rotate(360deg);
+            }
+          }
+          @keyframes gdtSwap {
+            from {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+          }
+          @keyframes gdtDraw {
+            from {
+              stroke-dashoffset: 288;
+            }
+          }
+          @keyframes gdtFly {
+            from {
+              transform: translateX(-288px);
+            }
+          }
+          @keyframes gdtFade {
+            from {
+              opacity: 0;
+            }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .gdt *,
+            .gdt *::before,
+            .gdt *::after {
+              animation: none !important;
+              transition: none !important;
+            }
+            .gdt-acc .band,
+            .gdt-acc .pip {
+              transform: none;
+            }
+          }
+          @media (max-width: 520px) {
+            .gdt-faq-item button {
+              padding-left: 16px;
+              font-size: 16px;
+            }
+            .gdt-faq-a p {
+              padding: 0 16px 20px 16px;
+            }
+          }
+        `}</style>
       </div>
     </>
   );
