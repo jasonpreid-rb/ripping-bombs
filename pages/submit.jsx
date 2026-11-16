@@ -6,6 +6,7 @@ import { tier, todayStr } from '../lib/constants';
 import { toCompressedB64 } from '../lib/image';
 import { Card, Field, PhotoField, Btn } from '../components/UI';
 import { getEventBySlug, checkEligibility, joinEvent, getEventStatus } from '../lib/events';
+import { clearPendingDrive, getPendingDrive, YARDS_PER_METER } from '../lib/pendingDrive';
 
 // Mirrors nameToSlug() in pages/profile/[slug].jsx — keep in sync
 function nameToSlug(name) {
@@ -41,6 +42,8 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
   const hcpConfirmedRef = useRef(false);
   const prefilledRef = useRef(false);
   const router = useRouter();
+  // Arrived from the /track GPS tracker (see the prefill effect below).
+  const fromGps = router.isReady && router.query.src === 'gps';
 
   // The handicap on this player's most recent drive. Used to pre-fill the
   // field and to ask for confirmation if the new value is different.
@@ -102,6 +105,34 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
     }
   }, [router.isReady, router.query.dist]);
 
+  // GPS tracker flow: /track sends a measured drive here as
+  // /submit?src=gps&dist=<yards>&facility=<place name>&date=<YYYY-MM-DD>
+  // (carried through /register?redirect=... for new accounts). dist is
+  // handled by the effect above; this pre-fills the venue name and date.
+  // Everything stays editable, and evidence is still required below.
+  useEffect(() => {
+    if (!router.isReady || router.query.src !== 'gps') return;
+    const { facility, date, dist } = router.query;
+    // The tracker saves a generated result card with the drive. Use it as the
+    // evidence photo, but only if it belongs to the distance in the URL.
+    const saved = getPendingDrive();
+    const card =
+      saved && saved.image && Math.round(saved.distanceM * YARDS_PER_METER) === Number(dist)
+        ? saved.image
+        : null;
+    setForm(f => {
+      const next = { ...f };
+      if (card && !f.photo) next.photo = card;
+      if (typeof facility === 'string' && facility.trim() && !f.facility) {
+        next.facility = facility.trim().slice(0, 80);
+      }
+      if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        next.date = date;
+      }
+      return next;
+    });
+  }, [router.isReady, router.query.src, router.query.facility, router.query.date, router.query.dist]);
+
   // Hooks must run on every render, so the event eligibility check and the
   // auto-join effect live ABOVE the `!loggedOrg` early return. Previously the
   // effect sat below it, so when loggedOrg arrived a moment after first render
@@ -120,13 +151,25 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
 
   if (!loggedOrg) {
     const venueParam = router.query.venue;
-    const currentPath = venueParam ? `/submit?venue=${venueParam}` : '/submit';
+    // Keep the venue (QR flow) and the GPS tracker's drive details through
+    // login/registration so the player comes back to a pre-filled form.
+    const carried = new URLSearchParams();
+    if (venueParam) carried.set('venue', String(venueParam));
+    if (fromGps) {
+      ['src', 'dist', 'facility', 'date'].forEach(k => {
+        if (typeof router.query[k] === 'string') carried.set(k, router.query[k]);
+      });
+    }
+    const carriedQS = carried.toString();
+    const currentPath = carriedQS ? `/submit?${carriedQS}` : '/submit';
     const redirectQS = `?redirect=${encodeURIComponent(currentPath)}`;
     return (
       <div style={{ padding:'80px 18px', textAlign:'center' }}>
-        <div style={{ fontFamily:DISP, fontSize:28, color:TXT, marginBottom:12 }}>Not Logged In</div>
+        <div style={{ fontFamily:DISP, fontSize:28, color:TXT, marginBottom:12 }}>{fromGps ? 'One Step Left' : 'Not Logged In'}</div>
         <div style={{ fontFamily:SANS, fontSize:14, color:MUT, marginBottom:24 }}>
-          {venueParam
+          {fromGps
+            ? "Your GPS-tracked drive is ready. Log in or create a free account to submit it — you'll come right back here."
+            : venueParam
             ? "Log in or create a free account to submit your drive — you'll come right back here."
             : 'Please log in to submit a drive.'}
         </div>
@@ -200,6 +243,8 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
                 : {};
               const result = await doSubmit(overrides);
               if (result && result.ok) {
+                // The tracker's saved copy has now been submitted.
+                if (fromGps) clearPendingDrive();
                 setRankResult(result);
               }
   };
@@ -291,8 +336,15 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
           </div>
         )}
 
+        {/* GPS tracker banner — distance, date and venue name came from /track */}
+        {fromGps && (
+          <div style={{ background:'rgba(255,0,144,0.06)', border:'1px solid rgba(255,0,144,0.2)', padding:'12px 16px', marginBottom:20, fontFamily:SANS, fontSize:12, color:MUT, lineHeight:1.6 }}>
+            📍 <span style={{ fontWeight:700, color:TXT }}>GPS-tracked drive</span> — The distance, date and venue name were filled in from the tracker. Check them. A result card from the tracker is attached as your evidence when available, and you can replace it with your own photo.
+          </div>
+        )}
+
         {/* Simulator info banner */}
-        {isSimulator && (
+        {isSimulator && !fromGps && (
           <div style={{ background:'rgba(255,0,144,0.06)', border:'1px solid rgba(255,0,144,0.2)', padding:'12px 16px', marginBottom:20, fontFamily:SANS, fontSize:12, color:MUT, lineHeight:1.6 }}>
             🖥️ <span style={{ fontWeight:700, color:TXT }}>Simulator Drive</span> — A screenshot of your simulator readout is required as evidence. Your drive will appear on the global leaderboard with the simulator badge.
           </div>
@@ -469,7 +521,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
           )}
 
           <PhotoField
-            label={isSimulator ? "Simulator Screenshot (required)" : "Photo Evidence (required)"}
+            label={fromGps ? "Photo or Screenshot (required)" : isSimulator ? "Simulator Screenshot (required)" : "Photo Evidence (required)"}
             value={form.photo}
             onChange={async e=>{ if(e.target.files[0]) setForm({...form,photo:await toCompressedB64(e.target.files[0])}); }}
             required
