@@ -13,6 +13,11 @@
   padding: 0;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 html, body {
   min-height: 100%;
   background: #1a1a1a;
@@ -83,6 +88,29 @@ p, li, td, th, blockquote,
   cursor: text;
 }
 
+/* Form fields must stay editable. The body-level user-select: none above is
+   known to make inputs un-typeable in some iOS Safari versions, so opt them
+   back in explicitly. */
+input, textarea, select, [contenteditable="true"] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+}
+input, textarea {
+  cursor: text;
+}
+
 button, a, [role="button"], summary {
   cursor: pointer;
+}
+
+/* iOS Safari zooms the whole page in when a field with a font size under 16px
+   gets focus. Most fields here set their size inline, so !important is needed
+   to win. Phones only; checkboxes, radios, file pickers etc. are left alone. */
+@media (max-width: 640px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="color"]):not([type="submit"]):not([type="button"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }

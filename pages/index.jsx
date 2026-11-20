@@ -168,6 +168,16 @@ function EmptySlot({ weekly }) {
 // Show the weekly category leaders section on the homepage.
 const SHOW_WEEKLY_LEADERS = true;
 
+// The ONE place the weekly and all-time rows are allowed to differ.
+//   weekly   → pink accent ("live", this week)
+//   all_time → neutral accent ("hall of records")
+// Everything else — type sizes, text colours, spacing, mobile behaviour — is
+// shared. To make the two rows look identical, give both the same values.
+const VIEW_THEME = {
+  weekly:   { accent: ORG, border: 'rgba(255,0,144,0.28)' },
+  all_time: { accent: MUT, border: BDR },
+};
+
 export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], setDetEnt, cvt, unitLbl, staticEntries=[], staticOrgs=[] }) {
   const entries = staticEntries.length ? staticEntries : propEntries;
   const orgs = staticOrgs.length ? staticOrgs : propOrgs;
@@ -286,7 +296,10 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
   // understands (see the matching useEffect there that reads router.query).
   const categoryHref = (key, allTime) => {
     const params = new URLSearchParams();
-    if (allTime) params.set('allTime', '1');
+    // Always explicit (1 or 0): the leaderboard page keeps its view/filters in
+    // app-level state, so a link that says nothing could open on whatever the
+    // visitor happened to be looking at last time.
+    params.set('allTime', allTime ? '1' : '0');
     if (key === 'mens')       { params.set('gender','male');   params.set('hcp','u15'); }
     else if (key === 'mens_hcp')   { params.set('gender','male');   params.set('hcp','o15'); }
     else if (key === 'womens')     { params.set('gender','female'); params.set('hcp','u15'); }
@@ -297,29 +310,34 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
     return qs ? `/leaderboard?${qs}` : '/leaderboard';
   };
 
-  // Weekly card — single best entry
-  const WeeklyCard = ({ cat }) => {
+  // One card and one section layout for BOTH the weekly and all-time rows, so
+  // the two can never drift apart again. The only difference is the accent in
+  // VIEW_THEME (module level, above the component).
+  const leaderCard = (cat, view) => {
     const { top3 } = cat;
+    const weekly = view === 'weekly';
+    const theme = VIEW_THEME[view];
+    const idleBorder = top3.length ? theme.border : BDR;
     return (
       <div
+        className="rb-lb-card"
         onClick={()=>{
-          if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_category_card_click',{event_category:'engagement',section:'weekly',category:cat.key});
-          router.push(categoryHref(cat.key, false));
+          if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_category_card_click',{event_category:'engagement',section:view,category:cat.key});
+          router.push(categoryHref(cat.key, !weekly));
         }}
-        style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.2)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,width:'100%',minWidth:0,minHeight:220,cursor:'pointer',transition:'border-color .15s'}}
-        className="rb-weekly-card"
+        style={{background:BG2,border:`1px solid ${idleBorder}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,width:'100%',minWidth:0,minHeight:220,cursor:'pointer',transition:'border-color .15s'}}
         onMouseEnter={ev=>{ev.currentTarget.style.borderColor='rgba(255,0,144,0.5)';}}
-        onMouseLeave={ev=>{ev.currentTarget.style.borderColor=top3.length?'rgba(255,0,144,0.2)':BDR;}}>
-        <span style={{fontFamily:SANS,fontSize:10,color:ORG,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.label}</span>
+        onMouseLeave={ev=>{ev.currentTarget.style.borderColor=idleBorder;}}>
+        <span style={{fontFamily:SANS,fontSize:10,color:theme.accent,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.label}</span>
         <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:top3.length===0?'center':'flex-start'}}>
         {top3.length === 0 ? (
-          <EmptySlot weekly />
+          <EmptySlot weekly={weekly} />
         ) : (
           top3.map((e, i) => {
             const org = orgFor(e.orgId);
             return (
               <div key={e.id}
-                style={{display:'flex',flexDirection:'column',gap:3,padding:'10px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',transition:'opacity .15s'}}>
+                style={{display:'flex',flexDirection:'column',gap:3,padding:'10px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none'}}>
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
                   <div style={{display:'flex',alignItems:'center',gap:5,minWidth:0,flex:1,overflow:'hidden'}}>
                     <span style={{fontSize:13,flexShrink:0}}>{MEDALS[i]}</span>
@@ -327,13 +345,13 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                   </div>
                   <div style={{flexShrink:0}}>
                     <span style={{fontFamily:DISP,fontSize:20,color:i===0?ORG:MUT,letterSpacing:.5}}>{cvt(e.dist)}</span>
-                    <span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:2}}>{unitLbl}</span>
+                    <span style={{fontFamily:SANS,fontSize:11,color:DIM,marginLeft:2}}>{unitLbl}</span>
                   </div>
                 </div>
                 <div style={{display:'flex',alignItems:'center',gap:5,paddingLeft:19}}>
                   {org?.avatarUrl && <img src={org.avatarUrl} alt={org.courseName || ''} onError={e=>e.target.style.display='none'} style={{width:18,height:18,borderRadius:'50%',objectFit:'cover',flexShrink:0}}/>}
                   {org?.country && <span title={org.country} style={{flexShrink:0,lineHeight:0}}>{cloneElement(countryFlag(org.country),{style:{width:18,height:13,objectFit:'cover',borderRadius:2,display:'block'}})}</span>}
-                  <span style={{fontFamily:SANS,fontSize:10,color:DIM,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
+                  <span style={{fontFamily:SANS,fontSize:11,color:DIM,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
                     {e.is_simulator ? <span style={{color:'rgba(255,0,144,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
                   </span>
                 </div>
@@ -346,53 +364,27 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
     );
   };
 
-  // All-time card — top 3 entries
-  const AllTimeCard = ({ cat }) => {
-    const { top3 } = cat;
+  const leaderSection = ({ view, eyebrow, title, items, bg, borders }) => {
+    const theme = VIEW_THEME[view];
     return (
-      <div
-        onClick={()=>{
-          if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_category_card_click',{event_category:'engagement',section:'all_time',category:cat.key});
-          router.push(categoryHref(cat.key, true));
-        }}
-        style={{background:BG2,border:`1px solid ${top3.length?'rgba(255,0,144,0.15)':BDR}`,padding:'16px 18px',display:'flex',flexDirection:'column',gap:0,width:'100%',minWidth:0,minHeight:220,cursor:'pointer',transition:'border-color .15s'}}
-        onMouseEnter={ev=>{ev.currentTarget.style.borderColor='rgba(255,0,144,0.4)';}}
-        onMouseLeave={ev=>{ev.currentTarget.style.borderColor=top3.length?'rgba(255,0,144,0.15)':BDR;}}>
-        <span style={{fontFamily:SANS,fontSize:10,color:MUT,fontWeight:700,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>{cat.label}</span>
-        <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:top3.length===0?'center':'flex-start'}}>
-        {top3.length === 0 ? (
-          <EmptySlot />
-        ) : (
-          top3.map((e, i) => {
-            const org = orgFor(e.orgId);
-            return (
-              <div key={e.id}
-                style={{display:'flex',flexDirection:'column',gap:3,padding:'10px 0',borderBottom:i<top3.length-1?`1px solid ${BDR}`:'none',transition:'opacity .15s'}}>
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
-                  <div style={{display:'flex',alignItems:'center',gap:5,minWidth:0,flex:1,overflow:'hidden'}}>
-                    <span style={{fontSize:13,flexShrink:0}}>{MEDALS[i]}</span>
-                    <span style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:TXT,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{e.player}</span>
-                  </div>
-                  <div style={{flexShrink:0}}>
-                    <span style={{fontFamily:DISP,fontSize:20,color:i===0?ORG:MUT,letterSpacing:.5}}>{cvt(e.dist)}</span>
-                    <span style={{fontFamily:SANS,fontSize:10,color:DIM,marginLeft:2}}>{unitLbl}</span>
-                  </div>
-                </div>
-                <div style={{display:'flex',alignItems:'center',gap:5,paddingLeft:19}}>
-                  {org?.avatarUrl && <img src={org.avatarUrl} alt={org.courseName || ''} onError={e=>e.target.style.display='none'} style={{width:18,height:18,borderRadius:'50%',objectFit:'cover',flexShrink:0}}/>}
-                  {org?.country && <span title={org.country} style={{flexShrink:0,lineHeight:0}}>{cloneElement(countryFlag(org.country),{style:{width:18,height:13,objectFit:'cover',borderRadius:2,display:'block'}})}</span>}
-                  <span style={{fontFamily:SANS,fontSize:10,color:DIM,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
-                    {e.is_simulator ? <span style={{color:'rgba(255,0,144,0.5)'}}>🖥️ Sim</span> : org?.courseName||'—'}
-                  </span>
-                </div>
-              </div>
-            );
-          })
-        )}
+      <div className="rb-lb-section" style={{background:bg,...borders,padding:'40px 0'}}>
+        <div style={{maxWidth:1200,margin:'0 auto',padding:'0 18px'}}>
+          <div className="rb-lb-header" style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
+            <div>
+              <div className="rb-lb-eyebrow" style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:theme.accent,textTransform:'uppercase',marginBottom:6}}>{eyebrow}</div>
+              <h2 className="rb-lb-title" style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5,fontWeight:400}}>{title}</h2>
+            </div>
+            <button className="rb-lb-more" onClick={()=>{
+              if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_full_leaderboard_click',{event_category:'engagement',section:view});
+              router.push(view === 'weekly' ? '/leaderboard?allTime=0' : '/leaderboard?allTime=1');
+            }} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
+          </div>
+          <InfiniteScrollRow items={items} bg={bg} renderItem={cat => leaderCard(cat, view)}/>
         </div>
       </div>
     );
   };
+
   return (
     <>
       <Head>
@@ -473,40 +465,24 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
         </div>
 
         {/* ALL-TIME LEADERS */}
-        <div style={{background:'#111',borderTop:`1px solid ${BDR}`,borderBottom:`1px solid ${BDR}`,padding:'40px 0 40px'}}>
-          <div style={{maxWidth:1200,margin:'0 auto',padding:'0 18px'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
-              <div>
-                <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:MUT,textTransform:'uppercase',marginBottom:6}}>Hall of Records</div>
-                <h2 style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5,fontWeight:400}}>All-Time Category Leaders</h2>
-              </div>
-              <button onClick={()=>{
-                if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_full_leaderboard_click',{event_category:'engagement',section:'all_time'});
-                router.push('/leaderboard');
-              }} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
-            </div>
-            <InfiniteScrollRow items={allTimeLeaders} bg="#111" renderItem={cat => <AllTimeCard cat={cat}/>}/>
-          </div>
-        </div>
+        {leaderSection({
+          view: 'all_time',
+          eyebrow: 'Hall of Records',
+          title: 'All-Time Category Leaders',
+          items: allTimeLeaders,
+          bg: '#111',
+          borders: { borderTop: `1px solid ${BDR}`, borderBottom: `1px solid ${BDR}` },
+        })}
 
         {/* WEEKLY LEADERS — set SHOW_WEEKLY_LEADERS to false to hide */}
-        {SHOW_WEEKLY_LEADERS && (
-        <div className="rb-weekly-section" style={{background:'#0e0e0e',borderBottom:`1px solid ${BDR}`,padding:'28px 0 40px'}}>
-          <div style={{maxWidth:1200,margin:'0 auto',padding:'0 18px'}}>
-            <div className="rb-weekly-header" style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20,flexWrap:'wrap',gap:10}}>
-              <div>
-                <div className="rb-weekly-eyebrow" style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:3,color:ORG,textTransform:'uppercase',marginBottom:6}}>Live from the Registry</div>
-                <h2 className="rb-weekly-title" style={{fontFamily:DISP,fontSize:26,color:TXT,letterSpacing:.5,fontWeight:400}}>{currentWeekLabel} — Category Leaders</h2>
-              </div>
-              <button onClick={()=>{
-                if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_full_leaderboard_click',{event_category:'engagement',section:'weekly'});
-                router.push('/leaderboard');
-              }} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
-            </div>
-            <InfiniteScrollRow items={weeklyLeaders} bg="#0e0e0e" renderItem={cat => <WeeklyCard cat={cat}/>}/>
-          </div>
-        </div>
-        )}
+        {SHOW_WEEKLY_LEADERS && leaderSection({
+          view: 'weekly',
+          eyebrow: 'Live from the Registry',
+          title: `${currentWeekLabel} — Category Leaders`,
+          items: weeklyLeaders,
+          bg: '#0e0e0e',
+          borders: { borderBottom: `1px solid ${BDR}` },
+        })}
 
         {/* LIVE STATS TICKER */}
         {(() => {
@@ -673,6 +649,17 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
         @media (prefers-reduced-motion: reduce) {
           .rb-empty-slot span { animation: none !important; }
         }
+        /* Weekly + all-time leader rows share these. They live in the global
+           block on purpose: the cards are built inside helper functions, which
+           a component-scoped <style jsx> can't reach. */
+        @media (max-width: 640px) {
+          .rb-lb-section { padding: 22px 0 26px !important; }
+          .rb-lb-header { margin-bottom: 12px !important; }
+          .rb-lb-eyebrow { display: none !important; }
+          .rb-lb-title { font-size: 20px !important; line-height: 1.15 !important; }
+          .rb-lb-more { padding: 10px 16px !important; min-height: 40px !important; }
+          .rb-lb-card { min-height: 0 !important; padding: 14px !important; }
+        }
       `}</style>
       <style jsx>{`
         @media (max-width: 640px) {
@@ -716,24 +703,6 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           }
           .rb-rank-divider {
             display: none !important;
-          }
-
-          /* Weekly leaderboard: pulled tighter so it lands near the fold */
-          .rb-weekly-section {
-            padding: 16px 0 20px !important;
-          }
-          .rb-weekly-header {
-            margin-bottom: 10px !important;
-          }
-          .rb-weekly-eyebrow {
-            display: none !important;
-          }
-          .rb-weekly-title {
-            font-size: 18px !important;
-          }
-          .rb-weekly-card {
-            min-height: 150px !important;
-            padding: 12px 14px !important;
           }
         }
       `}</style>

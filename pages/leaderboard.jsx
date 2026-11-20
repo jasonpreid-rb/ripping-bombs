@@ -15,11 +15,88 @@ const STICKY = { position:'sticky', zIndex:2 };
 const RANK_W = 52;
 const PLAYER_W = 180;
 
+// Player name: pink underlined link when the player has a public profile page,
+// plain white text otherwise. Shared by the desktop table and the mobile cards.
+function PlayerName({ e, org, size = 14 }) {
+  const slug = profileSlugFor(org);
+  return slug ? (
+    <Link
+      href={`/profile/${slug}`}
+      onClick={ev=>ev.stopPropagation()}
+      style={{fontFamily:SANS,fontWeight:700,fontSize:size,color:ORG,textDecoration:'none',borderBottom:`1px solid rgba(255,0,144,0.3)`}}>
+      {e.player}
+    </Link>
+  ) : (
+    <span style={{fontFamily:SANS,fontWeight:700,fontSize:size,color:TXT}}>{e.player}</span>
+  );
+}
+
+function ShareButton({ e, onShare, hit = 30 }) {
+  return (
+    <button
+      onClick={ev=>{ev.stopPropagation();onShare(e);}}
+      aria-label="Share drive"
+      title="Share"
+      style={{background:'transparent',border:'none',padding:6,minWidth:hit,minHeight:hit,cursor:'pointer',display:'inline-flex',alignItems:'center',justifyContent:'center',lineHeight:0,borderRadius:6}}
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={ORG} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="18" cy="5" r="3"/>
+        <circle cx="6" cy="12" r="3"/>
+        <circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+    </button>
+  );
+}
+
+// Phone layout: the 12-column table needs ~750px and pins 230px of it, which
+// leaves almost nothing to scroll on a phone. Under 640px each drive becomes a
+// compact tappable card instead (tap = the same detail modal the table opens).
+function MobileRow({ e, rank, org, onView, onShare, cvt, unitLbl }) {
+  const medal = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':null;
+  const meta = [
+    e.club,
+    e.hcp!=null && e.hcp!=='' ? `HCP ${e.hcp}` : null,
+    e.age ? `Age ${e.age}` : null,
+    e.gender==='female' ? '♀' : e.gender==='male' ? '♂' : null,
+  ].filter(Boolean).join(' · ');
+  // Same wording as the homepage cards: sim entries read "Sim", official ones show the venue.
+  const where = [
+    e.is_simulator ? '🖥️ Sim' : (org?.courseName || null),
+    e.tournament || null,
+    fmtDate(e.date),
+    tier(e.dist),
+  ].filter(Boolean).join(' · ');
+  return (
+    <div
+      className="rb-lb-row"
+      onClick={()=>onView(e)}
+      style={{display:'flex',alignItems:'center',gap:10,padding:'12px 14px',borderBottom:`1px solid ${BDR}`,cursor:'pointer'}}
+    >
+      <div style={{width:32,flexShrink:0,textAlign:'center',fontFamily:SANS,fontSize:medal?20:12,color:DIM}}>{medal||`#${rank}`}</div>
+      <PlayerAvatar fullName={org?.fullName || e.player} avatarUrl={org?.avatarUrl} size={36} />
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{display:'flex',alignItems:'center',gap:6,minWidth:0}}>
+          <span style={{minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}><PlayerName e={e} org={org} size={15} /></span>
+          {org?.country&&<span title={org.country} style={{flexShrink:0,lineHeight:0}}>{cloneElement(countryFlag(org.country),{style:{width:18,height:13,objectFit:'cover',borderRadius:2,display:'block'}})}</span>}
+        </div>
+        {meta&&<div style={{fontFamily:SANS,fontSize:12,color:MUT,marginTop:3,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{meta}</div>}
+        <div style={{fontFamily:SANS,fontSize:11,color:DIM,marginTop:2,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{where}</div>
+      </div>
+      <div style={{flexShrink:0,display:'flex',flexDirection:'column',alignItems:'flex-end',gap:0}}>
+        <div><span style={{fontFamily:DISP,fontSize:26,color:ORG,lineHeight:1}}>{cvt(e.dist)}</span><span style={{fontFamily:SANS,fontSize:11,color:DIM,marginLeft:3}}>{unitLbl}</span></div>
+        <ShareButton e={e} onShare={onShare} hit={40} />
+      </div>
+    </div>
+  );
+}
+
 // Click-and-drag horizontal panning, matching the category-card rows on the
 // homepage: native touch/trackpad momentum scrolling is left alone, mouse
 // users get grab-to-pan since the scrollbar is hidden, and a fading arrow
 // hints that the table scrolls until the user's first interaction with it.
-function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
+function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl, rankOf }) {
   const COLS = ['Rank','Player','Distance','Club','HCP','Age','Gender','Course','Event','Date','Tier','Share'];
   const scrollRef = useRef(null);
   const [showHint, setShowHint] = useState(true);
@@ -80,7 +157,8 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
   }
 
   return (
-    <div style={{position:'relative'}}>
+    <>
+    <div className="rb-lb-table-wrap" style={{position:'relative'}}>
     <div
       ref={scrollRef}
       onPointerDown={handlePointerDown}
@@ -108,9 +186,13 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
           </tr>
         </thead>
         <tbody>
-          {rows.map((e,ri)=>{
+          {rows.map((e)=>{
             const org=orgFor(e.orgId);
-            const medal=ri===0?'🥇':ri===1?'🥈':ri===2?'🥉':null;
+            // Rank = position by distance, whatever the table is sorted by —
+            // otherwise sorting by age/date would hand the medals to whoever
+            // happens to be in the first three rows.
+            const rank=rankOf(e);
+            const medal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':null;
             const tdSticky = (left) => ({...STICKY, left, background:BG2, borderRight:`1px solid ${BDR}`});
             return (
               <tr key={e.id} onClick={()=>onView(e)} style={{cursor:'pointer',borderBottom:`1px solid ${BDR}`,transition:'background .12s ease, box-shadow .12s ease'}}
@@ -125,22 +207,13 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
                   [...el.currentTarget.querySelectorAll('td[data-sticky]')].forEach(td=>td.style.background=BG2);
                 }}>
                 <td data-sticky="1" style={{...tdSticky(0),padding:'12px 14px',fontFamily:SANS,fontSize:12,color:DIM,minWidth:RANK_W}}>
-                  {medal||`#${ri+1}`}
+                  {medal||`#${rank}`}
                 </td>
                 <td data-sticky="1" style={{...tdSticky(RANK_W),padding:'12px 14px',minWidth:PLAYER_W}}>
                   <div style={{display:'flex',alignItems:'center',gap:8}}>
                     <PlayerAvatar fullName={org?.fullName || e.player} avatarUrl={org?.avatarUrl} size={28} />
                     <div>
-                      {(() => { const slug = profileSlugFor(org); return slug ? (
-                        <Link
-                          href={`/profile/${slug}`}
-                          onClick={ev=>ev.stopPropagation()}
-                          style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:ORG,textDecoration:'none',borderBottom:`1px solid rgba(255,0,144,0.3)`}}>
-                          {e.player}
-                        </Link>
-                      ) : (
-                        <span style={{fontFamily:SANS,fontWeight:700,fontSize:14,color:TXT}}>{e.player}</span>
-                      ); })()}
+                      <PlayerName e={e} org={org} />
                       {org?.country&&<span title={org.country} style={{display:'block',lineHeight:0,marginTop:4}}>{cloneElement(countryFlag(org.country),{style:{width:20,height:14,objectFit:'cover',borderRadius:2,display:'block'}})}</span>}
                     </div>
                   </div>
@@ -154,22 +227,7 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:12,color:DIM}}>{e.tournament||'—'}</td>
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:11,color:DIM}}>{fmtDate(e.date)}</td>
                 <td style={{padding:'12px 14px',fontFamily:SANS,fontSize:10,fontWeight:600,color:ORG}}>{tier(e.dist)}</td>
-                <td style={{padding:'12px 14px'}}>
-                  <button
-                    onClick={ev=>{ev.stopPropagation();onShare(e);}}
-                    aria-label="Share drive"
-                    title="Share"
-                    style={{background:'transparent',border:'none',padding:6,cursor:'pointer',display:'inline-flex',alignItems:'center',justifyContent:'center',lineHeight:0,borderRadius:6}}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={ORG} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="18" cy="5" r="3"/>
-                      <circle cx="6" cy="12" r="3"/>
-                      <circle cx="18" cy="19" r="3"/>
-                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                    </svg>
-                  </button>
-                </td>
+                <td style={{padding:'12px 14px'}}><ShareButton e={e} onShare={onShare} /></td>
               </tr>
             );
           })}
@@ -193,6 +251,24 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl }) {
       }
     `}</style>
     </div>
+
+    {/* Phone layout — shown instead of the table under 640px (see MobileRow) */}
+    <div className="rb-lb-cards" style={{border:`1px solid ${BDR}`,background:BG2}}>
+      {rows.map(e=>(
+        <MobileRow key={e.id} e={e} rank={rankOf(e)} org={orgFor(e.orgId)} onView={onView} onShare={onShare} cvt={cvt} unitLbl={unitLbl} />
+      ))}
+      {rows.length===0&&<div style={{padding:'44px 16px',textAlign:'center',color:DIM,fontFamily:SANS,fontSize:13}}>No drives recorded for this selection</div>}
+    </div>
+
+    <style jsx global>{`
+      .rb-lb-cards { display: none; }
+      @media (max-width: 640px) {
+        .rb-lb-table-wrap { display: none !important; }
+        .rb-lb-cards { display: block !important; }
+        .rb-lb-row:active { background: rgba(255,0,144,0.10); }
+      }
+    `}</style>
+    </>
   );
 }
 
@@ -204,8 +280,14 @@ export default function LeaderboardPage(props) {
     week, setWeek, allTime, setAllTime,
     fCountry, setFCountry, fHcp, setFHcp, fAge, setFAge,
     fClub, setFClub, fPlayer, setFPlayer, fGender, setFGender,
-    fSimulator, setFSimulator,
     sortBy, setSortBy } = props;
+
+  // _app.jsx doesn't provide fSimulator/setFSimulator, so without a fallback
+  // the "Entry Type" filter and "Clear filters" would call an undefined
+  // function. Use the app-level state if it ever gets added, local state until then.
+  const [localSimulator, setLocalSimulator] = useState('');
+  const fSimulator = props.setFSimulator ? props.fSimulator : localSimulator;
+  const setFSimulator = props.setFSimulator || setLocalSimulator;
 
   // Prefer server-rendered data (getStaticProps below) so the leaderboard
   // has real content in the initial HTML for crawlers/SEO. Falls back to
@@ -234,21 +316,28 @@ export default function LeaderboardPage(props) {
   const hcpIn=(hcp,b)=>{if(!b)return true;if(b==='scratch')return hcp<=0;if(b==='low')return hcp>0&&hcp<=5;if(b==='mid')return hcp>5&&hcp<=14;if(b==='high')return hcp>14&&hcp<=28;if(b==='beginner')return hcp>28;if(b==='u15'||b==='u20')return hcp<HIGH_HCP_THRESHOLD;if(b==='o15'||b==='o20')return hcp>=HIGH_HCP_THRESHOLD;return true;};
   const ageIn=(age,b)=>{if(!b)return true;if(b==='u25')return age<25;if(b==='25-40')return age>=25&&age<40;if(b==='40-55')return age>=40&&age<55;if(b==='55+')return age>=55;if(b==='u16')return age<16;return true;};
 
-  // Apply filters from the URL query on load (e.g. arriving from a homepage
-  // category card: /leaderboard?gender=male&hcp=o15). Only runs once the
-  // router has hydrated, and only sets a filter if a value was actually passed.
+  // Apply the view/filters named in the URL (e.g. arriving from a homepage
+  // card: /leaderboard?allTime=0&gender=male&hcp=o15). The filters live in
+  // app-level state, so when the URL names ANY view or filter we set all of
+  // them — anything it doesn't mention is cleared — otherwise a visitor would
+  // see leftovers from the last card they clicked. With no recognised params
+  // (e.g. coming Back from a profile) their current view is left alone.
   const router = useRouter();
   useEffect(() => {
     if (!router.isReady) return;
-    const { gender, hcp, age, country, player, club, simulator, allTime: allTimeQ } = router.query;
-    if (gender && setFGender) setFGender(String(gender));
-    if (hcp && setFHcp) setFHcp(String(hcp));
-    if (age && setFAge) setFAge(String(age));
-    if (country && setFCountry) setFCountry(String(country));
-    if (player && setFPlayer) setFPlayer(String(player));
-    if (club && setFClub) setFClub(String(club));
-    if (simulator && setFSimulator) setFSimulator(String(simulator));
-    if (allTimeQ && setAllTime) setAllTime(allTimeQ === '1' || allTimeQ === 'true');
+    const q = router.query;
+    const keys = ['gender','hcp','age','country','player','club','simulator','allTime'];
+    if (!keys.some(k => q[k] != null)) return;
+    const s = k => (q[k] != null ? String(q[k]) : '');
+    setFGender && setFGender(s('gender'));
+    setFHcp && setFHcp(s('hcp'));
+    setFAge && setFAge(s('age'));
+    setFCountry && setFCountry(s('country'));
+    setFPlayer && setFPlayer(s('player'));
+    setFClub && setFClub(s('club'));
+    setFSimulator && setFSimulator(s('simulator'));
+    setAllTime && setAllTime(s('allTime') === '1' || s('allTime') === 'true');
+    setWeek && setWeek(null); // back to the current week
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady]);
 
@@ -287,6 +376,11 @@ export default function LeaderboardPage(props) {
   const visibleRows = tableRows.slice(0, page * PAGE_SIZE);
   const hasMore = visibleRows.length < tableRows.length;
 
+  // Rank by distance within the current filters, independent of the sort order.
+  const distRank = new Map();
+  [...tableRows].sort((a,b)=>Number(b.dist)-Number(a.dist)).forEach((e,i)=>distRank.set(e.id,i+1));
+  const rankOf = e => distRank.get(e.id) || 0;
+
   return (
     <>
       <Head>
@@ -301,17 +395,29 @@ export default function LeaderboardPage(props) {
           <Link href="/venue-rankings" style={{color:ORG,textDecoration:'none',borderBottom:'1px solid rgba(255,0,144,0.3)'}}>See how venues rank &rarr;</Link>
         </div>
 
-        {/* Week nav */}
-        <div style={{background:allTime?BG2:'linear-gradient(135deg,rgba(255,0,144,0.14),rgba(255,0,144,0.03))',border:`1px solid ${allTime?BDR:'rgba(255,0,144,0.3)'}`,padding:'16px 20px',marginBottom:20,display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:14}}>
-          <div style={{display:'flex',alignItems:'center',gap:14,flexWrap:'wrap'}}>
-            <button onClick={()=>setWeek(prevWeek(currentWeek))} disabled={allTime} style={{background:'transparent',border:`1px solid ${BDR}`,color:allTime?DIM:MUT,fontFamily:SANS,fontSize:14,padding:'15px 16px',cursor:allTime?'default':'pointer',opacity:allTime?0.4:1}}>‹</button>
-            <div>
-              <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:allTime?DIM:ORG,textTransform:'uppercase',marginBottom:3}}>🏆 Weekly Championship</div>
-              <h2 style={{fontFamily:DISP,fontSize:22,color:allTime?MUT:TXT,letterSpacing:.5,fontWeight:400}}>{allTime?'All-Time Leaderboard':weekLabel(currentWeek)}</h2>
+        {/* View banner — weekly and all-time share one layout and one set of text
+            colours. Only the accent differs: pink container + eyebrow for the
+            weekly championship, neutral for the all-time records. */}
+        <div className="rb-lb-banner" style={{background:allTime?BG2:'linear-gradient(135deg,rgba(255,0,144,0.14),rgba(255,0,144,0.03))',border:`1px solid ${allTime?BDR:'rgba(255,0,144,0.3)'}`,padding:'16px 20px',marginBottom:20,display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:14}}>
+          <div className="rb-lb-banner-main" style={{display:'flex',alignItems:'center',gap:14,minWidth:0}}>
+            {!allTime&&<button className="rb-lb-nav" aria-label="Previous week" onClick={()=>setWeek(prevWeek(currentWeek))} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontSize:14,padding:'15px 16px',cursor:'pointer'}}>‹</button>}
+            <div style={{minWidth:0}}>
+              <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:allTime?MUT:ORG,textTransform:'uppercase',marginBottom:3}}>{allTime?'🏛️ Hall of Records':'🏆 Weekly Championship'}</div>
+              <h2 className="rb-lb-banner-title" style={{fontFamily:DISP,fontSize:22,color:TXT,letterSpacing:.5,fontWeight:400}}>{allTime?'All-Time Leaderboard':weekLabel(currentWeek)}</h2>
             </div>
-            <button onClick={()=>setWeek(nextWeek(currentWeek))} disabled={allTime} style={{background:'transparent',border:`1px solid ${BDR}`,color:allTime?DIM:MUT,fontFamily:SANS,fontSize:14,padding:'15px 16px',cursor:allTime?'default':'pointer',opacity:allTime?0.4:1}}>›</button>
+            {!allTime&&<button className="rb-lb-nav" aria-label="Next week" onClick={()=>setWeek(nextWeek(currentWeek))} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontSize:14,padding:'15px 16px',cursor:'pointer'}}>›</button>}
           </div>
-          <button onClick={()=>setAllTime(v=>!v)} style={{background:allTime?ORG:'transparent',border:`1px solid ${allTime?ORG:BDR}`,color:allTime?'#111':MUT,fontFamily:SANS,fontWeight:600,fontSize:12,padding:'8px 16px',cursor:'pointer',whiteSpace:'nowrap'}}>{allTime?'All Time ✓':'View All-Time →'}</button>
+          <div role="tablist" aria-label="Leaderboard view" className="rb-lb-seg" style={{display:'flex',border:`1px solid ${BDR}`}}>
+            {[[false,'This Week'],[true,'All-Time']].map(([val,label])=>{
+              const active=!!allTime===val;
+              return (
+                <button key={label} type="button" role="tab" aria-selected={active} onClick={()=>setAllTime(val)}
+                  style={{background:active?ORG:'transparent',border:'none',color:active?'#111':MUT,fontFamily:SANS,fontWeight:700,fontSize:12,padding:'10px 16px',cursor:'pointer',whiteSpace:'nowrap'}}>
+                  {label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Filter bar */}
@@ -327,9 +433,9 @@ export default function LeaderboardPage(props) {
             <span style={{fontSize:10,color:DIM,marginLeft:2}}>{filtersOpen?'▴':'▾'}</span>
           </button>
 
-          <div style={{minWidth:160}}>
+          <div className="rb-lb-sort" style={{minWidth:160}}>
             <div style={{position:'relative'}}>
-              <select value={sortBy} onChange={e=>setSortBy(e.target.value)} style={{width:'100%',background:BG2,border:`1px solid ${BDR}`,padding:'9px 28px 9px 12px',color:TXT,fontFamily:SANS,fontSize:13,outline:'none',cursor:'pointer',appearance:'none'}}>
+              <select className="rb-lb-field" value={sortBy} onChange={e=>setSortBy(e.target.value)} style={{width:'100%',background:BG2,border:`1px solid ${BDR}`,padding:'9px 28px 9px 12px',color:TXT,fontFamily:SANS,fontSize:13,outline:'none',cursor:'pointer',appearance:'none'}}>
                 {[['dist','Sort: Distance'],['date','Sort: Date'],['hcp','Sort: Handicap'],['age','Sort: Age'],['club','Sort: Club']].map(([v,l])=><option key={v} value={v}>{l}</option>)}
               </select>
               <span style={{position:'absolute',right:8,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',color:DIM,fontSize:10}}>▾</span>
@@ -347,7 +453,7 @@ export default function LeaderboardPage(props) {
               {label:'Search Player',val:fPlayer,set:setFPlayer,ph:'Player name'},
               {label:'Gender',val:fGender,set:setFGender,ph:'All',opts:[['','All'],['male','♂ Male'],['female','♀ Female']]},
               {label:'Country/Region',val:fCountry,set:setFCountry,ph:'Filter by location'},
-              {label:'Handicap',val:fHcp,set:setFHcp,ph:'All',opts:[['','All'],['scratch','Scratch'],['low','Low (1–5)'],['mid','Mid (6–14)'],['high','High (15–28)'],['beginner','Beginner (28+']]},
+              {label:'Handicap',val:fHcp,set:setFHcp,ph:'All',opts:[['','All'],['scratch','Scratch'],['low','Low (1–5)'],['mid','Mid (6–14)'],['high','High (15–28)'],['beginner','Beginner (28+)']]},
               {label:'Age Group',val:fAge,set:setFAge,ph:'All',opts:[['','All'],['u25','Under 25'],['25-40','25–40'],['40-55','40–55'],['55+','55+']]},
               {label:'Club Brand',val:fClub,set:setFClub,ph:'e.g. TaylorMade'},
               {label:'Entry Type',val:fSimulator,set:setFSimulator,ph:'All',opts:[['','All'],['official','🏌️ Official Only'],['simulator','🖥️ Simulator Only']]},
@@ -355,17 +461,17 @@ export default function LeaderboardPage(props) {
               <div key={label}>
                 <div style={{fontFamily:SANS,fontSize:9,fontWeight:700,color:DIM,letterSpacing:1.2,marginBottom:5,textTransform:'uppercase'}}>{label}</div>
                 {opts
-                  ?<div style={{position:'relative'}}><select value={val} onChange={e=>set(e.target.value)} style={{width:'100%',background:BG3,border:`1px solid ${BDR}`,padding:'8px 28px 8px 10px',color:val?TXT:DIM,fontFamily:SANS,fontSize:13,outline:'none',cursor:'pointer',appearance:'none'}}>
+                  ?<div style={{position:'relative'}}><select className="rb-lb-field" value={val} onChange={e=>set(e.target.value)} style={{width:'100%',background:BG3,border:`1px solid ${BDR}`,padding:'8px 28px 8px 10px',color:val?TXT:DIM,fontFamily:SANS,fontSize:13,outline:'none',cursor:'pointer',appearance:'none'}}>
                     {opts.map(([v,l])=><option key={v} value={v}>{l}</option>)}
                   </select><span style={{position:'absolute',right:8,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',color:DIM,fontSize:10}}>▾</span></div>
-                  :<input value={val} onChange={e=>set(e.target.value)} placeholder={ph} style={{width:'100%',background:BG3,border:`1px solid ${BDR}`,padding:'8px 10px',color:TXT,fontFamily:SANS,fontSize:13,outline:'none'}}/>
+                  :<input className="rb-lb-field" value={val} onChange={e=>set(e.target.value)} placeholder={ph} style={{width:'100%',background:BG3,border:`1px solid ${BDR}`,padding:'8px 10px',color:TXT,fontFamily:SANS,fontSize:13,outline:'none'}}/>
                 }
               </div>
             ))}
           </div>
         )}
 
-        <LeaderTable rows={visibleRows} orgFor={orgFor} onView={e=>setDetEnt&&setDetEnt(e)} onShare={e=>setShareEnt&&setShareEnt(e)} cvt={cvt} unitLbl={unitLbl}/>
+        <LeaderTable rows={visibleRows} orgFor={orgFor} onView={e=>setDetEnt&&setDetEnt(e)} onShare={e=>setShareEnt&&setShareEnt(e)} cvt={cvt} unitLbl={unitLbl} rankOf={rankOf}/>
 
         {hasMore && (
           <div style={{textAlign:'center', marginTop:20}}>
@@ -386,6 +492,20 @@ export default function LeaderboardPage(props) {
         {detEnt&&<EntryModal entry={detEnt} org={orgFor(detEnt.orgId)} onClose={()=>setDetEnt(null)} onShare={e=>{setDetEnt(null);setShareEnt(e);}} cvt={cvt} unitLbl={unitLbl}/>}
         {shareEnt&&<ShareModal entry={shareEnt} org={orgFor(shareEnt.orgId)} cvt={cvt} unitLbl={unitLbl} onClose={()=>setShareEnt(null)}/>}
       </div>
+      <style jsx global>{`
+        @media (max-width: 640px) {
+          .rb-lb-banner { flex-direction: column !important; align-items: stretch !important; padding: 14px !important; gap: 12px !important; }
+          .rb-lb-banner-main { justify-content: space-between; }
+          .rb-lb-banner-main > div { flex: 1; text-align: center; }
+          .rb-lb-banner-title { font-size: 19px !important; }
+          .rb-lb-nav { min-width: 44px; min-height: 44px; }
+          .rb-lb-seg { width: 100%; }
+          .rb-lb-seg button { flex: 1; min-height: 44px; }
+          .rb-lb-sort { flex: 1 1 160px; }
+          /* 16px stops iOS Safari zooming the page in when a field is focused */
+          .rb-lb-field { font-size: 16px !important; }
+        }
+      `}</style>
     </>
   );
 }
