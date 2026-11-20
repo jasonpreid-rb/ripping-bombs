@@ -395,14 +395,14 @@ export default function LeaderboardPage(props) {
           <Link href="/venue-rankings" style={{color:ORG,textDecoration:'none',borderBottom:'1px solid rgba(255,0,144,0.3)'}}>See how venues rank &rarr;</Link>
         </div>
 
-        {/* View banner — weekly and all-time share one layout and one set of text
-            colours. Only the accent differs: pink container + eyebrow for the
-            weekly championship, neutral for the all-time records. */}
-        <div className="rb-lb-banner" style={{background:allTime?BG2:'linear-gradient(135deg,rgba(255,0,144,0.14),rgba(255,0,144,0.03))',border:`1px solid ${allTime?BDR:'rgba(255,0,144,0.3)'}`,padding:'16px 20px',marginBottom:20,display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:14}}>
+        {/* View banner — weekly and all-time are styled identically (same pink
+            container, eyebrow and title); the label, title and the switch on
+            the right say which one you're looking at. */}
+        <div className="rb-lb-banner" style={{background:'linear-gradient(135deg,rgba(255,0,144,0.14),rgba(255,0,144,0.03))',border:'1px solid rgba(255,0,144,0.3)',padding:'16px 20px',marginBottom:20,display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:14}}>
           <div className="rb-lb-banner-main" style={{display:'flex',alignItems:'center',gap:14,minWidth:0}}>
             {!allTime&&<button className="rb-lb-nav" aria-label="Previous week" onClick={()=>setWeek(prevWeek(currentWeek))} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontSize:14,padding:'15px 16px',cursor:'pointer'}}>‹</button>}
             <div style={{minWidth:0}}>
-              <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:allTime?MUT:ORG,textTransform:'uppercase',marginBottom:3}}>{allTime?'🏛️ Hall of Records':'🏆 Weekly Championship'}</div>
+              <div style={{fontFamily:SANS,fontSize:10,fontWeight:700,letterSpacing:2,color:ORG,textTransform:'uppercase',marginBottom:3}}>{allTime?'🏛️ Hall of Records':'🏆 Weekly Championship'}</div>
               <h2 className="rb-lb-banner-title" style={{fontFamily:DISP,fontSize:22,color:TXT,letterSpacing:.5,fontWeight:400}}>{allTime?'All-Time Leaderboard':weekLabel(currentWeek)}</h2>
             </div>
             {!allTime&&<button className="rb-lb-nav" aria-label="Next week" onClick={()=>setWeek(nextWeek(currentWeek))} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontSize:14,padding:'15px 16px',cursor:'pointer'}}>›</button>}

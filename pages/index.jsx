@@ -146,17 +146,18 @@ function InfiniteScrollRow({ items, renderItem, bg, cardWidth = 210, gap = 10 })
 }
 
 // ── Empty-category state: turns "nobody yet" into a challenge ────────────────
-// Shown in a category card when it has no entries. `weekly` swaps the copy
-// so the weekly and all-time cards don't read identically side by side.
+// Shown in a category card when it has no entries. Same headline and call to
+// action in the weekly and all-time rows; only the one factual line changes
+// (`weekly` → "this week" vs. "here yet"), because that's a different fact.
 function EmptySlot({ weekly }) {
   return (
     <div className="rb-empty-slot" style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',gap:6,padding:'18px 10px',border:'1px dashed rgba(255,0,144,0.35)',background:'radial-gradient(circle at 50% 0%, rgba(255,0,144,0.10), transparent 70%)'}}>
       <span aria-hidden style={{fontSize:26,lineHeight:1,animation:'rbEmptyBounce 2.2s ease-in-out infinite'}}>🏆</span>
       <div style={{fontFamily:DISP,fontSize:20,color:TXT,letterSpacing:.8,lineHeight:1.1}}>
-        {weekly ? 'THE TEE IS YOURS' : 'THE THRONE IS EMPTY'}
+        THE TEE IS YOURS
       </div>
       <div style={{fontFamily:SANS,fontSize:11,color:MUT,lineHeight:1.5}}>
-        {weekly ? 'No drives posted this week.' : 'Nobody owns #1 here yet.'}
+        {weekly ? 'No drives posted this week.' : 'No drives posted here yet.'}
       </div>
       <div style={{fontFamily:SANS,fontSize:11,fontWeight:700,color:ORG,letterSpacing:1,textTransform:'uppercase',marginTop:4}}>
         Claim the top spot →
@@ -168,14 +169,13 @@ function EmptySlot({ weekly }) {
 // Show the weekly category leaders section on the homepage.
 const SHOW_WEEKLY_LEADERS = true;
 
-// The ONE place the weekly and all-time rows are allowed to differ.
-//   weekly   → pink accent ("live", this week)
-//   all_time → neutral accent ("hall of records")
-// Everything else — type sizes, text colours, spacing, mobile behaviour — is
-// shared. To make the two rows look identical, give both the same values.
+// Weekly and all-time rows currently look identical on purpose: same pink
+// category labels and section eyebrows, same card border. This is the one
+// place to change if you ever want them to differ (e.g. give all_time an
+// accent of MUT and a border of BDR for a neutral "hall of records" look).
 const VIEW_THEME = {
   weekly:   { accent: ORG, border: 'rgba(255,0,144,0.28)' },
-  all_time: { accent: MUT, border: BDR },
+  all_time: { accent: ORG, border: 'rgba(255,0,144,0.28)' },
 };
 
 export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], setDetEnt, cvt, unitLbl, staticEntries=[], staticOrgs=[] }) {
