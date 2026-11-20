@@ -165,8 +165,8 @@ function EmptySlot({ weekly }) {
   );
 }
 
-// Temporarily hide the weekly category leaders section on the homepage.
-const SHOW_WEEKLY_LEADERS = false;
+// Show the weekly category leaders section on the homepage.
+const SHOW_WEEKLY_LEADERS = true;
 
 export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], setDetEnt, cvt, unitLbl, staticEntries=[], staticOrgs=[] }) {
   const entries = staticEntries.length ? staticEntries : propEntries;
@@ -489,7 +489,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           </div>
         </div>
 
-        {/* WEEKLY LEADERS — temporarily hidden; flip SHOW_WEEKLY_LEADERS to true to restore */}
+        {/* WEEKLY LEADERS — set SHOW_WEEKLY_LEADERS to false to hide */}
         {SHOW_WEEKLY_LEADERS && (
         <div className="rb-weekly-section" style={{background:'#0e0e0e',borderBottom:`1px solid ${BDR}`,padding:'28px 0 40px'}}>
           <div style={{maxWidth:1200,margin:'0 auto',padding:'0 18px'}}>
