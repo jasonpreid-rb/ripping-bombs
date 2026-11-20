@@ -153,22 +153,36 @@ export default function App({ Component, pageProps }) {
   const orgFor = id => orgs.find(o => o.id === id);
   const pendingCount = orgs.filter(o => o.status === 'pending').length;
 
-  async function doRegister(redirectTo) {
+  // Returns { ok, error?, code? } so the register page can show problems
+  // inline next to the button. Without `opts.inline`, failures also raise a
+  // toast (the old behaviour), so any other caller keeps working unchanged.
+  async function doRegister(redirectTo, opts = {}) {
+    const fail = (error, code) => {
+      if (!opts.inline) toast(error);
+      return { ok: false, error, code };
+    };
     const isSimulator = reg.type === 'simulator';
+    // Trim: mobile autofill and paste often add a trailing space, which
+    // would otherwise become part of the stored email.
+    const email = (reg.email || '').trim();
+    const fullName = (reg.fullName || '').trim();
 
     // Validation
-    if (!reg.fullName || !reg.email || !reg.pw) { toast('Fill all required fields'); return; }
-    if (!isSimulator && (!reg.position || !reg.courseName || !reg.location || !reg.country)) { toast('Fill all required fields'); return; }
-    if (orgs.find(o => o.email === reg.email)) { toast('Email already registered'); return; }
+    if (!fullName || !email || !reg.pw) return fail('Fill all required fields', 'required');
+    if (!isSimulator && (!reg.courseName || !reg.location || !reg.country)) return fail('Fill all required fields', 'required');
+    if (reg.pw.length < 8) return fail('Your password needs at least 8 characters', 'password');
+    if (orgs.some(o => String(o.email || '').trim().toLowerCase() === email.toLowerCase())) {
+      return fail('That email already has an account', 'email_exists');
+    }
 
     const newOrg = {
       id: Date.now().toString(),
-      fullName: reg.fullName,
-      position: isSimulator ? 'Individual / Simulator' : reg.position,
-      courseName: isSimulator ? `${reg.simulator || 'Simulator'} — ${reg.fullName}` : reg.courseName,
-      location: reg.location || '',
+      fullName,
+      position: isSimulator ? 'Individual / Simulator' : (reg.position || 'Venue operator'),
+      courseName: isSimulator ? `${reg.simulator || 'Simulator'} — ${fullName}` : reg.courseName.trim(),
+      location: (reg.location || '').trim(),
       country: reg.country || '',
-      email: reg.email,
+      email,
       pw: reg.pw,
       logo: reg.logo || '',
       status: 'approved',
@@ -179,18 +193,26 @@ export default function App({ Component, pageProps }) {
       dob: reg.dob || '',
     };
 
-    const ok = await db.insertOrg(newOrg);
-    if (!ok) { toast('Registration failed — please try again'); return; }
+    let ok = false;
+    try { ok = await db.insertOrg(newOrg); } catch { ok = false; }
+    if (!ok) return fail('Registration failed — please try again', 'insert_failed');
 
-    setOrgs(prev => [...prev, newOrg]);
-    await sendRegistrationNotification(newOrg);
+    // The password is only needed for the insert above. Keep it out of React
+    // state and localStorage — doLogin already hands back an org without it.
+    const { pw: _pw, ...safeOrg } = newOrg;
+
+    setOrgs(prev => [...prev, safeOrg]);
+    // Fire-and-forget: the account already exists at this point, so a slow
+    // or failing notification email must never stall (or break) the sign-up.
+    Promise.resolve().then(() => sendRegistrationNotification(safeOrg)).catch(() => {});
     setReg({ type:'simulator', fullName:'', position:'', courseName:'', location:'', country:'', email:'', pw:'', logo:'', simulator:'', gender:'', dob:'' });
 
     // Every account is auto-approved now — log them straight in and send to the dashboard
-    setLoggedOrg(newOrg);
-    localStorage.setItem('rb_club', JSON.stringify(newOrg));
-    toast(isSimulator ? 'Account created! Welcome to Ripping Bombs.' : `Welcome, ${newOrg.courseName}!`);
+    setLoggedOrg(safeOrg);
+    localStorage.setItem('rb_club', JSON.stringify(safeOrg));
+    toast(isSimulator ? 'Account created! Welcome to Ripping Bombs.' : `Welcome, ${safeOrg.courseName}!`);
     router.push(redirectTo || '/dashboard');
+    return { ok: true };
   }
 
   async function doLogin(redirectTo) {
