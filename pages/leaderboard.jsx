@@ -242,14 +242,6 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl, rankOf }) {
         </div>
       </div>
     )}
-    <style jsx>{`
-      .rb-table-scroll::-webkit-scrollbar { display: none; }
-      .rb-table-scroll { scrollbar-width: none; -ms-overflow-style: none; }
-      @keyframes rbArrowPulse {
-        0%, 100% { opacity: 0.55; transform: translateX(0); }
-        50% { opacity: 1; transform: translateX(4px); }
-      }
-    `}</style>
     </div>
 
     {/* Phone layout — shown instead of the table under 640px (see MobileRow) */}
@@ -261,6 +253,12 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl, rankOf }) {
     </div>
 
     <style jsx global>{`
+      .rb-table-scroll::-webkit-scrollbar { display: none; }
+      .rb-table-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+      @keyframes rbArrowPulse {
+        0%, 100% { opacity: 0.55; transform: translateX(0); }
+        50% { opacity: 1; transform: translateX(4px); }
+      }
       .rb-lb-cards { display: none; }
       @media (max-width: 640px) {
         .rb-lb-table-wrap { display: none !important; }
