@@ -154,13 +154,10 @@ function EmptySlot({ weekly }) {
     <div className="rb-empty-slot" style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',gap:6,padding:'18px 10px',border:'1px dashed rgba(255,0,144,0.35)',background:'radial-gradient(circle at 50% 0%, rgba(255,0,144,0.10), transparent 70%)'}}>
       <span aria-hidden style={{fontSize:26,lineHeight:1,animation:'rbEmptyBounce 2.2s ease-in-out infinite'}}>🏆</span>
       <div style={{fontFamily:DISP,fontSize:20,color:TXT,letterSpacing:.8,lineHeight:1.1}}>
-        THE TEE IS YOURS
+        CLAIM THE TOP SPOT
       </div>
       <div style={{fontFamily:SANS,fontSize:11,color:MUT,lineHeight:1.5}}>
         {weekly ? 'No drives posted this week.' : 'No drives posted here yet.'}
-      </div>
-      <div style={{fontFamily:SANS,fontSize:11,fontWeight:700,color:ORG,letterSpacing:1,textTransform:'uppercase',marginTop:4}}>
-        Claim the top spot →
       </div>
     </div>
   );
@@ -445,7 +442,7 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           <div className="rb-hero-content" style={{position:'relative',zIndex:1,padding:'clamp(28px,5vw,44px) 20px clamp(24px,4vw,36px)',display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center'}}>
             {/* Condensed brand header */}
             <div className="rb-hero-badge" style={{fontFamily:SANS,fontSize:11,fontWeight:700,letterSpacing:4,color:ORG,textTransform:'uppercase',marginBottom:10,background:'rgba(255,0,144,0.15)',border:'1px solid rgba(255,0,144,0.4)',padding:'5px 16px',display:'inline-block'}}>
-              Live Global Simulator Database 
+              Live Global Drive Database 
             </div>
             <h1 className="rb-hero-title" style={{fontFamily:DISP,fontSize:'clamp(36px,6vw,56px)',color:'#ffffff',lineHeight:.95,letterSpacing:3,marginBottom:6,textShadow:'0 4px 32px rgba(0,0,0,0.5)'}}>
               LONG DRIVE LEADERBOARD
