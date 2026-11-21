@@ -270,6 +270,45 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl, rankOf }) {
   );
 }
 
+// Custom age filter values are stored in the same fAge string as the presets,
+// as 'age:LO-HI' (inclusive on both ends, so 'age:12-12' is exactly 12).
+// The prefix keeps them from clashing with presets like '25-40'.
+function parseCustomAge(b) {
+  const m = /^age:(\d{1,3})-(\d{1,3})$/.exec(String(b || ''));
+  if (!m) return null;
+  let lo = Number(m[1]), hi = Number(m[2]);
+  if (lo > hi) [lo, hi] = [hi, lo];
+  return [lo, hi];
+}
+
+// Two-handle age slider. Drag both handles to the same number for one exact age.
+function AgeRangeSlider({ min, max, lo, hi, onChange }) {
+  const span = Math.max(max - min, 1);
+  const p = v => (v - min) / span;
+  const label = lo === hi ? `Age ${lo}` : `Ages ${lo}–${hi}`;
+  return (
+    <div>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',gap:10,flexWrap:'wrap',marginBottom:6}}>
+        <span style={{fontFamily:SANS,fontSize:14,fontWeight:700,color:TXT}}>{label}</span>
+        <span style={{fontFamily:SANS,fontSize:11,color:DIM}}>Drag both handles to the same number to see one exact age</span>
+      </div>
+      <div className="rb-age-slider">
+        <div className="rb-age-track"/>
+        <div className="rb-age-fill" style={{left:`calc(11px + (100% - 22px) * ${p(lo)})`,width:`calc((100% - 22px) * ${p(hi) - p(lo)})`}}/>
+        <input type="range" aria-label="Minimum age" min={min} max={max} step={1} value={lo}
+          onChange={e=>onChange(Math.min(Number(e.target.value), hi), hi)}
+          style={{zIndex: lo > (min + max) / 2 ? 4 : 3}}/>
+        <input type="range" aria-label="Maximum age" min={min} max={max} step={1} value={hi}
+          onChange={e=>onChange(lo, Math.max(Number(e.target.value), lo))}
+          style={{zIndex:3}}/>
+      </div>
+      <div style={{display:'flex',justifyContent:'space-between',fontFamily:SANS,fontSize:10,color:DIM,padding:'0 2px'}}>
+        <span>{min}</span><span>{max}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function LeaderboardPage(props) {
   const { entries: propEntries=[], orgs: propOrgs=[], approvedOrgs: propApprovedOrgs=[],
     staticEntries=[], staticOrgs=[],
@@ -312,7 +351,7 @@ export default function LeaderboardPage(props) {
   // into an exact pre-filtered view via the URL query, below. The old
   // 'u20'/'o20' values still work as aliases so previously shared links don't break.
   const hcpIn=(hcp,b)=>{if(!b)return true;if(b==='scratch')return hcp<=0;if(b==='low')return hcp>0&&hcp<=5;if(b==='mid')return hcp>5&&hcp<=14;if(b==='high')return hcp>14&&hcp<=28;if(b==='beginner')return hcp>28;if(b==='u15'||b==='u20')return hcp<HIGH_HCP_THRESHOLD;if(b==='o15'||b==='o20')return hcp>=HIGH_HCP_THRESHOLD;return true;};
-  const ageIn=(age,b)=>{if(!b)return true;if(b==='u25')return age<25;if(b==='25-40')return age>=25&&age<40;if(b==='40-55')return age>=40&&age<55;if(b==='55+')return age>=55;if(b==='u16')return age<16;return true;};
+  const ageIn=(age,b)=>{if(!b)return true;const c=parseCustomAge(b);if(c){const a=Number(age);return age!=null&&Number.isFinite(a)&&a>=c[0]&&a<=c[1];}if(b==='u25')return age<25;if(b==='25-40')return age>=25&&age<40;if(b==='40-55')return age>=40&&age<55;if(b==='55+')return age>=55;if(b==='u16')return age<16;return true;};
 
   // Apply the view/filters named in the URL (e.g. arriving from a homepage
   // card: /leaderboard?allTime=0&gender=male&hcp=o15). The filters live in
@@ -370,6 +409,16 @@ export default function LeaderboardPage(props) {
     .filter(e=>ageIn(e.age,fAge))
     .filter(e=>!fClub||e.club.toLowerCase().includes(fClub.toLowerCase()))
     .sort((a,b)=>{if(sortBy==='hcp')return a.hcp-b.hcp;if(sortBy==='age')return a.age-b.age;if(sortBy==='club')return a.club.localeCompare(b.club);if(sortBy==='date')return new Date(b.date)-new Date(a.date);return b.dist-a.dist;});
+
+  // Slider bounds follow the ages actually on the leaderboard (fallback 5–80).
+  const ageVals = entries.map(e => Number(e.age)).filter(a => Number.isFinite(a) && a >= 1 && a <= 110);
+  let AGE_MIN = ageVals.length ? Math.min(...ageVals) : 5;
+  let AGE_MAX = ageVals.length ? Math.max(...ageVals) : 80;
+  if (AGE_MAX <= AGE_MIN) AGE_MAX = AGE_MIN + 1;
+  const customAge = parseCustomAge(fAge);
+  const clampAge = v => Math.min(AGE_MAX, Math.max(AGE_MIN, v));
+  const customLo = customAge ? clampAge(customAge[0]) : AGE_MIN;
+  const customHi = customAge ? clampAge(customAge[1]) : AGE_MAX;
 
   const visibleRows = tableRows.slice(0, page * PAGE_SIZE);
   const hasMore = visibleRows.length < tableRows.length;
@@ -452,20 +501,28 @@ export default function LeaderboardPage(props) {
               {label:'Gender',val:fGender,set:setFGender,ph:'All',opts:[['','All'],['male','♂ Male'],['female','♀ Female']]},
               {label:'Country/Region',val:fCountry,set:setFCountry,ph:'Filter by location'},
               {label:'Handicap',val:fHcp,set:setFHcp,ph:'All',opts:[['','All'],['scratch','Scratch'],['low','Low (1–5)'],['mid','Mid (6–14)'],['high','High (15–28)'],['beginner','Beginner (28+)']]},
-              {label:'Age Group',val:fAge,set:setFAge,ph:'All',opts:[['','All'],['u25','Under 25'],['25-40','25–40'],['40-55','40–55'],['55+','55+']]},
+              {label:'Age Group',val:fAge,set:setFAge,ph:'All',opts:[['','All'],['u25','Under 25'],['25-40','25–40'],['40-55','40–55'],['55+','55+'],['custom','Exact age / custom…']],
+                shown:customAge?'custom':fAge,
+                pick:v=>setFAge(v==='custom'?`age:${AGE_MIN}-${AGE_MAX}`:v)},
               {label:'Club Brand',val:fClub,set:setFClub,ph:'e.g. TaylorMade'},
               {label:'Entry Type',val:fSimulator,set:setFSimulator,ph:'All',opts:[['','All'],['official','🏌️ Official Only'],['simulator','🖥️ Simulator Only']]},
-            ].map(({label,val,set,ph,opts})=>(
+            ].map(({label,val,set,ph,opts,shown,pick})=>(
               <div key={label}>
                 <div style={{fontFamily:SANS,fontSize:9,fontWeight:700,color:DIM,letterSpacing:1.2,marginBottom:5,textTransform:'uppercase'}}>{label}</div>
                 {opts
-                  ?<div style={{position:'relative'}}><select className="rb-lb-field" value={val} onChange={e=>set(e.target.value)} style={{width:'100%',background:BG3,border:`1px solid ${BDR}`,padding:'8px 28px 8px 10px',color:val?TXT:DIM,fontFamily:SANS,fontSize:13,outline:'none',cursor:'pointer',appearance:'none'}}>
+                  ?<div style={{position:'relative'}}><select className="rb-lb-field" value={shown!==undefined?shown:val} onChange={e=>(pick||set)(e.target.value)} style={{width:'100%',background:BG3,border:`1px solid ${BDR}`,padding:'8px 28px 8px 10px',color:(shown!==undefined?shown:val)?TXT:DIM,fontFamily:SANS,fontSize:13,outline:'none',cursor:'pointer',appearance:'none'}}>
                     {opts.map(([v,l])=><option key={v} value={v}>{l}</option>)}
                   </select><span style={{position:'absolute',right:8,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',color:DIM,fontSize:10}}>▾</span></div>
                   :<input className="rb-lb-field" value={val} onChange={e=>set(e.target.value)} placeholder={ph} style={{width:'100%',background:BG3,border:`1px solid ${BDR}`,padding:'8px 10px',color:TXT,fontFamily:SANS,fontSize:13,outline:'none'}}/>
                 }
               </div>
             ))}
+            {customAge&&(
+              <div style={{gridColumn:'1 / -1',paddingTop:8,borderTop:`1px solid ${BDR}`,marginTop:4}}>
+                <AgeRangeSlider min={AGE_MIN} max={AGE_MAX} lo={customLo} hi={customHi}
+                  onChange={(a,b)=>setFAge(`age:${a}-${b}`)}/>
+              </div>
+            )}
           </div>
         )}
 
@@ -491,6 +548,14 @@ export default function LeaderboardPage(props) {
         {shareEnt&&<ShareModal entry={shareEnt} org={orgFor(shareEnt.orgId)} cvt={cvt} unitLbl={unitLbl} onClose={()=>setShareEnt(null)}/>}
       </div>
       <style jsx global>{`
+        .rb-age-slider { position: relative; height: 28px; }
+        .rb-age-track { position: absolute; left: 11px; right: 11px; top: 12px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.14); }
+        .rb-age-fill { position: absolute; top: 12px; height: 4px; border-radius: 2px; background: #ff0090; }
+        .rb-age-slider input[type=range] { position: absolute; left: 0; top: 0; width: 100%; height: 28px; margin: 0; padding: 0; background: transparent; pointer-events: none; -webkit-appearance: none; appearance: none; outline: none; }
+        .rb-age-slider input[type=range]::-webkit-slider-runnable-track { height: 28px; background: transparent; border: none; }
+        .rb-age-slider input[type=range]::-moz-range-track { height: 28px; background: transparent; border: none; }
+        .rb-age-slider input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; pointer-events: auto; width: 22px; height: 22px; margin-top: 3px; border-radius: 50%; background: #ff0090; border: 2px solid #111; cursor: pointer; }
+        .rb-age-slider input[type=range]::-moz-range-thumb { pointer-events: auto; width: 18px; height: 18px; border-radius: 50%; background: #ff0090; border: 2px solid #111; cursor: pointer; }
         @media (max-width: 640px) {
           .rb-lb-banner { flex-direction: column !important; align-items: stretch !important; padding: 14px !important; gap: 12px !important; }
           .rb-lb-banner-main { justify-content: space-between; }
