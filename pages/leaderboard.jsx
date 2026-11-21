@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState, useEffect, useRef, cloneElement } from 'react';
+import { useState, useEffect, useRef, useMemo, cloneElement } from 'react';
 
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP, profileSlugFor } from '../lib/constants';
 import { fmtDate, tier, nowWeek, weekLabel, prevWeek, nextWeek, sameWeek } from '../lib/constants';
@@ -330,7 +330,19 @@ export default function LeaderboardPage(props) {
   // has real content in the initial HTML for crawlers/SEO. Falls back to
   // the client-fetched global store (_app.jsx) only if static data is
   // somehow empty, e.g. a brand-new deploy before first revalidation.
-  const entries = staticEntries.length ? staticEntries : propEntries;
+  // The static snapshot can be up to 10 minutes old (revalidate below), so a
+  // drive someone has just submitted would be missing from it. Merge in the
+  // live client-side entries from _app.jsx (matched by id, live wins) so new
+  // submissions show up immediately, while the static data still supplies the
+  // full server-rendered list for crawlers and first paint.
+  const entries = useMemo(() => {
+    if (!staticEntries.length) return propEntries;
+    if (!propEntries.length) return staticEntries;
+    // String() keys so an id that is "123" in one list and 123 in the other still matches.
+    const byId = new Map(staticEntries.map(e => [String(e.id), e]));
+    propEntries.forEach(e => byId.set(String(e.id), { ...byId.get(String(e.id)), ...e }));
+    return Array.from(byId.values());
+  }, [staticEntries, propEntries]);
   // staticOrgs is already pre-filtered to status='approved' in getStaticProps,
   // so it can serve directly as both the lookup list and approvedOrgs.
   const orgs = staticOrgs.length ? staticOrgs : propOrgs;

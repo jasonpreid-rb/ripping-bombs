@@ -293,6 +293,10 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
               if (result && result.ok) {
                 // The tracker's saved copy has now been submitted.
                 if (fromGps) clearPendingDrive();
+                // Ask the server to rebuild the cached leaderboard pages now instead of
+                // waiting for the 10-minute timer. Fire-and-forget: a failure here must
+                // never get in the way of the player seeing their rank.
+                try { fetch('/api/revalidate-leaderboard', { method: 'POST' }).catch(() => {}); } catch {}
                 setRankResult(result);
               }
   };
