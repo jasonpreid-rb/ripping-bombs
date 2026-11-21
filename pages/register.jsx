@@ -294,6 +294,14 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
         <title>Register | Ripping Bombs</title>
         <meta name="description" content="Register your venue or simulator account on Ripping Bombs. Free to join. Submit verified longest drives to the global leaderboard." />
         <meta name="robots" content="noindex, follow" />
+        <meta key="og:title" property="og:title" content="Register | Ripping Bombs" />
+        <meta key="og:description" property="og:description" content="Register your venue or simulator account on Ripping Bombs. Free to join. Submit verified longest drives to the global leaderboard." />
+        <meta key="og:url" property="og:url" content="https://www.rippingbombs.com/register" />
+        <meta key="og:image" property="og:image" content="https://www.rippingbombs.com/og-default.png" />
+        <meta key="og:image:width" property="og:image:width" content="1200" />
+        <meta key="og:image:height" property="og:image:height" content="630" />
+        <meta key="twitter:card" name="twitter:card" content="summary_large_image" />
+        <meta key="twitter:image" name="twitter:image" content="https://www.rippingbombs.com/og-default.png" />
       </Head>
 
       <div style={{ maxWidth: 540, margin: '0 auto', padding: '28px 18px 80px' }}>

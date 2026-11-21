@@ -1,8 +1,17 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import Head from 'next/head';
 import { RBLogoWhite } from './Logo';
 import { ORG, MUT, BDR, DIM, SANS, DISP } from '../lib/constants';
+
+
+// Default social-share (Open Graph / Twitter) tags, inherited by every page that
+// renders inside Layout. Each tag has a `key` so next/head de-dupes it: a page's
+// own <Head> with the same key overrides this default (page Head renders after
+// Layout's because it is a child).
+const SITE_URL = 'https://www.rippingbombs.com';
+const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.png`; // 1200x630, lives in /public
 
 // "Compatible with" marquee — brand logos live in /public/logos/.
 // If a logo file is missing or fails to load, falls back to the brand name as text.
@@ -70,6 +79,17 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
 
   return (
     <div className="site-shell" style={{ minHeight: '100vh', background: '#1a1a1a', color: '#f0f0f0', fontFamily: SANS }}>
+
+      <Head>
+        <meta key="og:site_name" property="og:site_name" content="Ripping Bombs" />
+        <meta key="og:type" property="og:type" content="website" />
+        <meta key="og:image" property="og:image" content={DEFAULT_OG_IMAGE} />
+        <meta key="og:image:width" property="og:image:width" content="1200" />
+        <meta key="og:image:height" property="og:image:height" content="630" />
+        <meta key="og:image:alt" property="og:image:alt" content="Ripping Bombs — the global home of competition longest drives" />
+        <meta key="twitter:card" name="twitter:card" content="summary_large_image" />
+        <meta key="twitter:image" name="twitter:image" content={DEFAULT_OG_IMAGE} />
+      </Head>
 
       {/* Impersonation banner — shown whenever an admin is viewing as another account */}
       {loggedOrg?._impersonating && (
