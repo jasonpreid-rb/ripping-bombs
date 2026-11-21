@@ -17,6 +17,15 @@ function nameToSlug(name) {
     .replace(/\s+/g, '-');
 }
 
+// Drives are always stamped with the day they are submitted (the user's local
+// date), formatted YYYY-MM-DD. There is no date field on the form, so a drive
+// can't be backdated into a past week and old weekly leaderboards stay fixed.
+function localToday() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 // Age is derived from DOB (captured once at registration) as of the drive
 // date, rather than re-entered on every submission. Falls back gracefully
 // for any pre-existing simulator accounts registered before DOB was collected.
@@ -105,14 +114,20 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
     }
   }, [router.isReady, router.query.dist]);
 
+  // The drive date is never entered by the user — it is always today.
+  useEffect(() => {
+    const today = localToday();
+    if (form.date !== today) setForm(f => ({ ...f, date: today }));
+  }, [form.date]);
+
   // GPS tracker flow: /track sends a measured drive here as
   // /submit?src=gps&dist=<yards>&facility=<place name>&date=<YYYY-MM-DD>
   // (carried through /register?redirect=... for new accounts). dist is
-  // handled by the effect above; this pre-fills the venue name and date.
+  // handled by the effect above; this pre-fills the venue name. The drive date is always today's date.
   // Everything stays editable, and evidence is still required below.
   useEffect(() => {
     if (!router.isReady || router.query.src !== 'gps') return;
-    const { facility, date, dist } = router.query;
+    const { facility, dist } = router.query;
     // The tracker saves a generated result card with the drive. Use it as the
     // evidence photo, but only if it belongs to the distance in the URL.
     const saved = getPendingDrive();
@@ -126,12 +141,9 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
       if (typeof facility === 'string' && facility.trim() && !f.facility) {
         next.facility = facility.trim().slice(0, 80);
       }
-      if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
-        next.date = date;
-      }
       return next;
     });
-  }, [router.isReady, router.query.src, router.query.facility, router.query.date, router.query.dist]);
+  }, [router.isReady, router.query.src, router.query.facility, router.query.dist]);
 
   // Hooks must run on every render, so the event eligibility check and the
   // auto-join effect live ABOVE the `!loggedOrg` early return. Previously the
@@ -238,9 +250,11 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
               // account. Handed to doSubmit directly — a setForm() here wouldn't take effect
               // until the next render, so doSubmit would still see the old, empty values.
               // (If the drive belongs to an event, keep the event's name rather than 'Simulator'.)
+              // The date is always stamped as today at the moment of submission.
+              const today = localToday();
               const overrides = isSimulator
-                ? { player: loggedOrg.fullName, tournament: form.eventId ? form.tournament : 'Simulator', gender: loggedOrg.gender || 'male', age: calcAge(loggedOrg.dob, form.date) }
-                : {};
+                ? { player: loggedOrg.fullName, tournament: form.eventId ? form.tournament : 'Simulator', gender: loggedOrg.gender || 'male', age: calcAge(loggedOrg.dob, today), date: today }
+                : { date: today };
               const result = await doSubmit(overrides);
               if (result && result.ok) {
                 // The tracker's saved copy has now been submitted.
@@ -336,10 +350,10 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
           </div>
         )}
 
-        {/* GPS tracker banner — distance, date and venue name came from /track */}
+        {/* GPS tracker banner — distance and venue name came from /track */}
         {fromGps && (
           <div style={{ background:'rgba(255,0,144,0.06)', border:'1px solid rgba(255,0,144,0.2)', padding:'12px 16px', marginBottom:20, fontFamily:SANS, fontSize:12, color:MUT, lineHeight:1.6 }}>
-            📍 <span style={{ fontWeight:700, color:TXT }}>GPS-tracked drive</span> — The distance, date and venue name were filled in from the tracker. Check them. A result card from the tracker is attached as your evidence when available, and you can replace it with your own photo.
+            📍 <span style={{ fontWeight:700, color:TXT }}>GPS-tracked drive</span> — The distance and venue name were filled in from the tracker. Check them. The drive is logged with today's date. A result card from the tracker is attached as your evidence when available, and you can replace it with your own photo.
           </div>
         )}
 
@@ -490,7 +504,12 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
             )}
 
             <Field label="Distance (yards)" type="number" value={form.dist} onChange={e=>setForm({...form,dist:e.target.value})} placeholder="245" min="50" max="600" required/>
-            <Field label="Date of Drive" type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})} required/>
+            <div>
+              <label style={{ display:'block', fontFamily:SANS, fontSize:11, fontWeight:600, color:MUT, marginBottom:5, textTransform:'uppercase', letterSpacing:.8 }}>Date of Drive</label>
+              <div style={{ background:BG3, border:`1px solid ${BDR}`, padding:'10px 14px', fontFamily:SANS, fontSize:14, color:DIM }}>
+                Today ({new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })})
+              </div>
+            </div>
             <div style={{ gridColumn:'1/-1' }}><Field label="Club Brand & Model" value={form.club} onChange={e=>setForm({...form,club:e.target.value})} placeholder="TaylorMade Qi10 LS" required/></div>
             <Field label="Handicap" type="number" value={form.hcp} onChange={e=>setForm({...form,hcp:e.target.value})} placeholder="5" min="-10" max="54" required/>
             {isSimulator ? (
@@ -498,7 +517,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
                 <label style={{ display:'block', fontFamily:SANS, fontSize:11, fontWeight:600, color:MUT, marginBottom:5, textTransform:'uppercase', letterSpacing:.8 }}>Age</label>
                 {loggedOrg.dob ? (
                   <div style={{ background:BG3, border:`1px solid ${BDR}`, padding:'10px 14px', fontFamily:SANS, fontSize:14, color:DIM }}>
-                    {calcAge(loggedOrg.dob, form.date)} yrs
+                    {calcAge(loggedOrg.dob, localToday())} yrs
                   </div>
                 ) : (
                   <div style={{ background:BG3, border:`1px solid ${BDR}`, padding:'10px 14px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, flexWrap:'wrap' }}>
