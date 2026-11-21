@@ -39,7 +39,7 @@ function calcAge(dob, atDateStr) {
   return age;
 }
 
-export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateProfileConsent, cvt, unitLbl, entries=[], approvedOrgs=[] }) {
+export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateProfileConsent, cvt, unitLbl, unit, setUnit, entries=[], approvedOrgs=[] }) {
   const [consent, setConsent] = useState(false);
   const [showProfilePrompt, setShowProfilePrompt] = useState(false);
   const [rankResult, setRankResult] = useState(null);
@@ -48,6 +48,16 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
   const [eventError, setEventError] = useState('');
   const [formError, setFormError] = useState('');
   const [hcpConfirm, setHcpConfirm] = useState(null); // { from, to } while the confirm prompt is open
+
+  // Distance entry. form.dist is ALWAYS whole yards (that's what doSubmit saves
+  // and what the leaderboard stores), whichever unit the player types in.
+  // distText is the raw text they've typed in the current unit; null means
+  // "show form.dist converted to the current unit" (prefilled values, unit
+  // switches, and after the form resets).
+  const [distText, setDistText] = useState(null);
+  const isMetric = unit === 'm';
+  useEffect(() => { setDistText(null); }, [unit]);
+  useEffect(() => { if (!form.dist) setDistText(null); }, [form.dist]);
   const hcpConfirmedRef = useRef(false);
   const prefilledRef = useRef(false);
   const router = useRouter();
@@ -195,6 +205,23 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
 
   const isSimulator = loggedOrg.accountType === 'simulator';
 
+  // Whole yards <-> whole metres. Converting whole metres to yards and back
+  // always returns the same whole number, so what the player typed is what the
+  // leaderboard shows when it is set to metres.
+  const M_PER_YD = 0.9144;
+  const MIN_YDS = 50, MAX_YDS = 600;
+  const distShown = distText !== null
+    ? distText
+    : (form.dist ? String(Math.round(Number(form.dist) * (isMetric ? M_PER_YD : 1))) : '');
+  const onDistChange = e => {
+    const raw = e.target.value;
+    setDistText(raw);
+    const n = Number(raw);
+    if (raw === '' || !Number.isFinite(n)) { setForm(f => ({ ...f, dist: '' })); return; }
+    const yds = isMetric ? Math.round(n / M_PER_YD) : Math.round(n);
+    setForm(f => ({ ...f, dist: String(yds) }));
+  };
+
   // Event eligibility — only relevant when arriving via an /e/[slug] "Join" link.
   const eventStatus = eventData ? getEventStatus(eventData.event) : null;
 
@@ -236,6 +263,13 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
                   ? `You've used all ${eventData.event.maxEntriesPerPlayer} attempts for this event.`
                   : 'You have already submitted a drive this week. Simulator accounts are limited to one submission per week.');
                 return;
+              }
+              {
+                const yds = Number(form.dist);
+                if (!Number.isFinite(yds) || yds < MIN_YDS || yds > MAX_YDS) {
+                  setFormError(`Distance must be between ${MIN_YDS} and ${MAX_YDS} yards (${Math.round(MIN_YDS * M_PER_YD)}–${Math.round(MAX_YDS * M_PER_YD)} m).`);
+                  return;
+                }
               }
               if (!isSimulator && !form.playerEmail) { setFormError("Please enter the player's email so we can notify them."); return; }
               if (isSimulator && !loggedOrg.dob) { setFormError('Please add your date of birth in your profile before submitting — use the "Complete Profile" button above.'); return; }
@@ -503,7 +537,26 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
               </div>
             )}
 
-            <Field label="Distance (yards)" type="number" value={form.dist} onChange={e=>setForm({...form,dist:e.target.value})} placeholder="245" min="50" max="600" required/>
+            <div>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:5 }}>
+                <label htmlFor="rb-dist" style={{ fontFamily:SANS, fontSize:11, fontWeight:600, color:MUT, textTransform:'uppercase', letterSpacing:.8 }}>Distance ({isMetric ? 'metres' : 'yards'})</label>
+                <div role="group" aria-label="Distance unit" style={{ display:'flex', border:`1px solid ${BDR}` }}>
+                  {[['yds','yds'],['m','m']].map(([v,l]) => (
+                    <button key={v} type="button" aria-pressed={(isMetric ? 'm' : 'yds') === v} onClick={()=>setUnit && setUnit(v)}
+                      style={{ background:(isMetric ? 'm' : 'yds') === v ? ORG : 'transparent', border:'none', color:(isMetric ? 'm' : 'yds') === v ? '#111' : MUT, fontFamily:SANS, fontWeight:700, fontSize:11, padding:'4px 10px', cursor:'pointer' }}>
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <input id="rb-dist" type="number" inputMode="numeric" step="1"
+                value={distShown} onChange={onDistChange}
+                placeholder={isMetric ? '224' : '245'}
+                min={isMetric ? Math.round(MIN_YDS * M_PER_YD) : MIN_YDS}
+                max={isMetric ? Math.round(MAX_YDS * M_PER_YD) : MAX_YDS}
+                required
+                style={{ width:'100%', background:BG3, border:`1px solid ${BDR}`, padding:'10px 14px', color:TXT, fontFamily:SANS, fontSize:16, outline:'none', boxSizing:'border-box' }}/>
+            </div>
             <div>
               <label style={{ display:'block', fontFamily:SANS, fontSize:11, fontWeight:600, color:MUT, marginBottom:5, textTransform:'uppercase', letterSpacing:.8 }}>Date of Drive</label>
               <div style={{ background:BG3, border:`1px solid ${BDR}`, padding:'10px 14px', fontFamily:SANS, fontSize:14, color:DIM }}>
