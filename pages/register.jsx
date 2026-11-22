@@ -11,6 +11,34 @@ const SIMULATORS = [
   "SkyTrak","Uneekor","Bushnell Launch Pro","Garmin Approach","Other"
 ];
 
+// Optional Instagram handle — used to tag players in the weekly results posts.
+// Adults only: no social handle is collected from anyone under HANDLE_MIN_AGE.
+const HANDLE_MIN_AGE = 18;
+
+// Accepts "@name", "name" or a pasted instagram.com link and keeps just the name.
+function cleanHandle(v) {
+  return String(v || '')
+    .trim()
+    .replace(/^https?:\/\/(www\.)?instagram\.com\//i, '')
+    .replace(/[/?#].*$/, '')
+    .replace(/^@+/, '')
+    .replace(/[^A-Za-z0-9._]/g, '')
+    .slice(0, 30);
+}
+
+// Whole years from a yyyy-mm-dd string (parsed by hand so time zones can't shift
+// the day). Returns null while the date is empty or incomplete.
+function ageFromDob(dob) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob || '');
+  if (!m) return null;
+  const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+  if (y < 1900) return null;
+  const now = new Date();
+  let age = now.getFullYear() - y;
+  if (now.getMonth() + 1 < mo || (now.getMonth() + 1 === mo && now.getDate() < d)) age--;
+  return age < 0 ? null : age;
+}
+
 // Venue tier copy — kept in sync with the Free / TV Display comparison on the dashboard.
 // Players don't get a tier box: Premium isn't live yet, so there's nothing for them to decide.
 const VENUE_TIER = {
@@ -152,6 +180,8 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
   const router = useRouter();
   const redirectTo = router.isReady ? safeRedirect(router.query.redirect) : null;
   const isSimulator = reg.type !== 'club';
+  const dobAge = ageFromDob(reg.dob);
+  const canTagHandle = dobAge === null || dobAge >= HANDLE_MIN_AGE;
 
   // Arriving from the homepage rank widget (`dist` param) or the GPS tracker
   // (redirect back to /submit) means they're definitely a player, so the
@@ -213,7 +243,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
 
   function chooseType(val) {
     if (val === reg.type) return;
-    setReg(r => ({ ...r, type: val }));
+    setReg(r => ({ ...r, type: val, instagram: '' }));
     setError(null);
     setShowMore(false);
     track('register_type_change', { account_type: val });
@@ -448,7 +478,12 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
                   name="bday"
                   autoComplete="bday"
                   value={reg.dob}
-                  onChange={e => set('dob', e.target.value)}
+                  onChange={e => {
+                    const v = e.target.value;
+                    const a = ageFromDob(v);
+                    setReg(r => ({ ...r, dob: v, ...(a !== null && a < HANDLE_MIN_AGE ? { instagram: '' } : {}) }));
+                    if (error) setError(null);
+                  }}
                   required
                 />
                 <div style={helperStyle}>
@@ -463,7 +498,7 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
                   style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', padding: 0, margin: '2px 0 14px', cursor: 'pointer', fontFamily: SANS, fontSize: 12, color: MUT }}
                 >
                   <span style={{ color: ORG }}>{showMore ? '−' : '+'}</span>
-                  <span>Add your simulator &amp; city (optional)</span>
+                  <span>{canTagHandle ? 'Add your simulator, city & Instagram (optional)' : 'Add your simulator & city (optional)'}</span>
                 </button>
                 {showMore && (
                   <>
@@ -488,6 +523,23 @@ export default function RegisterPage({ reg, setReg, doRegister }) {
                       onChange={e => set('location', e.target.value)}
                       placeholder="e.g. London, UK"
                     />
+                    {canTagHandle && (
+                      <>
+                        <Field
+                          label="Instagram Handle"
+                          name="instagram"
+                          autoCapitalize="none"
+                          autoCorrect="off"
+                          spellCheck={false}
+                          value={reg.instagram || ''}
+                          onChange={e => set('instagram', cleanHandle(e.target.value))}
+                          placeholder="yourhandle (no @ needed)"
+                        />
+                        <div style={helperStyle}>
+                          Optional. Used to tag you in our weekly results posts. Leave it blank if you'd rather not be tagged.
+                        </div>
+                      </>
+                    )}
                   </>
                 )}
               </>
