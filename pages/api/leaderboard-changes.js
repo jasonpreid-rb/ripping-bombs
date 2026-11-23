@@ -15,9 +15,9 @@
 // relies on each drive's `date` being when it was posted; a drive entered later
 // with an old date would be treated as already on the board.
 //
-// Change types: new_number_one, record_broken (same #1, higher distance),
-// entered_top3, moved_up. Categories with no "before" board are skipped, and so
-// are changes that only affect distances lower down.
+// Change types: first_entry (the category had no drives before, so the first
+// leader appears), new_number_one, record_broken (same #1, higher distance),
+// entered_top3, moved_up. Changes that only affect distances lower down are skipped.
 //
 // Keep CATEGORIES in sync with pages/index.jsx (same as weekly-social-data.js).
 
@@ -98,7 +98,8 @@ function topThree(list, cat, orgById) {
 }
 
 function detect(before, after) {
-  if (!before.length || !after.length) return null;
+  if (!after.length) return null;
+  if (!before.length) return { type: 'first_entry', mover: after[0].id };
   const same = before.length === after.length && before.every((b, i) => b.id === after[i].id && b.dist === after[i].dist);
   if (same) return null;
   if (after[0].id !== before[0].id) return { type: 'new_number_one', mover: after[0].id };
