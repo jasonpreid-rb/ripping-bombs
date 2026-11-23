@@ -31,10 +31,10 @@ const PAGE = 1000;
 const MAX_PAGES = 50;
 
 const CATEGORIES = [
-  { key: 'mens',       label: 'Men',                 filter: e => e.gender === 'male'   && Number(e.age) >= 16 && Number(e.age) <= 54 && Number(e.hcp) <  HIGH_HCP_THRESHOLD },
-  { key: 'mens_hcp',   label: 'Men High Handicap',   filter: e => e.gender === 'male'   && Number(e.age) >= 16 && Number(e.age) <= 54 && Number(e.hcp) >= HIGH_HCP_THRESHOLD },
-  { key: 'womens',     label: 'Women',               filter: e => e.gender === 'female' && Number(e.age) >= 16 && Number(e.age) <= 54 && Number(e.hcp) <  HIGH_HCP_THRESHOLD },
-  { key: 'womens_hcp', label: 'Women High Handicap', filter: e => e.gender === 'female' && Number(e.age) >= 16 && Number(e.age) <= 54 && Number(e.hcp) >= HIGH_HCP_THRESHOLD },
+  { key: 'mens',       label: `Men Low Handicap (HCP under ${HIGH_HCP_THRESHOLD})`, filter: e => e.gender === 'male'   && Number(e.age) >= 16 && Number(e.age) <= 54 && Number(e.hcp) <  HIGH_HCP_THRESHOLD },
+  { key: 'mens_hcp',   label: `Men High Handicap (HCP ${HIGH_HCP_THRESHOLD}+)`,     filter: e => e.gender === 'male'   && Number(e.age) >= 16 && Number(e.age) <= 54 && Number(e.hcp) >= HIGH_HCP_THRESHOLD },
+  { key: 'womens',     label: `Women Low Handicap (HCP under ${HIGH_HCP_THRESHOLD})`, filter: e => e.gender === 'female' && Number(e.age) >= 16 && Number(e.age) <= 54 && Number(e.hcp) <  HIGH_HCP_THRESHOLD },
+  { key: 'womens_hcp', label: `Women High Handicap (HCP ${HIGH_HCP_THRESHOLD}+)`,     filter: e => e.gender === 'female' && Number(e.age) >= 16 && Number(e.age) <= 54 && Number(e.hcp) >= HIGH_HCP_THRESHOLD },
   { key: 'youth',      label: 'Youth (Under 16)',    filter: e => Number(e.age) < 16 },
   { key: 'senior',     label: 'Senior (55+)',        filter: e => Number(e.age) >= 55 },
 ];
