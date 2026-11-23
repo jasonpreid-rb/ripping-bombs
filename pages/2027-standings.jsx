@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { SeoPage } from '../components/SeoPageLayout'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../lib/supabaseClient'
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP } from '../lib/constants'
 import {
   CHAMPIONSHIP_LIVE, SEASON_YEAR, DIST_UNIT, CHAMPIONSHIP_CATEGORIES, POINTS_TABLE, POINTS_FLOOR,
