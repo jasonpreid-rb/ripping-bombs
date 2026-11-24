@@ -378,27 +378,31 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
           </div>
           {/* Sponsor banner — all-time section only, between the title row and the category cards */}
           {view === 'all_time' && (
-            <div className="rb-sponsor" style={{marginBottom:20}}>
-              <div style={{textAlign:'center',fontFamily:SANS,fontSize:10,color:DIM,letterSpacing:1.2,textTransform:'uppercase',marginBottom:8}}>
+            <div className="rb-sponsor" style={{marginBottom:16}}>
+              <div style={{textAlign:'center',fontFamily:SANS,fontSize:10,color:DIM,letterSpacing:1.2,textTransform:'uppercase',marginBottom:6}}>
                 Proudly brought to you by
               </div>
               <a
-                href="https://pissmissileballs.com/"
+                href="https://www.teeclaw.com/"
                 target="_blank"
                 rel="noopener noreferrer sponsored"
-                onClick={()=>{if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_sponsor_click',{event_category:'engagement',sponsor:'pissmissileballs',section:view});}}
+                onClick={()=>{if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_sponsor_click',{event_category:'engagement',sponsor:'teeclaw',section:view});}}
                 style={{
-                  display:'flex',alignItems:'center',justifyContent:'center',
-                  padding:'10px 16px',
-                  background:'#F2F913',border:`1px solid ${BDR}`,
+                  display:'flex',alignItems:'center',justifyContent:'center',flexWrap:'wrap',columnGap:18,rowGap:6,
+                  padding:'7px 16px',
+                  background:'#ffffff',border:`1px solid ${BDR}`,
                   textDecoration:'none',
                 }}
               >
                 <img
-                  src="https://pissmissileballs.com/cdn/shop/files/Group_3.svg?v=1762540896&width=600"
-                  alt="Piss Missile Balls"
-                  style={{height:52,width:'auto',maxWidth:'100%',display:'block'}}
+                  src="https://teeclaw.com/cdn/shop/files/TeeClawSp_LogoMain-croppedwebp.webp?v=1745785782"
+                  alt="Tee Claw Sports"
+                  style={{height:35,width:'auto',maxWidth:'100%',display:'block'}}
                 />
+                <span style={{display:'flex',alignItems:'center',gap:8,fontFamily:SANS,fontSize:13,fontWeight:700,color:'#1a1a1a',letterSpacing:.3,textAlign:'center'}}>
+                  15% OFF with code
+                  <span style={{background:'#7fc9c4',color:'#0b0b0b',padding:'3px 9px',letterSpacing:1.5,fontWeight:800}}>RB15</span>
+                </span>
               </a>
             </div>
           )}
