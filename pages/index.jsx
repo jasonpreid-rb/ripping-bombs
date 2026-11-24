@@ -10,6 +10,16 @@ import { countryFlag } from '../components/UI';
 import PlayerAvatar from '../components/PlayerAvatar';
 import InstantRankWidget from '../components/InstantRankWidget';
 
+// ── TeeClaw sponsor banner (all-time section) ─────────────────────────────────
+// Colours sampled by eye from the Tee Claw lanyard-pack bag — tweak here if needed.
+// TEECLAW_LOGO: set to a cropped, text-only logo (e.g. '/teeclaw-wordmark.png'
+// in /public) to show it in the banner beside the tagline.
+const TC_GREEN = '#0B8A2A';   // bag green
+const TC_GREEN_DK = '#064D17';
+const TC_YELLOW = '#F5D90A'; // bag yellow
+const TC_LINK = 'https://teeclaw.com/rippingbombs';
+const TEECLAW_LOGO = null;
+
 // ── Instant rank widget lives in components/InstantRankWidget.jsx (replaced the old percentile calculator that was here) ──────────
 // ── Infinite-loop horizontal scroll row (category cards) ─────────────────────
 // Renders `items` 3x back-to-back, starts scrolled into the middle copy, and
@@ -383,26 +393,27 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
                 Proudly brought to you by
               </div>
               <a
-                href="https://www.teeclaw.com/"
+                href={TC_LINK}
                 target="_blank"
                 rel="noopener noreferrer sponsored"
                 onClick={()=>{if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_sponsor_click',{event_category:'engagement',sponsor:'teeclaw',section:view});}}
-                style={{
-                  display:'flex',alignItems:'center',justifyContent:'center',flexWrap:'wrap',columnGap:18,rowGap:6,
-                  padding:'7px 16px',
-                  background:'#ffffff',border:`1px solid ${BDR}`,
-                  textDecoration:'none',
-                }}
+                style={{display:'flex',alignItems:'stretch',overflow:'hidden',textDecoration:'none',border:`1px solid ${BDR}`,minHeight:48,background:TC_GREEN}}
               >
-                <img
-                  src="https://teeclaw.com/cdn/shop/files/TeeClawSp_LogoMain-croppedwebp.webp?v=1745785782"
-                  alt="Tee Claw Sports"
-                  style={{height:35,width:'auto',maxWidth:'100%',display:'block'}}
-                />
-                <span style={{display:'flex',alignItems:'center',gap:8,fontFamily:SANS,fontSize:13,fontWeight:700,color:'#1a1a1a',letterSpacing:.3,textAlign:'center'}}>
-                  15% OFF with code
-                  <span style={{background:'#7fc9c4',color:'#0b0b0b',padding:'3px 9px',letterSpacing:1.5,fontWeight:800}}>RB15</span>
-                </span>
+                {/* Green side: Tee Claw tagline, yellow on green like their bag */}
+                <div style={{flex:'1 1 auto',minWidth:0,display:'flex',alignItems:'center',justifyContent:'center',gap:12,padding:'6px 28px 6px 14px'}}>
+                  {TEECLAW_LOGO && <img src={TEECLAW_LOGO} alt="Tee Claw Sports" style={{height:30,width:'auto',display:'block',flexShrink:0}}/>}
+                  <span style={{fontFamily:SANS,fontSize:'clamp(11px,3.2vw,16px)',fontWeight:500,letterSpacing:.8,color:TC_YELLOW,textTransform:'uppercase',lineHeight:1.25,textAlign:'center'}}>
+                    Tee it up with <b style={{fontWeight:800}}>Tee Claw</b>
+                  </span>
+                </div>
+                {/* Yellow side: the offer, on a slanted edge */}
+                <div style={{flex:'0 0 auto',background:TC_YELLOW,marginLeft:-14,padding:'6px 14px 6px 30px',clipPath:'polygon(14px 0,100% 0,100% 100%,0 100%)',display:'flex',alignItems:'center',gap:'clamp(8px,2.5vw,14px)'}}>
+                  <span style={{fontFamily:DISP,fontSize:'clamp(20px,5.5vw,28px)',color:TC_GREEN,letterSpacing:1,lineHeight:1,whiteSpace:'nowrap'}}>15% OFF</span>
+                  <span style={{display:'flex',alignItems:'center',gap:6,background:TC_GREEN_DK,padding:'4px 9px'}}>
+                    <span style={{fontFamily:SANS,fontSize:8,fontWeight:800,letterSpacing:1.2,color:'rgba(245,217,10,0.75)',textTransform:'uppercase',lineHeight:1.15}}>Code</span>
+                    <span style={{fontFamily:DISP,fontSize:'clamp(18px,5vw,24px)',color:TC_YELLOW,letterSpacing:1.5,lineHeight:1}}>RB15</span>
+                  </span>
+                </div>
               </a>
             </div>
           )}
