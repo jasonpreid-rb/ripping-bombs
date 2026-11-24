@@ -376,6 +376,32 @@ export default function HomePage({ entries: propEntries=[], orgs: propOrgs=[], s
               router.push(view === 'weekly' ? '/leaderboard?allTime=0' : '/leaderboard?allTime=1');
             }} style={{background:'transparent',border:`1px solid ${BDR}`,color:MUT,fontFamily:SANS,fontWeight:600,fontSize:11,padding:'8px 18px',cursor:'pointer',letterSpacing:.5,whiteSpace:'nowrap'}}>Full Leaderboard →</button>
           </div>
+          {/* Sponsor banner — all-time section only, between the title row and the category cards */}
+          {view === 'all_time' && (
+            <div className="rb-sponsor" style={{marginBottom:20}}>
+              <div style={{textAlign:'center',fontFamily:SANS,fontSize:10,color:DIM,letterSpacing:1.2,textTransform:'uppercase',marginBottom:8}}>
+                Proudly brought to you by
+              </div>
+              <a
+                href="https://pissmissileballs.com/"
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+                onClick={()=>{if(typeof window!=='undefined'&&window.gtag) window.gtag('event','homepage_sponsor_click',{event_category:'engagement',sponsor:'pissmissileballs',section:view});}}
+                style={{
+                  display:'flex',alignItems:'center',justifyContent:'center',
+                  padding:'10px 16px',
+                  background:'#F2F913',border:`1px solid ${BDR}`,
+                  textDecoration:'none',
+                }}
+              >
+                <img
+                  src="https://pissmissileballs.com/cdn/shop/files/Group_3.svg?v=1762540896&width=600"
+                  alt="Piss Missile Balls"
+                  style={{height:52,width:'auto',maxWidth:'100%',display:'block'}}
+                />
+              </a>
+            </div>
+          )}
           <InfiniteScrollRow items={items} bg={bg} renderItem={cat => leaderCard(cat, view)}/>
         </div>
       </div>
