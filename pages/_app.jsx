@@ -19,6 +19,7 @@ import { ORGS_KEY, ENT_KEY, SANS, ORG, MUT, BG2, BDR, TXT, DIM, DISP } from '../
 import { todayStr } from '../lib/constants';
 import { sendRegistrationNotification, sendPlayerSubmissionNotice } from '../lib/email';
 import { getEventSubmissionInfo } from '../lib/events';
+import { viewForEntry, rankInView } from '../lib/categories';
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
@@ -308,16 +309,18 @@ export default function App({ Component, pageProps }) {
     const updatedEntries = [...entries, e];
     setEntries(updatedEntries);
 
-    // Rank within gender category (male/female), by distance desc
-    const sameGender = updatedEntries
-      .filter(x => x.gender === e.gender)
-      .sort((a, b) => b.dist - a.dist);
-    const rank = sameGender.findIndex(x => x.id === e.id) + 1;
-    const total = sameGender.length;
+    // Rank in the leaderboard view this drive belongs to (Men, Women High Handicap,
+    // Youth, ...), counted the way the leaderboard counts: approved accounts only,
+    // one row per player. rank is 0 if the account isn't on the leaderboard yet.
+    const view = viewForEntry(e);
+    const approvedIds = new Set(approvedOrgs.map(o => o.id));
+    const { rank, total } = rankInView({
+      entries: updatedEntries, isApproved: id => approvedIds.has(id), entry: e, query: view.query,
+    });
 
     setForm({ player:'', dist:'', club:'', hcp:'', age:'', photo:'', date:todayStr(), tournament:'', gender:'male', venueId:'', facility:'', playerEmail:'', eventId:'' });
     toast('Drive submitted to the World Registry!');
-    return { ok: true, rank, total, gender: e.gender };
+    return { ok: true, rank, total, gender: e.gender, id: e.id, view };
   }
 
   function startImpersonation(org) {

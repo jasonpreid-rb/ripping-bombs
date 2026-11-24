@@ -17,6 +17,14 @@ function nameToSlug(name) {
     .replace(/\s+/g, '-');
 }
 
+// Mirrors toSlug() in pages/clubs/[slug].jsx — keep in sync
+function venueSlugFor(org) {
+  if (!org) return null;
+  if (org.customSlug) return org.customSlug;
+  if (!org.courseName) return null;
+  return org.courseName.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+}
+
 // Drives are always stamped with the day they are submitted (the user's local
 // date), formatted YYYY-MM-DD. There is no date field on the form, so a drive
 // can't be backdated into a past week and old weekly leaderboards stay fixed.
@@ -43,6 +51,8 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
   const [consent, setConsent] = useState(false);
   const [showProfilePrompt, setShowProfilePrompt] = useState(false);
   const [rankResult, setRankResult] = useState(null);
+  const [redirectIn, setRedirectIn] = useState(4);
+  const [pendingDest, setPendingDest] = useState(null); // where to go once the profile question is answered
   const [venueLocked, setVenueLocked] = useState(false);
   const [eventData, setEventData] = useState(null); // { event, venue }
   const [eventError, setEventError] = useState('');
@@ -171,6 +181,18 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
     }
   }, [eventData?.event?.id, eventEligibility?.eligible, loggedOrg?.id]);
 
+  // After a successful submit, count down and take the player to the leaderboard where
+  // they'll see their name. Skipped while the one-time profile question is still to be
+  // asked — answering it does the redirect instead (see the profile prompt below).
+  useEffect(() => {
+    if (!rankResult?.dest) return;
+    if (loggedOrg?.accountType === 'simulator' && loggedOrg.profileConsent === undefined) return;
+    setRedirectIn(4);
+    const tick = setInterval(() => setRedirectIn(s => (s > 1 ? s - 1 : s)), 1000);
+    const go = setTimeout(() => { setRankResult(null); router.push(rankResult.dest.path); }, 4000);
+    return () => { clearInterval(tick); clearTimeout(go); };
+  }, [rankResult]);
+
   if (!loggedOrg) {
     const venueParam = router.query.venue;
     // Keep the venue (QR flow) and the GPS tracker's drive details through
@@ -204,6 +226,27 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
   }
 
   const isSimulator = loggedOrg.accountType === 'simulator';
+
+  // Where to send the player after a successful submit:
+  //   event drive            -> that event's page
+  //   tagged venue (or a venue account's own drives) -> the venue's leaderboard
+  //   otherwise              -> the global leaderboard for their category
+  // All-time view; change allTime to '0' below for this week's board instead.
+  // `highlight` is the new entry's id — the pages use it to find and mark the row.
+  const destinationFor = (result, f) => {
+    if (f.eventId && router.query.event) {
+      return { path: `/e/${router.query.event}`, label: 'event leaderboard' };
+    }
+    const venue = f.venueId
+      ? approvedOrgs.find(o => o.id === f.venueId)
+      : (!isSimulator && loggedOrg.status === 'approved' ? loggedOrg : null);
+    const slug = venueSlugFor(venue);
+    if (venue && slug) {
+      return { path: `/clubs/${slug}?highlight=${encodeURIComponent(result.id)}`, label: `${venue.courseName} leaderboard` };
+    }
+    const q = new URLSearchParams({ allTime: '1', ...result.view.query, highlight: result.id });
+    return { path: `/leaderboard?${q.toString()}`, label: `${result.view.label} leaderboard` };
+  };
 
   // Whole yards <-> whole metres. Converting whole metres to yards and back
   // always returns the same whole number, so what the player typed is what the
@@ -297,7 +340,7 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
                 // waiting for the 10-minute timer. Fire-and-forget: a failure here must
                 // never get in the way of the player seeing their rank.
                 try { fetch('/api/revalidate-leaderboard', { method: 'POST' }).catch(() => {}); } catch {}
-                setRankResult(result);
+                setRankResult({ ...result, dest: destinationFor(result, form) });
               }
   };
 
@@ -668,23 +711,44 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
             <div style={{ fontFamily:SANS, fontSize:13, color:MUT, lineHeight:1.7, marginBottom:8 }}>
               Your drive just hit the global leaderboard.
             </div>
-            <div style={{ fontFamily:DISP, fontSize:42, color:ORG, letterSpacing:1, margin:'14px 0 6px' }}>
-              #{rankResult.rank}
-            </div>
-            <div style={{ fontFamily:SANS, fontSize:12, color:MUT, marginBottom:24, textTransform:'uppercase', letterSpacing:.6 }}>
-              of {rankResult.total} in {rankResult.gender === 'female' ? "Women's" : "Men's"} Longest Drive
-            </div>
-            <Btn
-              full
-              onClick={() => {
-                setRankResult(null);
-                if (isSimulator && loggedOrg.profileConsent === undefined) {
-                  setShowProfilePrompt(true);
-                }
-              }}
-            >
-              Continue →
-            </Btn>
+            {rankResult.rank > 0 && (
+              <>
+                <div style={{ fontFamily:DISP, fontSize:42, color:ORG, letterSpacing:1, margin:'14px 0 6px' }}>
+                  #{rankResult.rank}
+                </div>
+                <div style={{ fontFamily:SANS, fontSize:12, color:MUT, marginBottom:16, textTransform:'uppercase', letterSpacing:.6 }}>
+                  of {rankResult.total} in {rankResult.view.label} Longest Drive
+                </div>
+              </>
+            )}
+            {(() => {
+              const needsProfilePrompt = isSimulator && loggedOrg.profileConsent === undefined;
+              const dest = rankResult.dest;
+              return (
+                <>
+                  {dest && !needsProfilePrompt && (
+                    <div style={{ fontFamily:SANS, fontSize:12, color:DIM, marginBottom:16 }}>
+                      Taking you to the {dest.label} in {redirectIn}…
+                    </div>
+                  )}
+                  <Btn
+                    full
+                    onClick={() => {
+                      const d = rankResult.dest;
+                      setRankResult(null);
+                      if (needsProfilePrompt) {
+                        setPendingDest(d);
+                        setShowProfilePrompt(true);
+                      } else if (d) {
+                        router.push(d.path);
+                      }
+                    }}
+                  >
+                    {needsProfilePrompt ? 'Continue →' : 'See it now →'}
+                  </Btn>
+                </>
+              );
+            })()}
           </div>
         </div>
       )}
@@ -702,10 +766,10 @@ export default function SubmitPage({ loggedOrg, form, setForm, doSubmit, updateP
               showing your stats and submitted drives? It's a great way to track your progress and show off your best results.
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-              <Btn full onClick={async () => { await updateProfileConsent(loggedOrg.id, false); setShowProfilePrompt(false); }} style={{ background:'transparent', border:`1px solid ${BDR}`, color:MUT }}>
+              <Btn full onClick={async () => { await updateProfileConsent(loggedOrg.id, false); setShowProfilePrompt(false); if (pendingDest) { router.push(pendingDest.path); setPendingDest(null); } }} style={{ background:'transparent', border:`1px solid ${BDR}`, color:MUT }}>
                 Not Now
               </Btn>
-              <Btn full onClick={async () => { await updateProfileConsent(loggedOrg.id, true); setShowProfilePrompt(false); }}>
+              <Btn full onClick={async () => { await updateProfileConsent(loggedOrg.id, true); setShowProfilePrompt(false); if (pendingDest) { router.push(pendingDest.path); setPendingDest(null); } }}>
                 Yes, Create It →
               </Btn>
             </div>

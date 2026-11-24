@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useMemo, cloneElement } from 'react';
 
 import { ORG, MUT, TXT, BG2, BG3, BDR, DIM, SANS, DISP, profileSlugFor } from '../lib/constants';
 import { fmtDate, tier, nowWeek, weekLabel, prevWeek, nextWeek, sameWeek } from '../lib/constants';
-import { HIGH_HCP_THRESHOLD } from '../lib/categories';
+import { HIGH_HCP_THRESHOLD, playerKeyOf } from '../lib/categories';
 import { countryFlag, BadgePill } from '../components/UI';
 import EntryModal from '../components/EntryModal';
 import ShareModal from '../components/ShareModal';
@@ -53,7 +53,7 @@ function ShareButton({ e, onShare, hit = 30 }) {
 // Phone layout: the 12-column table needs ~750px and pins 230px of it, which
 // leaves almost nothing to scroll on a phone. Under 640px each drive becomes a
 // compact tappable card instead (tap = the same detail modal the table opens).
-function MobileRow({ e, rank, org, onView, onShare, cvt, unitLbl }) {
+function MobileRow({ e, rank, org, onView, onShare, cvt, unitLbl, highlight }) {
   const medal = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':null;
   const meta = [
     e.club,
@@ -71,8 +71,9 @@ function MobileRow({ e, rank, org, onView, onShare, cvt, unitLbl }) {
   return (
     <div
       className="rb-lb-row"
+      data-hl={highlight?'1':undefined}
       onClick={()=>onView(e)}
-      style={{display:'flex',alignItems:'center',gap:10,padding:'12px 14px',borderBottom:`1px solid ${BDR}`,cursor:'pointer'}}
+      style={{display:'flex',alignItems:'center',gap:10,padding:'12px 14px',borderBottom:`1px solid ${BDR}`,cursor:'pointer',background:highlight?'rgba(255,0,144,0.14)':'transparent',boxShadow:highlight?`inset 3px 0 0 ${ORG}`:'none'}}
     >
       <div style={{width:32,flexShrink:0,textAlign:'center',fontFamily:SANS,fontSize:medal?20:12,color:DIM}}>{medal||`#${rank}`}</div>
       <PlayerAvatar fullName={org?.fullName || e.player} avatarUrl={org?.avatarUrl} size={36} />
@@ -96,7 +97,7 @@ function MobileRow({ e, rank, org, onView, onShare, cvt, unitLbl }) {
 // homepage: native touch/trackpad momentum scrolling is left alone, mouse
 // users get grab-to-pan since the scrollbar is hidden, and a fading arrow
 // hints that the table scrolls until the user's first interaction with it.
-function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl, rankOf }) {
+function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl, rankOf, highlightKey }) {
   const COLS = ['Rank','Player','Distance','Club','HCP','Age','Gender','Course','Event','Date','Tier','Share'];
   const scrollRef = useRef(null);
   const [showHint, setShowHint] = useState(true);
@@ -193,18 +194,19 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl, rankOf }) {
             // happens to be in the first three rows.
             const rank=rankOf(e);
             const medal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':null;
-            const tdSticky = (left) => ({...STICKY, left, background:BG2, borderRight:`1px solid ${BDR}`});
+            const isHl = !!highlightKey && playerKeyOf(e)===highlightKey;
+            const tdSticky = (left) => ({...STICKY, left, background:isHl?'#2a1220':BG2, borderRight:`1px solid ${BDR}`});
             return (
-              <tr key={e.id} onClick={()=>onView(e)} style={{cursor:'pointer',borderBottom:`1px solid ${BDR}`,transition:'background .12s ease, box-shadow .12s ease'}}
+              <tr key={e.id} data-hl={isHl?'1':undefined} onClick={()=>onView(e)} style={{cursor:'pointer',borderBottom:`1px solid ${BDR}`,transition:'background .12s ease, box-shadow .12s ease',background:isHl?'rgba(255,0,144,0.14)':'transparent',boxShadow:isHl?`inset 3px 0 0 ${ORG}`:'none'}}
                 onMouseEnter={el=>{
                   el.currentTarget.style.background='rgba(255,0,144,0.12)';
                   el.currentTarget.style.boxShadow=`inset 3px 0 0 ${ORG}`;
                   [...el.currentTarget.querySelectorAll('td[data-sticky]')].forEach(td=>td.style.background='#2a1220');
                 }}
                 onMouseLeave={el=>{
-                  el.currentTarget.style.background='transparent';
-                  el.currentTarget.style.boxShadow='none';
-                  [...el.currentTarget.querySelectorAll('td[data-sticky]')].forEach(td=>td.style.background=BG2);
+                  el.currentTarget.style.background=isHl?'rgba(255,0,144,0.14)':'transparent';
+                  el.currentTarget.style.boxShadow=isHl?`inset 3px 0 0 ${ORG}`:'none';
+                  [...el.currentTarget.querySelectorAll('td[data-sticky]')].forEach(td=>td.style.background=isHl?'#2a1220':BG2);
                 }}>
                 <td data-sticky="1" style={{...tdSticky(0),padding:'12px 14px',fontFamily:SANS,fontSize:12,color:DIM,minWidth:RANK_W}}>
                   {medal||`#${rank}`}
@@ -247,7 +249,7 @@ function LeaderTable({ rows, orgFor, onView, onShare, cvt, unitLbl, rankOf }) {
     {/* Phone layout — shown instead of the table under 640px (see MobileRow) */}
     <div className="rb-lb-cards" style={{border:`1px solid ${BDR}`,background:BG2}}>
       {rows.map(e=>(
-        <MobileRow key={e.id} e={e} rank={rankOf(e)} org={orgFor(e.orgId)} onView={onView} onShare={onShare} cvt={cvt} unitLbl={unitLbl} />
+        <MobileRow key={e.id} e={e} rank={rankOf(e)} org={orgFor(e.orgId)} onView={onView} onShare={onShare} cvt={cvt} unitLbl={unitLbl} highlight={!!highlightKey && playerKeyOf(e)===highlightKey} />
       ))}
       {rows.length===0&&<div style={{padding:'44px 16px',textAlign:'center',color:DIM,fontFamily:SANS,fontSize:13}}>No drives recorded for this selection</div>}
     </div>
@@ -440,6 +442,23 @@ export default function LeaderboardPage(props) {
   [...tableRows].sort((a,b)=>Number(b.dist)-Number(a.dist)).forEach((e,i)=>distRank.set(e.id,i+1));
   const rankOf = e => distRank.get(e.id) || 0;
 
+  // Arriving from a fresh submission (?highlight=<entry id>): mark that player's row,
+  // load enough rows for it to be on screen, and scroll to it once.
+  const hlEntry = router.isReady && router.query.highlight
+    ? entries.find(x => String(x.id) === String(router.query.highlight))
+    : null;
+  const hlKey = hlEntry ? playerKeyOf(hlEntry) : null;
+  const hlIndex = hlKey ? tableRows.findIndex(x => playerKeyOf(x) === hlKey) : -1;
+  const hlScrolled = useRef(false);
+  useEffect(() => {
+    if (hlIndex >= PAGE_SIZE) setPage(Math.floor(hlIndex / PAGE_SIZE) + 1);
+  }, [hlIndex]);
+  useEffect(() => {
+    if (!hlKey || hlScrolled.current || hlIndex < 0 || hlIndex >= visibleRows.length) return;
+    const el = [...document.querySelectorAll('[data-hl="1"]')].find(n => n.offsetParent !== null);
+    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); hlScrolled.current = true; }
+  }, [hlKey, hlIndex, visibleRows.length]);
+
   return (
     <>
       <Head>
@@ -538,7 +557,7 @@ export default function LeaderboardPage(props) {
           </div>
         )}
 
-        <LeaderTable rows={visibleRows} orgFor={orgFor} onView={e=>setDetEnt&&setDetEnt(e)} onShare={e=>setShareEnt&&setShareEnt(e)} cvt={cvt} unitLbl={unitLbl} rankOf={rankOf}/>
+        <LeaderTable rows={visibleRows} orgFor={orgFor} onView={e=>setDetEnt&&setDetEnt(e)} onShare={e=>setShareEnt&&setShareEnt(e)} cvt={cvt} unitLbl={unitLbl} rankOf={rankOf} highlightKey={hlKey}/>
 
         {hasMore && (
           <div style={{textAlign:'center', marginTop:20}}>

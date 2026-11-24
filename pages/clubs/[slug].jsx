@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { isSampleId } from '../../lib/data';
@@ -277,6 +278,9 @@ function ShareBar({ org, best, canonicalUrl, ul }) {
 }
 
 export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
+  const router = useRouter();
+  // ?highlight=<entry id> arrives from a fresh submission: mark that row and scroll to it.
+  const highlightId = router.query.highlight ? String(router.query.highlight) : null;
   const [week, setWeek] = useState(nowWeek());
   const [allTime, setAllTime] = useState(true);
 
@@ -291,6 +295,11 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
 
   // Reset filters when view changes
   useEffect(() => {}, [allTime, week]);
+  useEffect(() => {
+    if (!highlightId) return;
+    const el = document.querySelector('[data-hl="1"]');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [highlightId]);
 
   const hcpIn = (hcp, b) => {
     if (!b) return true;
@@ -554,7 +563,7 @@ export default function ClubPage({ org, clubEntries, simOrgs = [] }) {
                 const simOrg = (e.is_simulator && e.orgId !== org.id) ? simOrgMap[e.orgId] : null;
                 const profileSlug = profileSlugFor(simOrg);
                 return (
-                  <tr key={e.id} style={{ borderBottom: `1px solid ${BDR}` }}>
+                  <tr key={e.id} data-hl={String(e.id) === highlightId ? '1' : undefined} style={{ borderBottom: `1px solid ${BDR}`, background: String(e.id) === highlightId ? 'rgba(255,0,144,0.14)' : undefined, boxShadow: String(e.id) === highlightId ? `inset 3px 0 0 ${ORG}` : undefined }}>
                     <td style={{ padding: '11px 14px', fontFamily: SANS, fontSize: 12, color: i < 3 ? ORG : DIM, fontWeight: i < 3 ? 700 : 400 }}>{rankLabel(i)}</td>
                     <td style={{ padding: '11px 14px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
