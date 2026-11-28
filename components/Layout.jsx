@@ -196,7 +196,7 @@ export default function Layout({ children, loggedOrg, onLogout, unit, setUnit, o
 
       {menuOpen && (
         <nav aria-label="Mobile menu" className="more-panel" style={{ position: 'fixed', left: 0, right: 0, background: 'rgba(14,14,14,0.98)', borderBottom: '1px solid rgba(255,255,255,0.08)', zIndex: 99, padding: '16px 22px 20px', display: 'flex', flexDirection: 'column', gap: 10, animation: 'slideDown .2s ease' }}>
-          {[['Leaderboard','/leaderboard'],['Free Tracker','/golf-drive-distance-tracker'],['Hall of Fame','/hall-of-fame'],['For Venues','/for-venues'],['Contact','/contact'],['Login','/login'],['Register','/register']].map(([label,href]) => (
+          {[['Leaderboard','/leaderboard'],['Free Tracker','/golf-drive-distance-tracker'],['Hall of Fame','/hall-of-fame'],['For Venues','/for-venues'],['Create Your Own Leaderboard','/create-your-own-golf-leaderboard'],['Contact','/contact'],['Login','/login'],['Register','/register']].map(([label,href]) => (
             <Link key={href} href={href} onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none', background: isActive(href) ? ORG : 'transparent', border: isActive(href) ? 'none' : '1px solid rgba(255,255,255,0.12)', color: isActive(href) ? '#111' : 'rgba(255,255,255,0.8)', fontFamily: SANS, fontWeight: 600, fontSize: 14, padding: '12px 16px', borderRadius: 0, cursor: 'pointer', textAlign: 'left' }}>{label}</Link>
           ))}
           {loggedOrg && <>
@@ -287,7 +287,7 @@ function SiteFooter() {
             <RBLogoWhite height={32}/>
             <div style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 14, marginBottom: 20, lineHeight: 1.7 }}>The global home of competition longest drives. Free to join, free to submit.</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {[['Leaderboard','/leaderboard'],['Free Distance Tracker','/golf-drive-distance-tracker'],['All Guides & Leaderboards','/resources'],['Clubs & Events','/clubs'],['For Venues','/for-venues'],['Register','/register'],['Login','/login'],['Contact Us','/contact']].map(([l,h]) => (
+              {[['Leaderboard','/leaderboard'],['Free Distance Tracker','/golf-drive-distance-tracker'],['All Guides & Leaderboards','/resources'],['Clubs & Events','/clubs'],['For Venues','/for-venues'],['Create Your Own Leaderboard','/create-your-own-golf-leaderboard'],['Register','/register'],['Login','/login'],['Contact Us','/contact']].map(([l,h]) => (
                 <Link key={h} href={h} style={{ fontFamily: SANS, fontSize: 12, color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }} onMouseEnter={e=>e.target.style.color=ORG} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.55)'}>{l}</Link>
               ))}
             </div>
